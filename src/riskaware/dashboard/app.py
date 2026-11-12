@@ -702,6 +702,9 @@ def page_backtest() -> None:
             return
         bar.empty()
         st.session_state.bt_results = results  # survives reruns (e.g. the log-scale toggle)
+        st.session_state.bt_pit = pit  # the news this run replayed, for the panel below
+        for key in ("bt_news_trade", "bt_news_sym", "bt_news_day"):
+            st.session_state.pop(key, None)
     results = st.session_state.get("bt_results")
     if not results:
         st.caption(L("Option strategies (aggressive_calls, wheel) are priced with Black-Scholes on modelled "
@@ -754,6 +757,90 @@ def page_backtest() -> None:
         st.dataframe(results[0].trades.iloc[::-1], hide_index=True, width="stretch")
     for n in results[0].notes:
         st.caption("• " + n)
+    news_seen_panel(results[0], st.session_state.get("bt_pit"))
+
+
+def news_kpis(rep) -> None:
+    """Score, confirmed and single-source stories and red flags of one news report."""
+    H('<div class="ra-grid ra-g4">' + "".join([
+        ui.kpi(T("news.score"), f"{rep.score:+.2f}", L("-1 bearish · +1 bullish", "-1 利空 · +1 利好"), "",
+               ui.tone(rep.score)),
+        ui.kpi(T("news.status.confirmed"), str(rep.confirmed), L("stories", "条")),
+        ui.kpi(T("news.status.unconfirmed"), str(rep.unconfirmed), L("not counted", "不计入")),
+        ui.kpi(T("news.flags"), str(len(rep.red_flags_confirmed)),
+               ", ".join(rep.red_flags_confirmed) or L("none confirmed", "无已确认"), "",
+               "down" if rep.red_flags_confirmed else "muted"),
+    ]) + "</div>")
+    if rep.red_flags_unconfirmed:
+        st.warning(f"{T('news.flags')} ({T('news.status.unconfirmed')}): {', '.join(rep.red_flags_unconfirmed)}")
+    if rep.red_flags_denied:
+        st.info(f"{T('news.flags')} ({T('news.denied')}): {', '.join(rep.red_flags_denied)}")
+
+
+def news_seen_panel(r, pit) -> None:
+    """What the backtest knew about one stock at one close: the news, its verdict, and what the strategy did."""
+    from riskaware.dashboard import newsview as nv
+    from riskaware.news.history import decision_time
+
+    H(ui.section(L("News the backtest saw", "回测看到的新闻"),
+                 L("each day sees only what was published before its close; orders fill the next day",
+                   "每天只看收盘前已发布的新闻；订单第二天成交")))
+    if pit is None or not pit.symbols:
+        st.caption(L("This run did not replay news. Turn on Replay news above and run it again.",
+                     "这次回测没有回放新闻。在上面打开「回放新闻」再跑一次。"))
+        return
+    syms = pit.symbols
+    seen = {}
+
+    def count(sym: str, day) -> int:
+        if (sym, day) not in seen:
+            seen[(sym, day)] = len(pit.visible(sym, decision_time(day)))
+        return seen[(sym, day)]
+
+    picks = nv.trade_picks(r.trades, syms, LANG, count=count)
+    ss = st.session_state
+    if ss.get("bt_news_sym") not in syms:  # a new run: start at its latest trade that had news, else its latest
+        first = next((v for v in picks.values() if count(*v)), next(iter(picks.values()), (syms[0], r.end)))
+        ss.bt_news_sym, ss.bt_news_day = first
+    ss.bt_news_day = min(max(ss.bt_news_day, r.start), r.end)
+
+    def jump() -> None:
+        hit = picks.get(ss.get("bt_news_trade") or "")
+        if hit:
+            ss.bt_news_sym, ss.bt_news_day = hit
+
+    c1, c2, c3 = st.columns([2.4, 1, 1])
+    if picks:
+        c1.selectbox(L("Jump to a trade", "跳到某笔交易"), ["", *picks], key="bt_news_trade", on_change=jump,
+                     format_func=lambda s: s or L("choose a trade…", "选一笔交易…"))
+    sym = c2.selectbox(L("Stock", "股票"), syms, key="bt_news_sym")
+    day = c3.date_input(L("Close of", "哪天收盘"), key="bt_news_day", min_value=r.start, max_value=r.end)
+    cutoff = decision_time(day)
+    items = pit.visible(sym, cutoff)
+    hours = pit.cfg.lookback_hours
+    note = L(f"At the close of {day:%Y-%m-%d} ({cutoff.astimezone(mc.NY):%H:%M} New York) the backtest had seen "
+             f"{len(items)} items about {sym} from the previous {hours} hours.",
+             f"{day:%Y-%m-%d} 收盘时（美东 {cutoff.astimezone(mc.NY):%H:%M}），回测能看到前 {hours} 小时里关于 {sym} "
+             f"的 {len(items)} 条新闻。")
+    if not mc.is_trading_day(day):
+        note += L(" The market was closed that day, so no decision was made.", " 那天休市，没有做决定。")
+    st.caption(note)
+    orders = nv.orders_from(r.trades, sym, day)
+    if len(orders):
+        st.markdown(L("**What the strategy did** (filled the next trading day)", "**策略的决定**（下一个交易日成交）"))
+        heads = {"date": L("date", "日期"), "symbol": L("symbol", "股票"), "side": L("side", "方向"),
+                 "qty": L("qty", "数量"), "price": L("price", "价格"), "reason": L("reason", "理由")}
+        st.dataframe(orders.rename(columns=heads), hide_index=True, width="stretch")
+    rep = pit.report(sym, day)
+    if rep is None:
+        st.info(L("Nothing about this stock was published in that window.", "这段时间里没有关于这只股票的新闻。"))
+        return
+    news_kpis(rep)
+    st.dataframe(pd.DataFrame(nv.story_rows(rep, LANG)), hide_index=True, width="stretch", column_config={
+        L("Headline", "标题"): st.column_config.TextColumn(width="large")})
+    if rep.off_topic:
+        st.caption(L(f"{rep.off_topic} headlines about other companies or the market were ignored.",
+                     f"已忽略 {rep.off_topic} 条讲其他公司或大盘的新闻。"))
 
 
 def page_news() -> None:
@@ -779,19 +866,7 @@ def page_news() -> None:
                             cfg.data.contact_email, cfg.news.request_interval)
         rep = analyze_news(sym, col.collect(sym, cfg.news.lookback_hours), cfg.news, sources=col.last_status,
                            names=company_names(sym, cache))
-    H('<div class="ra-grid ra-g4">' + "".join([
-        ui.kpi(T("news.score"), f"{rep.score:+.2f}", L("-1 bearish · +1 bullish", "-1 利空 · +1 利好"), "",
-               ui.tone(rep.score)),
-        ui.kpi(T("news.status.confirmed"), str(rep.confirmed), L("stories", "条")),
-        ui.kpi(T("news.status.unconfirmed"), str(rep.unconfirmed), L("not counted", "不计入")),
-        ui.kpi(T("news.flags"), str(len(rep.red_flags_confirmed)),
-               ", ".join(rep.red_flags_confirmed) or L("none confirmed", "无已确认"), "",
-               "down" if rep.red_flags_confirmed else "muted"),
-    ]) + "</div>")
-    if rep.red_flags_unconfirmed:
-        st.warning(f"{T('news.flags')} ({T('news.status.unconfirmed')}): {', '.join(rep.red_flags_unconfirmed)}")
-    if rep.red_flags_denied:
-        st.info(f"{T('news.flags')} ({T('news.denied')}): {', '.join(rep.red_flags_denied)}")
+    news_kpis(rep)
     st.dataframe(pd.DataFrame([{
         L("Status", "状态"): ("✅ " if c.status.value != "UNCONFIRMED" else "· ") + T("news.status." + c.status.value.lower())
         + (" · " + T("news.denial") if c.denial else ""),

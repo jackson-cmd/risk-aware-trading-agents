@@ -46,7 +46,16 @@ Backtests read it together with your own archive; when both hold the same item, 
 - The built-in `risk_aware` strategy uses the report the same way it does live: confirmed red flags block new buys, and a severe flag (bankruptcy, delisting, restated financials) triggers its emergency exit only when the company's own 8-K or press release carries it.
 - Without an archive, or with `--no-news`, `ctx.news()` returns `None`, exactly as before.
 
-`riskaware news-history show SYMBOL --date DAY` prints the items and the verdict a backtest saw at that close, so you can check any trade.
+## See what a backtest saw
+
+On the dashboard, run a backtest with **Replay news** on. Below the results, the **News the backtest saw** panel lists every trade with the number of news items the backtest had seen when it decided. Pick one, or any stock and day, and it shows:
+
+- the moment of the decision (the close, in New York time) and how many items were visible then;
+- what the strategy did with that stock, filled the next trading day;
+- the news score, the confirmed and single-source stories, and any red flags;
+- every story with its time, status, sentiment and sources.
+
+From the command line, `riskaware news-history show SYMBOL --date DAY` prints the same items and verdict.
 
 ## Sources
 
