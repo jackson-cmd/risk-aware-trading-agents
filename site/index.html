@@ -91,6 +91,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
     <span class="pill">FOMC · CPI · NFP</span><span class="pill">VIX · VIX3M</span><span class="pill">Fear &amp; Greed</span>
     <span class="pill">EMA 50/100/200</span><span class="pill">Finviz + RSS</span><span class="pill">Backtesting</span>
     <span class="pill">Paper trading</span><span class="pill">Daily paper agents</span><span class="pill">MCP server</span>
+    <span class="pill">2026 news in backtests</span><span class="pill">AI-written strategies</span>
     <span class="pill">Bull / bear LLM debate</span><span class="pill">MIT</span>
   </div>
 </div>
@@ -171,7 +172,20 @@ riskaware mcp                          # use them from Claude / 在 Claude 里�
     <tr><td><span lang="en">Worst calendar year</span><span lang="zh">最差年份</span></td><td>-3.7%</td><td>-18.2%</td></tr>
     <tr><td><span lang="en">Average stocks / cash + T-bills</span><span lang="zh">平均股票 / 现金加短债</span></td><td>57% / 39%</td><td>100% / 0%</td></tr>
   </table></div>
-  <p class="note"><span lang="en">Read this honestly: it earns less than the index in a long bull market and loses about half as much in the bad stretches. The list is today's large caps (survivorship bias), news and fundamentals are not used in backtests, and past results do not predict future ones. Reproduce it with <code>riskaware backtest --compare buy_and_hold</code>.</span><span lang="zh">要客观地看：在长牛市里它赚得比指数少，跌的时候亏得大约只有指数的一半。股票池是今天的大盘股（有幸存者偏差），回测没有用新闻和财报数据，过去的表现也不代表未来。用 <code>riskaware backtest --compare buy_and_hold</code> 可以自己复现。</span></p>
+  <p class="note"><span lang="en">Read this honestly: it earns less than the index in a long bull market and loses about half as much in the bad stretches. The list is today's large caps (survivorship bias), this long run uses no news or fundamentals (2026 with news is below), and past results do not predict future ones. Reproduce it with <code>riskaware backtest --compare buy_and_hold</code>.</span><span lang="zh">要客观地看：在长牛市里它赚得比指数少，跌的时候亏得大约只有指数的一半。股票池是今天的大盘股（有幸存者偏差），这组长期回测没有用新闻和财报数据（2026 年带新闻的结果见下方），过去的表现也不代表未来。用 <code>riskaware backtest --compare buy_and_hold</code> 可以自己复现。</span></p>
+  <h3 id="backtest-2026" style="margin-top:36px"><span lang="en">2026 so far, with news</span><span lang="zh">2026 年至今，带新闻</span></h3>
+  <p class="sub"><span lang="en">The same agent from January 2 to November 11, 2026, reading the 15,542 headlines and 605 SEC filings for these stocks that ship with the package; each day sees only what was out before its close.</span><span lang="zh">同一个智能体回测 2026 年 1 月 2 日到 11 月 11 日，读安装包自带的这些股票的 15,542 条标题和 605 份 SEC 公告；每天只看当天收盘前已经发布的新闻。</span></p>
+  <img class="chart" lang="en" src="assets/backtest_2026_news_en.png" alt="2026 equity and drawdown of the risk-aware agent with news versus SPY">
+  <img class="chart" lang="zh" src="assets/backtest_2026_news_zh.png" alt="2026 年带新闻的风险感知智能体与 SPY 的净值和回撤">
+  <div class="table-wrap" style="margin-top:16px"><table class="num">
+    <tr><th></th><th><span lang="en">risk_aware + news</span><span lang="zh">risk_aware + 新闻</span></th><th>SPY buy &amp; hold</th></tr>
+    <tr><td><span lang="en">Return</span><span lang="zh">收益</span></td><td>+15.9%</td><td>+12.1%</td></tr>
+    <tr><td><span lang="en">Volatility</span><span lang="zh">波动率</span></td><td>8.2%</td><td>14.0%</td></tr>
+    <tr><td><span lang="en">Sharpe</span><span lang="zh">夏普比率</span></td><td>1.70</td><td>0.77</td></tr>
+    <tr><td><span lang="en">Max drawdown</span><span lang="zh">最大回撤</span></td><td>-5.3%</td><td>-8.9%</td></tr>
+    <tr><td><span lang="en">Average stocks / cash + T-bills</span><span lang="zh">平均股票 / 现金加短债</span></td><td>60% / 35%</td><td>100% / 0%</td></tr>
+  </table></div>
+  <p class="note"><span lang="en">It beat SPY by 3.8 points with 60% of its money in stocks on average, and fell 5.3% in the March sell-off while SPY fell 8.9%. Without news it returned +15.4%. Ten months is a short test. Reproduce it with <code>riskaware backtest --preset megacap --start 2026-01-02 --end 2026-11-11 --news</code>.</span><span lang="zh">它平均只用 60% 的资金持股，收益比 SPY 多 3.8 个百分点；三月那波下跌里它跌了 5.3%，SPY 跌了 8.9%。不带新闻时收益是 +15.4%。十个月的回测时间偏短。用 <code>riskaware backtest --preset megacap --start 2026-01-02 --end 2026-11-11 --news</code> 可以自己复现。</span></p>
 </div></section>
 
 <section id="start"><div class="wrap">
