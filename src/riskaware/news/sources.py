@@ -37,9 +37,10 @@ def _parse_dt(value: str | None) -> datetime | None:
     try:
         dt = parsedate_to_datetime(value)
     except (TypeError, ValueError):
-        try:
-            dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
-        except ValueError:
+        from ..brokers.base import parse_ts
+
+        dt = parse_ts(value)
+        if dt is None:
             return None
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)

@@ -55,6 +55,8 @@ def test_status_and_timestamp_parsing():
     assert map_status("partially_filled") == OrderStatus.PARTIALLY_FILLED
     assert map_status("Filled") == OrderStatus.FILLED and map_status("CANCELLED") == OrderStatus.CANCELED
     assert parse_ts("2026-11-11T23:15:25.1137638Z").microsecond == 113763
+    assert parse_ts("2026-11-11T18:15:25.1-05:00").microsecond == 100000
+    assert parse_ts("2026-11-11T23:15:25Z").tzinfo is not None
 
 
 def test_registry_builds_every_rest_adapter_without_network():

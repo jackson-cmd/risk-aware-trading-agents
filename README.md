@@ -55,21 +55,22 @@ No account or API key is needed for any of the commands above. Add `--lang zh` t
 ## How it works
 
 ```mermaid
-flowchart LR
-  D[Prices · VIX · sectors<br/>FOMC / CPI / NFP calendar<br/>earnings · Finviz + RSS + SEC] --> A
-  subgraph A[Agents]
-    M[Macro: regime + fear/greed]
-    E[Events: FOMC, CPI, jobs]
-    T[Technical: EMA 50/100/200,<br/>mean reversion, trend]
-    F[Fundamental: earnings quality]
-    N[News: cross-verified]
-  end
-  A --> S[Strategy<br/>built-in or yours]
-  L[Optional LLM<br/>bull / bear / judge] -. ±0.15 .-> S
-  S --> R[Risk manager<br/>cash floor · caps · tranches · regime rules]
-  R --> G[Safety guards]
-  G --> B[Paper or live broker]
-  R --> X[Backtester]
+flowchart TB
+  D["Prices · VIX · sectors · FOMC / CPI / NFP calendar · earnings · Finviz + RSS + SEC"]
+  M["Macro agent<br/>regime + fear/greed"]
+  E["Event agent<br/>FOMC, CPI, jobs"]
+  T["Technical agent<br/>EMA 50/100/200,<br/>mean reversion, trend"]
+  F["Fundamental agent<br/>earnings quality"]
+  N["News agent<br/>cross-verified"]
+  S["Strategy: built-in or yours"]
+  L["Optional LLM<br/>bull / bear / judge"]
+  R["Risk manager: cash floor · caps · tranches · regime rules"]
+  D --> M & E & T & F & N
+  M & E & T & F & N --> S
+  L -.->|"±0.15 at most"| S
+  S --> R
+  R --> G["Safety guards"] --> B["Paper or live broker"]
+  R --> X["Backtester"]
 ```
 
 ### What the agent does in each regime

@@ -141,7 +141,9 @@ def parse_ts(text: str | None) -> datetime | None:
     s = str(text).strip().replace("Z", "+00:00")
     m = re.match(r"^(.*?T\d{2}:\d{2}:\d{2})(\.\d+)?(.*)$", s)
     if m:
-        s = m.group(1) + (m.group(2) or "")[:7] + m.group(3)
+        # Python 3.10 only accepts exactly 6 fractional digits
+        frac = "." + m.group(2)[1:7].ljust(6, "0") if m.group(2) else ""
+        s = m.group(1) + frac + m.group(3)
     try:
         return datetime.fromisoformat(s)
     except ValueError:
