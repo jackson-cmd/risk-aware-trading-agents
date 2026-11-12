@@ -33,7 +33,8 @@ NEGATIVE: list[tuple[str, float]] = [
     (r"downgrade[sd]? (to )?(sell|underperform|underweight|neutral|hold)", 1.5),
     (r"\bdowngrade[sd]?\b", 1.0),
     (r"profit warning|warns? (on|of)", 1.5),
-    (r"\bbankrupt(cy)?\b|chapter 11|going[- ]concern|\bfraud\b|delist(ed|ing)?|restatement", 2.0),
+    (r"\bbankrupt(cy)?\b|\b(chapter|chap\.?|ch\.) ?(7|11)\b|going[- ]concern|\bfraud\b|delist(ed|ing)?|"
+     r"\brestat(e|es|ed|ing|ement)\b", 2.0),
     (r"(dividend cut|cuts? (its )?dividend|suspends? (its )?dividend)", 1.5),
     (r"\b(lawsuit|sued|class action|antitrust|probe|investigation|subpoena|fined|penalty)\b", 1.0),
     (r"\b(recall|halts?|halted|delays?|delayed|outage|breach)\b", 0.8),
@@ -42,12 +43,13 @@ NEGATIVE: list[tuple[str, float]] = [
     (r"\b(fall(s|ing)?|fell|drop(s|ped|ping)?|slid(e|es|ing)?|declin(e|es|ed|ing)|lower|bearish|loss widens|slowdown|underperform(s|ed)?)\b", 0.5),
 ]
 
-# Severe red flags can trigger an emergency exit when confirmed by independent sources.
+# Severe red flags block new buys. They force an exit only when the company itself backs them: its own
+# 8-K, or its own press release confirming what independent outlets reported first (see verify.py).
 SEVERE_RED_FLAGS: dict[str, str] = {
     "fraud": r"\bfraud(ulent)?\b|ponzi",
     "accounting": r"accounting (irregularit|scandal|errors?)|non-reliance|restat(e|es|ed|ement)",
     "going_concern": r"going[- ]concern",
-    "bankruptcy": r"\bbankrupt(cy)?\b|chapter (7|11)\b",
+    "bankruptcy": r"\bbankrupt(cy)?\b|\b(chapter|chap\.?|ch\.) ?(7|11)\b",
     "delisting": r"\bdelist(ed|ing)?\b|deficiency notice",
     "sec_charges": r"sec (charges|sues)|charged by the sec|indict(ed|ment)|criminal (charges|probe|investigation)",
     "auditor": r"auditor (resign|quits|dismiss)|material weakness",
@@ -63,6 +65,67 @@ MODERATE_RED_FLAGS: dict[str, str] = {
     "data_breach": r"data breach|cyberattack|hack(ed|ers)",
     "recall": r"\brecall(s|ed)?\b",
 }
+
+# Allegations made by others. A company release that mentions one is usually a response to it, so the
+# release does not back the flag, and the company's denial does not clear it either.
+ALLEGATION_FLAGS = frozenset({"fraud", "sec_charges", "short_report", "investigation", "data_breach"})
+# Severe flags about the company's own actions (a filing, a restatement, an auditor leaving), which the
+# company's own release can confirm.
+COMPANY_SEVERE_FLAGS = frozenset(SEVERE_RED_FLAGS) - ALLEGATION_FLAGS
+
+# A red-flag phrase does not count when its own clause negates or denies it: "denies bankruptcy report",
+# "is not filing for Chapter 11", "no plans to file", "the bankruptcy rumor is false". "not", "no" and
+# "never" reach the next five words, verbs such as "denies" the next nine, and neither crosses a clause
+# break. Words such as "false" or "fake" do not negate what follows them ("false statements in a fraud
+# scheme").
+NEGATORS = r"\b(not|no|never|nor|without)\b|n't\b"
+REBUTTALS = (
+    r"\b(den(y|ies|ied|ying|ial)|refut(e|es|ed|ing)|reject(s|ed|ing)?|dismiss(es|ed|ing)?|"
+    r"disput(e|es|ed|ing)|debunk(s|ed|ing)?|rebut(s|ted|ting)?|avoid(s|ed|ing)?|avert(s|ed|ing)?|"
+    r"rul(e|es|ed|ing) out)\b"
+)
+NEGATED_AFTER = [  # matched right after the phrase: "bankruptcy rumors are false", "Chapter 11 report baseless"
+    r"^\s*(\w+\s+){0,3}?(is|are|was|were|been)\s+(\w+\s+)?(false|untrue|not true|fake|bogus|baseless|"
+    r"unfounded|groundless|a hoax)\b",
+    r"^\s*(\w+\s+){0,3}?(untrue|not true|baseless|unfounded|groundless|a hoax|without merit)\b",
+    r"^\s*(reports?|rumou?rs?|stor(y|ies)|claims?|news|headlines?|tweets?|posts?|(press )?releases?)\s+"
+    r"(false|fake)\b",
+]
+CLAUSE_BREAK = (
+    r"[,;:!?|()\"“”]|\s[-–—]\s|"
+    # a full stop ends a sentence, but not in "Ch. 11", "ACME Corp." or "U.S."
+    r"(?<!\bch)(?<!\bchap)(?<!\binc)(?<!\bcorp)(?<!\bco)(?<!\bltd)(?<!\bno)(?<!\bst)(?<!\bvs)(?<!\bu\.s)\.(\s|$)|"
+    r"\b(but|as|while|amid|after|although|though|despite|yet|whereas|following)\b"
+)
+RELATIVE = r"\b(that|which|who|whose)\b"  # "restates results that were false" is not a denial
+# A court or a regulator rejecting or dismissing something is news, not a denial by the company.
+AUTHORITY_VERB = (
+    r"\b(court|judge|jury|regulators?|fda|sec|ftc|doj|nasdaq|nyse|exchange|agency)\s+(\w+\s+)?"
+    r"(den(y|ies|ied)|reject(s|ed)?|dismiss(es|ed)?|refus(e|es|ed))\b"
+)
+# Headlines that rebut a report ("denies reports", "rejects rumors"). They never confirm the story.
+DENIAL_PATTERNS: list[str] = [
+    r"\b(den(y|ies|ied|ying)|refut(e|es|ed|ing)|reject(s|ed|ing)?|dismiss(es|ed|ing)?|disput(e|es|ed|ing)|"
+    r"debunk(s|ed|ing)?|rebut(s|ted|ting)?)\s+(\w+\s+){0,3}?(reports?|rumou?rs?|claims?|speculation|"
+    r"stor(y|ies)|articles?|news|tweets?|posts?|(press )?releases?)\b",
+]
+# Headlines that call a piece of news fake as a whole, which also covers denials that do not repeat the
+# story ("finds fake release"). Phrases such as "false reports" or "claims were false" are left out on
+# purpose: they usually describe an accusation against the company, not a hoax.
+_NEWS_NOUN = r"(rumou?rs?|stor(y|ies)|articles?|tweets?|posts?|(press )?releases?|headlines?|(news|media) reports?)"
+HOAX_PATTERNS: list[str] = [
+    r"\b(fake|bogus|phony|hoax)\s+(press\s+)?(releases?|reports?|news|stor(y|ies)|headlines?|tweets?|posts?|"
+    r"announcements?|articles?)\b",
+    r"\bfalse\s+(rumou?rs?|news|headlines?|tweets?|press releases?)\b",
+    r"\bhoax\b",
+    rf"\b{_NEWS_NOUN}\s+(\w+\s+){{0,2}}?(is|are|was|were)\s+(false|untrue|not true|fake|bogus|baseless|"
+    r"unfounded|groundless|fabricated|a hoax)\b",
+    rf"\b(calls?|called|labels?|brands?|branded|deems?)\s+((the|this|that|these)\s+)?(\w+\s+)?"
+    rf"(reports?|news|{_NEWS_NOUN})\s+(\w+\s+)?(false|untrue|fake|bogus|baseless|unfounded|groundless|"
+    r"fabricated|a hoax)\b",
+    r"\b(retract(s|ed|ing)?|withdr(aw|aws|ew|awn))\s+(\w+\s+){0,2}?(stor(y|ies)|articles?|tweets?|posts?|"
+    r"headlines?)\b",
+]
 
 OPINION_PATTERNS: list[str] = [
     r"\?\s*$", r"should you (buy|sell)", r"is it (time|too late) to", r"stocks? to (buy|sell|watch)",
@@ -102,9 +165,22 @@ SEC_ITEM_EVENTS: dict[str, tuple[str, float, str | None]] = {
 }
 
 PRIMARY_PUBLISHERS = {"sec edgar"}
-PRESS_WIRES = {"business wire", "pr newswire", "globenewswire", "accesswire", "newsfile", "globe newswire"}
+# Press-release distribution services. A release on one of them is the company speaking through its own
+# channel: outlets that rewrite it do not confirm it independently, several wires carrying the same
+# release are still one source, and anyone with a wire account can post a release in a company's name.
+PRESS_WIRES = {
+    "business wire", "pr newswire", "globenewswire", "internet wire", "accesswire", "newsfile",
+    "marketwired", "prweb", "ein presswire", "canada newswire",
+}
 
 PUBLISHER_ALIASES = {
+    "businesswire": "business wire", "prnewswire": "pr newswire", "pr newswire (us)": "pr newswire",
+    "globe newswire": "globenewswire", "internetwire": "internet wire", "access newswire": "accesswire",
+    "accessnewswire": "accesswire", "newsfile corp": "newsfile", "newsfile corp.": "newsfile",
+    "newsfilecorp": "newsfile", "marketwire": "marketwired", "market wire": "marketwired", "pr web": "prweb",
+    "einpresswire": "ein presswire", "einnews": "ein presswire", "cnw group": "canada newswire",
+    "bloomberg television": "bloomberg", "bloomberg tv": "bloomberg", "bloomberg news": "bloomberg",
+    "thomson reuters": "reuters",
     "barrons.com": "barron's", "barron's": "barron's", "barrons": "barron's",
     "wsj": "wall street journal", "the wall street journal": "wall street journal",
     "marketwatch": "marketwatch", "reuters": "reuters", "bloomberg": "bloomberg",
@@ -126,6 +202,7 @@ PUBLISHER_FAMILY = {
     "wall street journal": "dow jones", "barron's": "dow jones", "marketwatch": "dow jones",
     "dow jones newswires": "dow jones", "investor's business daily": "ibd",
     "insider monkey": "insider monkey", "yahoo finance": "yahoo",
+    **{wire: "press release" for wire in PRESS_WIRES},
 }
 
 TIER1 = {"reuters", "bloomberg", "wall street journal", "barron's", "marketwatch", "financial times", "cnbc",
@@ -133,6 +210,7 @@ TIER1 = {"reuters", "bloomberg", "wall street journal", "barron's", "marketwatch
 TIER2 = {"yahoo finance", "seeking alpha", "benzinga", "investing.com", "investor's business daily",
          "business insider", "fortune", "forbes", "thestreet", "the information", "axios", "techcrunch",
          "rttnews", "zacks", "tipranks", "motley fool", "nasdaq"} | PRESS_WIRES
+KNOWN_MEDIA = TIER1 | TIER2 | set(PUBLISHER_ALIASES.values())
 
 STOPWORDS = set(
     """a an the and or but of to in on for with at by from as is are was were be been being this that these
@@ -168,6 +246,31 @@ def publisher_family(name: str) -> str:
     return PUBLISHER_FAMILY.get(name, name)
 
 
+def is_press_wire(publisher: str) -> bool:
+    """``publisher`` is a normalized name (see ``normalize_publisher``)."""
+    return publisher in PRESS_WIRES
+
+
+_CORPORATE_SUFFIX = (r"\s+(corp(oration)?|inc(orporated)?|co|company|ltd|limited|plc|llc|group|holdings?|"
+                     r"newsroom|ir|investor relations|press room)\.?$")
+
+
+def is_company_statement(publisher: str | None, title: str) -> bool:
+    """The publisher is the company the headline is about, e.g. "ACME Corp" posting "ACME Corp denies ..."
+    on its own site. Used only to weigh denials: a statement on the company's own site can clear a story,
+    but it cannot confirm bad news (that takes the 8-K or a press release)."""
+    p = normalize_publisher(publisher)
+    if p == "unknown" or p in KNOWN_MEDIA or p in PRIMARY_PUBLISHERS:
+        return False
+    core = p.rstrip(" .")
+    while True:
+        shorter = re.sub(_CORPORATE_SUFFIX, "", core).rstrip(" .,")
+        if shorter == core:
+            break
+        core = shorter
+    return len(core) >= 3 and re.match(re.escape(core) + r"\b", title.lower().strip()) is not None
+
+
 def reliability(publisher: str) -> float:
     if publisher in TIER1:
         return 1.0
@@ -179,11 +282,15 @@ def reliability(publisher: str) -> float:
 def sentiment(text: str) -> float:
     """Score in [-1, 1] from weighted phrase matches; phrases are consumed so they count once.
 
-    In "X falls despite record quarter" the clause after "despite" counts a quarter as much.
+    In "X falls despite record quarter" the clause after "despite" counts a quarter as much. Negated or
+    denied phrases do not count ("denies bankruptcy report"), and a headline about a fake release or a
+    hoax scores 0.
     """
     if not text:
         return 0.0
-    low = text.lower()
+    low = _prepare(text)
+    if is_hoax(low):
+        return 0.0
     m = re.search(r"\b(despite|even as|although|though)\b", low)
     if m:
         main, aside = low[: m.start()], low[m.end():]
@@ -200,31 +307,89 @@ def sentiment(text: str) -> float:
 
 def _raw_scores(remaining: str) -> tuple[float, float]:
     pos = neg = 0.0
-    for pattern, weight in POSITIVE:
-        hits = rx(pattern).findall(remaining)
-        if hits:
-            pos += weight * len(hits)
-            remaining = rx(pattern).sub(" ", remaining)
-    for pattern, weight in NEGATIVE:
-        hits = rx(pattern).findall(remaining)
-        if hits:
-            neg += weight * len(hits)
+    for table, positive in ((POSITIVE, True), (NEGATIVE, False)):
+        for pattern, weight in table:
+            hits = list(rx(pattern).finditer(remaining))
+            if not hits:
+                continue
+            counted = weight * sum(not _negated(remaining, m.start(), m.end()) for m in hits)
+            if positive:
+                pos += counted
+            else:
+                neg += counted
             remaining = rx(pattern).sub(" ", remaining)
     return pos, neg
 
 
+def _prepare(text: str) -> str:
+    return text.lower().replace("\u2019", "'")  # curly apostrophe, as in "isn’t"
+
+
+def _negated(low: str, start: int, end: int) -> bool:
+    """True when the phrase at ``low[start:end]`` is negated or denied within its own clause."""
+    cut = 0
+    for m in rx(CLAUSE_BREAK).finditer(low, 0, start):
+        cut = m.end()
+    before = rx(AUTHORITY_VERB).sub(" ", low[cut:start])
+    before = rx(r"\bnot only\b|\bno\.?\s*\d").sub(" ", before)
+    for pattern, reach in ((REBUTTALS, 8), (NEGATORS, 4)):
+        for m in rx(pattern).finditer(before):
+            if len(before[m.end():].split()) <= reach:
+                return True
+    after = low[end:]
+    stop = rx(CLAUSE_BREAK + "|" + RELATIVE).search(after)
+    if stop:
+        after = after[: stop.start()]
+    return any(rx(p).search(after) for p in NEGATED_AFTER)
+
+
+def is_hoax(text: str) -> bool:
+    """The headline says a release, story or post is fake ("finds fake release", "bankruptcy rumor a hoax")."""
+    low = rx(AUTHORITY_VERB).sub(" ", _prepare(text))
+    return any(rx(p).search(low) for p in HOAX_PATTERNS)
+
+
+def _flag_hits(text: str) -> list[tuple[str, bool, bool]]:
+    """(flag, severe, negated) for every red-flag phrase in the headline, severe flags first."""
+    low = _prepare(text)
+    hoax = is_hoax(low)
+    hits = []
+    for table, severe in ((SEVERE_RED_FLAGS, True), (MODERATE_RED_FLAGS, False)):
+        for name, pattern in table.items():
+            for m in rx(pattern).finditer(low):
+                hits.append((name, severe, hoax or _negated(low, m.start(), m.end())))
+    return hits
+
+
 def red_flags(text: str) -> tuple[list[str], bool]:
-    """Return (flags, any_severe)."""
-    flags, severe = [], False
-    low = text.lower()
-    for name, pattern in SEVERE_RED_FLAGS.items():
-        if rx(pattern).search(low):
+    """Return (flags, any_severe) for the red flags the headline asserts; denied or negated ones do not count."""
+    flags: list[str] = []
+    severe = False
+    for name, sev, negated in _flag_hits(text):
+        if not negated and name not in flags:
             flags.append(name)
-            severe = True
-    for name, pattern in MODERATE_RED_FLAGS.items():
-        if rx(pattern).search(low) and name not in flags:
-            flags.append(name)
+            severe = severe or sev
     return flags, severe
+
+
+def denied_flags(text: str) -> list[str]:
+    """Red flags the headline denies or negates ("not filing for Chapter 11" -> ["bankruptcy"])."""
+    hits = _flag_hits(text)
+    asserted = {name for name, _, negated in hits if not negated}
+    out: list[str] = []
+    for name, _, negated in hits:
+        if negated and name not in asserted and name not in out:
+            out.append(name)
+    return out
+
+
+def is_denial(text: str) -> bool:
+    """The headline denies, rejects or retracts a report, or calls it fake. Such a headline is never
+    counted as a publisher that confirms the story it denies."""
+    if denied_flags(text) or is_hoax(text):
+        return True
+    low = rx(AUTHORITY_VERB).sub(" ", _prepare(text))
+    return any(rx(p).search(low) for p in DENIAL_PATTERNS)
 
 
 def is_opinion(title: str) -> bool:

@@ -64,8 +64,9 @@ class Regime(str, Enum):
 
 
 class NewsStatus(str, Enum):
-    CONFIRMED = "CONFIRMED"  # two or more independent publishers
-    PRIMARY = "PRIMARY"  # SEC filing or press wire
+    CONFIRMED = "CONFIRMED"  # two or more independent outlets
+    PRIMARY = "PRIMARY"  # the company's own SEC 8-K filing
+    ISSUER = "ISSUER"  # the company's own press release on a press-release wire
     UNCONFIRMED = "UNCONFIRMED"  # a single publisher
     OPINION = "OPINION"  # listicles, "should you buy" pieces
 
@@ -242,10 +243,24 @@ class NewsCluster:
     severe: bool
     first_seen: datetime | None
     last_seen: datetime | None
+    denial: bool = False  # the story denies or retracts a report; it never confirms what it denies
+    denies: list[str] = field(default_factory=list)  # red flags a denial names
+    backed_flags: list[str] = field(default_factory=list)  # severe flags the company itself backs (can force a sale)
+    disputed_flags: list[str] = field(default_factory=list)  # flags a later denial disputes
+    cleared_flags: list[str] = field(default_factory=list)  # flags withdrawn by a denial at least as well sourced
 
     @property
     def confirmed(self) -> bool:
-        return self.status in (NewsStatus.CONFIRMED, NewsStatus.PRIMARY)
+        return self.status in (NewsStatus.CONFIRMED, NewsStatus.PRIMARY, NewsStatus.ISSUER)
+
+    @property
+    def live_flags(self) -> list[str]:
+        return [f for f in self.red_flags if f not in self.cleared_flags]
+
+    @property
+    def cleared(self) -> bool:
+        """Every red flag of the story was withdrawn by a denial."""
+        return bool(self.red_flags) and not self.live_flags
 
 
 @dataclass
