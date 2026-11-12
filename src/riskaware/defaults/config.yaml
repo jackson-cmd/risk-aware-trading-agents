@@ -48,7 +48,7 @@ news:
   enabled: true
   finviz: true                  # free Finviz quote-page headlines / Finviz 免费新闻
   feeds: [google, nasdaq, seekingalpha, yahoo, sec]
-  min_independent_sources: 2    # a story counts only when two independent publishers carry it / 两家独立媒体报道才算确认
+  min_independent_sources: 2    # independent outlets needed to confirm a story; the company's release or 8-K also confirms / 几家独立媒体报道才算确认，公司通稿或 8-K 也算
   # archive_dir: ~/.riskaware/news  # local news history for backtests (riskaware news-history) / 回测用的本地新闻库
 
 llm:

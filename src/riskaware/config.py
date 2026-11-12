@@ -229,6 +229,7 @@ class NewsConfig(_Model):
     similarity_threshold: float = 0.34
     max_symbols_per_run: int = 25
     request_interval: float = 1.0
+    relevance_filter: bool = Field(True, description="ignore stories that do not name the company or its ticker")
     archive_dir: str = Field(str(RISKAWARE_HOME / "news"), description="local news history for backtests")
     benzinga_key_env: str = "BENZINGA_API_KEY"
 

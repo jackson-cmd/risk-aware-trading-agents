@@ -41,6 +41,8 @@ Signal(symbol, Action.SELL, strength=1.0, fraction=1.0, emergency=True, reason="
 
 `ctx.day` 之后的数据一律看不到，所以回测不会用到未来数据。
 
+`ctx.news(sym)` 返回一个 `NewsReport`。`red_flags_confirmed` 是两家独立媒体、公司自己的通稿或 SEC 公告报道过的风险信号（内置策略遇到就不买）。只有公司自己确认的严重利空，也就是 8-K 公告，或者公司通稿证实了独立媒体先报道的消息，`severe_confirmed` 才为真，具体信号在 `red_flags_backed` 里，内置策略会把这只股票全部卖出。`red_flags_unconfirmed` 是单一来源的信号，`red_flags_denied` 是被辟谣撤销的信号。`clusters` 里的每条新闻有 `status`（`PRIMARY`、`ISSUER`、`CONFIRMED`、`UNCONFIRMED`、`OPINION`）和 `denial`（是不是辟谣）两个字段。
+
 ## 参数
 
 ```python

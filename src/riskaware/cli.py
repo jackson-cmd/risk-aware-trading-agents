@@ -286,36 +286,46 @@ def calendar(days: int = typer.Option(45, help="Days ahead"),
 @app.command()
 def news(symbol: str, show_all: bool = typer.Option(False, "--all", help="Show single-source and opinion stories")) -> None:
     """Cross-verified news for one symbol (Finviz + RSS + SEC filings). / 交叉验证新闻"""
+    from .news.relevance import company_names
     from .news.sources import NewsCollector
     from .news.verify import analyze_news
     from .utils import DiskCache
 
     c = cfg()
     symbol = symbol.upper()
-    collector = NewsCollector((["finviz"] if c.news.finviz else []) + c.news.feeds, DiskCache(c.data.cache_path),
+    cache = DiskCache(c.data.cache_path)
+    collector = NewsCollector((["finviz"] if c.news.finviz else []) + c.news.feeds, cache,
                               c.data.contact_email, c.news.request_interval)
     with console.status(f"Collecting news for {symbol}..."):
         items = collector.collect(symbol, c.news.lookback_hours)
-        rep = analyze_news(symbol, items, c.news, sources=collector.last_status)
+        rep = analyze_news(symbol, items, c.news, sources=collector.last_status, names=company_names(symbol, cache))
     console.print(f"[bold]{T('news.title')}: {symbol}[/]  {T('news.score')} {rep.score:+.2f} · "
                   f"{rep.confirmed} {T('news.status.confirmed')} / {rep.unconfirmed} {T('news.status.unconfirmed')} / "
                   f"{rep.opinion} {T('news.status.opinion')}")
     console.print(f"[dim]{T('news.sources')}: " + ", ".join(f"{k} {v}" for k, v in rep.sources.items()) + "[/]")
-    if rep.red_flags_confirmed or rep.red_flags_unconfirmed:
+    if rep.off_topic:
+        console.print(f"[dim]{rep.off_topic} " + ("headlines about other companies or the market were ignored"
+                                                  if S.lang == "en" else "条讲其他公司或大盘的新闻已忽略") + "[/]")
+    if rep.red_flags_confirmed or rep.red_flags_unconfirmed or rep.red_flags_denied:
         console.print(f"[bold red]{T('news.flags')}:[/] confirmed {rep.red_flags_confirmed}, "
-                      f"single-source {rep.red_flags_unconfirmed}")
+                      f"single-source {rep.red_flags_unconfirmed}"
+                      + (f", {T('news.denied')} {rep.red_flags_denied}" if rep.red_flags_denied else ""))
     tbl = Table(show_lines=False)
     tbl.add_column("")
     tbl.add_column("Sent.", justify="right")
     tbl.add_column("Headline")
     tbl.add_column("Publishers")
     shown = rep.clusters if show_all else [x for x in rep.clusters if x.confirmed]
-    order = {"PRIMARY": 0, "CONFIRMED": 1, "UNCONFIRMED": 2, "OPINION": 3}
+    order = {"PRIMARY": 0, "ISSUER": 1, "CONFIRMED": 2, "UNCONFIRMED": 3, "OPINION": 4}
+    badge = {"PRIMARY": "[green]●[/]", "ISSUER": "[green]◆[/]", "CONFIRMED": "[green]✓[/]",
+             "UNCONFIRMED": "[yellow]?[/]", "OPINION": "[dim]~[/]"}
     for cl in sorted(shown, key=lambda x: (order[x.status.value], -(x.last_seen.timestamp() if x.last_seen else 0)))[:40]:
-        badge = {"PRIMARY": "[green]●[/]", "CONFIRMED": "[green]✓[/]", "UNCONFIRMED": "[yellow]?[/]", "OPINION": "[dim]~[/]"}
         color = "green" if cl.sentiment > 0.1 else "red" if cl.sentiment < -0.1 else "white"
+        note = (" ⚑" + ",".join(cl.live_flags) if cl.live_flags else "") + \
+               (f" ✗{T('news.denied')}:" + ",".join(cl.cleared_flags) if cl.cleared_flags else "") + \
+               (" ↩ " + T("news.denial") if cl.denial else "")
         tbl.add_row(badge[cl.status.value], f"[{color}]{cl.sentiment:+.2f}[/]", cl.headline[:100],
-                    ", ".join(cl.publishers[:4]) + (" ⚑" + ",".join(cl.red_flags) if cl.red_flags else ""))
+                    ", ".join(cl.publishers[:4]) + note)
     console.print(tbl)
     if not show_all:
         console.print("[dim]--all shows single-source and opinion stories too[/]")
@@ -386,6 +396,8 @@ def analyze(symbol: str) -> None:
             nl.append(f"  [{cl.status.value.lower()}] {cl.headline[:90]} ({cl.sentiment:+.2f})")
         if news_rep.red_flags_confirmed or news_rep.red_flags_unconfirmed:
             nl.append(f"[red]{T('news.flags')}: {news_rep.red_flags_confirmed or ''} {news_rep.red_flags_unconfirmed or ''}[/]")
+        if news_rep.red_flags_denied:
+            nl.append(f"[dim]{T('news.denied')}: {', '.join(news_rep.red_flags_denied)}[/]")
         console.print(Panel("\n".join(nl), title=T("analyze.news"), expand=False))
     sigs = res["signals"]
     if sigs:
@@ -577,10 +589,13 @@ def backtest(
     pit = None
     if (c.backtest.news if news is None else news) and not synthetic:
         from .news.history import NewsArchive, PointInTimeNews
+        from .news.relevance import company_names
+        from .utils import DiskCache as _Cache
 
         archive = NewsArchive(c.news.archive_path)
         if archive.symbols():
-            pit = PointInTimeNews(archive, c.news)
+            name_cache = _Cache(c.data.cache_path)
+            pit = PointInTimeNews(archive, c.news, names=lambda s: company_names(s, name_cache))
         else:
             console.print(f"[yellow]{T('bt.news_off')}[/]")
     bt = Backtester(c, prices, news=pit)
@@ -1140,10 +1155,13 @@ def news_history_show(
 ) -> None:
     """Replay one day: the news a backtest sees for SYMBOL at the close. / 回放某一天回测能看到的新闻"""
     from .news.history import PointInTimeNews, decision_time
+    from .news.relevance import company_names
+    from .utils import DiskCache
 
     c = cfg()
     d = date.fromisoformat(day)
-    pit = PointInTimeNews(_archive(), c.news, [symbol])
+    cache = DiskCache(c.data.cache_path)
+    pit = PointInTimeNews(_archive(), c.news, [symbol], names=lambda s: company_names(s, cache))
     cutoff = decision_time(d)
     items = pit.visible(symbol, cutoff)
     console.print(f"[bold]{T('nh.asof', day=d.isoformat())}: {symbol.upper()}[/] "
@@ -1154,6 +1172,7 @@ def news_history_show(
     rep = pit.report(symbol, d)
     console.print(f"{T('news.score')} {rep.score:+.2f} · {rep.confirmed} {T('news.status.confirmed')} / "
                   f"{rep.unconfirmed} {T('news.status.unconfirmed')} / {rep.opinion} {T('news.status.opinion')}"
+                  + (f" · [dim]{rep.off_topic} off-topic[/]" if rep.off_topic else "")
                   + (f" · [bold red]{T('news.flags')}[/] {rep.red_flags_confirmed}" if rep.red_flags_confirmed else ""))
     tbl = Table()
     tbl.add_column("UTC")

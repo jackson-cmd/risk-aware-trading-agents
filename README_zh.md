@@ -8,7 +8,7 @@
 
 **FOMC · CPI · 非农 · VIX 决定市场状态 · 回踩 EMA 50 / 100 / 200 时买入 · 财报过关才抄底 · Finviz + RSS + SEC 新闻交叉验证 · 每天自动跑的模拟盘智能体 · 给 Claude 用的 MCP 服务器 · 11 个策略（含期权）· 回测你自己的策略 · 10 家券商的模拟盘和实盘 · 中文和 English**
 
-[English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [快速开始](#-快速开始) · [模拟盘智能体](#-模拟盘智能体) · [MCP](#-mcp-服务器) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
+[English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [截图](#-截图一览) · [快速开始](#-快速开始) · [模拟盘智能体](#-模拟盘智能体) · [MCP](#-mcp-服务器) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
@@ -28,7 +28,7 @@
 
 ## 目录
 
-- [🆕 新功能](#-新功能) · [💡 设计思路](#-设计思路) · [✨ 主要功能](#-主要功能) · [🚀 快速开始](#-快速开始)
+- [🆕 新功能](#-新功能) · [📸 截图一览](#-截图一览) · [💡 设计思路](#-设计思路) · [✨ 主要功能](#-主要功能) · [🚀 快速开始](#-快速开始)
 - [🤖 模拟盘智能体](#-模拟盘智能体) · [🔗 MCP 服务器](#-mcp-服务器)
 - [🧠 工作原理](#-工作原理)：[市场状态](#不同市场状态下的做法) · [风险档位](#风险档位)
 - [📊 回测](#-回测)：[用新闻回测](#用新闻回测) · [📚 策略库](#-策略库)：[期权](#期权目前只支持回测) · [🧩 写你自己的策略](#-写你自己的策略)
@@ -49,6 +49,16 @@
 
 <sub>0.2.0 加入了期权回测（`aggressive_calls`、`wheel`）和四个股票策略，详见[更新记录](CHANGELOG_zh.md)。</sub>
 
+## 📸 截图一览
+
+网页看板（`riskaware dashboard`）的每一页，中英文都有。点图片可以看大图。
+
+<table>
+<tr><td width="50%"><a href="site/assets/dashboard_zh.jpg"><img src="site/assets/dashboard_zh.jpg" alt="市场"></a><br><sub><b>市场</b> — 市场状态、恐慌贪婪、VIX、板块广度和宏观日历</sub></td><td width="50%"><a href="site/assets/agents_zh.jpg"><img src="site/assets/agents_zh.jpg" alt="智能体"></a><br><sub><b>智能体</b> — 模拟盘智能体排行榜，和 SPY 对比</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/agent_detail_zh.jpg"><img src="site/assets/agent_detail_zh.jpg" alt="智能体详情"></a><br><sub><b>智能体详情</b> — 持仓、订单和每个决策的理由</sub></td><td width="50%"><a href="site/assets/signals_zh.jpg"><img src="site/assets/signals_zh.jpg" alt="信号"></a><br><sub><b>信号</b> — 策略今天会买什么、卖什么，附信心分和理由</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/backtest_zh.jpg"><img src="site/assets/backtest_zh.jpg" alt="回测"></a><br><sub><b>回测</b> — 任意策略和 SPY 对比，含回撤和每笔交易</sub></td><td width="50%"><a href="site/assets/news_zh.jpg"><img src="site/assets/news_zh.jpg" alt="交叉验证新闻"></a><br><sub><b>交叉验证新闻</b> — 两家独立媒体、公司自己的通稿或 SEC 公告报道了才算确认</sub></td></tr>
+</table>
+
 ---
 
 ## 💡 设计思路
@@ -61,9 +71,9 @@
 
 - **看宏观的市场状态判断。** 综合 VIX 及其期限结构（VIX/VIX3M）、板块广度、信用偏好（HYG 对 IEF）、避险需求、用免费数据自算的恐慌贪婪指数（同时显示 CNN 恐慌贪婪指数作参考），以及 **FOMC 议息、CPI、非农、PPI、GDP、PCE** 的发布日历，把市场分成四种状态：偏多、中性、不确定、避险。
 - **低买高卖。** 回踩 **EMA 50 / 100 / 200** 时买入；RSI(2) 和 z-score 均值回归；**财报过关才抄底**（看营收增长、利润率、自由现金流、负债、EPS 是否超预期）；强势行情里做突破和趋势延续。股价远远高于 EMA50 时分批止盈，跌破下行的 EMA50 时趋势减仓。
-- **不恐慌卖出。** 市场处于不确定或避险状态时只持有、不卖出，只在强支撑位买入。只有经过确认的重大利空（造假、破产、退市、财报重述），或者你设置的硬止损，才会触发强制卖出。
+- **不恐慌卖出。** 市场处于不确定或避险状态时只持有、不卖出，只在强支撑位买入。只有公司自己在 8-K 公告或通稿里确认的重大利空（破产、退市、财报重述），或者你设置的硬止损，才会触发强制卖出。
 - **风控优先。** **现金加短期国债始终不低于 30%**；单只股票、单个板块、高波动"小博大"仓位都有上限；按波动率决定仓位大小；分批建仓；保守档另配国债仓位；闲置现金自动买短期国债 ETF；回撤过大自动暂停买入；一键停止交易。
-- **新闻交叉验证。** 汇总 Finviz（免费）、Google News、Nasdaq、Seeking Alpha、Yahoo 的 RSS，以及公司自己的 **SEC 8-K 公告**。一条新闻只有被两家独立媒体报道，或者有 SEC 公告佐证，才算"已确认"。一条假新闻没法让它买入或卖出。
+- **新闻交叉验证。** 汇总 Finviz（免费）、Google News、Nasdaq、Seeking Alpha、Yahoo 的 RSS，以及公司自己的 **SEC 8-K 公告**。一条新闻被两家独立媒体报道、公司自己发了通稿，或者有 SEC 公告佐证，才算"已确认"，上面的风险信号会挡住新的买入。但只有公司自己的 8-K 公告，或者公司通稿证实了独立媒体先报道的消息，才会触发强制卖出，所以一条假新闻，或者一份假通稿加上别家的转载，都没法让它清仓。辟谣会抵消它所否认的那条新闻，不会被当成确认。
 - **10 家券商，统一接口。** 内置模拟盘，以及 **Alpaca、盈透（IBKR）、Public.com、嘉信（Schwab）、tastytrade、Tradier、富途/moomoo、老虎证券、长桥**。
 - **期权策略（回测）。** 一个激进的买 call 策略和 wheel（卖现金担保 put 加备兑 call），有权利金上限，卖 put 的保证金不占现金底线，支持行权和到期结算。
 - **什么都能回测，包括你自己的策略。** 只要写一个 Python 方法，同一个策略对象就能在回测、模拟盘和实盘里运行，并且走同一套风控。多个策略可以并排对比，生成 HTML 报告；还能从本地新闻库按发布时间回放新闻（SEC 8-K 公告、你自己的 Benzinga key 或 CSV）。
@@ -154,7 +164,7 @@ flowchart TB
 | 🟡 **不确定** | FOMC 议息前两天、CPI 和非农发布前一天、VIX 20–30、恐慌指数 < 35、下跌趋势 | 只在 EMA100 / EMA200 支撑买 | **不卖：持有** | 50% |
 | 🔴 **避险** | VIX ≥ 30、跌破 EMA200 且 VIX 期限倒挂、信用紧张 | 只抄优质股和宽基 ETF，小批量 | **不卖：持有** | 35% |
 
-紧急卖出（经过确认的严重利空，或者档位里的硬止损）在任何状态下都有效。
+紧急卖出（公司自己在 8-K 公告或通稿里确认的严重利空，或者档位里的硬止损）在任何状态下都有效。
 
 ### 风险档位
 

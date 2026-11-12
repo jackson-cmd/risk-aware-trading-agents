@@ -25,7 +25,7 @@ import csv
 import json
 import logging
 import re
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
@@ -33,6 +33,7 @@ from zoneinfo import ZoneInfo
 
 from ..config import RISKAWARE_HOME, NewsConfig
 from ..types import NewsItem
+from .relevance import company_names
 from .verify import NewsReport, analyze_news
 
 log = logging.getLogger(__name__)
@@ -256,19 +257,25 @@ class PointInTimeNews:
     """What the news looked like at the close of a given day, using only items published before it.
 
     A backtest decides at the close of day t and fills on t+1, so an item stamped after
-    16:00 New York time on day t is first visible on t+1.
+    16:00 New York time on day t is first visible on t+1. Stories go through the same relevance
+    filter as live trading (``news.relevance_filter``): ``names(symbol)`` gives the company names to
+    look for; by default only the built-in aliases are used, so a backtest needs no network.
     """
 
-    def __init__(self, archive: NewsArchive, cfg: NewsConfig | None = None, symbols: Iterable[str] | None = None):
+    def __init__(self, archive: NewsArchive, cfg: NewsConfig | None = None, symbols: Iterable[str] | None = None,
+                 names: Callable[[str], list[str]] | None = None):
         self.cfg = cfg or NewsConfig()
         self.archive = archive
         self._items: dict[str, list[NewsItem]] = {}
         self._times: dict[str, list[float]] = {}
+        self._names: dict[str, list[str]] = {}
         for sym in symbols if symbols is not None else archive.symbols():
             items = [i for i in archive.items(sym) if i.published is not None]
             if items:
-                self._items[sym.upper()] = items
-                self._times[sym.upper()] = [i.published.timestamp() for i in items]
+                key = sym.upper()
+                self._items[key] = items
+                self._times[key] = [i.published.timestamp() for i in items]
+                self._names[key] = names(key) if names else company_names(key, fetch=False)
 
     @property
     def symbols(self) -> list[str]:
@@ -300,4 +307,5 @@ class PointInTimeNews:
         items = self.visible(symbol, cutoff)
         if not items:
             return None
-        return analyze_news(symbol, items, self.cfg, now=cutoff, sources={"archive": f"{len(items)} items"})
+        return analyze_news(symbol, items, self.cfg, now=cutoff, sources={"archive": f"{len(items)} items"},
+                            names=self._names.get(symbol.upper()))

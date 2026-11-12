@@ -91,6 +91,17 @@ def test_supplied_sentiment_is_used(tmp_path):
     assert rep.confirmed == 1 and rep.score > 0.5
 
 
+def test_replay_uses_the_live_relevance_filter(tmp_path):
+    a = NewsArchive(tmp_path)
+    t = ny(2024, 5, 2, 11, 0)
+    a.add([item("AAPL", "Apple supplier deal widens", t, "reuters"),
+           item("AAPL", "Costco recalls frozen berries", t, "bloomberg")])
+    rep = PointInTimeNews(a).report("AAPL", date(2024, 5, 2))
+    assert rep.off_topic == 1 and rep.total_items == 1
+    loose = PointInTimeNews(a, NewsConfig(relevance_filter=False)).report("AAPL", date(2024, 5, 2))
+    assert loose.off_topic == 0 and loose.total_items == 2
+
+
 SUBMISSIONS = {
     "cik": "320193",
     "filings": {

@@ -148,8 +148,9 @@ class RiskAwareStrategy(Strategy):
         if self.params["use_news"]:  # in backtests this needs the local news archive (otherwise None)
             report = ctx.news(sym)
             if report is not None and getattr(report, "severe_confirmed", False):
+                flags = getattr(report, "red_flags_backed", None) or report.red_flags_confirmed
                 return Signal(sym, Action.SELL, 1.0,
-                              "thesis break: confirmed " + ", ".join(report.red_flags_confirmed),
+                              "thesis break: " + ", ".join(flags) + " backed by the company's own filing or release",
                               ["thesis_break"], fraction=1.0, emergency=True, details={"tag": "thesis_break"})
 
         if ctx.market.regime not in (Regime.RISK_ON, Regime.NEUTRAL):

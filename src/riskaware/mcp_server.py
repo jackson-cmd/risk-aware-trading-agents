@@ -123,22 +123,28 @@ def analyze_stock(symbol: str) -> dict[str, Any]:
 
 
 def stock_news(symbol: str) -> dict[str, Any]:
-    """Cross-verified news for one stock: a story counts only when two independent publishers or an SEC filing
-    carry it."""
+    """Cross-verified news for one stock: a story counts when two independent outlets, the company's own press
+    release or its SEC filing carry it. Only a severe flag the company itself backs (its 8-K, or its release
+    confirming earlier reports) counts as a thesis break; denials clear the stories they refute."""
+    from .news.relevance import company_names
     from .news.sources import NewsCollector
     from .news.verify import analyze_news
     from .utils import DiskCache
 
     c = _cfg()
-    col = NewsCollector((["finviz"] if c.news.finviz else []) + list(c.news.feeds), DiskCache(c.data.cache_path),
+    cache = DiskCache(c.data.cache_path)
+    col = NewsCollector((["finviz"] if c.news.finviz else []) + list(c.news.feeds), cache,
                         c.data.contact_email, c.news.request_interval)
-    rep = analyze_news(symbol.upper(), col.collect(symbol.upper(), c.news.lookback_hours), c.news,
-                       sources=col.last_status)
-    return {"symbol": symbol.upper(), "score": _plain(rep.score), "confirmed": rep.confirmed,
+    sym = symbol.upper()
+    rep = analyze_news(sym, col.collect(sym, c.news.lookback_hours), c.news, sources=col.last_status,
+                       names=company_names(sym, cache))
+    return {"symbol": sym, "score": _plain(rep.score), "confirmed": rep.confirmed, "off_topic_ignored": rep.off_topic,
             "unconfirmed": rep.unconfirmed, "red_flags_confirmed": list(rep.red_flags_confirmed),
             "red_flags_unconfirmed": list(rep.red_flags_unconfirmed),
+            "red_flags_denied": list(rep.red_flags_denied), "thesis_break": rep.severe_confirmed,
             "stories": [{"headline": x.headline, "status": x.status.value, "publishers": x.publishers[:5],
-                         "sentiment": _plain(x.sentiment), "flags": list(x.red_flags)} for x in rep.top(20)]}
+                         "sentiment": _plain(x.sentiment), "flags": list(x.live_flags),
+                         "denied_flags": list(x.cleared_flags), "denial": x.denial} for x in rep.top(20)]}
 
 
 def list_strategies() -> dict[str, Any]:

@@ -27,8 +27,8 @@ Put `data.contact_email` in `riskaware.yaml` once and you can drop `--contact-em
 ## How the replay works
 
 - The backtester decides at the close of day *t* (16:00 New York time) and fills orders on day *t+1*. `ctx.news(symbol)` on day *t* sees only items published at or before that close, within `news.lookback_hours` (72 by default). An item stamped 16:01 on day *t* is first visible on day *t+1*.
-- The visible items go through the same code as live trading: headlines are clustered into stories, a story is **confirmed** when two independent publishers carry it or an SEC filing backs it, and a single-source red flag can block a buy but never trigger a sell.
-- The built-in `risk_aware` strategy uses the report the same way it does live: confirmed red flags block new buys, and a confirmed severe flag (bankruptcy, delisting, restated financials) triggers its emergency exit.
+- The visible items go through the same code as live trading: stories that do not name the company or its ticker are dropped (SEC filings always count), headlines are clustered into stories, a story is **confirmed** when two independent publishers carry it or an SEC filing backs it, and a single-source red flag can block a buy but never trigger a sell.
+- The built-in `risk_aware` strategy uses the report the same way it does live: confirmed red flags block new buys, and a severe flag (bankruptcy, delisting, restated financials) triggers its emergency exit only when the company's own 8-K or press release carries it.
 - Without an archive, or with `--no-news`, `ctx.news()` returns `None`, exactly as before.
 
 `riskaware news-history show SYMBOL --date DAY` prints the items and the verdict a backtest saw at that close, so you can check any trade.
@@ -64,6 +64,8 @@ Any news you have the right to use. One row per headline:
 | `sentiment` | no | a number from -1 to 1; replaces the built-in headline lexicon for that row |
 
 Timestamps without a time zone are read as UTC; pass `--tz America/New_York` for exchange-time exports. Rows without a timestamp or a headline are skipped. Use the real publisher in `source`: the two-source check counts publishers, so labeling everything with one name makes every story single-source.
+
+Backtests apply the same relevance filter as live trading: a story counts toward a stock only when its headline (or summary) names the company or its ticker, and SEC filings always count. Headlines in your CSV that name neither are dropped and shown as off-topic in `news-history show`; set `news.relevance_filter: false` to keep them.
 
 ## The archive
 

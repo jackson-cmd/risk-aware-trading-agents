@@ -41,6 +41,8 @@ Signal(symbol, Action.SELL, strength=1.0, fraction=1.0, emergency=True, reason="
 
 Nothing after `ctx.day` is visible, so backtests have no look-ahead.
 
+`ctx.news(sym)` returns a `NewsReport`. `red_flags_confirmed` lists red flags that two independent outlets, the company's own press release or its SEC filing carry (the built-in strategy does not buy). `severe_confirmed` is true only when the company itself backs a severe flag, through its 8-K or through its own release confirming what independent outlets reported first; those flags are in `red_flags_backed`, and the built-in strategy sells the whole position. `red_flags_unconfirmed` holds single-source flags and `red_flags_denied` the flags a denial withdrew. Each story in `clusters` has a `status` (`PRIMARY`, `ISSUER`, `CONFIRMED`, `UNCONFIRMED`, `OPINION`) and a `denial` field.
+
 ## Parameters
 
 ```python

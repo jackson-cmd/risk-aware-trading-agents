@@ -592,15 +592,18 @@ def page_backtest() -> None:
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=results[0].benchmark.index, y=results[0].benchmark, name="SPY",
                              line=dict(color=P["neutral"], width=1.4, dash="dot")))
-    for r in results:
-        fig.add_trace(go.Scatter(x=r.equity.index, y=r.equity, name=r.strategy, line=dict(width=2)))
+    colors = [P[k] for k in ("accent", "warn", "violet", "cyan", "up", "down")]
+    for i, r in enumerate(results):
+        fig.add_trace(go.Scatter(x=r.equity.index, y=r.equity, name=r.strategy,
+                                 line=dict(width=2, color=colors[i % len(colors)])))
     fig.update_layout(**ui.plotly_layout(P, 400, T("bt.equity"), yaxis=dict(type="log" if log_y else "linear",
                                                                              gridcolor=P["line"])))
     st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False})
     fig = go.Figure()
-    for r in results:
+    for i, r in enumerate(results):
         dd = drawdown_series(r.equity) * 100
-        fig.add_trace(go.Scatter(x=dd.index, y=dd, name=r.strategy, fill="tozeroy", line=dict(width=1.2)))
+        fig.add_trace(go.Scatter(x=dd.index, y=dd, name=r.strategy, fill="tozeroy",
+                                 line=dict(width=1.2, color=colors[i % len(colors)])))
     fig.update_layout(**ui.plotly_layout(P, 240, T("bt.drawdown") + " %"))
     st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False})
     from riskaware.backtest.metrics import METRIC_LABELS, fmt_metric
@@ -618,21 +621,27 @@ def page_backtest() -> None:
 
 def page_news() -> None:
     cfg = get_config()
-    H(ui.section(T("news.title"), L("a story counts only when two independent publishers or an SEC filing carry it",
-                                          "只有两家独立媒体或 SEC 文件都报道了，才算确认")))
+    H(ui.section(T("news.title"), L("a story counts when two independent outlets, the company's own release or its SEC "
+                                    "filing carry it; only the company's 8-K, or its release confirming earlier "
+                                    "reports, can force a sale",
+                                    "两家独立媒体、公司自己的通稿或 SEC 公告报道了才算确认；"
+                                    "只有公司自己的 8-K 公告，或证实了先前报道的公司通稿，才能触发强制卖出")))
     c1, c2 = st.columns([3, 1], vertical_alignment="bottom")
     sym = c1.text_input(L("Symbol", "股票代码"), "AAPL").strip().upper()
     if not (c2.button(L("Fetch news", "获取新闻"), type="primary", width="stretch", icon=":material/newspaper:")
             and sym):
         return
+    from riskaware.news.relevance import company_names
     from riskaware.news.sources import NewsCollector
     from riskaware.news.verify import analyze_news
     from riskaware.utils import DiskCache
 
     with st.spinner("Finviz + RSS + SEC…"):
-        col = NewsCollector((["finviz"] if cfg.news.finviz else []) + cfg.news.feeds, DiskCache(cfg.data.cache_path),
+        cache = DiskCache(cfg.data.cache_path)
+        col = NewsCollector((["finviz"] if cfg.news.finviz else []) + cfg.news.feeds, cache,
                             cfg.data.contact_email, cfg.news.request_interval)
-        rep = analyze_news(sym, col.collect(sym, cfg.news.lookback_hours), cfg.news, sources=col.last_status)
+        rep = analyze_news(sym, col.collect(sym, cfg.news.lookback_hours), cfg.news, sources=col.last_status,
+                           names=company_names(sym, cache))
     H('<div class="ra-grid ra-g4">' + "".join([
         ui.kpi(T("news.score"), f"{rep.score:+.2f}", L("-1 bearish · +1 bullish", "-1 利空 · +1 利好"), "",
                ui.tone(rep.score)),
@@ -644,13 +653,20 @@ def page_news() -> None:
     ]) + "</div>")
     if rep.red_flags_unconfirmed:
         st.warning(f"{T('news.flags')} ({T('news.status.unconfirmed')}): {', '.join(rep.red_flags_unconfirmed)}")
+    if rep.red_flags_denied:
+        st.info(f"{T('news.flags')} ({T('news.denied')}): {', '.join(rep.red_flags_denied)}")
     st.dataframe(pd.DataFrame([{
-        L("Status", "状态"): ("✅ " if c.status.value != "UNCONFIRMED" else "· ") + T("news.status." + c.status.value.lower()),
+        L("Status", "状态"): ("✅ " if c.status.value != "UNCONFIRMED" else "· ") + T("news.status." + c.status.value.lower())
+        + (" · " + T("news.denial") if c.denial else ""),
         L("Sentiment", "情绪"): round(c.sentiment, 2), L("Headline", "标题"): c.headline,
-        L("Publishers", "来源"): ", ".join(c.publishers[:5]), L("Flags", "风险"): ", ".join(c.red_flags)}
+        L("Publishers", "来源"): ", ".join(c.publishers[:5]),
+        L("Flags", "风险"): ", ".join(c.live_flags)
+        + (f" ({T('news.denied')}: {', '.join(c.cleared_flags)})" if c.cleared_flags else "")}
         for c in rep.top(60)]), hide_index=True, width="stretch", column_config={
         L("Headline", "标题"): st.column_config.TextColumn(width="large")})
-    st.caption(T("news.sources") + ": " + ", ".join(f"{k} {v}" for k, v in rep.sources.items()))
+    st.caption(T("news.sources") + ": " + ", ".join(f"{k} {v}" for k, v in rep.sources.items())
+               + (L(f" · {rep.off_topic} headlines about other companies or the market were ignored",
+                    f" · 已忽略 {rep.off_topic} 条讲其他公司或大盘的新闻") if rep.off_topic else ""))
 
 
 def page_account() -> None:

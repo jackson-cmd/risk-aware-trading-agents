@@ -8,7 +8,7 @@
 
 **Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · daily paper-trading agents · an MCP server for Claude · 11 strategies including options · backtest your own · paper and live trading on 10 brokers · English and 中文**
 
-[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
+[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Screenshots](#-screenshots) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
@@ -28,7 +28,7 @@
 
 ## Contents
 
-- [🆕 What's new](#-whats-new) · [💡 The idea](#-the-idea) · [✨ Highlights](#-highlights) · [🚀 Quick start](#-quick-start)
+- [🆕 What's new](#-whats-new) · [📸 Screenshots](#-screenshots) · [💡 The idea](#-the-idea) · [✨ Highlights](#-highlights) · [🚀 Quick start](#-quick-start)
 - [🤖 Paper-trading agents](#-paper-trading-agents) · [🔗 MCP server](#-mcp-server)
 - [🧠 How it works](#-how-it-works): [Market regimes](#what-the-agent-does-in-each-regime) · [Risk profiles](#risk-profiles)
 - [📊 Backtest](#-backtest): [News in backtests](#news-in-backtests) · [📚 Strategy library](#-strategy-library): [Options](#options-backtest-only) · [🧩 Write your own strategy](#-write-your-own-strategy)
@@ -49,6 +49,16 @@
 
 <sub>0.2.0 added options to the backtester (`aggressive_calls`, `wheel`) and four stock strategies; see the [changelog](CHANGELOG.md).</sub>
 
+## 📸 Screenshots
+
+Every page of the dashboard (`riskaware dashboard`), in English and 中文. Click a picture to open it full size.
+
+<table>
+<tr><td width="50%"><a href="site/assets/dashboard_en.jpg"><img src="site/assets/dashboard_en.jpg" alt="Market"></a><br><sub><b>Market</b> — the regime, fear and greed, VIX, breadth and the macro calendar</sub></td><td width="50%"><a href="site/assets/agents_en.jpg"><img src="site/assets/agents_en.jpg" alt="Agents"></a><br><sub><b>Agents</b> — paper-trading agents ranked against SPY</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/agent_detail_en.jpg"><img src="site/assets/agent_detail_en.jpg" alt="Agent details"></a><br><sub><b>Agent details</b> — positions, orders and the reason behind every decision</sub></td><td width="50%"><a href="site/assets/signals_en.jpg"><img src="site/assets/signals_en.jpg" alt="Signals"></a><br><sub><b>Signals</b> — what a strategy would buy or sell today, with conviction and reasons</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/backtest_en.jpg"><img src="site/assets/backtest_en.jpg" alt="Backtest"></a><br><sub><b>Backtest</b> — any strategy against SPY, with drawdowns and every trade</sub></td><td width="50%"><a href="site/assets/news_en.jpg"><img src="site/assets/news_en.jpg" alt="Cross-verified news"></a><br><sub><b>Cross-verified news</b> — a story counts when two outlets, the company's own release or its SEC filing carry it</sub></td></tr>
+</table>
+
 ---
 
 ## 💡 The idea
@@ -61,9 +71,9 @@ Most trading bots either chase every signal or need a quant team to configure. T
 
 - **Macro-aware market regimes.** VIX and its term structure (VIX/VIX3M), sector breadth, credit appetite (HYG vs IEF), safe-haven demand, a fear-and-greed gauge computed from free data (and CNN's Fear & Greed for reference), and the **FOMC, CPI, jobs report, PPI, GDP and PCE** calendar put the market in one of four regimes: risk-on, neutral, uncertain, risk-off.
 - **Buy low, sell high.** Pullbacks to **EMA 50 / 100 / 200**, RSI(2) and z-score mean reversion, **quality dips that must pass an earnings check** (revenue growth, margins, free cash flow, leverage, EPS beats), breakouts and trend continuation in strong markets. Take-profit trims when a stock runs far above EMA50; trend exits after a break of a falling EMA50.
-- **No panic selling.** When the regime is uncertain or risk-off the agent holds, does not sell, and only buys at strong support. Only confirmed disasters (fraud, bankruptcy, delisting, restatement) or an optional hard stop can force an exit.
+- **No panic selling.** When the regime is uncertain or risk-off the agent holds, does not sell, and only buys at strong support. Only a disaster the company itself confirms (bankruptcy, delisting, restatement in its own 8-K or press release) or an optional hard stop can force an exit.
 - **Risk first.** A **30% cash + T-bill floor**, position, sector and speculative ("lottery ticket") caps, volatility-scaled sizes, buying in tranches, a Treasury sleeve for conservative profiles, idle cash parked in a T-bill ETF, a drawdown pause, a kill switch.
-- **Cross-verified news.** Finviz (free), Google News, Nasdaq, Seeking Alpha and Yahoo RSS plus the company's own **SEC 8-K filings**. A story only counts when two independent publishers or an SEC filing carry it, so a single fake headline cannot make the agent buy or sell.
+- **Cross-verified news.** Finviz (free), Google News, Nasdaq, Seeking Alpha and Yahoo RSS plus the company's own **SEC 8-K filings**. A story counts when two independent outlets, the company's own press release or its SEC filing carry it, and a red flag on such a story blocks new buys. Only the company's 8-K, or its own release confirming what independent outlets reported first, can force a sale, so a fake headline, or a fake press release and the outlets that repeat it, cannot. A denial clears the story it refutes instead of confirming it.
 - **10 brokers, one interface.** Built-in paper account, **Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers, Longbridge**.
 - **Options strategies (backtest).** An aggressive call-buying strategy and the wheel (cash-secured puts and covered calls), with premium caps, put collateral outside the cash floor, assignment and expiry.
 - **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report, and replay point-in-time news (SEC 8-K filings, your own Benzinga key or a CSV) from a local archive.
@@ -154,7 +164,7 @@ flowchart TB
 | 🟡 **Uncertain** | 2 days before an FOMC decision, the day before CPI or the jobs report, VIX 20–30, fear gauge < 35, downtrend | EMA100 / EMA200 support only | **none: hold** | 50% |
 | 🔴 **Risk-off** | VIX ≥ 30, VIX backwardation below EMA200, credit stress | quality dips and broad ETFs, small tranches | **none: hold** | 35% |
 
-Emergency exits (a confirmed severe red flag, or the profile's hard stop) work in every regime.
+Emergency exits (a severe red flag the company itself confirms in its 8-K or its own press release, or the profile's hard stop) work in every regime.
 
 ### Risk profiles
 
