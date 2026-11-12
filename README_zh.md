@@ -16,7 +16,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![默认模拟盘](https://img.shields.io/badge/%E9%BB%98%E8%AE%A4-%E6%A8%A1%E6%8B%9F%E7%9B%98-orange.svg)](#-安全机制)
-[![版本 0.6.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.6.0-e5534b.svg)](CHANGELOG_zh.md)
+[![版本 0.6.1](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.6.1-e5534b.svg)](CHANGELOG_zh.md)
 [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器)
 [![11 个策略](https://img.shields.io/badge/%E7%AD%96%E7%95%A5-11%20%E4%B8%AA-8957e5.svg)](#-策略库)
 [![10 家券商](https://img.shields.io/badge/%E5%88%B8%E5%95%86-10%20%E5%AE%B6-0969da.svg)](#-支持的券商)
@@ -39,10 +39,11 @@
 
 ## 🆕 新功能
 
-<sub>最新版本 **0.6.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>最新版本 **0.6.1**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
 
-| | 0.6.0 和 0.5.0 新加入 |
+| | 0.6 和 0.5 新加入 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔎 每笔回测交易背后的新闻**：看板回测页新增 **回测看到的新闻** 面板。选一笔交易，就能看到回测在那天收盘时看到的标题、哪些已确认、新闻分，以及策略第二天下的单。[怎么用 →](docs/zh/news-history.md#查看回测看到的新闻) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 自带 2026 年新闻**：安装包里带了内置股票池 64 只股票的 16,945 条新闻（Benzinga 标题，只有标题，加上 SEC 8-K 公告，2026 年 1 月到 11 月），`riskaware backtest --news` 或看板回测页新加的 **回放新闻** 开关，什么都不用下载就能用。2026 年至今，内置智能体带新闻回测收益 **+15.9%**，同期 SPY +12.1%；最大回撤 **-5.3%**，SPY 是 -8.9%。[看结果 →](#2026-年至今带新闻) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧪 说出策略，AI 写代码并回测**：通过 MCP，Claude、Codex 或 Gemini 读 `strategy_guide`，把策略写成代码，用 `backtest_code` 回测。代码先检查有没有偷看未来、有没有副作用，再放到单独的进程里跑；好用的可以保存下来，看板和模拟盘智能体都能直接用。别处拿到的代码用 `riskaware lab 文件` 一样能跑。[怎么用 →](#-策略实验室) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔭 回测不偷看未来**：回测每天只能看到当天收盘前发布的新闻（提前收盘的日子是 13:00），有两种读法的时间按更晚的读，策略也没法再通过拿到的价格数据摸到之后的价格。[细节 →](docs/zh/news-history.md#回测怎么防止偷看未来) |
@@ -60,7 +61,7 @@
 <tr><td width="50%"><a href="site/assets/dashboard_zh.jpg"><img src="site/assets/dashboard_zh.jpg" alt="市场"></a><br><sub><b>市场</b> — 市场状态、恐慌贪婪、VIX、板块广度和宏观日历</sub></td><td width="50%"><a href="site/assets/agents_zh.jpg"><img src="site/assets/agents_zh.jpg" alt="智能体"></a><br><sub><b>智能体</b> — 模拟盘智能体排行榜，和 SPY 对比</sub></td></tr>
 <tr><td width="50%"><a href="site/assets/decisions_zh.jpg"><img src="site/assets/decisions_zh.jpg" alt="它是怎么决定的"></a><br><sub><b>它是怎么决定的</b> — 技术形态、风控结论，以及 LLM 的多方、空方意见和裁判结论</sub></td><td width="50%"><a href="site/assets/agent_detail_zh.jpg"><img src="site/assets/agent_detail_zh.jpg" alt="智能体详情"></a><br><sub><b>智能体详情</b> — 持仓、订单和每个决策的理由</sub></td></tr>
 <tr><td width="50%"><a href="site/assets/signals_zh.jpg"><img src="site/assets/signals_zh.jpg" alt="信号"></a><br><sub><b>信号</b> — 策略今天会买什么、卖什么，附信心分和理由</sub></td><td width="50%"><a href="site/assets/backtest_zh.jpg"><img src="site/assets/backtest_zh.jpg" alt="回测"></a><br><sub><b>回测</b> — 任意策略和 SPY 对比，含回撤和每笔交易</sub></td></tr>
-<tr><td width="50%"><a href="site/assets/news_zh.jpg"><img src="site/assets/news_zh.jpg" alt="交叉验证新闻"></a><br><sub><b>交叉验证新闻</b> — 两家独立媒体、公司自己的通稿或 SEC 公告报道了才算确认</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/news_zh.jpg"><img src="site/assets/news_zh.jpg" alt="交叉验证新闻"></a><br><sub><b>交叉验证新闻</b> — 两家独立媒体、公司自己的通稿或 SEC 公告报道了才算确认</sub></td><td width="50%"><a href="site/assets/backtest_news_zh.jpg"><img src="site/assets/backtest_news_zh.jpg" alt="回测看到的新闻"></a><br><sub><b>回测看到的新闻</b> — 选任意一笔交易，看回测在那天收盘时看到了哪些标题、怎么判断的，以及第二天下了什么单</sub></td></tr>
 </table>
 
 ---

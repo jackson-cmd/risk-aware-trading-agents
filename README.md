@@ -16,7 +16,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#-safety)
-[![Version 0.6.0](https://img.shields.io/badge/version-0.6.0-e5534b.svg)](CHANGELOG.md)
+[![Version 0.6.1](https://img.shields.io/badge/version-0.6.1-e5534b.svg)](CHANGELOG.md)
 [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server)
 [![11 strategies](https://img.shields.io/badge/strategies-11-8957e5.svg)](#-strategy-library)
 [![10 brokers](https://img.shields.io/badge/brokers-10-0969da.svg)](#-brokers)
@@ -39,10 +39,11 @@
 
 ## 🆕 What's new
 
-<sub>Latest release **0.6.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
+<sub>Latest release **0.6.1** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
 
-| | New in 0.6.0 and 0.5.0 |
+| | New in 0.6 and 0.5 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔎 The news behind every backtest trade**: the dashboard's Backtest page now has a **News the backtest saw** panel. Pick a trade and it shows the headlines the backtest had seen at that close, which of them were confirmed, the news score, and the order the strategy placed the next day. [How →](docs/news-history.md#see-what-a-backtest-saw) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 2026 news in the box**: 16,945 news items for the 64 stocks of the built-in lists ship with the package (Benzinga headlines, titles only, and SEC 8-K filings, January to November 2026), so `riskaware backtest --news`, or the new **Replay news** switch on the dashboard's Backtest page, works with nothing to download. In 2026 so far the built-in agent with news returned **+15.9%** against SPY's +12.1%, with a max drawdown of **-5.3%** against -8.9%. [Results →](#2026-so-far-with-news) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧪 Describe a strategy, the AI writes and tests it**: over MCP, Claude, Codex or Gemini read `strategy_guide`, write the strategy as code and run it with `backtest_code`. The code is checked for look-ahead and side effects and runs in a separate process; the good ones are saved for the dashboard and the paper agents. `riskaware lab FILE` does the same for code from anywhere. [How →](#-strategy-lab) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔭 No peeking at the future**: each backtest day sees only news published before its close (13:00 on early-close days), a timestamp that could be read two ways is read the later way, and a strategy can no longer reach later prices through the price data it is given. [Details →](docs/news-history.md#how-the-backtest-avoids-look-ahead) |
@@ -60,7 +61,7 @@ Every page of the dashboard (`riskaware dashboard`), in English and 中文. Clic
 <tr><td width="50%"><a href="site/assets/dashboard_en.jpg"><img src="site/assets/dashboard_en.jpg" alt="Market"></a><br><sub><b>Market</b> — the regime, fear and greed, VIX, breadth and the macro calendar</sub></td><td width="50%"><a href="site/assets/agents_en.jpg"><img src="site/assets/agents_en.jpg" alt="Agents"></a><br><sub><b>Agents</b> — paper-trading agents ranked against SPY</sub></td></tr>
 <tr><td width="50%"><a href="site/assets/decisions_en.jpg"><img src="site/assets/decisions_en.jpg" alt="How it decided"></a><br><sub><b>How it decided</b> — the setups, the risk check, and the LLM's bull case, bear case and verdict</sub></td><td width="50%"><a href="site/assets/agent_detail_en.jpg"><img src="site/assets/agent_detail_en.jpg" alt="Agent details"></a><br><sub><b>Agent details</b> — positions, orders and the reason behind every decision</sub></td></tr>
 <tr><td width="50%"><a href="site/assets/signals_en.jpg"><img src="site/assets/signals_en.jpg" alt="Signals"></a><br><sub><b>Signals</b> — what a strategy would buy or sell today, with conviction and reasons</sub></td><td width="50%"><a href="site/assets/backtest_en.jpg"><img src="site/assets/backtest_en.jpg" alt="Backtest"></a><br><sub><b>Backtest</b> — any strategy against SPY, with drawdowns and every trade</sub></td></tr>
-<tr><td width="50%"><a href="site/assets/news_en.jpg"><img src="site/assets/news_en.jpg" alt="Cross-verified news"></a><br><sub><b>Cross-verified news</b> — a story counts when two outlets, the company's own release or its SEC filing carry it</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/news_en.jpg"><img src="site/assets/news_en.jpg" alt="Cross-verified news"></a><br><sub><b>Cross-verified news</b> — a story counts when two outlets, the company's own release or its SEC filing carry it</sub></td><td width="50%"><a href="site/assets/backtest_news_en.jpg"><img src="site/assets/backtest_news_en.jpg" alt="News the backtest saw"></a><br><sub><b>News the backtest saw</b> — pick any trade and see the headlines the backtest had at that close, their verdict and the order it placed</sub></td></tr>
 </table>
 
 ---

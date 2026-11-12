@@ -2,6 +2,11 @@
 
 [中文](CHANGELOG_zh.md)
 
+## 0.6.1 (2026-11-12)
+
+- The dashboard's Backtest page has a **News the backtest saw** panel. After a run with Replay news on, pick a trade (each one shows how many news items the backtest had seen when it decided), or any stock and day, to see the close at which it was decided, the order the strategy placed the next day, the news score with its confirmed and single-source stories and red flags, and every story with its New York time, status, sentiment and sources. It opens at the latest trade that had news.
+- The News page's summary cards and the new panel share one component.
+
 ## 0.6.0 (2026-11-12)
 
 - 2026 news ships with the package: 16,945 items for the 64 stocks of the built-in lists, January 1 to November 11, 2026 (16,249 Benzinga headlines with only the title, time and ticker, and 696 SEC 8-K filings), in `riskaware/news/data/news_2026.jsonl.gz` (0.7 MB). Backtests with `--news` read it together with your own archive; `news.bundled: false` leaves it out. A headline counts for a stock only when Benzinga tagged the stock and the headline names the company or its ticker; automated price recaps are left out. `scripts/build_news_bundle.py` rebuilds the file.
