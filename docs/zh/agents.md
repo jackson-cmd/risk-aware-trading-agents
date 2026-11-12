@@ -58,6 +58,24 @@ riskaware llm-check ollama:qwen2.5:3b                     # 发一次示例复�
 
 回复用严格的 JSON schema 模式请求，模型必须按规定的格式回答；仍然不合格式的回复会被忽略，这笔交易照规则正常进行。用同一天的买入候选简单比了一下：`gpt-5.6-luna` 每次约 2.5 秒，调整在 -0.04 到 +0.05 之间；3B 的本地模型每次约 7.5 秒，几乎都回答 +0.00。小的本地模型免费、隐私好，但给出的判断不多。
 
+### 不需要 API key：用你的订阅
+
+如果你订阅了 Claude、ChatGPT 或 Gemini，智能体的复核可以通过你已经登录的命令行工具走订阅额度：
+
+| 写法 | 工具 | 实测一次复核 |
+|---|---|---|
+| `claude-cli[:模型]` | Claude Code（`claude`），你的 Claude Pro / Max / Team 账号 | 需要先登录 `claude`（运行一次，用 `/login`） |
+| `codex-cli[:模型]` | OpenAI Codex（`codex`），你的 ChatGPT 账号 | 约 9 秒，用掉订阅里约 17,600 个 token |
+| `gemini-cli[:模型]` | Google 的 Gemini CLI（`gemini`），没装 Gemini CLI 时用 Antigravity（`agy`） | Antigravity 配 `gemini-3.8-flash-low`：约 17 秒、12,200 个 token |
+
+```bash
+riskaware llm-check codex-cli                         # 这台电脑上能不能用？
+riskaware agents add plan --strategy risk_aware --llm gemini-cli:gemini-3.8-flash-low
+riskaware agents llm steady claude-cli:sonnet
+```
+
+每次复核会在一个空的临时文件夹里启动一次工具，关掉它的工具调用，要求同样的 JSON schema。这些工具自带很长的系统提示，所以比 API 调用慢，也会占用订阅额度里不小的一部分；不会按 token 另外收费。要用别的可执行文件或包装脚本，用 `--llm-command`（或者环境变量 `RISKAWARE_CLAUDE_CLI`、`RISKAWARE_CODEX_CLI`、`RISKAWARE_GEMINI_CLI`）。这些工具也可能读你自己的说明文件（比如全局的 `AGENTS.md`），所以复核内容可能用你在那里设定的语言。
+
 ### 看看每个决定是怎么做出来的
 
 <img src="../../site/assets/decisions_zh.jpg" width="820" alt="决定是怎么做出来的">
@@ -88,24 +106,20 @@ riskaware agents schedule --uninstall  # 关闭
 
 后台任务在你执行安装命令的那个文件夹里运行，所以会用那个文件夹里的 `riskaware.yaml` 和 `.env`。配置里设置了通知（Telegram、Discord、Slack）的话，每天运行完也会收到一份汇总。
 
-## 在 Claude 里使用（MCP）
+## 在 Claude、ChatGPT 或 Gemini 里使用（MCP）
 
-MCP 服务器让 AI 助手可以直接向这些智能体提问、让它们运行。需要先装 `mcp` 扩展：
+MCP 服务器让 AI 应用可以直接向这些智能体提问、让它们运行，走你自己的订阅，不需要 API key。需要先装 `mcp` 扩展，然后一条命令接上一个应用（默认打印这一步，加 `--apply` 直接执行）：
 
 ```bash
 pip install -e ".[mcp]"
-claude mcp add riskaware -- riskaware mcp          # Claude Code
+riskaware mcp-setup claude-desktop --apply    # Claude Desktop：改它的配置文件（会留备份），然后重启应用
+riskaware mcp-setup claude-code --apply       # Claude Code：claude mcp add -s user riskaware -- ...
+riskaware mcp-setup codex --apply             # OpenAI Codex，用你的 ChatGPT 登录
+riskaware mcp-setup gemini --apply            # Google 的 Gemini CLI
+riskaware mcp-setup antigravity --apply       # Antigravity（用包装脚本时加 --command agyw）
 ```
 
-Claude Desktop、Cursor 等客户端添加一个运行 `riskaware mcp` 的 stdio 服务器即可：
-
-```json
-{
-  "mcpServers": {
-    "riskaware": { "command": "riskaware", "args": ["mcp"] }
-  }
-}
-```
+ChatGPT 自己的应用只能连远程（HTTPS）的 MCP 服务器，所以 OpenAI 这边用 Codex。Cursor 等其他客户端，添加一个运行 `riskaware mcp` 的 stdio 服务器即可（`riskaware mcp-setup claude-desktop` 会打印出完整的 JSON）。
 
 | 工具 | 作用 |
 |---|---|
@@ -118,7 +132,7 @@ Claude Desktop、Cursor 等客户端添加一个运行 `riskaware mcp` 的 stdio
 | `agents_leaderboard` | 所有模拟盘智能体的排名和定时运行状态 |
 | `agent_detail` | 单个智能体的设置、持仓、每天的净值和最近的订单 |
 | `agent_decisions` | 智能体最近的决定是怎么做出来的，含 LLM 的多方、空方意见和结论（需要时也给 prompt） |
-| `agents_create` | 新建模拟盘智能体，可以配 LLM（`openai:gpt-5.6-luna`、`ollama:qwen2.5:3b`） |
+| `agents_create` | 新建模拟盘智能体，可以配 LLM（`openai:gpt-5.6-luna`、`ollama:qwen2.5:3b`、`codex-cli`、`gemini-cli`） |
 | `agents_run` | 现在让智能体在模拟账户里运行一次（也可以只预演） |
 
 所有工具要么只读，要么只操作本地模拟账户，没有任何工具能向券商发送订单。

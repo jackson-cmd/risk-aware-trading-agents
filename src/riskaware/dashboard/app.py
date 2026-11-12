@@ -45,12 +45,14 @@ PROFILE_NAMES = {"conservative": ("Conservative", "保守"), "balanced": ("Balan
 UNIVERSES = ["megacap", "tech", "defensive", "etf", "sectors"]
 
 
-LLM_KINDS = ["off", "openai", "ollama", "anthropic"]
+LLM_KINDS = ["off", "openai", "ollama", "anthropic", "codex-cli", "gemini-cli", "claude-cli"]
 
 
 def llm_kind_name(k: str) -> str:
-    return {"off": L("Off", "不用"), "openai": "OpenAI (GPT)", "ollama": L("Local model (Ollama)", "本地模型（Ollama）"),
-            "anthropic": "Claude"}[k]
+    return {"off": L("Off", "不用"), "openai": "OpenAI API (GPT)", "ollama": L("Local model (Ollama)", "本地模型（Ollama）"),
+            "anthropic": "Claude API", "codex-cli": L("ChatGPT plan (Codex CLI, no key)", "ChatGPT 订阅（Codex CLI，免 key）"),
+            "gemini-cli": L("Gemini (Gemini CLI / Antigravity, no key)", "Gemini（Gemini CLI / Antigravity，免 key）"),
+            "claude-cli": L("Claude plan (Claude Code, no key)", "Claude 订阅（Claude Code，免 key）")}[k]
 
 
 def llm_choice_inputs(key: str, current: str | None = None) -> str | None:
@@ -65,7 +67,7 @@ def llm_choice_inputs(key: str, current: str | None = None) -> str | None:
                                                   "each buy and can move conviction by at most ±0.15 or veto it.",
                                                   "多方、空方和裁判阅读每个买入候选的证据，最多把信心分调整 ±0.15，或者否决。"))
     model = c2.text_input(L("Model", "模型"), value=model0, key=f"{key}_model",
-                          placeholder="gpt-5.6-luna · qwen2.5:3b · claude-opus-5-5")
+                          placeholder="gpt-5.6-luna · qwen2.5:3b · default")
     if kind == "off":
         return "off"
     return f"{kind}:{model.strip() or DEFAULT_MODELS.get(kind, '')}"
@@ -446,8 +448,10 @@ def _agent_detail(a, name: str, bench: pd.Series | None) -> None:
                 st.error(str(exc))
             else:
                 st.rerun()
-        st.caption(L("OpenAI needs OPENAI_API_KEY in your .env; a local model needs `ollama serve`.",
-                     "OpenAI 需要在 .env 里设置 OPENAI_API_KEY；本地模型需要先运行 `ollama serve`。"))
+        st.caption(L("OpenAI API needs OPENAI_API_KEY in your .env; a local model needs `ollama serve`; the plan "
+                     "choices need that tool installed and logged in (`codex`, `gemini` or `agy`, `claude`).",
+                     "OpenAI API 需要在 .env 里设置 OPENAI_API_KEY；本地模型需要先运行 `ollama serve`；订阅类选项需要"
+                     "装好并登录对应的命令行工具（`codex`、`gemini` 或 `agy`、`claude`）。"))
     with c4.popover(L("Delete", "删除"), icon=":material/delete:"):
         st.write(L("Delete this agent and its paper account?", "删除这个智能体和它的模拟账户？"))
         if st.button(L("Yes, delete", "确定删除"), key=f"del_{name}", type="primary"):

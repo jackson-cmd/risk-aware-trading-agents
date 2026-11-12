@@ -58,6 +58,24 @@ riskaware llm-check ollama:qwen2.5:3b                     # one sample review: i
 
 Replies are requested in strict JSON schema mode, so the model has to answer in the expected shape; a reply that still does not fit is ignored, and the trade goes ahead on the rules alone. In a quick comparison on one day of buy candidates, `gpt-5.6-luna` answered in about 2.5 seconds with adjustments between -0.04 and +0.05, while the 3B local model took about 7.5 seconds and mostly answered +0.00: a small local model is free and private but adds little judgment.
 
+### No API key: use your plan
+
+If you pay for Claude, ChatGPT or Gemini, an agent's review can run on that plan through its command-line tool, the one you are already logged in to:
+
+| Choice | Tool | Measured on one review |
+|---|---|---|
+| `claude-cli[:MODEL]` | Claude Code (`claude`), your Claude Pro / Max / Team login | needs `claude` logged in (run it once and use `/login`) |
+| `codex-cli[:MODEL]` | OpenAI Codex (`codex`), your ChatGPT login | about 9 s and 17,600 tokens of your plan |
+| `gemini-cli[:MODEL]` | Google's Gemini CLI (`gemini`), or Antigravity (`agy`) when Gemini CLI is not installed | Antigravity with `gemini-3.8-flash-low`: about 17 s and 12,200 tokens |
+
+```bash
+riskaware llm-check codex-cli                         # does it work on this computer?
+riskaware agents add plan --strategy risk_aware --llm gemini-cli:gemini-3.8-flash-low
+riskaware agents llm steady claude-cli:sonnet
+```
+
+Each review starts the tool once in an empty temporary folder with its tools switched off and asks for the same JSON schema. These tools add long system prompts of their own, so a review is slower than an API call and uses a noticeable share of your plan's limits; nothing is billed per token. Use `--llm-command` (or `RISKAWARE_CLAUDE_CLI`, `RISKAWARE_CODEX_CLI`, `RISKAWARE_GEMINI_CLI`) for a different executable or a wrapper script. The tools may also follow your own instruction files (such as a global `AGENTS.md`), so the review can come back in the language you use there.
+
 ### See how a decision was made
 
 <img src="../site/assets/decisions_en.jpg" width="820" alt="How a decision was made">
@@ -88,24 +106,20 @@ riskaware agents schedule --uninstall  # stop it
 
 The job runs in the folder where you installed it, so it uses that folder's `riskaware.yaml` and `.env`. Notifications (Telegram, Discord, Slack) set up in the config also receive a summary after each daily run.
 
-## Use it from Claude (MCP)
+## Use it from Claude, ChatGPT or Gemini (MCP)
 
-The MCP server lets an AI assistant ask the agents questions and run them. It needs the `mcp` extra:
+The MCP server lets an AI app ask the agents questions and run them, on your own plan and without an API key. It needs the `mcp` extra; then one command connects each app (it prints the step, and `--apply` runs it):
 
 ```bash
 pip install -e ".[mcp]"
-claude mcp add riskaware -- riskaware mcp          # Claude Code
+riskaware mcp-setup claude-desktop --apply    # Claude Desktop: edits its config (keeps a backup); restart the app
+riskaware mcp-setup claude-code --apply       # Claude Code: claude mcp add -s user riskaware -- ...
+riskaware mcp-setup codex --apply             # OpenAI Codex, on your ChatGPT login
+riskaware mcp-setup gemini --apply            # Google's Gemini CLI
+riskaware mcp-setup antigravity --apply       # Antigravity (add --command agyw for a wrapper)
 ```
 
-For Claude Desktop, Cursor or another client, add a stdio server that runs `riskaware mcp`:
-
-```json
-{
-  "mcpServers": {
-    "riskaware": { "command": "riskaware", "args": ["mcp"] }
-  }
-}
-```
+ChatGPT's own app only connects to remote (HTTPS) MCP servers, so on the OpenAI side use Codex. For Cursor or any other client, add a stdio server that runs `riskaware mcp` (the command `riskaware mcp-setup claude-desktop` prints the exact JSON).
 
 | Tool | What it does |
 |---|---|
@@ -118,7 +132,7 @@ For Claude Desktop, Cursor or another client, add a stdio server that runs `risk
 | `agents_leaderboard` | all paper agents ranked, with the schedule status |
 | `agent_detail` | one agent's settings, positions, equity by day and recent orders |
 | `agent_decisions` | how an agent made its recent decisions, with the LLM's bull, bear and verdict (and, if asked, the prompts) |
-| `agents_create` | create a paper agent, optionally with an LLM (`openai:gpt-5.6-luna`, `ollama:qwen2.5:3b`) |
+| `agents_create` | create a paper agent, optionally with an LLM (`openai:gpt-5.6-luna`, `ollama:qwen2.5:3b`, `codex-cli`, `gemini-cli`) |
 | `agents_run` | run agents once now on their paper accounts (or as a dry run) |
 
 All tools are read-only or act on local paper accounts. There is no tool that can send an order to a broker.

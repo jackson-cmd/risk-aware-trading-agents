@@ -267,7 +267,7 @@ class LLMConfig(_Model):
     endpoint (OpenAI, DeepSeek, Ollama, vLLM, OpenRouter, ...) set through base_url."""
 
     enabled: bool = False
-    provider: Literal["openai", "anthropic"] = "anthropic"
+    provider: Literal["openai", "anthropic", "claude-cli", "codex-cli", "gemini-cli"] = "anthropic"
     model: str = "claude-opus-5-5"
     base_url: str | None = None
     api_key_env: str = "OPENAI_API_KEY"
@@ -276,6 +276,8 @@ class LLMConfig(_Model):
     reasoning_effort: str | None = Field(None, description="reasoning models (gpt-5.x, o-series): none, minimal, "
                                                             "low, medium or high")
     max_tokens: int = Field(1200, ge=100, description="cap on the length of each reply")
+    command: str | None = Field(None, description="for claude-cli, codex-cli and gemini-cli: the executable or "
+                                                   "wrapper to run (default: claude, codex, gemini or agy)")
     timeout: float = 120.0
     max_symbols_per_run: int = 10
     refusal_fallback: bool = True

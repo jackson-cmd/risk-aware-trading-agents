@@ -13,6 +13,7 @@ from typing import Optional
 
 import typer
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.prompt import Confirm, Prompt
 from rich.table import Table
@@ -675,7 +676,8 @@ def brokers() -> None:
         mod = mods.get(key)
         ok = mod is None or importlib.util.find_spec(mod) is not None
         tbl.add_row(key, spec["label"], spec["paper"],
-                    f'pip install "risk-aware-trading-agents[{spec["install"]}]"' if spec["install"] else "built in",
+                    escape(f'pip install "risk-aware-trading-agents[{spec["install"]}]"') if spec["install"]
+                    else "built in",
                     ", ".join(spec["env"]) or "-", "[green]ready[/]" if ok else "[dim]missing[/]")
     console.print(tbl)
 
@@ -702,7 +704,7 @@ def resume() -> None:
 def dashboard(port: int = typer.Option(8501)) -> None:
     """Open the web dashboard (needs the [dashboard] extra). / 打开网页看板"""
     if importlib.util.find_spec("streamlit") is None:
-        console.print('Install it first: pip install "risk-aware-trading-agents[dashboard]"')
+        console.print('Install it first: pip install "risk-aware-trading-agents[dashboard]"', markup=False)
         raise typer.Exit(1)
     import subprocess
 
@@ -721,7 +723,7 @@ def dashboard(port: int = typer.Option(8501)) -> None:
 def mcp() -> None:
     """Serve the agents to Claude or any MCP client over stdio (needs the [mcp] extra). / MCP 服务器"""
     if importlib.util.find_spec("mcp") is None:
-        console.print('Install it first: pip install "risk-aware-trading-agents[mcp]"', style="red")
+        console.print('Install it first: pip install "risk-aware-trading-agents[mcp]"', style="red", markup=False)
         raise typer.Exit(1)
     from .mcp_server import main as serve
 
@@ -737,16 +739,49 @@ def _tokens(usage: dict) -> int | None:
     return sum(int(x) for x in parts if x) or None
 
 
+@app.command("mcp-setup")
+def mcp_setup(client: str = typer.Argument(..., help="claude-code, claude-desktop, codex, gemini or antigravity"),
+              do_apply: bool = typer.Option(False, "--apply", help="register it now instead of printing the command"),
+              tool: Optional[str] = typer.Option(None, "--command", help="the client's executable or wrapper, "
+                                                                         "e.g. agyw")) -> None:
+    """Connect the MCP server to Claude, Codex (ChatGPT login), Gemini CLI or Antigravity. / 把 MCP 接到 AI 客户端"""
+    import json
+    import shlex
+
+    from . import mcp_setup as ms
+
+    if client not in ms.CLIENTS:
+        console.print(f"[red]choose one of {', '.join(ms.CLIENTS)}[/]")
+        raise typer.Exit(1)
+    if importlib.util.find_spec("mcp") is None:
+        typer.echo('The server needs the MCP extra first: pip install "risk-aware-trading-agents[mcp]"',
+                   err=True)  # stderr, so the command printed below can be copied or piped as it is
+    if do_apply:
+        try:
+            console.print(ms.apply(client, tool))
+        except (RuntimeError, ValueError, OSError) as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(1) from exc
+        return
+    if client == "claude-desktop":  # plain output, so the lines can be copied as they are
+        typer.echo(f"Add this to {ms.desktop_config_path()} (or run with --apply), then restart Claude Desktop:")
+        typer.echo(json.dumps(ms.desktop_snippet(), indent=2, ensure_ascii=False))
+        return
+    typer.echo(shlex.join(ms.setup_command(client, tool=tool)))
+
+
 @app.command("llm-check")
-def llm_check(choice: str = typer.Argument("openai:gpt-5.6-luna", help="provider:model, e.g. ollama:qwen2.5:3b"),
+def llm_check(choice: str = typer.Argument("openai:gpt-5.6-luna", help="provider:model, e.g. ollama:qwen2.5:3b, "
+                                                                        "codex-cli, gemini-cli, claude-cli:sonnet"),
               base_url: Optional[str] = typer.Option(None, "--base-url"),
-              key_env: Optional[str] = typer.Option(None, "--key-env")) -> None:
+              key_env: Optional[str] = typer.Option(None, "--key-env"),
+              command: Optional[str] = typer.Option(None, "--command", help="for the -cli choices")) -> None:
     """Send one sample review to an LLM and show its answer: checks a key or a local model. / 测试 LLM 连接"""
     from .llm import llm_config, make_reviewer
     from .types import Action, Signal
 
     try:
-        c = llm_config(choice, base=cfg().llm, base_url=base_url, key_env=key_env)
+        c = llm_config(choice, base=cfg().llm, base_url=base_url, key_env=key_env, command=command)
         reviewer = make_reviewer(c)
     except (ValueError, RuntimeError) as exc:
         console.print(f"[red]{exc}[/]")
@@ -768,7 +803,7 @@ def llm_check(choice: str = typer.Argument("openai:gpt-5.6-luna", help="provider
     console.print(Panel(f"bull: {verdict.bull_case}\nbear: {verdict.bear_case}\njudge: {verdict.summary}\n"
                         f"adjustment {verdict.adjustment:+.2f} · veto {verdict.veto} · {rec.latency_ms} ms"
                         + (f" · {_tokens(rec.usage)} tokens" if _tokens(rec.usage) else ""),
-                        title=f"{c.model} via {c.base_url or c.provider}", expand=False))
+                        title=f"{c.model} via {c.command or c.base_url or c.provider}", expand=False))
 
 
 @app.command("config")
@@ -873,9 +908,12 @@ def agents_add(
     param: Optional[list[str]] = typer.Option(None, "--param", help="strategy parameter key=value (repeatable)"),
     note: str = typer.Option("", help="a short description"),
     llm: Optional[str] = typer.Option(None, "--llm", help="LLM review: openai:gpt-5.6-luna, ollama:qwen2.5:3b, "
-                                                           "anthropic:MODEL, compat:MODEL, or off"),
+                                                           "anthropic:MODEL, compat:MODEL; without an API key: "
+                                                           "claude-cli, codex-cli, gemini-cli; or off"),
     llm_base_url: Optional[str] = typer.Option(None, "--llm-base-url", help="for compat: or a remote Ollama"),
     llm_key_env: Optional[str] = typer.Option(None, "--llm-key-env", help="environment variable with the API key"),
+    llm_command: Optional[str] = typer.Option(None, "--llm-command", help="for the -cli choices: the executable "
+                                                                           "or wrapper to run"),
     overwrite: bool = typer.Option(False, "--overwrite", help="replace an agent with the same name"),
 ) -> None:
     """Create a paper-trading agent from any strategy, including your own file. / 新建智能体"""
@@ -895,7 +933,8 @@ def agents_add(
     try:
         spec = _arena().add(AgentSpec(name=name, strategy=strategy, profile=profile, preset=universe,
                                       symbols=(symbols or "").split(","), cash=cash, params=params, note=note,
-                                      llm=llm, llm_base_url=llm_base_url, llm_key_env=llm_key_env),
+                                      llm=llm, llm_base_url=llm_base_url, llm_key_env=llm_key_env,
+                                      llm_command=llm_command),
                             overwrite=overwrite)
     except Exception as exc:
         console.print(f"[red]{exc}[/]")
@@ -906,12 +945,14 @@ def agents_add(
 
 @agents_app.command("llm")
 def agents_llm(name: str, choice: str = typer.Argument(..., help="openai:gpt-5.6-luna, ollama:qwen2.5:3b, "
-                                                                  "anthropic:MODEL, compat:MODEL, off, or config"),
+                                                                  "anthropic:MODEL, compat:MODEL, claude-cli, "
+                                                                  "codex-cli, gemini-cli, off, or config"),
                base_url: Optional[str] = typer.Option(None, "--base-url"),
-               key_env: Optional[str] = typer.Option(None, "--key-env")) -> None:
+               key_env: Optional[str] = typer.Option(None, "--key-env"),
+               command: Optional[str] = typer.Option(None, "--command", help="for the -cli choices")) -> None:
     """Give an agent an LLM review board, or turn it off. / 设置智能体的 LLM 复核"""
     try:
-        spec = _arena().set_llm(name, None if choice == "config" else choice, base_url, key_env)
+        spec = _arena().set_llm(name, None if choice == "config" else choice, base_url, key_env, command)
     except (KeyError, ValueError) as exc:
         console.print(f"[red]{exc.args[0] if exc.args else exc}[/]")
         raise typer.Exit(1) from exc

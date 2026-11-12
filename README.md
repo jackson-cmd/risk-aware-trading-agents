@@ -14,7 +14,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#-safety)
-[![Version 0.4.0](https://img.shields.io/badge/version-0.4.0-e5534b.svg)](CHANGELOG.md)
+[![Version 0.5.0](https://img.shields.io/badge/version-0.5.0-e5534b.svg)](CHANGELOG.md)
 [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server)
 [![11 strategies](https://img.shields.io/badge/strategies-11-8957e5.svg)](#-strategy-library)
 [![10 brokers](https://img.shields.io/badge/brokers-10-0969da.svg)](#-brokers)
@@ -37,10 +37,13 @@
 
 ## 🆕 What's new
 
-<sub>Latest release **0.4.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
+<sub>Latest release **0.5.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
 
-| | New in 0.4.0 |
+| | New in 0.5.0 and 0.4.0 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔑 No API key needed**: an agent's review can run on your Claude, ChatGPT or Gemini plan through the tool you are already logged in to: `--llm claude-cli`, `--llm codex-cli` or `--llm gemini-cli` (Gemini CLI or Antigravity). [How →](docs/agents.md#no-api-key-use-your-plan) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔌 MCP in one command**: `riskaware mcp-setup claude-desktop` (or `claude-code`, `codex`, `gemini`, `antigravity`) connects the agents to that app, so you can ask it about the market and run agents in plain words. [Set it up →](#-mcp-server) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ News in backtests**: `riskaware news-history` keeps a point-in-time archive on your own machine (SEC 8-K filings for free, your Benzinga key, or any CSV), and `riskaware backtest --news` lets strategies see only what was published before each day's close. [How →](#news-in-backtests) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧠 An LLM for each agent**: give any paper-trading agent GPT (for example `gpt-5.6-luna`), Claude, or a free local model through Ollama. A bull analyst, a bear analyst and a judge review every buy; they can move conviction by at most ±0.15 or veto it, never create a trade. [How →](#-paper-trading-agents) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔍 See how every decision was made**: the setups and reasons, what the risk manager said, the bull, bear and judge, and the exact prompt and raw reply, on the dashboard's Decisions tab or with `riskaware agents why NAME`. Everything stays on your computer. [Details →](docs/agents.md#an-llm-for-each-agent) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏠 Free local models**: `ollama:qwen2.5:3b` runs on your own machine; `riskaware llm-check ollama:qwen2.5:3b` tests a key or a model in one command. [Set it up →](docs/agents.md#an-llm-for-each-agent) |
@@ -123,20 +126,20 @@ riskaware agents                                         # the leaderboard
 riskaware agents schedule --install                      # every trading day, by itself
 ```
 
-The daily job (a LaunchAgent on macOS, a crontab line on Linux, a scheduled task on Windows) wakes every 15 minutes on weekdays and trades each agent once per trading day after 15:40 New York time, before the close. It skips holidays, catches up after the laptop sleeps, and keeps going when one agent fails. Each agent keeps its account, journal and daily equity in `~/.riskaware/arena/NAME/`. The **Agents** page of the dashboard shows the leaderboard and lets you create, run, pause, reset and delete agents; its **Decisions** tab shows how each decision was made, including the LLM's bull case, bear case and verdict and the exact prompt it was sent. GPT needs `OPENAI_API_KEY` in your `.env`; a local model needs [Ollama](https://ollama.com) (`ollama pull qwen2.5:3b`). More in [docs/agents.md](docs/agents.md).
+The daily job (a LaunchAgent on macOS, a crontab line on Linux, a scheduled task on Windows) wakes every 15 minutes on weekdays and trades each agent once per trading day after 15:40 New York time, before the close. It skips holidays, catches up after the laptop sleeps, and keeps going when one agent fails. Each agent keeps its account, journal and daily equity in `~/.riskaware/arena/NAME/`. The **Agents** page of the dashboard shows the leaderboard and lets you create, run, pause, reset and delete agents; its **Decisions** tab shows how each decision was made, including the LLM's bull case, bear case and verdict and the exact prompt it was sent. GPT needs `OPENAI_API_KEY` in your `.env`; a local model needs [Ollama](https://ollama.com) (`ollama pull qwen2.5:3b`); and `--llm claude-cli`, `codex-cli` or `gemini-cli` uses your Claude, ChatGPT or Gemini plan through its command-line tool, with no API key. More in [docs/agents.md](docs/agents.md).
 
 <img src="site/assets/agents_en.jpg" width="820" alt="Agents page: a leaderboard of paper-trading agents with equity, return, comparison with SPY and status">
 
 ## 🔗 MCP server
 
-`riskaware mcp` serves the agents over the Model Context Protocol, so Claude, Cursor or any MCP client can use them:
+`riskaware mcp` serves the agents over the Model Context Protocol, so Claude, Codex, Gemini, Cursor or any MCP client can use them, on your plan and without an API key. `riskaware mcp-setup` prints (or, with `--apply`, runs) the one step that connects it:
 
 ```bash
 pip install -e ".[mcp]"
-claude mcp add riskaware -- riskaware mcp
+riskaware mcp-setup claude-desktop --apply   # or: claude-code, codex (your ChatGPT login), gemini, antigravity
 ```
 
-Eleven tools: `market_regime`, `scan`, `analyze_stock`, `stock_news`, `list_strategies`, `backtest`, `agents_leaderboard`, `agent_detail`, `agent_decisions`, `agents_create` and `agents_run`. They are read-only or act on local paper accounts; no tool can send an order to a broker. Then just ask, for example "What regime is the market in, and what is coming up this week?" or "Backtest the wheel on megacap with $1M since 2018." Setup for Claude Desktop and other clients is in [docs/agents.md](docs/agents.md#use-it-from-claude-mcp).
+Eleven tools: `market_regime`, `scan`, `analyze_stock`, `stock_news`, `list_strategies`, `backtest`, `agents_leaderboard`, `agent_detail`, `agent_decisions`, `agents_create` and `agents_run`. They are read-only or act on local paper accounts; no tool can send an order to a broker. Then just ask, for example "What regime is the market in, and what is coming up this week?" or "Backtest the wheel on megacap with $1M since 2018." ChatGPT itself only connects to remote servers, so on the OpenAI side use Codex, which runs on your ChatGPT login. More in [docs/agents.md](docs/agents.md#use-it-from-claude-chatgpt-or-gemini-mcp).
 
 ## 🧠 How it works
 

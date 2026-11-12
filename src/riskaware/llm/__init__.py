@@ -12,8 +12,10 @@ from ..config import LLMConfig
 from .reviewer import LLMReviewer, LLMVerdict, ReviewRecord
 
 OLLAMA_URL = "http://localhost:11434/v1"
-CHOICES = ("openai", "ollama", "anthropic", "compat")
-DEFAULT_MODELS = {"openai": "gpt-5.6-luna", "ollama": "qwen2.5:3b", "anthropic": "claude-opus-5-5"}
+CHOICES = ("openai", "ollama", "anthropic", "compat", "claude-cli", "codex-cli", "gemini-cli")
+# the -cli choices use a logged-in subscription through its command-line tool; "default" = the tool's own default
+DEFAULT_MODELS = {"openai": "gpt-5.6-luna", "ollama": "qwen2.5:3b", "anthropic": "claude-opus-5-5",
+                  "claude-cli": "default", "codex-cli": "default", "gemini-cli": "default"}
 
 
 def parse_choice(choice: str) -> tuple[str, str]:
@@ -30,13 +32,21 @@ def parse_choice(choice: str) -> tuple[str, str]:
 
 
 def llm_config(choice: str, base: LLMConfig | None = None, base_url: str | None = None,
-               key_env: str | None = None, effort: str | None = None) -> LLMConfig:
+               key_env: str | None = None, effort: str | None = None, command: str | None = None) -> LLMConfig:
     """An enabled LLMConfig for a short choice such as 'openai:gpt-5.6-luna', 'ollama:qwen2.5:3b',
-    'anthropic:claude-opus-5-5' or 'compat:deepseek-chat' (any OpenAI-compatible server; give base_url)."""
+    'anthropic:claude-opus-5-5', 'compat:deepseek-chat' (any OpenAI-compatible server; give base_url), or a
+    subscription through its command-line tool: 'claude-cli:sonnet', 'codex-cli', 'gemini-cli'."""
     kind, model = parse_choice(choice)
     c = (base or LLMConfig()).model_copy(deep=True)
     c.enabled = True
     c.model = model
+    if kind.endswith("-cli"):
+        c.provider = kind
+        c.command = command or None
+        c.base_url = None
+        c.reasoning_effort = None
+        c.timeout = max(c.timeout, 240.0)
+        return c
     if kind == "anthropic":
         c.provider = "anthropic"
         c.base_url = base_url
@@ -65,6 +75,10 @@ def make_provider(cfg: LLMConfig):
         from .anthropic_provider import AnthropicProvider
 
         return AnthropicProvider(cfg)
+    if cfg.provider.endswith("-cli"):
+        from .cli_provider import CLIProvider
+
+        return CLIProvider(cfg)
     from .openai_compat import OpenAICompatProvider
 
     return OpenAICompatProvider(cfg)
