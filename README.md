@@ -8,6 +8,8 @@
 
 **Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · daily paper-trading agents · an MCP server for Claude · 11 strategies including options · backtest your own · paper and live trading on 10 brokers · English and 中文**
 
+📊 **2026 backtest with news: +15.9% vs SPY +12.1% · max drawdown -5.3% vs -8.9% · Sharpe 1.70 vs 0.77** · [details](#2026-so-far-with-news)
+
 [中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Screenshots](#-screenshots) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy lab](#-strategy-lab) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
@@ -41,7 +43,7 @@
 
 | | New in 0.6.0 and 0.5.0 |
 |---|---|
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 2026 news in the box**: 16,945 news items for the 64 stocks of the built-in lists ship with the package (Benzinga headlines, titles only, and SEC 8-K filings, January to November 2026), so `riskaware backtest --news`, or the new **Replay news** switch on the dashboard's Backtest page, works with nothing to download. [How →](#news-in-backtests) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 2026 news in the box**: 16,945 news items for the 64 stocks of the built-in lists ship with the package (Benzinga headlines, titles only, and SEC 8-K filings, January to November 2026), so `riskaware backtest --news`, or the new **Replay news** switch on the dashboard's Backtest page, works with nothing to download. In 2026 so far the built-in agent with news returned **+15.9%** against SPY's +12.1%, with a max drawdown of **-5.3%** against -8.9%. [Results →](#2026-so-far-with-news) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧪 Describe a strategy, the AI writes and tests it**: over MCP, Claude, Codex or Gemini read `strategy_guide`, write the strategy as code and run it with `backtest_code`. The code is checked for look-ahead and side effects and runs in a separate process; the good ones are saved for the dashboard and the paper agents. `riskaware lab FILE` does the same for code from anywhere. [How →](#-strategy-lab) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔭 No peeking at the future**: each backtest day sees only news published before its close (13:00 on early-close days), a timestamp that could be read two ways is read the later way, and a strategy can no longer reach later prices through the price data it is given. [Details →](docs/news-history.md#how-the-backtest-avoids-look-ahead) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔑 No API key needed**: an agent's review can run on your Claude, ChatGPT or Gemini plan through the tool you are already logged in to: `--llm claude-cli`, `--llm codex-cli` or `--llm gemini-cli` (Gemini CLI or Antigravity). [How →](docs/agents.md#no-api-key-use-your-plan) |
@@ -78,9 +80,9 @@ Most trading bots either chase every signal or need a quant team to configure. T
 - **Cross-verified news.** Finviz (free), Google News, Nasdaq, Seeking Alpha and Yahoo RSS plus the company's own **SEC 8-K filings**. A story only counts toward the company it names, and it is confirmed when two independent outlets, the company's own press release or its SEC filing carry it; a red flag on a confirmed story blocks new buys. Only the company's 8-K, or its own release confirming what independent outlets reported first, can force a sale, so a fake headline, a fake press release and the outlets that repeat it, or another company's bad news cannot. A denial clears the story it refutes instead of confirming it.
 - **10 brokers, one interface.** Built-in paper account, **Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers, Longbridge**.
 - **Options strategies (backtest).** An aggressive call-buying strategy and the wheel (cash-secured puts and covered calls), with premium caps, put collateral outside the cash floor, assignment and expiry.
-- **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report, and replay point-in-time news (SEC 8-K filings, your own Benzinga key or a CSV) from a local archive.
+- **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report, and replay point-in-time news: 2026 headlines and SEC filings ship with the package, and other years come from a local archive (SEC 8-K filings, your own Benzinga key or a CSV).
 - **Daily paper-trading agents.** Run several strategies side by side, each on its own paper account with free prices. A background job trades them every trading day, and a leaderboard compares them with SPY.
-- **Works with Claude (MCP).** `riskaware mcp` gives Claude, Cursor or any MCP client the regime, signals, news, backtests and the paper agents.
+- **Works with Claude (MCP).** `riskaware mcp` gives Claude, Cursor or any MCP client the regime, signals, news, backtests and the paper agents. Describe a strategy in words and the AI writes it as code and backtests it, checked for look-ahead.
 - **Optional LLM review, per agent.** A bull analyst, a bear analyst and a risk judge (GPT, Claude, any OpenAI-compatible model such as DeepSeek or Qwen, or a free local model through Ollama) can nudge conviction by at most ±0.15 or veto a buy. They can never create a trade or change a limit. News reaches them only as quoted, untrusted text, and every prompt and reply is kept in the local journal so you can see how each decision was made.
 - **Bilingual.** CLI, dashboard, reports and docs in English and 中文.
 
@@ -209,7 +211,7 @@ Built-in strategy, balanced profile, the 55-stock `megacap` list, $100k, signals
 
 <img src="site/assets/backtest_equity_en.png" width="820" alt="Equity curve versus SPY with regime shading">
 
-Read it honestly: in a long bull market the agent earns less than the index because it keeps at least 30% in cash, and it loses roughly half as much when markets fall. The list is today's large caps, so it carries survivorship bias; these numbers use neither news nor fundamentals (news can be replayed from a local archive, see below), and past results do not predict future ones. Reproduce it with `riskaware backtest --compare buy_and_hold`.
+Read it honestly: in a long bull market the agent earns less than the index because it keeps at least 30% in cash, and it loses roughly half as much when markets fall. The list is today's large caps, so it carries survivorship bias; these numbers use neither news nor fundamentals (2026 with news is below), and past results do not predict future ones. Reproduce it with `riskaware backtest --compare buy_and_hold`.
 
 ```bash
 riskaware backtest --strategy risk_aware --compare buy_and_hold,ema_bounce,rsi2 --start 2018-01-01 --open
@@ -219,6 +221,22 @@ riskaware backtest --synthetic                     # offline demo, no download
 ```
 
 Every run writes a self-contained HTML report (metrics, equity and drawdown charts with regime shading, monthly returns, every trade with its reason) plus CSV files.
+
+### 2026 so far, with news
+
+The same agent and settings on 2026, from January 2 to November 11, now reading the news that ships with the package: 15,542 Benzinga headlines and 605 SEC filings for these 56 stocks, each day only what was out before its close.
+
+| January 2 – November 11, 2026 | risk_aware + news | risk_aware, no news | SPY buy & hold |
+|---|---|---|---|
+| Return | **+15.9%** | +15.4% | +12.1% |
+| Volatility | 8.2% | 7.8% | 14.0% |
+| Sharpe | 1.70 | 1.73 | 0.77 |
+| Max drawdown | **-5.3%** | -5.3% | -8.9% |
+| Average stocks / cash + T-bills | 60% / 35% | 61% / 34% | 100% / 0% |
+
+<img src="site/assets/backtest_2026_news_en.png" width="820" alt="2026 equity and drawdown of the risk-aware agent with news versus SPY, with regime shading">
+
+The agent beat SPY by 3.8 points while holding stocks with 60% of its money on average, and its worst drop was 60% of SPY's: in the March sell-off it fell 5.3% while SPY fell 8.9%. News added half a point of return this year. Ten months is a short test, so the 2018–2026 table above is still the better guide. Reproduce it with `riskaware backtest --preset megacap --start 2026-01-02 --end 2026-11-11 --news`.
 
 ### News in backtests
 

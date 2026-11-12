@@ -10,6 +10,7 @@
 - The dashboard's Backtest page has a **Replay news** switch, and saved AI strategies appear in its strategy lists and in the create-agent form.
 - The MCP `backtest` tool takes `news=True`; backtests load news only for the symbols they trade.
 - `news-history status` counts bundled items in their own column and prints what the bundle holds.
+- The READMEs and the website show the 2026 backtest with news (January 2 to November 11, megacap): +15.9% against SPY's +12.1%, max drawdown -5.3% against -8.9%.
 
 ## 0.5.0 (2026-11-12)
 
