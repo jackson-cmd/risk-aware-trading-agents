@@ -11,6 +11,7 @@ import json
 import os
 import platform
 import shutil
+import stat
 import subprocess
 import sys
 from datetime import datetime
@@ -63,18 +64,28 @@ def apply_desktop(path: Path | None = None, server: list[str] | None = None) -> 
     """Add the server to Claude Desktop's config, keeping every other entry and a backup of the old file."""
     path = path or desktop_config_path()
     data: dict = {}
+    mode = 0o600  # the file can hold other servers' tokens: never make it, or its backup, readable by others
     if path.is_file():
+        mode = stat.S_IMODE(path.stat().st_mode)
         text = path.read_text(encoding="utf-8")
         data = json.loads(text) if text.strip() else {}
         backup = path.with_name(f"{path.name}.{datetime.now():%Y%m%d-%H%M%S}.bak")
-        backup.write_text(text, encoding="utf-8")
+        _write_private(backup, text, mode)
     entry = desktop_snippet(server)["mcpServers"][NAME]
     data.setdefault("mcpServers", {})[NAME] = entry
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    _write_private(tmp, json.dumps(data, indent=2, ensure_ascii=False) + "\n", mode)
     tmp.replace(path)
     return f"added '{NAME}' to {path}; restart Claude Desktop to load it"
+
+
+def _write_private(path: Path, text: str, mode: int) -> None:
+    """Create the file with ``mode`` from the start, so it is never readable by others, even briefly."""
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, mode)
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        fh.write(text)
+    os.chmod(path, mode)  # O_CREAT's mode is reduced by the umask
 
 
 def apply(client: str, tool: str | None = None) -> str:

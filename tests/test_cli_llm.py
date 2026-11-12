@@ -148,6 +148,11 @@ def test_mcp_setup_commands_and_desktop_config(tmp_path, monkeypatch):
     assert data["mcpServers"]["riskaware"] == {"command": "/opt/riskaware", "args": ["mcp"]}
     assert data["mcpServers"]["other"] == {"command": "x"} and data["theme"] == "dark"
     assert list(cfg.parent.glob("*.bak")) and "restart Claude Desktop" in msg
+    if sys.platform != "win32":  # a private config stays private, and so does its backup
+        cfg.chmod(0o600)
+        ms.apply_desktop(cfg, server)
+        assert oct(cfg.stat().st_mode & 0o777) == "0o600"
+        assert all(oct(b.stat().st_mode & 0o777) == "0o600" for b in sorted(cfg.parent.glob("*.bak"))[-1:])
     monkeypatch.setattr(ms.shutil, "which", lambda name: None)
     with pytest.raises(RuntimeError):
         ms.apply("codex")
