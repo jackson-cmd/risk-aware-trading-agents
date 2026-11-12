@@ -1,5 +1,6 @@
 import plistlib
 from datetime import date, datetime
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -75,7 +76,7 @@ def test_config_for_forces_the_paper_account(arena, offline_cfg):
                                cash=25_000))
     c = arena.config_for(spec)
     assert c.broker.name == "paper" and c.execution.mode == "paper"
-    assert c.broker.options["account_file"].endswith("tech/tech.json")
+    assert Path(c.broker.options["account_file"]) == arena.dir("tech") / "tech.json"
     assert c.broker.options["starting_cash"] == 25_000
     assert c.profile == "aggressive" and c.strategy.name == "momentum_rotation"
     assert c.universe.preset == "tech" and c.universe.symbols == []
