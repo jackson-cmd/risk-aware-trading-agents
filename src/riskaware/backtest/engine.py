@@ -29,6 +29,7 @@ from ..agents.macro import MacroAgent, MarketState, to_regime
 from ..config import AppConfig, ExecutionConfig, RiskProfile
 from ..data.events import EventCalendar
 from ..data.prices import PriceProvider
+from ..news.history import PointInTimeNews
 from ..options.pricing import bs_price, model_iv, year_fraction
 from ..risk import PlannedOrder, RiskManager
 from ..strategy.base import (
@@ -102,12 +103,14 @@ class BacktestResult:
 
 class Backtester:
     def __init__(self, cfg: AppConfig, prices: PriceProvider, calendar: EventCalendar | None = None,
-                 profile: RiskProfile | None = None, quality_fn: Callable[[str, date], Any] | None = None):
+                 profile: RiskProfile | None = None, quality_fn: Callable[[str, date], Any] | None = None,
+                 news: PointInTimeNews | None = None):
         self.cfg = cfg
         self.prices = prices
         self.calendar = calendar if calendar is not None else EventCalendar(cfg.macro.events)
         self.profile = profile or cfg.risk_profile()
         self.quality_fn = quality_fn
+        self.news = news
         self._data_cache: dict[tuple, dict[str, pd.DataFrame]] = {}
 
     # ------------------------------------------------------------------ data
@@ -142,10 +145,14 @@ class Backtester:
         days = full_index[(full_index >= pd.Timestamp(start)) & (full_index <= pd.Timestamp(end))]
         if len(days) < 2:
             raise RuntimeError("not enough trading days in the backtest window")
-        notes = [
-            "Signals use the close of day t; orders fill on day t+1 (open or limit).",
-            "News is not used in backtests (no free point-in-time archive).",
-        ]
+        notes = ["Signals use the close of day t; orders fill on day t+1 (open or limit)."]
+        if self.news is None:
+            notes.append("News is not used in this backtest (build a local archive with `riskaware news-history`).")
+        else:
+            covered = [s for s in universe if s in self.news.symbols]
+            feeds = ", ".join(f"{k} {v}" for k, v in sorted(self.news.feeds().items()))
+            notes.append(f"News replayed from the local archive for {len(covered)}/{len(universe)} symbols "
+                         f"({feeds}); an item stamped after 16:00 New York time is first visible the next day.")
         if self.quality_fn is None:
             notes.append("Fundamentals are unknown in this backtest; dip buys use the technical proxy.")
         missing = [s for s in universe if s not in frames]
@@ -491,8 +498,12 @@ class Backtester:
             if self.quality_fn is not None:
                 qf = self.quality_fn
                 quality = lambda sym, _d=day, _qf=qf: _qf(sym, _d)  # noqa: E731
+            news_fn = None
+            if self.news is not None:
+                pit = self.news
+                news_fn = lambda sym, _d=day, _p=pit: _p.report(sym, _d)  # noqa: E731
             ctx = StrategyContext(day, trade_syms, market, pf, prof, rows=rows, history=history, quality=quality,
-                                  mode="backtest", scoring_weights=weights)
+                                  news=news_fn, mode="backtest", scoring_weights=weights)
             signals = strategy.on_bar(ctx)
             prices_now = {s: float(sd.arr[i, sd.cols["close"]])
                           for s, sd in sym_data.items() if (i := sd.position_of(ts)) is not None}

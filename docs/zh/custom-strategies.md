@@ -35,7 +35,7 @@ Signal(symbol, Action.SELL, strength=1.0, fraction=1.0, emergency=True, reason="
 | `ctx.portfolio` | 账户：`equity, cash, cash_ratio, stock_exposure, drawdown, positions` |
 | `ctx.market` | 市场：`regime`（状态）、`vix`、`vix_ratio`、`fear_greed`、`breadth`、`event_risk`、`reasons`、`macro_score`、`dip_tailwind` |
 | `ctx.quality(sym)` | 财报结论（`QUALITY` 优质、`NEUTRAL`、`BROKEN` 变差、`UNKNOWN`、`ETF`）和 0 到 100 的分数；只在实盘可用，除非你提供历史时点数据 |
-| `ctx.news(sym)` | 交叉验证后的新闻报告（`score`、`confirmed`、`red_flags_confirmed` 等）；只在实盘可用 |
+| `ctx.news(sym)` | 交叉验证后的新闻报告（`score`、`confirmed`、`red_flags_confirmed`、`clusters` 等）；实盘可用，回测加 `--news` 时也可用（[news-history.md](news-history.md)） |
 | `ctx.days_to_earnings(sym)` | 距离下次财报的交易日数，只在实盘可用 |
 | `ctx.profile` | 当前风险档位 |
 

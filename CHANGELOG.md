@@ -6,6 +6,11 @@
 
 - No API key needed: `--llm claude-cli[:MODEL]`, `codex-cli[:MODEL]` and `gemini-cli[:MODEL]` run each review through Claude Code, OpenAI Codex, Google's Gemini CLI or Antigravity, on the plan you are logged in to. The tool runs in an empty temporary folder with its tools off and the same strict JSON schema; `--llm-command` / `RISKAWARE_*_CLI` choose a different executable or wrapper. Also in the dashboard's LLM picker and `riskaware llm-check`.
 - `riskaware mcp-setup claude-desktop | claude-code | codex | gemini | antigravity [--apply]` prints or runs the one step that connects the MCP server to that app (Claude Desktop's config is edited in place with a backup).
+- News in backtests: `riskaware news-history` builds a local, point-in-time news archive (`~/.riskaware/news`) from SEC EDGAR 8-K filings, your own Benzinga API key, or any CSV, and `riskaware backtest --news` replays it through the same clustering and two-source verification used live. Items stamped after the 16:00 New York close become visible the next day.
+- `news-history show SYMBOL --date DAY` prints exactly what a backtest saw at that close.
+- New `core` universe preset (SPY, QQQ and the seven largest US stocks) and an example news strategy (`examples/strategies/news_earnings_drift.py`).
+- `NewsItem.sentiment`: a sentiment score supplied by the data source (for example an imported CSV) overrides the headline lexicon.
+- The `thesis_break` emergency exit now also works in backtests that use an archive, under the same rule as live trading: the company's own 8-K or press release must carry the severe flag.
 
 ## 0.4.0 (2026-11-12)
 

@@ -6,6 +6,11 @@
 
 - 不需要 API key：`--llm claude-cli[:模型]`、`codex-cli[:模型]` 和 `gemini-cli[:模型]` 通过 Claude Code、OpenAI Codex、Google 的 Gemini CLI 或 Antigravity 做每次复核，走你已经登录的订阅。工具在一个空的临时文件夹里运行，关掉它的工具调用，要求同样严格的 JSON schema；`--llm-command` 或 `RISKAWARE_*_CLI` 可以换成别的可执行文件或包装脚本。看板的 LLM 选择和 `riskaware llm-check` 也都支持。
 - `riskaware mcp-setup claude-desktop | claude-code | codex | gemini | antigravity [--apply]` 打印或直接执行把 MCP 服务器接到对应应用的那一步（Claude Desktop 的配置文件会就地修改并留备份）。
+- 回测可以用新闻了：`riskaware news-history` 在本机建一个按发布时间存的新闻库（`~/.riskaware/news`），来源可以是 SEC EDGAR 8-K 公告、你自己的 Benzinga API key 或任何 CSV；`riskaware backtest --news` 按天回放，走和实盘一样的聚类和两家来源交叉验证。美东 16:00 收盘后发布的新闻，第二天才看得到。
+- `news-history show 代码 --date 日期` 打印回测在那天收盘时看到的新闻。
+- 新的 `core` 股票池（SPY、QQQ 和美股最大的七只股票）和一个用新闻的示例策略（`examples/strategies/news_earnings_drift.py`）。
+- `NewsItem.sentiment`：数据源自带的情绪分（例如导入的 CSV）会代替标题情绪词典。
+- 用新闻库回测时，`thesis_break` 紧急卖出在回测里也会触发，规则和实盘一样：严重利空要出现在公司自己的 8-K 或通稿里。
 
 ## 0.4.0（2026-11-12）
 

@@ -145,7 +145,7 @@ class RiskAwareStrategy(Strategy):
         if prof.hard_stop is not None and gain <= -prof.hard_stop:
             return Signal(sym, Action.SELL, 1.0, f"hard stop: {gain:.0%} loss", ["hard_stop"], fraction=1.0,
                           emergency=True, details={"tag": "hard_stop"})
-        if self.params["use_news"] and ctx.mode != "backtest":
+        if self.params["use_news"]:  # in backtests this needs the local news archive (otherwise None)
             report = ctx.news(sym)
             if report is not None and getattr(report, "severe_confirmed", False):
                 flags = getattr(report, "red_flags_backed", None) or report.red_flags_confirmed

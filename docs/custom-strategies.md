@@ -35,7 +35,7 @@ Signal(symbol, Action.SELL, strength=1.0, fraction=1.0, emergency=True, reason="
 | `ctx.portfolio` | `equity, cash, cash_ratio, stock_exposure, drawdown, positions` |
 | `ctx.market` | `regime`, `vix`, `vix_ratio`, `fear_greed`, `breadth`, `event_risk`, `reasons`, `macro_score`, `dip_tailwind` |
 | `ctx.quality(sym)` | earnings verdict (`QUALITY`, `NEUTRAL`, `BROKEN`, `UNKNOWN`, `ETF`) and a 0..100 score; live only unless you supply point-in-time data |
-| `ctx.news(sym)` | cross-verified news report (`score`, `confirmed`, `red_flags_confirmed`, ...); live only |
+| `ctx.news(sym)` | cross-verified news report (`score`, `confirmed`, `red_flags_confirmed`, `clusters`, ...); live, and in backtests run with `--news` ([news-history.md](news-history.md)) |
 | `ctx.days_to_earnings(sym)` | trading days to the next report, live only |
 | `ctx.profile` | the active risk profile |
 

@@ -26,6 +26,9 @@ app = typer.Typer(add_completion=False, no_args_is_help=True, rich_markup_mode="
                   help="Risk-Aware Trading Agents: macro-aware, risk-first stock trading agents. / 风险感知交易智能体")
 paper_app = typer.Typer(help="Local paper account / 本地模拟盘", no_args_is_help=True)
 app.add_typer(paper_app, name="paper")
+news_app = typer.Typer(help="Local news archive for backtests (SEC 8-K, your Benzinga key, CSV). / 回测用的本地新闻库",
+                       no_args_is_help=True)
+app.add_typer(news_app, name="news-history")
 agents_app = typer.Typer(help="Paper-trading agents that run every trading day / 每个交易日自动运行的模拟盘智能体",
                          invoke_without_command=True)
 app.add_typer(agents_app, name="agents")
@@ -559,6 +562,8 @@ def backtest(
     out: Optional[str] = typer.Option(None, help="Report folder (default ./backtests)"),
     report: bool = typer.Option(True, "--report/--no-report"),
     open_report: bool = typer.Option(False, "--open", help="Open the HTML report"),
+    news: Optional[bool] = typer.Option(None, "--news/--no-news",
+                                        help="Replay the local news archive (default: backtest.news in the config)"),
 ) -> None:
     """Backtest one or more strategies with the same risk engine. / 回测与策略对比"""
     from rich.progress import Progress
@@ -581,7 +586,19 @@ def backtest(
     d1 = date.fromisoformat(end) if end else (c.backtest.end and date.fromisoformat(c.backtest.end)) or date.today()
     prices = SyntheticPrices(seed=7, start=d0 - timedelta(days=700), end=d1) if synthetic else \
         make_price_provider(c.data.price_source, DiskCache(c.data.cache_path), c.data.csv_dir)
-    bt = Backtester(c, prices)
+    pit = None
+    if (c.backtest.news if news is None else news) and not synthetic:
+        from .news.history import NewsArchive, PointInTimeNews
+        from .news.relevance import company_names
+        from .utils import DiskCache as _Cache
+
+        archive = NewsArchive(c.news.archive_path)
+        if archive.symbols():
+            name_cache = _Cache(c.data.cache_path)
+            pit = PointInTimeNews(archive, c.news, names=lambda s: company_names(s, name_cache))
+        else:
+            console.print(f"[yellow]{T('bt.news_off')}[/]")
+    bt = Backtester(c, prices, news=pit)
     names = [strategy] + ([x.strip() for x in compare.split(",") if x.strip()] if compare else [])
     results = []
     with Progress(console=console) as progress:
@@ -1170,6 +1187,156 @@ def paper_reset(cash: float = typer.Option(100_000.0), account: str = typer.Opti
 def version() -> None:
     """Show the version."""
     console.print(f"risk-aware-trading-agents {__version__}")
+
+
+# ----------------------------------------------------------------------------- news history
+def _archive():
+    from .news.history import NewsArchive
+
+    return NewsArchive(cfg().news.archive_path)
+
+
+def _symbols_arg(symbols: Optional[str], preset: Optional[str]) -> list[str]:
+    from .universe import preset_symbols
+
+    if symbols:
+        return [x.strip().upper() for x in symbols.split(",") if x.strip()]
+    out: list[str] = []
+    for name in (preset or "core").split("+"):
+        out.extend(preset_symbols(name.strip()))
+    return list(dict.fromkeys(out))
+
+
+@news_app.command("build")
+def news_history_build(
+    symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols (default: the 'core' preset)"),
+    preset: Optional[str] = typer.Option(None, help="Universe preset instead of --symbols: core, megacap, tech, ..."),
+    start: str = typer.Option("2018-01-01", help="YYYY-MM-DD"),
+    end: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default today)"),
+    source: str = typer.Option("sec", help="sec, benzinga, or both: sec,benzinga"),
+    contact_email: Optional[str] = typer.Option(None, help="Contact email SEC asks for (default: data.contact_email)"),
+) -> None:
+    """Download point-in-time news into the local archive. / 下载历史新闻到本地新闻库"""
+    from .config import env
+    from .news.history_sources import BenzingaHistory, HistoryError, SecFilingHistory
+    from .utils import DiskCache
+
+    c = cfg()
+    syms = _symbols_arg(symbols, preset)
+    d0 = date.fromisoformat(start)
+    d1 = date.fromisoformat(end) if end else date.today()
+    wanted = [x.strip().lower() for x in source.split(",") if x.strip()]
+    archive = _archive()
+    try:
+        fetchers = []
+        if "sec" in wanted:
+            fetchers.append(("sec", SecFilingHistory(contact_email or c.data.contact_email, DiskCache(c.data.cache_path))))
+        if "benzinga" in wanted:
+            fetchers.append(("benzinga", BenzingaHistory(env(c.news.benzinga_key_env))))
+            console.print(f"[dim]{T('nh.private')}[/]")
+        if not fetchers:
+            raise HistoryError(f"unknown source '{source}' (use sec, benzinga or sec,benzinga)")
+        tbl = Table(title=f"{T('nh.title')} · {d0} → {d1}")
+        for k in ("col.symbol", "nh.feeds", "nh.added", "nh.items"):
+            tbl.add_column(T(k), justify="left" if k in ("col.symbol", "nh.feeds") else "right")
+        for sym in syms:
+            for name, f in fetchers:
+                with console.status(f"{name}: {sym}..."):
+                    items = f.fetch(sym, d0, d1)
+                added = archive.add(items)
+                tbl.add_row(sym, name, str(added), str(len(archive.items(sym))))
+    except HistoryError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
+    console.print(tbl)
+    console.print(f"[dim]{archive.root}[/]")
+
+
+@news_app.command("import")
+def news_history_import(
+    path: str = typer.Argument(..., help="CSV with timestamp, symbol, headline[, source, url, sentiment]"),
+    source: Optional[str] = typer.Option(None, help="Publisher name for rows without a source column"),
+    tz: str = typer.Option("UTC", help="Time zone for timestamps without one, e.g. America/New_York"),
+) -> None:
+    """Import news from a CSV into the local archive. / 从 CSV 导入新闻"""
+    from .news.history import read_csv
+
+    try:
+        items = read_csv(path, default_source=source, assume_tz=tz)
+    except (OSError, ValueError) as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
+    archive = _archive()
+    added = archive.add(items)
+    syms = sorted({i.symbol for i in items if i.symbol})
+    console.print(f"{T('nh.added')}: {added} / {len(items)} · {len(syms)} {T('col.symbol')}: {', '.join(syms[:20])}")
+    console.print(f"[dim]{T('nh.private')}[/]")
+
+
+@news_app.command("status")
+def news_history_status() -> None:
+    """What the local archive holds. / 查看本地新闻库"""
+    archive = _archive()
+    stats = archive.stats()
+    if not stats:
+        console.print(T("nh.empty"))
+        return
+    tbl = Table(title=f"{T('nh.title')} · {archive.root}")
+    for k in ("col.symbol", "nh.items", "nh.first", "nh.last", "nh.feeds"):
+        tbl.add_column(T(k), justify="right" if k == "nh.items" else "left")
+    for st in stats:
+        tbl.add_row(st.symbol, str(st.items), st.first.date().isoformat() if st.first else "-",
+                    st.last.date().isoformat() if st.last else "-",
+                    ", ".join(f"{k} {v}" for k, v in sorted(st.feeds.items())))
+    console.print(tbl)
+
+
+@news_app.command("show")
+def news_history_show(
+    symbol: str,
+    day: str = typer.Option(..., "--date", help="YYYY-MM-DD: show what a backtest sees at that day's close"),
+) -> None:
+    """Replay one day: the news a backtest sees for SYMBOL at the close. / 回放某一天回测能看到的新闻"""
+    from .news.history import PointInTimeNews, decision_time
+    from .news.relevance import company_names
+    from .utils import DiskCache
+
+    c = cfg()
+    d = date.fromisoformat(day)
+    cache = DiskCache(c.data.cache_path)
+    pit = PointInTimeNews(_archive(), c.news, [symbol], names=lambda s: company_names(s, cache))
+    cutoff = decision_time(d)
+    items = pit.visible(symbol, cutoff)
+    console.print(f"[bold]{T('nh.asof', day=d.isoformat())}: {symbol.upper()}[/] "
+                  f"[dim](≤ {cutoff.strftime('%Y-%m-%d %H:%M')} UTC, {c.news.lookback_hours}h)[/]")
+    if not items:
+        console.print(T("nh.none"))
+        return
+    rep = pit.report(symbol, d)
+    console.print(f"{T('news.score')} {rep.score:+.2f} · {rep.confirmed} {T('news.status.confirmed')} / "
+                  f"{rep.unconfirmed} {T('news.status.unconfirmed')} / {rep.opinion} {T('news.status.opinion')}"
+                  + (f" · [dim]{rep.off_topic} off-topic[/]" if rep.off_topic else "")
+                  + (f" · [bold red]{T('news.flags')}[/] {rep.red_flags_confirmed}" if rep.red_flags_confirmed else ""))
+    tbl = Table()
+    tbl.add_column("UTC")
+    tbl.add_column(T("nh.feeds"))
+    tbl.add_column("Headline")
+    for it in items[-40:]:
+        tbl.add_row(it.published.strftime("%m-%d %H:%M"), it.publisher, it.title[:100])
+    console.print(tbl)
+
+
+@news_app.command("remove")
+def news_history_remove(
+    symbol: str,
+    feed: Optional[str] = typer.Option(None, help="Only items from this feed (sec, benzinga, import)"),
+    yes: bool = typer.Option(False, "--yes", "-y"),
+) -> None:
+    """Delete a symbol's items from the local archive. / 删除某只股票的本地新闻"""
+    if not yes and not Confirm.ask(f"Remove {symbol.upper()} {feed or 'all feeds'} from the archive?"):
+        raise typer.Exit(1)
+    n = _archive().remove(symbol, feed)
+    console.print(f"removed {n}")
 
 
 def main() -> None:
