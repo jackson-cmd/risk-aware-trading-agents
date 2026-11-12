@@ -266,3 +266,25 @@ def test_manual_run_counts_as_todays_trade(arena, monkeypatch):
     arena.run(["b"], mode="dry-run", quote_fn=fake_quotes, data_factory=data_factory)
     _, runs = arena.scheduled_run(now=ny(2026, 11, 12, 15, 50), quote_fn=fake_quotes, data_factory=data_factory)
     assert [r.name for r in runs] == ["b"]
+
+
+def test_runs_never_overlap(arena):
+    arena.add(AgentSpec(name="a", strategy="buy_and_hold"))
+    assert arena._acquire()  # e.g. the daily job is trading right now
+    with pytest.raises(RuntimeError):
+        arena.run(quote_fn=fake_quotes, data_factory=data_factory)
+    why, runs = arena.scheduled_run(now=ny(2026, 11, 12, 15, 45), quote_fn=fake_quotes, data_factory=data_factory)
+    assert runs == [] and why == "another run is in progress"
+    arena._release()
+    assert arena.run(quote_fn=fake_quotes, data_factory=data_factory)[0].ok
+    assert not (arena.root / "run.lock").exists()
+
+
+def test_stale_lock_from_a_crash_is_ignored(arena):
+    import os
+
+    arena.add(AgentSpec(name="a", strategy="buy_and_hold"))
+    assert arena._acquire()
+    old = datetime.now().timestamp() - 4 * 3600
+    os.utime(arena.root / "run.lock", (old, old))
+    assert arena.run(quote_fn=fake_quotes, data_factory=data_factory)[0].ok

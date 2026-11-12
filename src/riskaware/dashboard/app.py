@@ -408,7 +408,11 @@ def _agent_detail(a, name: str, bench: pd.Series | None) -> None:
     c1, c2, c3, c4, _ = st.columns([1, 1, 1, 1, 2])
     if c1.button(L("Run now", "现在运行"), key=f"run_{name}", icon=":material/play_arrow:", type="primary"):
         with st.spinner(L(f"Running {name}…", f"正在运行 {name}…")):
-            res = a.run([name])
+            try:
+                res = a.run([name])
+            except RuntimeError as exc:
+                res = []
+                st.warning(str(exc))
         for r in res:
             (st.success if r.ok else st.error)(r.summary())
         load_benchmark.clear()
@@ -442,10 +446,14 @@ def page_agents() -> None:
         if agents and b2.button(L("Run all now", "全部现在运行"), icon=":material/play_arrow:", type="primary",
                                 width="stretch"):
             with st.status(L("Running agents…", "正在运行智能体…"), expanded=True) as box:
-                runs = a.run(progress=lambda n: box.write(L(f"→ {n}", f"→ {n}")))
-                for r in runs:
-                    box.write(("✅ " if r.ok else "❌ ") + r.summary())
-                box.update(label=L("Done", "完成"), state="complete")
+                try:
+                    runs = a.run(progress=lambda n: box.write(f"→ {n}"))
+                except RuntimeError as exc:
+                    box.update(label=str(exc), state="error")
+                else:
+                    for r in runs:
+                        box.write(("✅ " if r.ok else "❌ ") + r.summary())
+                    box.update(label=L("Done", "完成"), state="complete")
             load_benchmark.clear()
     if not agents:
         H(ui.empty("🤖", L("No agents yet", "还没有智能体"),

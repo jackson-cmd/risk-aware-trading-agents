@@ -930,7 +930,7 @@ def agents_run(
         try:
             runs = arena.run(names or None, mode="dry-run" if dry_run else "paper",
                              progress=lambda n: status.update(f"Running {n}..."))
-        except KeyError as exc:
+        except (KeyError, RuntimeError) as exc:
             console.print(f"[red]{exc.args[0]}[/]")
             raise typer.Exit(1) from exc
     tbl = Table(title="Agents run" if S.lang == "en" else "本次运行")

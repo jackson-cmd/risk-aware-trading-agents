@@ -283,11 +283,40 @@ class Arena:
                              state_root=self.dir(spec.name) / "state")
 
     # running ---------------------------------------------------------------------------------
+    LOCK_STALE_SECONDS = 3 * 3600
+
+    def _acquire(self) -> bool:
+        """Take the run lock atomically, so a manual run and the daily job never trade at the same time."""
+        self.root.mkdir(parents=True, exist_ok=True)
+        lock = self.root / "run.lock"
+        for _ in range(2):
+            try:
+                fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            except FileExistsError:
+                try:
+                    stale = datetime.now().timestamp() - lock.stat().st_mtime > self.LOCK_STALE_SECONDS
+                except FileNotFoundError:
+                    continue
+                if not stale:
+                    return False
+                lock.unlink(missing_ok=True)  # left behind by a crashed run
+                continue
+            with os.fdopen(fd, "w") as fh:
+                fh.write(str(os.getpid()))
+            return True
+        return False
+
+    def _release(self) -> None:
+        (self.root / "run.lock").unlink(missing_ok=True)
+
     def run(self, names: Iterable[str] | None = None, mode: str = "paper",
             quote_fn: Callable[[list[str]], dict[str, Quote]] | None = None,
             data_factory: Callable[[AppConfig], Any] | None = None,
-            progress: Callable[[str], None] | None = None) -> list[AgentRun]:
-        """Run one cycle for each agent (all enabled agents when ``names`` is empty)."""
+            progress: Callable[[str], None] | None = None, _locked: bool = False) -> list[AgentRun]:
+        """Run one cycle for each agent (all enabled agents when ``names`` is empty).
+
+        Raises RuntimeError when another run (for example the daily job) is still trading.
+        """
         if mode not in ("paper", "dry-run"):
             raise ValueError("agents only trade the built-in paper account (mode paper or dry-run)")
         wanted = {n.lower() for n in names} if names else None
@@ -295,20 +324,26 @@ class Arena:
         if wanted and len(specs) < len(wanted):
             missing = wanted - {a.name for a in specs}
             raise KeyError(f"no agent named {', '.join(sorted(missing))}")
-        quotes = quote_fn if isinstance(quote_fn, QuoteCache) else QuoteCache(quote_fn)
-        out = []
-        for spec in specs:
-            if progress:
-                progress(spec.name)
-            out.append(self._run_one(spec, mode, quotes, data_factory))
-        if mode == "paper":  # a day is traded once: the scheduled run skips agents that already traded today
-            today = mc.now_ny().date().isoformat()
-            last = self._last_run()
-            if last.get("date") != today:
-                last = {"date": today, "done": [], "attempts": {}}
-            last["done"] = sorted(set(last.get("done", [])) | {r.name for r in out if r.ok})
-            self._write_last_run(last)
-        return out
+        if not _locked and not self._acquire():
+            raise RuntimeError("another agents run is in progress (maybe the daily job); try again in a few minutes")
+        try:
+            quotes = quote_fn if isinstance(quote_fn, QuoteCache) else QuoteCache(quote_fn)
+            out = []
+            for spec in specs:
+                if progress:
+                    progress(spec.name)
+                out.append(self._run_one(spec, mode, quotes, data_factory))
+            if mode == "paper":  # a day is traded once: the scheduled run skips agents that already traded today
+                today = mc.now_ny().date().isoformat()
+                last = self._last_run()
+                if last.get("date") != today:
+                    last = {"date": today, "done": [], "attempts": {}}
+                last["done"] = sorted(set(last.get("done", [])) | {r.name for r in out if r.ok})
+                self._write_last_run(last)
+            return out
+        finally:
+            if not _locked:
+                self._release()
 
     def _run_one(self, spec: AgentSpec, mode: str, quotes: QuoteCache,
                  data_factory: Callable[[AppConfig], Any] | None) -> AgentRun:
@@ -472,15 +507,12 @@ class Arena:
                    and last["attempts"].get(a.name, 0) < max_attempts]
         if not pending:
             return "every agent already ran today", []
-        lock = self.root / "run.lock"
-        if lock.exists() and datetime.now().timestamp() - lock.stat().st_mtime < 3 * 3600:
+        if not self._acquire():
             return "another run is in progress", []
-        self.root.mkdir(parents=True, exist_ok=True)
-        lock.write_text(str(os.getpid()), encoding="utf-8")
         try:
-            runs = self.run(pending, mode="paper", quote_fn=quote_fn, data_factory=data_factory)
+            runs = self.run(pending, mode="paper", quote_fn=quote_fn, data_factory=data_factory, _locked=True)
         finally:
-            lock.unlink(missing_ok=True)
+            self._release()
         last = {**self._last_run(), "attempts": last["attempts"]}
         for r in runs:
             last["attempts"][r.name] = last["attempts"].get(r.name, 0) + 1
