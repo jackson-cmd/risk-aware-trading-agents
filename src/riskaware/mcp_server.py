@@ -202,13 +202,27 @@ def agent_detail(name: str) -> dict[str, Any]:
 
 
 def agents_create(name: str, strategy: str = "risk_aware", profile: str = "balanced", universe: str | None = None,
-                  symbols: list[str] | None = None, cash: float = 100_000.0, note: str = "") -> dict[str, Any]:
-    """Create a paper-trading agent: a strategy with its own simulated account that trades every trading day."""
+                  symbols: list[str] | None = None, cash: float = 100_000.0, note: str = "",
+                  llm: str | None = None) -> dict[str, Any]:
+    """Create a paper-trading agent: a strategy with its own simulated account that trades every trading day.
+
+    llm optionally adds an LLM review board, e.g. "openai:gpt-5.6-luna", "ollama:qwen2.5:3b" or "off"."""
     from .arena import AgentSpec, Arena
 
     spec = Arena(base_cfg=_cfg()).add(AgentSpec(name=name, strategy=strategy, profile=profile, preset=universe,
-                                                symbols=symbols or [], cash=cash, note=note))
+                                                symbols=symbols or [], cash=cash, note=note, llm=llm))
     return {"created": spec.model_dump()}
+
+
+def agent_decisions(name: str, symbol: str | None = None, limit: int = 20,
+                    include_prompts: bool = False) -> dict[str, Any]:
+    """How an agent made its recent decisions: the setups and reasons, whether the risk manager let each one
+    through, and the LLM's bull case, bear case and verdict when the agent has an LLM. include_prompts adds the
+    exact prompt sent to the model and its raw reply."""
+    from .arena import Arena
+
+    rows = Arena(base_cfg=_cfg()).decisions(name, symbol, limit, with_prompts=include_prompts)
+    return {"agent": name, "decisions": _plain(rows)}
 
 
 def agents_run(names: list[str] | None = None, dry_run: bool = False) -> dict[str, Any]:
@@ -224,9 +238,9 @@ def agents_run(names: list[str] | None = None, dry_run: bool = False) -> dict[st
 
 
 TOOLS = [market_regime, scan, analyze_stock, stock_news, list_strategies, backtest, agents_leaderboard,
-         agent_detail, agents_create, agents_run]
+         agent_detail, agent_decisions, agents_create, agents_run]
 READ_ONLY = {"market_regime", "scan", "analyze_stock", "stock_news", "list_strategies", "backtest",
-             "agents_leaderboard", "agent_detail"}
+             "agents_leaderboard", "agent_detail", "agent_decisions"}
 
 
 def build_server():

@@ -38,6 +38,36 @@ riskaware agents add slow --strategy ema_bounce --symbols NVDA,AAPL,COST --param
 
 每个智能体的东西都放在 `~/.riskaware/arena/名字/`：模拟账户（`名字.json`）、持仓记录、每次运行、决策和订单的日志（`journal.db`），以及每个交易日一行的 `equity.csv`。所有智能体的定义在 `~/.riskaware/arena/agents.yaml`，也可以直接手动编辑。
 
+## 每个智能体配一个 LLM
+
+每个智能体都可以有自己的复核小组：多方分析师、空方分析师和风控裁判，阅读每个买入候选的证据（技术形态、理由、财报质量、市场状态和经过验证的新闻标题），按固定的 JSON 格式回答。裁判最多把信心分调整 ±0.15，或者否决这笔买入。它不能发起交易、改仓位或限额，也不能卖出任何东西；新闻只作为加了引号的不可信文本交给它。
+
+```bash
+riskaware agents add luna --strategy risk_aware --llm openai:gpt-5.6-luna
+riskaware agents add local --strategy risk_aware --llm ollama:qwen2.5:3b
+riskaware agents llm steady anthropic:claude-opus-5-5     # 改已有的智能体；`off` 表示关闭
+riskaware llm-check ollama:qwen2.5:3b                     # 发一次示例复核，看 key 或模型能不能用
+```
+
+| 写法 | 用的是什么 | 需要什么 |
+|---|---|---|
+| `openai:模型` | OpenAI，比如 `gpt-5.6-luna`（关掉推理，一次复核几秒钟） | `.env` 里的 `OPENAI_API_KEY` |
+| `ollama:模型` | 你电脑上的免费本地模型，比如 `qwen2.5:3b` | [Ollama](https://ollama.com)：`ollama pull qwen2.5:3b`，再 `ollama serve` |
+| `anthropic:模型` | 用官方 SDK 调 Claude | `pip install -e ".[llm]"` 和 `ANTHROPIC_API_KEY` |
+| `compat:模型` | 任何 OpenAI 兼容服务（DeepSeek、Groq、OpenRouter、vLLM、LM Studio） | `--llm-base-url` 和 `--llm-key-env` |
+
+回复用严格的 JSON schema 模式请求，模型必须按规定的格式回答；仍然不合格式的回复会被忽略，这笔交易照规则正常进行。用同一天的买入候选简单比了一下：`gpt-5.6-luna` 每次约 2.5 秒，调整在 -0.04 到 +0.05 之间；3B 的本地模型每次约 7.5 秒，几乎都回答 +0.00。小的本地模型免费、隐私好，但给出的判断不多。
+
+### 看看每个决定是怎么做出来的
+
+每次运行都会为每个买入候选保存：技术形态和理由、风控的结论，以及 LLM 的多方意见、空方意见、结论、发给它的完整 prompt 和原始回复。除了 prompt 本身会发给你选的模型（本地模型则不发给任何人），其他东西都不离开你的电脑。
+
+- 网页看板：「智能体 → 决策」，选一个决定。
+- 命令行：`riskaware agents why 名字 [股票代码]`；加 `--prompt` 打印 prompt 和原始回复。
+- Claude：MCP 工具 `agent_decisions`。
+
+每日后台任务和手动运行读的是同一个 `.env`，所以把 `OPENAI_API_KEY` 放在执行 `riskaware agents schedule --install` 的那个文件夹，或者 `~/.riskaware/.env` 里。没有 key 时智能体照样交易，只是不经过复核。
+
 ## 每日自动运行是怎么工作的
 
 `riskaware agents schedule --install` 会装一个后台任务，工作日每 15 分钟唤醒一次，执行 `riskaware agents run --scheduled`：
@@ -85,7 +115,8 @@ Claude Desktop、Cursor 等客户端添加一个运行 `riskaware mcp` 的 stdio
 | `backtest` | 任意策略的回测，并和 SPY 买入持有对比 |
 | `agents_leaderboard` | 所有模拟盘智能体的排名和定时运行状态 |
 | `agent_detail` | 单个智能体的设置、持仓、每天的净值和最近的订单 |
-| `agents_create` | 新建模拟盘智能体 |
+| `agent_decisions` | 智能体最近的决定是怎么做出来的，含 LLM 的多方、空方意见和结论（需要时也给 prompt） |
+| `agents_create` | 新建模拟盘智能体，可以配 LLM（`openai:gpt-5.6-luna`、`ollama:qwen2.5:3b`） |
 | `agents_run` | 现在让智能体在模拟账户里运行一次（也可以只预演） |
 
 所有工具要么只读，要么只操作本地模拟账户，没有任何工具能向券商发送订单。

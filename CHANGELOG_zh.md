@@ -2,8 +2,13 @@
 
 [English](CHANGELOG.md)
 
-## 未发布
+## 0.4.0（2026-11-12）
 
+- 每个智能体都能配 LLM：`riskaware agents add 名字 --llm openai:gpt-5.6-luna | ollama:qwen2.5:3b | anthropic:模型 | compat:模型`，`riskaware agents llm 名字 选择`，网页看板的新建表单和智能体页也能选。本地模型通过 Ollama 免费运行。
+- 每次 LLM 复核都存进智能体的日志（prompt、原始回复、多方意见、空方意见、结论、复核前后的信心分、耗时、token 数）。看板的「决策」页、`riskaware agents why 名字 [股票代码] [--prompt]` 和新的 MCP 工具 `agent_decisions` 都能看到每个决定是怎么做出来的。
+- `riskaware llm-check 选择` 发一次示例复核，检查 key 或本地模型能不能用。
+- OpenAI 兼容接口的回复改用严格的 JSON schema 输出（接口不支持时依次退回 JSON 模式和普通文本），解析时只读第一个 JSON 对象；gpt-5.x 和 o 系列模型改传 `max_completion_tokens` 和 `reasoning_effort`，不再传温度；请求超时会自动重试一次。
+- 每日新开仓和买入上限现在会算上当天早些时候已经开的仓，同一天跑好几次也不会超（回测结果不变）。
 - 新闻：一条新闻只有在标题或摘要里提到这家公司或它的股票代码时才算这只股票的新闻，SEC 文件一律算。之前搜索「COST stock」会把所有讲成本（cost）的文章都抓进来，别家公司的新闻还可能给错的股票打上已确认的风险标记（比如高管离职）。内置股票池里的公司都带了常用名称，其他股票用雅虎的公司名（有缓存）。`news.relevance_filter: false` 可以关闭。
 - 网页看板：回测图里每个策略始终用同一种颜色；两份 README 和项目主页加了截图一览。
 

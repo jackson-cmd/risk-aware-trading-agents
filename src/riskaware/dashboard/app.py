@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import re
-import sqlite3
 from datetime import date
 
 import pandas as pd
@@ -44,6 +43,32 @@ def H(markup: str, where=None) -> None:
 PROFILE_NAMES = {"conservative": ("Conservative", "保守"), "balanced": ("Balanced", "平衡"),
                  "aggressive": ("Aggressive", "激进")}
 UNIVERSES = ["megacap", "tech", "defensive", "etf", "sectors"]
+
+
+LLM_KINDS = ["off", "openai", "ollama", "anthropic"]
+
+
+def llm_kind_name(k: str) -> str:
+    return {"off": L("Off", "不用"), "openai": "OpenAI (GPT)", "ollama": L("Local model (Ollama)", "本地模型（Ollama）"),
+            "anthropic": "Claude"}[k]
+
+
+def llm_choice_inputs(key: str, current: str | None = None) -> str | None:
+    """Two inputs (provider, model) that return 'off' or 'provider:model'."""
+    from riskaware.llm import DEFAULT_MODELS
+
+    kind0, _, model0 = (current or "off").partition(":")
+    kind0 = kind0 if kind0 in LLM_KINDS else "off"
+    c1, c2 = st.columns([1, 1.4])
+    kind = c1.selectbox(L("LLM review", "LLM 复核"), LLM_KINDS, index=LLM_KINDS.index(kind0), format_func=llm_kind_name,
+                        key=f"{key}_kind", help=L("A bull analyst, a bear analyst and a judge read the evidence for "
+                                                  "each buy and can move conviction by at most ±0.15 or veto it.",
+                                                  "多方、空方和裁判阅读每个买入候选的证据，最多把信心分调整 ±0.15，或者否决。"))
+    model = c2.text_input(L("Model", "模型"), value=model0, key=f"{key}_model",
+                          placeholder="gpt-5.6-luna · qwen2.5:3b · claude-opus-5-5")
+    if kind == "off":
+        return "off"
+    return f"{kind}:{model.strip() or DEFAULT_MODELS.get(kind, '')}"
 
 
 def profile_name(p: str) -> str:
@@ -228,7 +253,7 @@ def _agent_cards(rows: list[dict]) -> str:
         cards.append(f"""<div class="ra-card ra-agent{' first' if first else ''}">
           <div class="top"><div><div class="rank">#{r['rank']}{' · ' + L('leader', '领先') if first else ''}</div>
           <div class="name">{ui.esc(r['name'])}</div>
-          <div class="meta">{ui.esc(r['strategy'])} · {profile_name(r['profile'])} · {ui.esc(universe_name(r['universe']))}</div></div>
+          <div class="meta">{ui.esc(r['strategy'])} · {profile_name(r['profile'])} · {ui.esc(universe_name(r['universe']))}{(' · 🧠 ' + ui.esc(r['llm'])) if r.get('llm') else ''}</div></div>
           <div>{status}</div></div>
           <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px">
             <div><div class="eq">{ui.money(r['equity'])}</div>
@@ -266,13 +291,14 @@ def _create_agent_form(a) -> None:
                                 format_func=lambda u: u or L("from your config", "用配置里的"))
         cash = c5.number_input(L("Starting cash ($)", "初始资金（美元）"), 1_000, 10_000_000, 100_000, 10_000)
         symbols = st.text_input(L("Extra symbols (optional)", "额外股票（可选）"), placeholder="PLTR, SHOP")
+        llm = llm_choice_inputs("new_agent_llm")
         note = st.text_input(L("Note (optional)", "备注（可选）"))
         st.caption(strategies.get(strat, ""))
         if st.form_submit_button(L("Create agent", "创建智能体"), type="primary"):
             try:
                 spec = a.add(AgentSpec(name=name, strategy=custom.strip() or strat, profile=profile,
                                        preset=universe or None, symbols=symbols.split(","), cash=float(cash),
-                                       note=note))
+                                       note=note, llm=llm))
             except Exception as exc:
                 st.error(str(exc))
             else:
@@ -385,23 +411,13 @@ def _agent_detail(a, name: str, bench: pd.Series | None) -> None:
             st.dataframe(orders[["ts", "side", "symbol", "qty", "limit_price", "status", "tag", "reason"]],
                          hide_index=True, width="stretch")
     with t4:
-        if jpath.is_file():
-            with sqlite3.connect(jpath) as db:
-                dec = pd.read_sql_query(
-                    "SELECT r.ts, d.symbol, d.action, d.strength, d.accepted, d.reject_reason, d.reason "
-                    "FROM decisions d JOIN runs r ON r.id = d.run_id ORDER BY r.id DESC LIMIT 200", db)
-            if dec.empty:
-                st.info(L("No signals yet.", "还没有信号。"))
-            else:
-                st.dataframe(dec, hide_index=True, width="stretch", column_config={
-                    "strength": st.column_config.ProgressColumn(min_value=0.0, max_value=1.0, format="%.2f"),
-                    "accepted": st.column_config.CheckboxColumn()})
-        else:
-            st.info(L("No signals yet.", "还没有信号。"))
+        _decisions_tab(a, name)
+    llm_text = {None: L("LLM as in the config", "LLM 跟随配置"), "off": L("no LLM", "不用 LLM")}.get(
+        spec.llm, f"🧠 {spec.llm}")
     st.caption(f"{spec.strategy} · {profile_name(spec.profile)} · {universe_name(spec.universe_label)} · "
-               f"{L('start', '初始')} {ui.money(spec.cash)} · {L('since', '起始')} {spec.created}"
+               f"{L('start', '初始')} {ui.money(spec.cash)} · {L('since', '起始')} {spec.created} · {llm_text}"
                + (f" · {agent_note(spec)}" if spec.note else ""))
-    c1, c2, c3, c4, _ = st.columns([1, 1, 1, 1, 2])
+    c1, c2, c3, c4, c5, _ = st.columns([1, 1, 1, 1, 1, 1])
     if c1.button(L("Run now", "现在运行"), key=f"run_{name}", icon=":material/play_arrow:", type="primary"):
         with st.spinner(L(f"Running {name}…", f"正在运行 {name}…")):
             try:
@@ -421,11 +437,94 @@ def _agent_detail(a, name: str, bench: pd.Series | None) -> None:
         if st.button(L("Yes, reset", "确定重置"), key=f"reset_{name}"):
             a.reset(name)
             st.rerun()
+    with c5.popover(L("LLM", "LLM"), icon=":material/psychology:"):
+        choice = llm_choice_inputs(f"llm_{name}", spec.llm)
+        if st.button(L("Save", "保存"), key=f"llm_save_{name}", type="primary"):
+            try:
+                a.set_llm(name, choice)
+            except ValueError as exc:
+                st.error(str(exc))
+            else:
+                st.rerun()
+        st.caption(L("OpenAI needs OPENAI_API_KEY in your .env; a local model needs `ollama serve`.",
+                     "OpenAI 需要在 .env 里设置 OPENAI_API_KEY；本地模型需要先运行 `ollama serve`。"))
     with c4.popover(L("Delete", "删除"), icon=":material/delete:"):
         st.write(L("Delete this agent and its paper account?", "删除这个智能体和它的模拟账户？"))
         if st.button(L("Yes, delete", "确定删除"), key=f"del_{name}", type="primary"):
             a.remove(name)
             st.rerun()
+
+
+def _decisions_tab(a, name: str) -> None:
+    rows = a.decisions(name, limit=150, with_prompts=True)
+    if not rows:
+        st.info(L("No signals yet.", "还没有信号。"))
+        return
+
+    def verdict(rv):
+        if not rv:
+            return "–"
+        if rv.get("adjustment") is None:
+            return L("error", "出错")
+        return "VETO" if rv.get("veto") else f"{rv['adjustment']:+.2f}"
+
+    table = pd.DataFrame([{
+        L("Time", "时间"): str(r["ts"])[:16].replace("T", " "), L("Symbol", "代码"): r["symbol"],
+        L("Action", "操作"): ("🟢 " if r["action"] == "BUY" else "🔴 ") + i18n.t("action." + r["action"], LANG),
+        L("Conviction", "信心"): float(r["strength"]), L("Passed risk check", "通过风控"): bool(r["accepted"]),
+        "LLM": verdict(r.get("llm"))} for r in rows])
+    st.dataframe(table, hide_index=True, width="stretch", height=260, column_config={
+        L("Conviction", "信心"): st.column_config.ProgressColumn(min_value=0.0, max_value=1.0, format="%.2f"),
+        L("Passed risk check", "通过风控"): st.column_config.CheckboxColumn()})
+    i = st.selectbox(L("How was this decision made?", "这个决定是怎么做出来的？"), range(len(rows)),
+                     format_func=lambda k: f"{str(rows[k]['ts'])[:16].replace('T', ' ')} · {rows[k]['symbol']} · "
+                                           f"{rows[k]['action']} · {rows[k]['strength']:.2f}",
+                     key=f"why_{name}")
+    _decision_view(rows[i])
+
+
+def _decision_view(r: dict) -> None:
+    rv = r.get("llm") or {}
+    ok = bool(r["accepted"])
+    setups = "".join(f'<span class="ra-chip">{ui.esc(i18n.setup(s, LANG))}</span>' for s in r["setups"])
+    reasons = "".join(f"<li>{ui.esc(x)}</li>" for x in str(r["reason"]).split("; ") if x)
+    check = (ui.pill(L("passed the risk check", "通过风控"), P["up"]) if ok else
+             ui.pill(L("blocked by the risk manager", "被风控拦下"), P["warn"]))
+    before = rv.get("strength_before")
+    conv = (f"{before:.2f} → {r['strength']:.2f}" if before is not None and rv.get("adjustment") is not None
+            else f"{r['strength']:.2f}")
+    H(f"""<div class="ra-card" style="margin-top:6px">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+        <div><div class="ra-note">{ui.esc(str(r['ts'])[:19].replace('T', ' '))} UTC · run #{r['run_id']}</div>
+        <div style="font-size:1.3rem;font-weight:800">{ui.esc(r['symbol'])} · {ui.esc(i18n.t('action.' + r['action'], LANG))}</div></div>
+        <div>{check} {ui.pill(L('conviction ', '信心 ') + conv, P['accent'], dot=False)}</div>
+      </div>
+      <div class="ra-note" style="margin-top:12px">{L('1 · What the technical, earnings and news agents found', '1 · 技术面、财报和新闻智能体的发现')}</div>
+      <div class="ra-chips" style="margin-top:6px">{setups}</div>
+      <ul style="margin:8px 0 0 18px;padding:0">{reasons}</ul>
+      <div class="ra-note" style="margin-top:12px">{L('2 · Risk manager', '2 · 风控')}</div>
+      <div>{ui.esc(r['reject_reason']) if not ok else L('within the cash floor, position, sector and regime limits', '没有超出现金底线、单票、板块和市场状态的限制')}</div>
+    </div>""")
+    if not rv:
+        st.caption(L("3 · No LLM review: the LLM only looks at buy candidates, and only for agents that have one.",
+                     "3 · 没有 LLM 复核：LLM 只看买入候选，而且要智能体开了 LLM。"))
+        return
+    H(f'<div class="ra-note" style="margin:14px 0 6px">{L("3 · LLM review board", "3 · LLM 复核")} · '
+      f'{ui.esc(rv["model"])} · {rv["latency_ms"]} ms</div>')
+    if rv.get("adjustment") is None:
+        st.warning(f"{rv['model']}: {rv.get('error') or L('no usable answer', '没有可用的回答')}")
+    else:
+        judge = (f'<b class="down">VETO</b> · {ui.esc(rv["veto_reason"])}' if rv.get("veto")
+                 else f'{L("adjustment", "调整")} <b class="{ui.tone(rv["adjustment"])}">{rv["adjustment"]:+.2f}</b>')
+        H(f"""<div class="ra-grid ra-g3">
+          <div class="ra-card ra-bull"><div class="ra-note">{L('Bull analyst', '多方分析师')}</div><div>{ui.esc(rv['bull'])}</div></div>
+          <div class="ra-card ra-bear"><div class="ra-note">{L('Bear analyst', '空方分析师')}</div><div>{ui.esc(rv['bear'])}</div></div>
+          <div class="ra-card ra-judge"><div class="ra-note">{L('Risk judge', '风控裁判')} · {judge}</div><div>{ui.esc(rv['summary'])}</div></div>
+        </div>""")
+    with st.expander(L("Prompt sent to the model", "发给模型的 prompt")):
+        st.code((rv.get("system_prompt") or "") + "\n\n" + (rv.get("prompt") or ""), language=None, wrap_lines=True)
+    with st.expander(L("Raw reply", "模型的原始回复")):
+        st.code(rv.get("raw") or rv.get("error") or "", language="json", wrap_lines=True)
 
 
 def page_agents() -> None:

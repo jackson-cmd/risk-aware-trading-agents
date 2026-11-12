@@ -267,6 +267,9 @@ class LLMConfig(_Model):
     api_key_env: str = "OPENAI_API_KEY"
     max_adjustment: float = Field(0.15, ge=0.0, le=0.5)
     temperature: float = 0.2  # OpenAI-compatible endpoints only
+    reasoning_effort: str | None = Field(None, description="reasoning models (gpt-5.x, o-series): none, minimal, "
+                                                            "low, medium or high")
+    max_tokens: int = Field(1200, ge=100, description="cap on the length of each reply")
     timeout: float = 120.0
     max_symbols_per_run: int = 10
     refusal_fallback: bool = True

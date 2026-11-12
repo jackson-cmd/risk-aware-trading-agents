@@ -2,8 +2,13 @@
 
 [中文](CHANGELOG_zh.md)
 
-## Unreleased
+## 0.4.0 (2026-11-12)
 
+- An LLM for each agent: `riskaware agents add NAME --llm openai:gpt-5.6-luna | ollama:qwen2.5:3b | anthropic:MODEL | compat:MODEL`, `riskaware agents llm NAME CHOICE`, and the same choice in the dashboard's create form and agent page. Local models run through Ollama for free.
+- Every LLM review is stored in the agent's journal (prompt, raw reply, bull case, bear case, verdict, conviction before and after, latency, tokens). The dashboard's Decisions tab, `riskaware agents why NAME [SYMBOL] [--prompt]` and the new `agent_decisions` MCP tool show how each decision was made.
+- `riskaware llm-check CHOICE` sends one sample review to check a key or a local model.
+- OpenAI-compatible replies use strict JSON schema output (falling back to JSON mode, then plain text, where an endpoint has no schema support), and the parser reads only the first JSON object; gpt-5.x and o-series models get `max_completion_tokens` and `reasoning_effort` instead of a temperature, and a timed-out request is retried once.
+- The daily new-position and buy limits now count positions opened earlier the same day, so several runs on one day cannot exceed them (backtests are unchanged).
 - News: a story only counts toward a stock when its headline or summary names the company or its ticker; SEC filings always count. Before, a search for "COST stock" pulled in every article about costs, and another company's news could pin a confirmed red flag (for example an executive departure) on the wrong stock. Built-in names for every stock in the bundled lists, Yahoo's company name for the rest (cached). `news.relevance_filter: false` turns it off.
 - Dashboard: the backtest charts keep one color per strategy; screenshot gallery in the READMEs and on the website.
 
