@@ -60,6 +60,8 @@ Replies are requested in strict JSON schema mode, so the model has to answer in 
 
 ### See how a decision was made
 
+<img src="../site/assets/decisions_en.jpg" width="820" alt="How a decision was made">
+
 Every run stores, for each buy candidate, the setups and reasons, the risk manager's verdict, and the LLM's bull case, bear case, verdict, the exact prompt it was sent and its raw reply. Nothing leaves your computer except the prompt itself, sent to the model you chose (or to no one, with a local model).
 
 - Dashboard: **Agents → Decisions**, then pick a decision.
