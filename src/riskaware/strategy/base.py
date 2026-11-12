@@ -44,24 +44,24 @@ from ..universe import BROAD_INDEX_ETFS, is_etf
 
 
 class RowView:
-    """Read-only view of one indicator row, backed by a numpy array (fast in backtests).
+    """One indicator row: today's values only.
 
-    Supports ``row["close"]``, ``row.close`` and ``row.get("rsi2")``; missing values are NaN.
+    Supports ``row["close"]``, ``row.close`` and ``row.get("rsi2")``; missing values are NaN. The row holds its
+    own copy of the values, so nothing reachable from it leads to later rows of the backtest.
     """
 
-    __slots__ = ("_arr", "_cols", "_i")
+    __slots__ = ("_vals", "_cols")
 
     def __init__(self, arr: np.ndarray, cols: dict[str, int], i: int):
-        self._arr = arr
+        self._vals = np.array(arr[i], dtype=float, copy=True)
         self._cols = cols
-        self._i = i
 
     def __getitem__(self, key: str) -> float:
-        return float(self._arr[self._i, self._cols[key]])
+        return float(self._vals[self._cols[key]])
 
     def get(self, key: str, default: float = math.nan) -> float:
         j = self._cols.get(key)
-        return default if j is None else float(self._arr[self._i, j])
+        return default if j is None else float(self._vals[j])
 
     def __getattr__(self, key: str) -> float:
         try:
@@ -73,7 +73,7 @@ class RowView:
         return list(self._cols)
 
     def to_dict(self) -> dict[str, float]:
-        return {k: float(self._arr[self._i, j]) for k, j in self._cols.items()}
+        return {k: float(self._vals[j]) for k, j in self._cols.items()}
 
 
 class SymbolData:

@@ -127,8 +127,10 @@ ChatGPT's own app only connects to remote (HTTPS) MCP servers, so on the OpenAI 
 | `scan` | today's signals for a strategy and a profile, on your list or the symbols you name |
 | `analyze_stock` | indicators, technical setups, earnings quality, verified news and the decision for one stock |
 | `stock_news` | cross-verified headlines and red flags for one stock |
-| `list_strategies` | the built-in strategies |
-| `backtest` | a backtest of any strategy against SPY buy and hold |
+| `list_strategies` | the built-in strategies and the ones saved from `backtest_code` |
+| `backtest` | a backtest of any strategy against SPY buy and hold; `news=True` replays the news |
+| `strategy_guide` | how to write a strategy for `backtest_code`: what `ctx` holds, the rules, a template |
+| `backtest_code` | check and backtest a strategy the AI wrote as code, in a separate process ([strategy lab](strategy-lab.md)) |
 | `agents_leaderboard` | all paper agents ranked, with the schedule status |
 | `agent_detail` | one agent's settings, positions, equity by day and recent orders |
 | `agent_decisions` | how an agent made its recent decisions, with the LLM's bull, bear and verdict (and, if asked, the prompts) |

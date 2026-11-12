@@ -126,6 +126,12 @@ class Backtester:
             self._data_cache[key] = self.prices.history(wanted, data_start, end)
         return self._data_cache[key]
 
+    def universe_for(self, universe: list[str] | None = None) -> list[str]:
+        """The symbols a run trades: the given list or the configured universe, without the cash vehicles."""
+        tsym = self.cfg.universe.treasury_symbol if self.profile.treasury_sleeve > 0 else None
+        skip = {self.cfg.universe.cash_vehicle, self.cfg.backtest.cash_yield_symbol, tsym} - {None}
+        return [s for s in (universe or self.cfg.universe.resolve()) if s not in skip]
+
     # ------------------------------------------------------------------- run
     def run(self, strategy: Strategy, start: date, end: date | None = None, universe: list[str] | None = None,
             initial_cash: float | None = None, progress: Callable[[int, int], None] | None = None) -> BacktestResult:
@@ -134,8 +140,7 @@ class Backtester:
         end = end or date.today()
         initial_cash = float(initial_cash or bt.initial_cash)
         tsym = cfg.universe.treasury_symbol if prof.treasury_sleeve > 0 else None
-        skip = {cfg.universe.cash_vehicle, bt.cash_yield_symbol, tsym} - {None}
-        universe = [s for s in (universe or cfg.universe.resolve()) if s not in skip]
+        universe = self.universe_for(universe)
         frames = self.load(universe, start, end)
         bench_sym = cfg.universe.benchmark
         if bench_sym not in frames:
@@ -147,12 +152,16 @@ class Backtester:
             raise RuntimeError("not enough trading days in the backtest window")
         notes = ["Signals use the close of day t; orders fill on day t+1 (open or limit)."]
         if self.news is None:
-            notes.append("News is not used in this backtest (build a local archive with `riskaware news-history`).")
+            notes.append("News is not used in this backtest (turn it on with --news; 2026 headlines ship with the "
+                         "package, other years come from `riskaware news-history`).")
         else:
             covered = [s for s in universe if s in self.news.symbols]
             feeds = ", ".join(f"{k} {v}" for k, v in sorted(self.news.feeds().items()))
-            notes.append(f"News replayed from the local archive for {len(covered)}/{len(universe)} symbols "
-                         f"({feeds}); an item stamped after 16:00 New York time is first visible the next day.")
+            first, last = self.news.coverage()
+            span = f", {first:%Y-%m-%d} to {last:%Y-%m-%d}" if first and last else ""
+            notes.append(f"News replayed for {len(covered)}/{len(universe)} symbols ({feeds}{span}). Each day sees "
+                         "only items published before its close (16:00 New York, 13:00 on early-close days); "
+                         "orders fill the next day.")
         if self.quality_fn is None:
             notes.append("Fundamentals are unknown in this backtest; dip buys use the technical proxy.")
         missing = [s for s in universe if s not in frames]
@@ -492,7 +501,8 @@ class Backtester:
                 if sd is None:
                     return None
                 i = sd.position_of(_ts)
-                return None if i is None else sd.frame.iloc[max(0, i - lookback + 1): i + 1]
+                # a copy: a slice could still reach the later rows through its underlying arrays
+                return None if i is None else sd.frame.iloc[max(0, i - lookback + 1): i + 1].copy()
 
             quality = None
             if self.quality_fn is not None:

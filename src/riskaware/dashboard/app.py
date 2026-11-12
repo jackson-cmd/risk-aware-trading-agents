@@ -292,9 +292,10 @@ def _create_agent_form(a) -> None:
         c1, c2 = st.columns(2)
         name = c1.text_input(L("Name", "名字"), placeholder="my-dips", help=L("lowercase letters, digits, - or _",
                                                                               "小写字母、数字、- 或 _"))
-        strat = c2.selectbox(L("Strategy", "策略"), list(strategies), format_func=lambda s: s,
-                             help=L("built-in strategies; or give your own file below",
-                                    "内置策略；也可以在下面填你自己的策略文件"))
+        saved = saved_ai_strategies()
+        strat = c2.selectbox(L("Strategy", "策略"), [*strategies, *saved], format_func=lambda s: s,
+                             help=L("built-in strategies and the ones an AI saved for you; or give your own file "
+                                    "below", "内置策略和 AI 帮你保存的策略；也可以在下面填你自己的策略文件"))
         custom = st.text_input(L("…or your own strategy file", "…或你自己的策略文件"),
                                placeholder="/path/to/my_strategy.py:MyStrategy")
         c3, c4, c5 = st.columns(3)
@@ -309,7 +310,8 @@ def _create_agent_form(a) -> None:
         st.caption(strategies.get(strat, ""))
         if st.form_submit_button(L("Create agent", "创建智能体"), type="primary"):
             try:
-                spec = a.add(AgentSpec(name=name, strategy=custom.strip() or strat, profile=profile,
+                spec = a.add(AgentSpec(name=name, strategy=custom.strip() or saved.get(strat, strat),
+                                       profile=profile,
                                        preset=universe or None, symbols=symbols.split(","), cash=float(cash),
                                        note=note, llm=llm))
             except Exception as exc:
@@ -636,16 +638,25 @@ def page_signals() -> None:
             L("Why", "理由"): st.column_config.TextColumn(width="large")})
 
 
+def saved_ai_strategies() -> dict[str, str]:
+    """Strategies kept by backtest_code (MCP) or riskaware lab --save: label -> file path."""
+    from riskaware.lab import saved_strategies
+
+    return {f"AI · {s['name']}": s["path"] for s in saved_strategies()}
+
+
 def page_backtest() -> None:
     from riskaware.strategy import list_strategies
 
     strategies = list_strategies()
+    saved = saved_ai_strategies()
+    choices = [*strategies, *saved]
     H(ui.section(L("Backtest", "回测"), L("signals at the close, fills the next day, 5 bps slippage",
                                                "收盘出信号、次日成交、5 个基点滑点")))
     with st.form("bt"):
         c1, c2, c3 = st.columns(3)
-        strat = c1.selectbox(L("Strategy", "策略"), list(strategies))
-        compare = c2.multiselect(L("Compare with", "对比策略"), list(strategies), default=["buy_and_hold"])
+        strat = c1.selectbox(L("Strategy", "策略"), choices)
+        compare = c2.multiselect(L("Compare with", "对比策略"), choices, default=["buy_and_hold"])
         preset = c3.selectbox(L("Stock list", "股票池"), UNIVERSES)
         d1, d2, d3, d4 = st.columns(4)
         start = d1.date_input(L("Start", "开始"), date(2018, 1, 1))
@@ -655,6 +666,9 @@ def page_backtest() -> None:
                                index=list(PROFILE_PRESETS).index("balanced"), format_func=profile_name)
         custom = st.text_input(L("…or your own strategy file", "…或你自己的策略文件"),
                                placeholder="/path/to/my_strategy.py:MyStrategy")
+        news = st.toggle(L("Replay news: each day sees only what was published before its close "
+                           "(2026 headlines ship with the package)",
+                           "回放新闻：每天只看到收盘前已发布的新闻（安装包自带 2026 年标题）"), value=False)
         run = st.form_submit_button(L("Run backtest", "开始回测"), type="primary")
     if run:
         from riskaware.backtest.engine import Backtester
@@ -664,9 +678,18 @@ def page_backtest() -> None:
 
         bcfg = get_config(profile).model_copy(deep=True)
         bcfg.universe.preset = preset
-        bt = Backtester(bcfg, make_price_provider(bcfg.data.price_source, DiskCache(bcfg.data.cache_path),
-                                                   bcfg.data.csv_dir))
-        names = list(dict.fromkeys([custom.strip() or strat, *[c for c in compare if c != strat]]))
+        cache = DiskCache(bcfg.data.cache_path)
+        pit = None
+        if news:
+            from riskaware.news.history import NewsArchive, PointInTimeNews
+            from riskaware.news.relevance import company_names
+
+            pit = PointInTimeNews(NewsArchive(bcfg.news.archive_path, bundled=bcfg.news.bundled), bcfg.news,
+                                  bcfg.universe.resolve(), names=lambda s: company_names(s, cache))
+            pit = pit if pit.symbols else None
+        bt = Backtester(bcfg, make_price_provider(bcfg.data.price_source, cache, bcfg.data.csv_dir), news=pit)
+        names = list(dict.fromkeys([custom.strip() or saved.get(strat, strat),
+                                    *[saved.get(c, c) for c in compare if c != strat]]))
         results = []
         bar = st.progress(0.0, text=L("Downloading prices and simulating…", "下载价格并模拟中…"))
         try:

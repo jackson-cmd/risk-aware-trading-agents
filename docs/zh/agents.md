@@ -127,8 +127,10 @@ ChatGPT 自己的应用只能连远程（HTTPS）的 MCP 服务器，所以 Open
 | `scan` | 某个策略和档位今天的信号，可以扫描股票池或指定的股票 |
 | `analyze_stock` | 单只股票的指标、技术形态、财报质量、交叉验证新闻和结论 |
 | `stock_news` | 单只股票交叉验证后的新闻和风险标记 |
-| `list_strategies` | 内置策略列表 |
-| `backtest` | 任意策略的回测，并和 SPY 买入持有对比 |
+| `list_strategies` | 内置策略，以及用 `backtest_code` 保存下来的策略 |
+| `backtest` | 任意策略的回测，并和 SPY 买入持有对比；`news=True` 时回放新闻 |
+| `strategy_guide` | 怎么给 `backtest_code` 写策略：`ctx` 里有什么、规则、模板 |
+| `backtest_code` | 检查 AI 写成代码的策略，并在单独的进程里回测（[策略实验室](strategy-lab.md)） |
 | `agents_leaderboard` | 所有模拟盘智能体的排名和定时运行状态 |
 | `agent_detail` | 单个智能体的设置、持仓、每天的净值和最近的订单 |
 | `agent_decisions` | 智能体最近的决定是怎么做出来的，含 LLM 的多方、空方意见和结论（需要时也给 prompt） |

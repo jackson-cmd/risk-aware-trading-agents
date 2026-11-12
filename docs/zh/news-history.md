@@ -2,31 +2,46 @@
 
 实盘里新闻是发生一条读一条。回测要还原每个交易日当时已经知道什么，所以每条新闻都必须有发布时间。没有发布时间的话，策略会在新闻出现之前就"看到"它，任何新闻策略的回测结果都会虚高。
 
-`riskaware news-history` 在你自己的电脑上建一个按时间存的新闻库，`riskaware backtest --news` 按天回放它。
+2026 年的新闻已经随安装包自带，这一年用 `riskaware backtest --news` 什么都不用下载。其他年份用 `riskaware news-history` 在你自己的电脑上建一个按时间存的新闻库，回测会把两者一起回放。
 
 ## 快速开始
 
 ```bash
-# 1. core 股票池 2018 年以来的 SEC 8-K 公告（免费；SEC 要求注明联系邮箱）
+# 2026 年不用准备：标题随安装包自带
+riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset megacap --start 2026-01-02 --news --compare buy_and_hold
+
+# 其他年份：core 股票池 2018 年以来的 SEC 8-K 公告（免费；SEC 要求注明联系邮箱）
 riskaware news-history build --preset core --start 2018-01-01 --contact-email you@example.com
 
-# 2. 可选：加入你自己的新闻来源
+# 可选：加入你自己的新闻来源
 riskaware news-history build --symbols AAPL,NVDA --source benzinga      # 需要在 .env 里填 BENZINGA_API_KEY
-riskaware news-history import my_news.csv --tz America/New_York
+riskaware news-history import my_news.csv                                # 不带时区的时间按美东时间读
 
-# 3. 看看新闻库里有什么，以及回测在某一天能看到什么
+# 看看新闻库里有什么，以及回测在某一天能看到什么
 riskaware news-history status
-riskaware news-history show NVDA --date 2024-05-22
-
-# 4. 带新闻回测
-riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset core --news --compare buy_and_hold
+riskaware news-history show NVDA --date 2026-05-20
 ```
 
-在 `riskaware.yaml` 里写一次 `data.contact_email`，以后就不用加 `--contact-email`。设置 `backtest.news: true`，每次回测都会回放新闻。
+看板的回测页打开 **回放新闻** 开关也可以。在 `riskaware.yaml` 里写一次 `data.contact_email`，以后就不用加 `--contact-email`。设置 `backtest.news: true`，每次回测都会回放新闻。
 
-## 回放规则
+## 安装包自带的新闻
 
-- 回测在第 *t* 天收盘（美东时间 16:00）做决定，第 *t+1* 天成交。第 *t* 天调用 `ctx.news(symbol)`，只能看到这个收盘时刻以前、`news.lookback_hours`（默认 72 小时）以内发布的新闻。第 *t* 天 16:01 发布的新闻，第 *t+1* 天才看得到。
+`riskaware/news/data/news_2026.jsonl.gz`（0.7 MB）收了内置股票池（`core`、`megacap`、`tech`、`defensive`）里 64 只股票的 16,945 条新闻，时间从 2026 年 1 月 1 日到 11 月 11 日：
+
+- Benzinga 标题 16,249 条：只有标题、发布时间和股票代码，别的都没有（没有正文、摘要、链接和情绪分）。只有 Benzinga 给这条新闻标了这只股票、并且标题本身提到这家公司或代码时，才算这只股票的新闻。机器生成的数据汇总（"当年投 1000 美元现在值多少"、股息计算、期权异动、做空比例、市盈率汇总、电视节目荐股清单）没有收：它们只是复述价格，不是新闻。
+- SEC 8-K 公告 696 份，带 SEC 受理时间和公告链接。
+
+回测会把它和你自己的新闻库一起读；两边有同一条时以你的为准，`remove` 只删你自己的。不想用的话设置 `news.bundled: false`。`scripts/build_news_bundle.py` 可以从一个新闻库重新生成这个文件。
+
+**更多历史数据。** 我们手里的新闻库大得多，2011 到 2026 年约 320 万条 Benzinga 标题，放不进安装包，所以只带了内置股票池的 2026 年。如果你需要更多年份或更多股票，欢迎开 issue，我们再看怎么提供，比如做成单独下载。
+
+## 回测怎么防止偷看未来
+
+- 回测在第 *t* 天收盘时做决定，第 *t+1* 天成交。收盘是美东时间 16:00，提前收盘的日子是 13:00（7 月 3 日、感恩节次日、平安夜）。第 *t* 天调用 `ctx.news(symbol)`，只能看到收盘时刻**之前**、`news.lookback_hours`（默认 72 小时）以内发布的新闻。正好标在 16:00 的新闻（很多财报就在这一刻发出），要到第 *t+1* 天才看得到。
+- 一个时间有两种读法时，按更晚的那种读。只有日期没有时间的，算那天结束时发布。没有时区的时间按美东时间读：万一它其实是 UTC，新闻只会晚几个小时出现；反过来读错，新闻会早几个小时出现。日期在未来的新闻当成坏数据丢掉。
+- 策略拿到的都是副本：指标行只存当天的数值，`ctx.history()` 返回过去几行的副本，所以从价格数据里摸不到第 *t* 天之后的任何东西。指标都只往回算；有测试把数据截断在第 *t* 天重算，检查结果完全一样。
+- 回测从不调用大模型。用测试期文本训练过的模型知道每件事最后怎么样了。
+- AI 通过[策略实验室](strategy-lab.md)写的策略，还会检查作者自己"知道未来"的写法：代码里不能写日期，也不能写股票代码。
 - 能看到的新闻走和实盘一样的代码：没提到这家公司或股票代码的新闻先被丢掉（SEC 公告一律算），标题再聚成"同一件事"，有两家独立媒体报道或有 SEC 公告佐证才算**已确认**；单一来源的利空可以挡住买入，但永远不会触发卖出。
 - 内置的 `risk_aware` 策略和实盘一样使用新闻：已确认的风险信号挡住新的买入；严重利空（破产、退市、财报重述）只有出现在公司自己的 8-K 或通稿里，才会触发紧急卖出。
 - 没有新闻库，或者加了 `--no-news`，`ctx.news()` 返回 `None`，和以前一样。
@@ -48,7 +63,7 @@ riskaware backtest --strategy examples/strategies/news_earnings_drift.py --prese
 
 `--source benzinga` 用 `BENZINGA_API_KEY`（或 `news.benzinga_key_env` 指定的变量）里的 key 调用 Benzinga 新闻 API（`api.benzinga.com/api/v2/news`），每次取一个自然月，每页 100 条标题。能取到多早的数据取决于你的 Benzinga 套餐。这部分按 Benzinga 公开的 API 文档编写，用录制的响应做了测试；如果真实 key 下有问题，欢迎反馈。
 
-Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或第二家媒体佐证之前都算"单一来源"。**Benzinga 的条款不允许再分发它的内容。** 新闻库放在你的用户目录里，不在代码仓库内；不要提交、上传或分享它。
+Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或第二家媒体佐证之前都算"单一来源"。用你的 key 下载的内容存在你用户目录下的新闻库里，不在代码仓库内。
 
 ### CSV
 
@@ -63,7 +78,7 @@ Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或�
 | `url` | 否 | 新闻链接 |
 | `sentiment` | 否 | -1 到 1 的数，填了就代替内置的标题情绪词典 |
 
-不带时区的时间按 UTC 读；如果导出的是美东时间，加 `--tz America/New_York`。没有时间或标题的行会被跳过。`source` 请填真实的媒体名：交叉验证数的是媒体家数，全部填同一个名字，每条新闻都会变成"单一来源"。
+不带时区的时间按美东时间读，这是更稳妥的猜法（见上文）；知道时区时用 `--tz UTC` 等指定。只有日期没有时间的，算那天结束时发布。没有时间或标题的行会被跳过，日期在未来的也会被跳过。`source` 请填真实的媒体名：交叉验证数的是媒体家数，全部填同一个名字，每条新闻都会变成"单一来源"。
 
 回测和实盘用同一个相关性过滤：标题（或摘要）里提到这家公司或股票代码的新闻才算这只股票的新闻，SEC 公告一律算。CSV 里两样都没提到的标题会被丢掉，在 `news-history show` 里显示为 off-topic；想保留它们，设置 `news.relevance_filter: false`。
 
@@ -71,7 +86,7 @@ Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或�
 
 - 位置：`~/.riskaware/news/`（配置里的 `news.archive_dir`；跟随 `RISKAWARE_HOME`）。
 - 每只股票一个 JSON Lines 文件，按时间排序，按来源、链接和时间去重。再次运行 `build` 只会加新的新闻。
-- `riskaware news-history remove 代码 [--feed sec|benzinga|import]` 删除新闻。
+- `riskaware news-history remove 代码 [--feed sec|benzinga|import]` 删除你自己的新闻。自带的 2026 年新闻只读；`status` 在"自带"一列里单独计数。
 
 ## 写一个用新闻的策略
 
@@ -89,5 +104,6 @@ if report is not None:
 ## 局限
 
 - 8-K 新闻库只告诉你"发了一份公告、是哪类事件"；除了明显的利空（破产、退市、减值、财报重述），它本身不带情绪。
+- 标题按抓取时的样子保存；如果媒体后来改过标题，存下的可能是改过的措辞，时间仍是原来的发布时间。
 - 免费的、时间准确的历史新闻标题很少。依赖新闻的回测结果，可信度取决于新闻库本身；先用 `status` 和 `show` 看清覆盖情况，再相信数字。
 - 内置股票池都是今天的大盘股，在上面做的回测都有幸存者偏差。

@@ -196,7 +196,7 @@ def test_backtest_replays_archive_without_lookahead(tmp_path):
     rep = strat.seen[date(2019, 6, 6)]
     assert rep.severe_confirmed and "accounting" in rep.red_flags_confirmed
     assert max(strat.seen) <= date(2019, 6, 10)  # 72-hour lookback
-    assert any("local archive" in n for n in res.notes)
+    assert any("News replayed for" in n and "before its close" in n for n in res.notes)
 
 
 def test_cli_import_status_show(tmp_path):

@@ -5,6 +5,7 @@ Start it with ``riskaware mcp`` (stdio). Add it to Claude Code with::
     claude mcp add riskaware -- riskaware mcp
 
 Every tool is read-only or works on the local paper accounts. There is no tool that can send a live order.
+backtest_code runs strategy code an AI wrote, after checks, in a separate process (see riskaware.lab).
 """
 
 from __future__ import annotations
@@ -22,9 +23,11 @@ from .config import AppConfig, load_config
 INSTRUCTIONS = (
     "Risk-Aware Trading Agents for US stocks. Use market_regime first: it explains whether the agents are buying, "
     "holding or only buying at strong support, and which macro events (FOMC, CPI, jobs report) are close. "
-    "scan and analyze_stock show the signals and why; backtest tests any built-in strategy on history; the agents_* "
-    "tools manage paper-trading agents that run on simulated money every trading day. Nothing here is investment "
-    "advice and no tool can trade a real account."
+    "scan and analyze_stock show the signals and why; backtest tests any built-in strategy on history. To test a "
+    "strategy the user describes in words, read strategy_guide, write the Strategy class, and run it with "
+    "backtest_code; fix the problems it reports and run it again. The agents_* tools manage paper-trading agents "
+    "that run on simulated money every trading day. Nothing here is investment advice and no tool can trade a "
+    "real account."
 )
 
 
@@ -148,16 +151,21 @@ def stock_news(symbol: str) -> dict[str, Any]:
 
 
 def list_strategies() -> dict[str, Any]:
-    """The built-in strategies that backtest and the agents can use."""
+    """The built-in strategies that backtest and the agents can use, and the strategies saved from backtest_code
+    (pass their path as the strategy)."""
+    from .lab import saved_strategies
     from .strategy import list_strategies as _ls
 
-    return {"strategies": [{"name": k, "description": v} for k, v in _ls().items()]}
+    return {"strategies": [{"name": k, "description": v} for k, v in _ls().items()], "saved": saved_strategies()}
 
 
 def backtest(strategy: str = "risk_aware", start: str = "2018-01-01", end: str | None = None,
              universe: str = "megacap", symbols: list[str] | None = None, profile: str = "balanced",
-             cash: float = 100_000.0) -> dict[str, Any]:
-    """Backtest a strategy on daily data (signals at the close, fills the next day) against SPY buy and hold."""
+             cash: float = 100_000.0, news: bool = False) -> dict[str, Any]:
+    """Backtest a strategy on daily data (signals at the close, fills the next day) against SPY buy and hold.
+
+    news=True replays the news archive: each day the strategy sees only items published before that day's close.
+    2026 headlines and SEC filings for the built-in watchlists ship with the package."""
     from .backtest.engine import Backtester
     from .data.prices import make_price_provider
     from .strategy import load_strategy
@@ -169,12 +177,48 @@ def backtest(strategy: str = "risk_aware", start: str = "2018-01-01", end: str |
         c.universe.symbols = [s.upper() for s in symbols]
         if not universe:
             c.universe.preset = None
-    bt = Backtester(c, make_price_provider(c.data.price_source, DiskCache(c.data.cache_path), c.data.csv_dir))
+    cache = DiskCache(c.data.cache_path)
+    pit = None
+    if news:
+        from .news.history import NewsArchive, PointInTimeNews
+        from .news.relevance import company_names
+
+        pit = PointInTimeNews(NewsArchive(c.news.archive_path, bundled=c.news.bundled), c.news, c.universe.resolve(),
+                              names=lambda s: company_names(s, cache))
+        pit = pit if pit.symbols else None
+    bt = Backtester(c, make_price_provider(c.data.price_source, cache, c.data.csv_dir), news=pit)
     res = bt.run(load_strategy(strategy), date.fromisoformat(start),
                  date.fromisoformat(end) if end else date.today(), initial_cash=cash)
     return {"strategy": res.strategy, "profile": profile, "metrics": _plain(res.metrics),
             "spy_buy_and_hold": _plain(res.benchmark_metrics), "trades": int(len(res.trades)),
             "notes": list(res.notes)}
+
+
+def strategy_guide() -> dict[str, Any]:
+    """How to write a strategy for backtest_code: the Strategy class, what ctx holds (indicators, price history,
+    positions, market regime, point-in-time news), the rules the code must follow, a template and a news
+    example. Read it before writing code."""
+    from .lab import guide
+
+    return guide()
+
+
+def backtest_code(code: str, symbols: list[str] | None = None, universe: str | None = "megacap",
+                  start: str = "2026-01-02", end: str | None = None, news: bool = True, profile: str = "balanced",
+                  cash: float = 100_000.0, params: dict[str, Any] | None = None, compare: list[str] | None = None,
+                  save_as: str | None = None) -> dict[str, Any]:
+    """Backtest a strategy written as Python code (one Strategy subclass; see strategy_guide).
+
+    The stocks come from symbols or universe (megacap, tech, defensive, core, etf, sectors), never from the code.
+    The code is checked first: dates or stock tickers written in the code, files, network and private attributes
+    are refused, because they let a backtest see the future or touch the machine. It then runs in a separate
+    process, where each day sees only that day's data and news published before the close. Returns metrics,
+    SPY and buy-and-hold for comparison, trades and the risk manager's refusals; or the problems to fix, with
+    line numbers. save_as='name' keeps the code in ~/.riskaware/strategies/ai/ for backtest and agents_create."""
+    from .lab import backtest_code as _run
+
+    return _run(code, symbols=symbols, universe=None if symbols else universe, start=start, end=end, news=news,
+                profile=profile, cash=cash, params=params, compare=compare, save_as=save_as)
 
 
 # ------------------------------------------------------------------------------------------- agents
@@ -209,6 +253,7 @@ def agents_create(name: str, strategy: str = "risk_aware", profile: str = "balan
                   llm: str | None = None) -> dict[str, Any]:
     """Create a paper-trading agent: a strategy with its own simulated account that trades every trading day.
 
+    strategy is a built-in name or the path of a strategy saved by backtest_code (list_strategies shows both).
     llm optionally adds an LLM review board, e.g. "openai:gpt-5.6-luna", "ollama:qwen2.5:3b" or "off"."""
     from .arena import AgentSpec, Arena
 
@@ -240,9 +285,9 @@ def agents_run(names: list[str] | None = None, dry_run: bool = False) -> dict[st
                      for r in runs]}
 
 
-TOOLS = [market_regime, scan, analyze_stock, stock_news, list_strategies, backtest, agents_leaderboard,
-         agent_detail, agent_decisions, agents_create, agents_run]
-READ_ONLY = {"market_regime", "scan", "analyze_stock", "stock_news", "list_strategies", "backtest",
+TOOLS = [market_regime, scan, analyze_stock, stock_news, list_strategies, backtest, strategy_guide, backtest_code,
+         agents_leaderboard, agent_detail, agent_decisions, agents_create, agents_run]
+READ_ONLY = {"market_regime", "scan", "analyze_stock", "stock_news", "list_strategies", "backtest", "strategy_guide",
              "agents_leaderboard", "agent_detail", "agent_decisions"}
 
 

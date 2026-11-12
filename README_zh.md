@@ -8,13 +8,13 @@
 
 **FOMC · CPI · 非农 · VIX 决定市场状态 · 回踩 EMA 50 / 100 / 200 时买入 · 财报过关才抄底 · Finviz + RSS + SEC 新闻交叉验证 · 每天自动跑的模拟盘智能体 · 给 Claude 用的 MCP 服务器 · 11 个策略（含期权）· 回测你自己的策略 · 10 家券商的模拟盘和实盘 · 中文和 English**
 
-[English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [截图](#-截图一览) · [快速开始](#-快速开始) · [模拟盘智能体](#-模拟盘智能体) · [MCP](#-mcp-服务器) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
+[English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [截图](#-截图一览) · [快速开始](#-快速开始) · [模拟盘智能体](#-模拟盘智能体) · [MCP](#-mcp-服务器) · [策略实验室](#-策略实验室) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![默认模拟盘](https://img.shields.io/badge/%E9%BB%98%E8%AE%A4-%E6%A8%A1%E6%8B%9F%E7%9B%98-orange.svg)](#-安全机制)
-[![版本 0.5.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.5.0-e5534b.svg)](CHANGELOG_zh.md)
+[![版本 0.6.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.6.0-e5534b.svg)](CHANGELOG_zh.md)
 [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器)
 [![11 个策略](https://img.shields.io/badge/%E7%AD%96%E7%95%A5-11%20%E4%B8%AA-8957e5.svg)](#-策略库)
 [![10 家券商](https://img.shields.io/badge/%E5%88%B8%E5%95%86-10%20%E5%AE%B6-0969da.svg)](#-支持的券商)
@@ -29,7 +29,7 @@
 ## 目录
 
 - [🆕 新功能](#-新功能) · [📸 截图一览](#-截图一览) · [💡 设计思路](#-设计思路) · [✨ 主要功能](#-主要功能) · [🚀 快速开始](#-快速开始)
-- [🤖 模拟盘智能体](#-模拟盘智能体) · [🔗 MCP 服务器](#-mcp-服务器)
+- [🤖 模拟盘智能体](#-模拟盘智能体) · [🔗 MCP 服务器](#-mcp-服务器) · [🧪 策略实验室](#-策略实验室)
 - [🧠 工作原理](#-工作原理)：[市场状态](#不同市场状态下的做法) · [风险档位](#风险档位)
 - [📊 回测](#-回测)：[用新闻回测](#用新闻回测) · [📚 策略库](#-策略库)：[期权](#期权目前只支持回测) · [🧩 写你自己的策略](#-写你自己的策略)
 - [🔌 支持的券商](#-支持的券商) · [🔒 安全机制](#-安全机制) · [🔧 配置](#-配置) · [💻 命令一览](#-命令一览) · [📁 目录结构](#-目录结构)
@@ -37,20 +37,18 @@
 
 ## 🆕 新功能
 
-<sub>最新版本 **0.5.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>最新版本 **0.6.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
 
-| | 0.5.0 和 0.4.0 新加入 |
+| | 0.6.0 和 0.5.0 新加入 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 自带 2026 年新闻**：安装包里带了内置股票池 64 只股票的 16,945 条新闻（Benzinga 标题，只有标题，加上 SEC 8-K 公告，2026 年 1 月到 11 月），`riskaware backtest --news` 或看板回测页新加的 **回放新闻** 开关，什么都不用下载就能用。[怎么用 →](#用新闻回测) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧪 说出策略，AI 写代码并回测**：通过 MCP，Claude、Codex 或 Gemini 读 `strategy_guide`，把策略写成代码，用 `backtest_code` 回测。代码先检查有没有偷看未来、有没有副作用，再放到单独的进程里跑；好用的可以保存下来，看板和模拟盘智能体都能直接用。别处拿到的代码用 `riskaware lab 文件` 一样能跑。[怎么用 →](#-策略实验室) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔭 回测不偷看未来**：回测每天只能看到当天收盘前发布的新闻（提前收盘的日子是 13:00），有两种读法的时间按更晚的读，策略也没法再通过拿到的价格数据摸到之后的价格。[细节 →](docs/zh/news-history.md#回测怎么防止偷看未来) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔑 不需要 API key**：智能体的复核可以走你的 Claude、ChatGPT 或 Gemini 订阅，用你已经登录的命令行工具：`--llm claude-cli`、`--llm codex-cli` 或 `--llm gemini-cli`（Gemini CLI 或 Antigravity）。[怎么用 →](docs/zh/agents.md#不需要-api-key用你的订阅) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔌 一条命令接上 MCP**：`riskaware mcp-setup claude-desktop`（或 `claude-code`、`codex`、`gemini`、`antigravity`）把智能体接到对应的应用里，用大白话问行情、让智能体运行。[怎么配置 →](#-mcp-服务器) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 回测里也能用新闻**：`riskaware news-history` 在你自己的电脑上建一个按发布时间存的新闻库（免费的 SEC 8-K 公告、你自己的 Benzinga key 或任意 CSV），`riskaware backtest --news` 让策略只能看到每天收盘前已经发布的新闻。[怎么用 →](#用新闻回测) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧠 每个智能体都能配 LLM**：给任意模拟盘智能体配上 GPT（比如 `gpt-5.6-luna`）、Claude，或者用 Ollama 跑的免费本地模型。多方、空方和裁判复核每一笔买入，最多把信心分调整 ±0.15 或者否决，不能自己发起交易。[怎么用 →](#-模拟盘智能体) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔍 每个决定是怎么做出来的都能看**：技术形态和理由、风控的结论、多方空方和裁判的意见，以及发给模型的完整 prompt 和原始回复，在看板的「决策」页或者用 `riskaware agents why 名字` 查看。所有东西都留在你自己的电脑上。[细节 →](docs/zh/agents.md#每个智能体配一个-llm) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏠 免费的本地模型**：`ollama:qwen2.5:3b` 在你自己的电脑上运行；`riskaware llm-check ollama:qwen2.5:3b` 一条命令测试 key 或模型能不能用。[怎么配置 →](docs/zh/agents.md#每个智能体配一个-llm) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **📰 新闻更干净、更难造假**：讲其他公司或大盘的新闻不再算到这只股票头上；辟谣会抵消它否认的传言；只有公司自己的 8-K 公告或通稿才能因为新闻触发强制卖出，媒体报道只能挡住买入。[原理 →](#-主要功能) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🛡️ 修复**：LLM 的回复改用严格的 JSON schema 输出；同一天跑好几次时，每日新开仓上限也能守住。[更新记录 →](CHANGELOG_zh.md) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗄️ 自己的新闻库**：其他年份用 `riskaware news-history` 在你自己的电脑上建一个按发布时间存的新闻库（免费的 SEC 8-K 公告、你自己的 Benzinga key 或任意 CSV），回测按同样的规则回放。[怎么用 →](docs/zh/news-history.md) |
 
-<sub>0.3.0 加入了每天自动跑的模拟盘智能体、MCP 服务器和新看板；0.2.0 加入了期权回测和四个股票策略。详见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>0.4.0 让每个智能体都能配 LLM 复核（GPT、Claude 或免费的本地模型），每个决定都有记录，新闻也更难造假；0.3.0 加入了每天自动跑的模拟盘智能体、MCP 服务器和新看板；0.2.0 加入了期权回测和四个股票策略。详见[更新记录](CHANGELOG_zh.md)。</sub>
 
 ## 📸 截图一览
 
@@ -139,7 +137,15 @@ pip install -e ".[mcp]"
 riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex（用你的 ChatGPT 登录）、gemini、antigravity
 ```
 
-一共十一个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`agents_leaderboard`、`agent_detail`、`agent_decisions`、`agents_create` 和 `agents_run`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。ChatGPT 本身只能连远程服务器，所以 OpenAI 这边用 Codex，它走你的 ChatGPT 登录。详见 [docs/zh/agents.md](docs/zh/agents.md#在-claudechatgpt-或-gemini-里使用mcp)。
+一共十三个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`strategy_guide`、`backtest_code`、`agents_leaderboard`、`agent_detail`、`agent_decisions`、`agents_create` 和 `agents_run`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。ChatGPT 本身只能连远程服务器，所以 OpenAI 这边用 Codex，它走你的 ChatGPT 登录。详见 [docs/zh/agents.md](docs/zh/agents.md#在-claudechatgpt-或-gemini-里使用mcp)。
+
+## 🧪 策略实验室
+
+用大白话说出你想要的策略，让 AI 来写。通过 MCP，Claude、Codex 或 Gemini 读 `strategy_guide`，把策略写成一个 Python 类，再用 `backtest_code` 回测。代码运行前，实验室会拒绝写死在代码里的日期和股票代码（两者都会让回测知道未来），也不允许读写文件、联网、访问私有属性。检查通过后，在一个没有任何 API key、有时间上限的单独进程里回测，返回的指标和 SPY、买入持有放在一起；有问题就返回要改的行。
+
+> 写一个策略：上升趋势里连跌两天、最近新闻偏正面时买入，持有 10 天或涨 8% 卖出。用 2026 年的 tech 股票池带新闻回测。
+
+`save_as` 把好用的策略保存下来，之后看板里能看到，也能当模拟盘智能体每天跑。从别处拿到的代码，用 `riskaware lab my_strategy.py --preset tech` 做同样的检查和回测。详见 [docs/zh/strategy-lab.md](docs/zh/strategy-lab.md)。
 
 ## 🧠 工作原理
 
@@ -216,9 +222,10 @@ riskaware backtest --synthetic                             # 离线演示，不�
 
 ### 用新闻回测
 
-回测只能用当天已经能看到的新闻，所以每条新闻都要有发布时间。`riskaware news-history` 在你自己的电脑上建一个这样的新闻库（`~/.riskaware/news`，不进代码仓库），回测加 `--news` 就会按天回放，走的是和实盘一样的聚类和两家来源交叉验证。美东时间 16:00 以后发布的新闻，回测要到第二天才能看到。
+回测只能用当天已经能看到的新闻，所以每条新闻都要有发布时间。2026 年的新闻随安装包自带：内置股票池 64 只股票的 16,945 条（Benzinga 标题，只有标题，加上 SEC 8-K 公告，2026 年 1 月 1 日到 11 月 11 日）。其他年份用 `riskaware news-history` 在你自己的电脑上建新闻库（`~/.riskaware/news`，不进代码仓库）。回测加 `--news` 会把两者一起按天回放，走的是和实盘一样的聚类和两家来源交叉验证。每天只能看到当天收盘前（美东时间 16:00，提前收盘的日子是 13:00）发布的新闻，第二天才成交。
 
 ```bash
+riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset megacap --start 2026-01-02 --news   # 2026 年什么都不用下载
 riskaware news-history build --preset core --contact-email you@example.com   # 2018 年以来的 SEC 8-K 公告
 riskaware news-history build --symbols AAPL,NVDA --source benzinga             # 用你自己的 BENZINGA_API_KEY
 riskaware news-history import my_news.csv --tz America/New_York               # 列：timestamp, symbol, headline[, source, url, sentiment]
@@ -229,11 +236,14 @@ riskaware backtest --strategy examples/strategies/news_earnings_drift.py --prese
 
 | 来源 | 存进新闻库的内容 | 费用 |
 |---|---|---|
+| 安装包自带 | 内置股票池 64 只股票的 2026 年 Benzinga 标题（只有标题）和 SEC 8-K 公告 | 免费，装好就有 |
 | SEC EDGAR | 每一份 8-K（财报、高管变动、并购、减值、财报重述），带 SEC 受理时间 | 免费；SEC 要求注明联系邮箱 |
 | Benzinga | 用你自己的新闻 API key 拉到的标题 | 你的 Benzinga 套餐 |
 | CSV | 任何你有权使用的新闻 | — |
 
-`core` 股票池是 SPY、QQQ、AAPL、MSFT、NVDA、AMZN、GOOGL、META、TSLA。SPY、QQQ 是基金不是公司，SEC 新闻库里基本没有它们的公告；议息、CPI、非农日历本来就在每次回测里决定市场状态。Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或第二家媒体佐证之前都算"单一来源"。Benzinga 的条款不允许再分发：新闻库只留在你的电脑上，不要提交到仓库或分享。详见 [docs/zh/news-history.md](docs/zh/news-history.md)。
+`core` 股票池是 SPY、QQQ、AAPL、MSFT、NVDA、AMZN、GOOGL、META、TSLA。SPY、QQQ 是基金不是公司，SEC 新闻库里基本没有它们的公告；议息、CPI、非农日历本来就在每次回测里决定市场状态。Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或第二家媒体佐证之前都算"单一来源"。你下载或导入的新闻只存在你自己的电脑上。详见 [docs/zh/news-history.md](docs/zh/news-history.md)。
+
+**更多历史数据。** 我们手里的新闻库大得多，2011 到 2026 年约 320 万条 Benzinga 标题，放不进安装包，所以只带了内置股票池的 2026 年。如果你需要更多年份或更多股票，欢迎开 issue，我们再看怎么提供，比如做成单独下载。
 
 ## 📚 策略库
 
@@ -299,7 +309,7 @@ class MyDip(Strategy):
         return signals
 ```
 
-策略只负责说"想做什么、有多大把握"；买多少由风控决定，现金底线、各种上限和市场状态规则也由风控执行，所以你的策略自动得到同样的保护。`ctx.market` 里有市场状态、VIX 和即将到来的事件；实盘时 `ctx.quality(sym)` 和 `ctx.news(sym)` 给出财报评分和验证过的新闻；回测加 `--news` 时 `ctx.news` 也能用。详见 [docs/zh/custom-strategies.md](docs/zh/custom-strategies.md)。
+策略只负责说"想做什么、有多大把握"；买多少由风控决定，现金底线、各种上限和市场状态规则也由风控执行，所以你的策略自动得到同样的保护。`ctx.market` 里有市场状态、VIX 和即将到来的事件；实盘时 `ctx.quality(sym)` 和 `ctx.news(sym)` 给出财报评分和验证过的新闻；回测加 `--news` 时 `ctx.news` 也能用。详见 [docs/zh/custom-strategies.md](docs/zh/custom-strategies.md)。也可以用大白话描述，让 AI 在[策略实验室](#-策略实验室)里帮你写。
 
 ## 🔌 支持的券商
 
@@ -371,7 +381,8 @@ llm:
 | `riskaware run [--dry-run] [--live]` | 跑一次交易循环 |
 | `riskaware schedule [--print-cron]` | 每个交易日在 `execution.run_time`（美东时间）自动运行 |
 | `riskaware portfolio` | 账户、持仓、未成交订单 |
-| `riskaware backtest [--news]` | 回测和策略对比（`--news` 回放本地新闻库） |
+| `riskaware backtest [--news]` | 回测和策略对比（`--news` 回放新闻；安装包自带 2026 年） |
+| `riskaware lab 文件 [--check-only] [--save 名字]` | 检查策略有没有偷看未来、有没有副作用，再在单独的进程里回测 |
 | `riskaware news-history build / import / status / show` | 回测用的本地历史新闻库 |
 | `riskaware strategies` / `new-strategy` | 列出内置策略 / 生成策略模板 |
 | `riskaware brokers` | 支持的券商及所需配置 |

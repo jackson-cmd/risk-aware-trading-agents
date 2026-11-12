@@ -593,11 +593,11 @@ def backtest(
         from .news.relevance import company_names
         from .utils import DiskCache as _Cache
 
-        archive = NewsArchive(c.news.archive_path)
-        if archive.symbols():
-            name_cache = _Cache(c.data.cache_path)
-            pit = PointInTimeNews(archive, c.news, names=lambda s: company_names(s, name_cache))
-        else:
+        archive = NewsArchive(c.news.archive_path, bundled=c.news.bundled)
+        name_cache = _Cache(c.data.cache_path)
+        pit = PointInTimeNews(archive, c.news, c.universe.resolve(), names=lambda s: company_names(s, name_cache))
+        if not pit.symbols:
+            pit = None
             console.print(f"[yellow]{T('bt.news_off')}[/]")
     bt = Backtester(c, prices, news=pit)
     names = [strategy] + ([x.strip() for x in compare.split(",") if x.strip()] if compare else [])
@@ -646,6 +646,62 @@ def strategies() -> None:
         tbl.add_row(name, desc)
     console.print(tbl)
     console.print("Write your own: riskaware new-strategy my_strategy")
+
+
+@app.command("lab")
+def lab_cmd(
+    path: Path = typer.Argument(..., help="A strategy file, e.g. one an AI wrote for you"),
+    symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols"),
+    preset: str = typer.Option("megacap", help="Universe preset when no --symbols"),
+    start: str = typer.Option("2026-01-02", help="YYYY-MM-DD"),
+    end: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default today)"),
+    news: bool = typer.Option(True, "--news/--no-news", help="Replay the news archive (2026 ships with the package)"),
+    profile: str = typer.Option("balanced", help="Risk profile"),
+    check_only: bool = typer.Option(False, "--check-only", help="Only check the code; do not run it"),
+    save: Optional[str] = typer.Option(None, help="Keep the strategy under this name in ~/.riskaware/strategies/ai"),
+) -> None:
+    """Check a strategy for look-ahead and side effects, then backtest it in a separate process. / 检查并回测策略代码"""
+    from rich.markup import escape
+
+    from . import lab
+
+    code = path.read_text(encoding="utf-8")
+    syms = [x.strip().upper() for x in symbols.split(",") if x.strip()] if symbols else None
+    names = syms or _symbols_arg(None, preset)
+    problems, warnings = lab.review_code(code, names)
+    for p in problems:
+        console.print(f"[red]line {p['line']}:[/] {escape(p['problem'])}", highlight=False)
+    for w in warnings:
+        console.print(f"[yellow]line {w['line']}:[/] {escape(w['warning'])}", highlight=False)
+    if problems:
+        raise typer.Exit(1)
+    if check_only:
+        console.print("[green]No problems found.[/]")
+        return
+    with console.status("backtesting in a separate process..."):
+        out = lab.backtest_code(code, symbols=syms, universe=None if syms else preset, start=start, end=end,
+                                news=news, profile=profile, save_as=save)
+    if not out.get("ok"):
+        where = ", ".join(f"line {w['line']}" for w in out.get("where") or [])
+        console.print(f"[red]{escape(str(out.get('error') or out.get('problems')))}[/]"
+                      + (f" ({where})" if where else ""), highlight=False)
+        raise typer.Exit(1)
+    from .backtest.metrics import METRIC_LABELS, fmt_metric
+
+    cmp = out.get("compare") or {}
+    tbl = Table(title=f"{out['strategy']} · {out['period']}")
+    tbl.add_column(T("col.metric"))
+    for col in (out["strategy"], *cmp, "SPY"):
+        tbl.add_column(col, justify="right")
+    for k, (label, _) in METRIC_LABELS.items():
+        if k in out["metrics"]:
+            tbl.add_row(label, fmt_metric(k, out["metrics"].get(k)), *[fmt_metric(k, v.get(k)) for v in cmp.values()],
+                        fmt_metric(k, out["spy_buy_and_hold"].get(k)))
+    console.print(tbl)
+    for n in out.get("notes", []):
+        console.print(f"[dim]• {escape(n)}[/]", highlight=False)
+    if out.get("saved"):
+        console.print(f"saved: {out['saved']['path']}")
 
 
 @app.command("new-strategy")
@@ -1195,7 +1251,8 @@ def version() -> None:
 def _archive():
     from .news.history import NewsArchive
 
-    return NewsArchive(cfg().news.archive_path)
+    c = cfg()
+    return NewsArchive(c.news.archive_path, bundled=c.news.bundled)
 
 
 def _symbols_arg(symbols: Optional[str], preset: Optional[str]) -> list[str]:
@@ -1258,7 +1315,9 @@ def news_history_build(
 def news_history_import(
     path: str = typer.Argument(..., help="CSV with timestamp, symbol, headline[, source, url, sentiment]"),
     source: Optional[str] = typer.Option(None, help="Publisher name for rows without a source column"),
-    tz: str = typer.Option("UTC", help="Time zone for timestamps without one, e.g. America/New_York"),
+    tz: str = typer.Option("America/New_York",
+                           help="Time zone for timestamps without one (New York by default: a wrong guess then "
+                                "only delays an item, never shows it early)"),
 ) -> None:
     """Import news from a CSV into the local archive. / 从 CSV 导入新闻"""
     from .news.history import read_csv
@@ -1284,13 +1343,18 @@ def news_history_status() -> None:
         console.print(T("nh.empty"))
         return
     tbl = Table(title=f"{T('nh.title')} · {archive.root}")
-    for k in ("col.symbol", "nh.items", "nh.first", "nh.last", "nh.feeds"):
-        tbl.add_column(T(k), justify="right" if k == "nh.items" else "left")
+    for k in ("col.symbol", "nh.items", "nh.bundled", "nh.first", "nh.last", "nh.feeds"):
+        tbl.add_column(T(k), justify="right" if k in ("nh.items", "nh.bundled") else "left")
     for st in stats:
-        tbl.add_row(st.symbol, str(st.items), st.first.date().isoformat() if st.first else "-",
-                    st.last.date().isoformat() if st.last else "-",
+        tbl.add_row(st.symbol, str(st.items), str(st.bundled) if st.bundled else "-",
+                    st.first.date().isoformat() if st.first else "-", st.last.date().isoformat() if st.last else "-",
                     ", ".join(f"{k} {v}" for k, v in sorted(st.feeds.items())))
     console.print(tbl)
+    info = archive.bundle_info()
+    if info:
+        console.print("[dim]" + T("nh.bundle", items=info["items"], symbols=info["symbols"],
+                                  first=info["first"].date().isoformat(), last=info["last"].date().isoformat(),
+                                  feeds=", ".join(f"{k} {v}" for k, v in sorted(info["feeds"].items()))) + "[/]")
 
 
 @news_app.command("show")
@@ -1310,7 +1374,7 @@ def news_history_show(
     cutoff = decision_time(d)
     items = pit.visible(symbol, cutoff)
     console.print(f"[bold]{T('nh.asof', day=d.isoformat())}: {symbol.upper()}[/] "
-                  f"[dim](≤ {cutoff.strftime('%Y-%m-%d %H:%M')} UTC, {c.news.lookback_hours}h)[/]")
+                  f"[dim](< {cutoff.strftime('%Y-%m-%d %H:%M')} UTC, {c.news.lookback_hours}h)[/]")
     if not items:
         console.print(T("nh.none"))
         return
