@@ -67,6 +67,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
 <header><div class="wrap">
   <a class="brand" href="#"><span lang="en">Risk-Aware Trading Agents</span><span lang="zh">风险感知交易智能体</span></a>
   <nav>
+    <a class="hide-sm" href="#agents"><span lang="en">Agents</span><span lang="zh">智能体</span></a>
     <a class="hide-sm" href="#how"><span lang="en">How it works</span><span lang="zh">原理</span></a>
     <a class="hide-sm" href="#backtest"><span lang="en">Backtest</span><span lang="zh">回测</span></a>
     <a class="hide-sm" href="#start"><span lang="en">Quick start</span><span lang="zh">快速开始</span></a>
@@ -87,7 +88,8 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
   <div class="pills">
     <span class="pill">FOMC · CPI · NFP</span><span class="pill">VIX · VIX3M</span><span class="pill">Fear &amp; Greed</span>
     <span class="pill">EMA 50/100/200</span><span class="pill">Finviz + RSS</span><span class="pill">Backtesting</span>
-    <span class="pill">Paper trading</span><span class="pill">Bull / bear LLM debate</span><span class="pill">MIT</span>
+    <span class="pill">Paper trading</span><span class="pill">Daily paper agents</span><span class="pill">MCP server</span>
+    <span class="pill">Bull / bear LLM debate</span><span class="pill">MIT</span>
   </div>
 </div>
 
@@ -101,7 +103,20 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
     <div class="card"><h3><span lang="en">No panic selling</span><span lang="zh">不恐慌卖出</span></h3><p><span lang="en">In uncertain or risk-off markets the agent holds and only buys at strong support. Only confirmed disasters (fraud, bankruptcy) can force an exit.</span><span lang="zh">不确定或避险时只持有，只在强支撑位买入。只有经过确认的重大利空（造假、破产）才会强制卖出。</span></p></div>
     <div class="card"><h3><span lang="en">Cross-verified news</span><span lang="zh">交叉验证新闻</span></h3><p><span lang="en">Finviz, Google News, Nasdaq, Seeking Alpha, Yahoo and SEC 8-K filings. A story counts only when two independent publishers or an SEC filing carry it, so one fake headline cannot move the agent.</span><span lang="zh">汇总 Finviz、Google News、Nasdaq、Seeking Alpha、Yahoo 和 SEC 8-K。只有两家独立媒体或 SEC 文件都报道才算确认，一条假新闻带不动它。</span></p></div>
     <div class="card"><h3><span lang="en">Your own strategies</span><span lang="zh">写你自己的策略</span></h3><p><span lang="en">Write one Python method, then backtest, compare and paper trade it with the same risk engine. Optional bull / bear / judge LLM review with hard bounds.</span><span lang="zh">只要写一个 Python 方法，就能用同一套风控去回测、对比和模拟盘交易。可选的 LLM 多空辩论复核，影响有硬性上限。</span></p></div>
+    <div class="card"><h3><span lang="en">Agents that trade every day</span><span lang="zh">每天自动交易的智能体</span></h3><p><span lang="en">Give any strategy its own paper account. A background job on macOS, Linux or Windows trades every agent once per trading day on free prices, and a leaderboard compares them with SPY.</span><span lang="zh">给任意策略配一个独立的模拟账户。macOS、Linux 或 Windows 上的后台任务每个交易日用免费价格让每个智能体交易一次，排行榜拿它们和 SPY 对比。</span></p></div>
+    <div class="card"><h3><span lang="en">Works with Claude (MCP)</span><span lang="zh">能在 Claude 里用（MCP）</span></h3><p><span lang="en"><code>riskaware mcp</code> lets Claude, Cursor or any MCP client read the regime, scan, backtest and run the paper agents. No tool can touch a live account.</span><span lang="zh"><code>riskaware mcp</code> 让 Claude、Cursor 或任何 MCP 客户端查市场状态、扫描、回测和运行模拟盘智能体。没有任何工具能碰实盘账户。</span></p></div>
   </div>
+</div></section>
+
+<section id="agents"><div class="wrap">
+  <h2><span lang="en">Paper-trading agents that run every day</span><span lang="zh">每天自动运行的模拟盘智能体</span></h2>
+  <p class="sub"><span lang="en">Give any strategy a name, a risk profile and starting cash. It trades its own paper account on free prices every trading day, and the leaderboard shows which one beats SPY.</span><span lang="zh">给任意策略起个名字，配上风险档位和初始资金。它每个交易日用免费价格在自己的模拟账户里交易，排行榜告诉你谁跑赢了 SPY。</span></p>
+  <img class="chart" lang="en" src="assets/agents_en.jpg" alt="Agents page of the dashboard: a leaderboard of paper-trading agents">
+  <img class="chart" lang="zh" src="assets/agents_zh.jpg" alt="网页看板的智能体页面：模拟盘智能体排行榜">
+<pre><code>riskaware agents init                  # four starter agents / 四个示例智能体
+riskaware agents run                   # trade once now / 现在交易一次
+riskaware agents schedule --install    # every trading day / 每个交易日自动运行
+riskaware mcp                          # use them from Claude / 在 Claude 里使用</code></pre>
 </div></section>
 
 <section id="how"><div class="wrap">
@@ -147,13 +162,15 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
   <p class="sub"><span lang="en">Python 3.10+. No account or API key needed for the first four commands.</span><span lang="zh">需要 Python 3.10+。前四条命令不需要券商账户或 API key。</span></p>
 <pre><code>git clone https://github.com/jackson-cmd/risk-aware-trading-agents
 cd risk-aware-trading-agents
-pip install -e ".[dashboard]"
+pip install -e ".[dashboard,mcp]"
 
 riskaware init                 # 2-minute wizard / 两分钟配置向导
 riskaware regime               # market regime, VIX, fear &amp; greed, FOMC countdown
 riskaware scan                 # today's signals with reasons
 riskaware backtest --compare buy_and_hold,ema_bounce
 riskaware run                  # paper trading (built-in paper account)
+riskaware agents init          # paper-trading agents / 模拟盘智能体
+riskaware agents schedule --install   # trade every trading day / 每天自动交易
 riskaware dashboard            # web UI, English / 中文</code></pre>
   <h3><span lang="en">Bring your own strategy</span><span lang="zh">写你自己的策略</span></h3>
 <pre><code>from riskaware.strategy import Strategy, Signal, Action

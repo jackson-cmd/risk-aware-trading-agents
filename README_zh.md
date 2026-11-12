@@ -6,20 +6,21 @@
 
 *别人恐慌时买入 · 始终留 30% 现金 · 从不恐慌割肉*
 
-**FOMC · CPI · 非农 · VIX 决定市场状态 · 回踩 EMA 50 / 100 / 200 时买入 · 财报过关才抄底 · Finviz + RSS + SEC 新闻交叉验证 · 11 个策略（含期权）· 回测你自己的策略 · 10 家券商的模拟盘和实盘 · 中文和 English**
+**FOMC · CPI · 非农 · VIX 决定市场状态 · 回踩 EMA 50 / 100 / 200 时买入 · 财报过关才抄底 · Finviz + RSS + SEC 新闻交叉验证 · 每天自动跑的模拟盘智能体 · 给 Claude 用的 MCP 服务器 · 11 个策略（含期权）· 回测你自己的策略 · 10 家券商的模拟盘和实盘 · 中文和 English**
 
-[English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [快速开始](#-快速开始) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
+[English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [快速开始](#-快速开始) · [模拟盘智能体](#-模拟盘智能体) · [MCP](#-mcp-服务器) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![默认模拟盘](https://img.shields.io/badge/%E9%BB%98%E8%AE%A4-%E6%A8%A1%E6%8B%9F%E7%9B%98-orange.svg)](#-安全机制)
-[![版本 0.2.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.2.0-e5534b.svg)](CHANGELOG_zh.md)
+[![版本 0.3.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.3.0-e5534b.svg)](CHANGELOG_zh.md)
+[![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器)
 [![11 个策略](https://img.shields.io/badge/%E7%AD%96%E7%95%A5-11%20%E4%B8%AA-8957e5.svg)](#-策略库)
 [![10 家券商](https://img.shields.io/badge/%E5%88%B8%E5%95%86-10%20%E5%AE%B6-0969da.svg)](#-支持的券商)
 [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
 
-<img src="site/assets/dashboard_zh.jpg" width="820" alt="网页看板：市场状态、VIX、恐慌贪婪指数、板块广度">
+<img src="site/assets/dashboard_zh.jpg" width="820" alt="网页看板：市场状态卡片、恐慌贪婪仪表盘、VIX、板块广度和宏观日历">
 
 </div>
 
@@ -28,6 +29,7 @@
 ## 目录
 
 - [🆕 新功能](#-新功能) · [💡 设计思路](#-设计思路) · [✨ 主要功能](#-主要功能) · [🚀 快速开始](#-快速开始)
+- [🤖 模拟盘智能体](#-模拟盘智能体) · [🔗 MCP 服务器](#-mcp-服务器)
 - [🧠 工作原理](#-工作原理)：[市场状态](#不同市场状态下的做法) · [风险档位](#风险档位)
 - [📊 回测](#-回测) · [📚 策略库](#-策略库)：[期权](#期权目前只支持回测) · [🧩 写你自己的策略](#-写你自己的策略)
 - [🔌 支持的券商](#-支持的券商) · [🔒 安全机制](#-安全机制) · [🔧 配置](#-配置) · [💻 命令一览](#-命令一览) · [📁 目录结构](#-目录结构)
@@ -35,16 +37,17 @@
 
 ## 🆕 新功能
 
-<sub>最新版本 **0.2.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>最新版本 **0.3.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
 
-| | 0.2.0 新加入 |
+| | 0.3.0 新加入 |
 |---|---|
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🎯 回测支持期权**：买入看涨和看跌期权、卖现金担保看跌、卖备兑看涨，用 Black-Scholes 定价、每天估值，到期、行权和备兑股票被买走都会处理。[怎么算的 →](#期权目前只支持回测) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔥 `aggressive_calls` 激进买看涨**：强势上升趋势中回调时，买入 45–60 天到期、delta 约 0.6 的看涨期权；赚 100% 止盈，亏 50% 止损。风险高：2018–2026 年回测最大回撤 -40%。[看回测结果 →](#-策略库) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔄 `wheel` 车轮策略**：在支撑位附近卖现金担保看跌，被行权后在成本价以上卖备兑看涨。2018–2026 年年化 14.1%，夏普 1.12（激进档，100 万美元）。[看回测结果 →](#-策略库) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **📈 四个新的股票策略**：`momentum_rotation`、`donchian_breakout`、`bollinger_reversion` 和 `fear_greed_dca`，一样守住 30% 现金底线。[对比一下 →](#-策略库) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🛡️ 期权风控**：每个档位有权利金预算，卖看跌的保证金不占用现金底线，为已卖出看涨担保的股票不会被卖掉。[具体规则 →](#期权目前只支持回测) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧩 自定义策略也能用期权**：信号里附上 `OptionSpec` 就开仓，写上 `option_key` 就平仓。[怎么写 →](docs/zh/custom-strategies.md#期权目前只支持回测) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🤖 模拟盘智能体**：给任意策略起个名字，配上风险档位和初始资金，它就用免费价格在自己的模拟账户里交易。可以几个一起跑。[怎么用 →](#-模拟盘智能体) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **⏰ 每天自动交易**：`riskaware agents schedule --install` 会在 macOS、Linux 或 Windows 上装一个后台任务，每个交易日纽约时间 15:40 之后让每个智能体交易一次，电脑睡眠醒来会补跑。[细节 →](docs/zh/agents.md#每日自动运行是怎么工作的) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏆 智能体排行榜**：所有智能体和 SPY 对比排名，能看净值曲线、持仓、订单和每个决策的理由；在网页看板上就能新建、运行、暂停或重置智能体。[看看 →](#-模拟盘智能体) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔗 给 Claude 用的 MCP 服务器**：在 Claude、Cursor 或任何 MCP 客户端里问市场状态、信号、新闻和回测，或者让它新建、运行模拟盘智能体。没有任何工具能碰实盘账户。[怎么配置 →](#-mcp-服务器) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🖥️ 全新网页看板**：深色交易终端风格，有市场状态卡片、恐慌贪婪仪表盘、迷你走势图、宏观事件时间线和顶部导航，中英文都支持。[看截图 ↑](#-风险感知交易智能体--risk-aware-trading-agents) |
+
+<sub>0.2.0 加入了期权回测（`aggressive_calls`、`wheel`）和四个股票策略，详见[更新记录](CHANGELOG_zh.md)。</sub>
 
 ---
 
@@ -64,6 +67,8 @@
 - **10 家券商，统一接口。** 内置模拟盘，以及 **Alpaca、盈透（IBKR）、Public.com、嘉信（Schwab）、tastytrade、Tradier、富途/moomoo、老虎证券、长桥**。
 - **期权策略（回测）。** 一个激进的买 call 策略和 wheel（卖现金担保 put 加备兑 call），有权利金上限，卖 put 的保证金不占现金底线，支持行权和到期结算。
 - **什么都能回测，包括你自己的策略。** 只要写一个 Python 方法，同一个策略对象就能在回测、模拟盘和实盘里运行，并且走同一套风控。多个策略可以并排对比，生成 HTML 报告。
+- **每天自动跑的模拟盘智能体。** 几个策略可以同时跑，每个都有自己的模拟账户，用免费价格交易。后台任务每个交易日让它们交易一次，排行榜拿它们和 SPY 对比。
+- **能在 Claude 里用（MCP）。** `riskaware mcp` 让 Claude、Cursor 或任何 MCP 客户端都能查市场状态、信号、新闻、回测，以及管理模拟盘智能体。
 - **可选的 LLM 复核。** 多头分析师、空头分析师和风控裁判（Claude 用 Anthropic 官方 SDK，也支持任何 OpenAI 兼容模型，比如 GPT、DeepSeek、通义千问或本地 Ollama）可以把信心分最多调高或调低 0.15，或者否决一笔买入。它们不能自己发起交易，也不能改任何限额。新闻只作为加了引号的不可信文本交给它们。
 - **中英双语。** 命令行、网页看板、回测报告和文档都支持中文和英文。
 
@@ -72,7 +77,7 @@
 ```bash
 git clone https://github.com/jackson-cmd/risk-aware-trading-agents
 cd risk-aware-trading-agents
-pip install -e ".[dashboard]"        # 需要 Python 3.10+
+pip install -e ".[dashboard,mcp]"    # 需要 Python 3.10+
 ```
 
 ```bash
@@ -83,10 +88,41 @@ riskaware --lang zh analyze NVDA      # 各个智能体对一只股票的看法
 riskaware --lang zh news AAPL         # 交叉验证后的新闻
 riskaware --lang zh backtest --compare buy_and_hold,ema_bounce
 riskaware --lang zh run               # 跑一次模拟盘交易（内置模拟账户）
-riskaware dashboard                   # 网页看板，侧边栏可切换中文
+riskaware --lang zh agents init       # 四个示例模拟盘智能体
+riskaware --lang zh agents run        # 现在让它们交易一次
+riskaware agents schedule --install   # 以后每个交易日自动交易
+riskaware --lang zh dashboard         # 网页看板，右上角可切换中英文
 ```
 
 上面这些命令都不需要券商账户或 API key。在配置文件里写 `language: zh`，以后就不用每次加 `--lang zh`。
+
+## 🤖 模拟盘智能体
+
+一个智能体就是一个策略加一个属于它自己的模拟账户。选好策略（内置的或你自己写的文件）、风险档位、股票池和初始资金，它就每个交易日用雅虎财经的免费价格在这个账户里交易一次。几个智能体可以同时跑，看看谁能跑赢 SPY。智能体只会用内置的模拟账户，永远不会连接券商。
+
+```bash
+riskaware agents init                                    # steady、momentum、breakout、fear-buyer
+riskaware agents add dips --strategy rsi2 --universe tech --cash 25000
+riskaware agents add mine --strategy my_dip.py:MyDip --profile aggressive
+riskaware agents run                                     # 让所有活跃的智能体现在交易一次
+riskaware agents                                         # 排行榜
+riskaware agents schedule --install                      # 以后每个交易日自动运行
+```
+
+后台任务（macOS 上是 LaunchAgent，Linux 上是一行 crontab，Windows 上是计划任务）在工作日每 15 分钟唤醒一次，每个交易日纽约时间 15:40 之后、收盘之前，让每个智能体交易一次。它会跳过节假日，电脑睡眠醒来会补跑，某个智能体出错也不影响其他的。每个智能体的账户、日志和每天的净值都存在 `~/.riskaware/arena/名字/`。网页看板的「智能体」页能看到排行榜，也能新建、运行、暂停、重置和删除智能体。详见 [docs/zh/agents.md](docs/zh/agents.md)。
+
+<img src="site/assets/agents_zh.jpg" width="820" alt="智能体页面：模拟盘智能体排行榜，显示净值、收益、相对 SPY 的表现和运行状态">
+
+## 🔗 MCP 服务器
+
+`riskaware mcp` 通过 Model Context Protocol 提供这些智能体的能力，Claude、Cursor 或任何 MCP 客户端都能直接用：
+
+```bash
+pip install -e ".[mcp]"
+claude mcp add riskaware -- riskaware mcp
+```
+
+一共十个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`agents_leaderboard`、`agent_detail`、`agents_create` 和 `agents_run`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。Claude Desktop 和其他客户端的配置方法见 [docs/zh/agents.md](docs/zh/agents.md#在-claude-里使用mcp)。
 
 ## 🧠 工作原理
 
@@ -301,6 +337,9 @@ llm:
 | `riskaware strategies` / `new-strategy` | 列出内置策略 / 生成策略模板 |
 | `riskaware brokers` | 支持的券商及所需配置 |
 | `riskaware halt` / `resume` | 一键停止 / 恢复交易 |
+| `riskaware agents [init\|add\|run\|list\|show\|pause\|resume\|reset\|remove]` | 模拟盘智能体 |
+| `riskaware agents schedule --install` | 每个交易日自动运行智能体 |
+| `riskaware mcp` | 给 Claude 等 AI 助手用的 MCP 服务器 |
 | `riskaware dashboard` | 网页看板 |
 
 ## 📁 目录结构
@@ -316,7 +355,10 @@ src/riskaware/
   engine.py    模拟盘 / 实盘交易循环、安全开关、日志、持仓状态
   backtest/    回测引擎、指标、HTML 报告
   llm/         可选的多空辩论复核
-  dashboard/   Streamlit 网页看板
+  dashboard/   Streamlit 网页看板（页面、主题、图表）
+  arena.py     模拟盘智能体：账户、每日运行、排行榜
+  scheduler.py 每日后台任务（launchd、cron、计划任务）
+  mcp_server.py  给 Claude 和其他 MCP 客户端用的工具
 site/          中英双语项目主页（GitHub Pages）
 docs/          设计说明和使用指南（中英文）
 ```
