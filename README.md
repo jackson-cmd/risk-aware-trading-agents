@@ -8,13 +8,13 @@
 
 **Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · daily paper-trading agents · an MCP server for Claude · 11 strategies including options · backtest your own · paper and live trading on 10 brokers · English and 中文**
 
-[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Screenshots](#-screenshots) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
+[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Screenshots](#-screenshots) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy lab](#-strategy-lab) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#-safety)
-[![Version 0.5.0](https://img.shields.io/badge/version-0.5.0-e5534b.svg)](CHANGELOG.md)
+[![Version 0.6.0](https://img.shields.io/badge/version-0.6.0-e5534b.svg)](CHANGELOG.md)
 [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server)
 [![11 strategies](https://img.shields.io/badge/strategies-11-8957e5.svg)](#-strategy-library)
 [![10 brokers](https://img.shields.io/badge/brokers-10-0969da.svg)](#-brokers)
@@ -29,7 +29,7 @@
 ## Contents
 
 - [🆕 What's new](#-whats-new) · [📸 Screenshots](#-screenshots) · [💡 The idea](#-the-idea) · [✨ Highlights](#-highlights) · [🚀 Quick start](#-quick-start)
-- [🤖 Paper-trading agents](#-paper-trading-agents) · [🔗 MCP server](#-mcp-server)
+- [🤖 Paper-trading agents](#-paper-trading-agents) · [🔗 MCP server](#-mcp-server) · [🧪 Strategy lab](#-strategy-lab)
 - [🧠 How it works](#-how-it-works): [Market regimes](#what-the-agent-does-in-each-regime) · [Risk profiles](#risk-profiles)
 - [📊 Backtest](#-backtest): [News in backtests](#news-in-backtests) · [📚 Strategy library](#-strategy-library): [Options](#options-backtest-only) · [🧩 Write your own strategy](#-write-your-own-strategy)
 - [🔌 Brokers](#-brokers) · [🔒 Safety](#-safety) · [🔧 Configuration](#-configuration) · [💻 CLI](#-cli) · [📁 Project layout](#-project-layout)
@@ -37,20 +37,18 @@
 
 ## 🆕 What's new
 
-<sub>Latest release **0.5.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
+<sub>Latest release **0.6.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
 
-| | New in 0.5.0 and 0.4.0 |
+| | New in 0.6.0 and 0.5.0 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 2026 news in the box**: 16,945 news items for the 64 stocks of the built-in lists ship with the package (Benzinga headlines, titles only, and SEC 8-K filings, January to November 2026), so `riskaware backtest --news`, or the new **Replay news** switch on the dashboard's Backtest page, works with nothing to download. [How →](#news-in-backtests) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧪 Describe a strategy, the AI writes and tests it**: over MCP, Claude, Codex or Gemini read `strategy_guide`, write the strategy as code and run it with `backtest_code`. The code is checked for look-ahead and side effects and runs in a separate process; the good ones are saved for the dashboard and the paper agents. `riskaware lab FILE` does the same for code from anywhere. [How →](#-strategy-lab) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔭 No peeking at the future**: each backtest day sees only news published before its close (13:00 on early-close days), a timestamp that could be read two ways is read the later way, and a strategy can no longer reach later prices through the price data it is given. [Details →](docs/news-history.md#how-the-backtest-avoids-look-ahead) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔑 No API key needed**: an agent's review can run on your Claude, ChatGPT or Gemini plan through the tool you are already logged in to: `--llm claude-cli`, `--llm codex-cli` or `--llm gemini-cli` (Gemini CLI or Antigravity). [How →](docs/agents.md#no-api-key-use-your-plan) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔌 MCP in one command**: `riskaware mcp-setup claude-desktop` (or `claude-code`, `codex`, `gemini`, `antigravity`) connects the agents to that app, so you can ask it about the market and run agents in plain words. [Set it up →](#-mcp-server) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ News in backtests**: `riskaware news-history` keeps a point-in-time archive on your own machine (SEC 8-K filings for free, your Benzinga key, or any CSV), and `riskaware backtest --news` lets strategies see only what was published before each day's close. [How →](#news-in-backtests) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧠 An LLM for each agent**: give any paper-trading agent GPT (for example `gpt-5.6-luna`), Claude, or a free local model through Ollama. A bull analyst, a bear analyst and a judge review every buy; they can move conviction by at most ±0.15 or veto it, never create a trade. [How →](#-paper-trading-agents) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔍 See how every decision was made**: the setups and reasons, what the risk manager said, the bull, bear and judge, and the exact prompt and raw reply, on the dashboard's Decisions tab or with `riskaware agents why NAME`. Everything stays on your computer. [Details →](docs/agents.md#an-llm-for-each-agent) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏠 Free local models**: `ollama:qwen2.5:3b` runs on your own machine; `riskaware llm-check ollama:qwen2.5:3b` tests a key or a model in one command. [Set it up →](docs/agents.md#an-llm-for-each-agent) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **📰 Cleaner, harder-to-fake news**: stories about other companies or the market no longer count toward a stock, denials clear the rumors they refute, and only the company's own 8-K or press release can force a news sale; outlets alone can only block buys. [How it works →](#-highlights) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🛡️ Fixes**: replies from the LLM use strict JSON schema output, and the daily new-position limit now holds across several runs on the same day. [Changelog →](CHANGELOG.md) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗄️ Your own news archive**: for other years, `riskaware news-history` keeps a point-in-time archive on your own machine (SEC 8-K filings for free, your Benzinga key, or any CSV) that backtests replay the same way. [How →](docs/news-history.md) |
 
-<sub>0.3.0 added daily paper-trading agents, the MCP server and the new dashboard; 0.2.0 added options to the backtester and four stock strategies. See the [changelog](CHANGELOG.md).</sub>
+<sub>0.4.0 gave each agent its own LLM review (GPT, Claude or a free local model) with every decision on record, and made the news harder to fake; 0.3.0 added daily paper-trading agents, the MCP server and the new dashboard; 0.2.0 added options to the backtester and four stock strategies. See the [changelog](CHANGELOG.md).</sub>
 
 ## 📸 Screenshots
 
@@ -139,7 +137,15 @@ pip install -e ".[mcp]"
 riskaware mcp-setup claude-desktop --apply   # or: claude-code, codex (your ChatGPT login), gemini, antigravity
 ```
 
-Eleven tools: `market_regime`, `scan`, `analyze_stock`, `stock_news`, `list_strategies`, `backtest`, `agents_leaderboard`, `agent_detail`, `agent_decisions`, `agents_create` and `agents_run`. They are read-only or act on local paper accounts; no tool can send an order to a broker. Then just ask, for example "What regime is the market in, and what is coming up this week?" or "Backtest the wheel on megacap with $1M since 2018." ChatGPT itself only connects to remote servers, so on the OpenAI side use Codex, which runs on your ChatGPT login. More in [docs/agents.md](docs/agents.md#use-it-from-claude-chatgpt-or-gemini-mcp).
+Thirteen tools: `market_regime`, `scan`, `analyze_stock`, `stock_news`, `list_strategies`, `backtest`, `strategy_guide`, `backtest_code`, `agents_leaderboard`, `agent_detail`, `agent_decisions`, `agents_create` and `agents_run`. They are read-only or act on local paper accounts; no tool can send an order to a broker. Then just ask, for example "What regime is the market in, and what is coming up this week?" or "Backtest the wheel on megacap with $1M since 2018." ChatGPT itself only connects to remote servers, so on the OpenAI side use Codex, which runs on your ChatGPT login. More in [docs/agents.md](docs/agents.md#use-it-from-claude-chatgpt-or-gemini-mcp).
+
+## 🧪 Strategy lab
+
+Describe a strategy in plain words and let the AI build it. Over MCP, Claude, Codex or Gemini read `strategy_guide`, write the strategy as a Python class and run it with `backtest_code`. Before the code runs, the lab refuses dates and stock tickers written into it (both let a backtest know the future), files, network and private attributes. Then it backtests the code in a separate process with no API keys and a time limit, and returns the metrics next to SPY and buy-and-hold, or the lines to fix.
+
+> Write a strategy that buys two-day pullbacks in uptrends when the recent news is positive, and sells after 10 days or at +8%. Backtest it on the tech list for 2026 with news.
+
+`save_as` keeps a strategy that works: it then shows up on the dashboard and can run as a paper agent. For code from anywhere else, `riskaware lab my_strategy.py --preset tech` does the same checks and backtest. More in [docs/strategy-lab.md](docs/strategy-lab.md).
 
 ## 🧠 How it works
 
@@ -216,9 +222,10 @@ Every run writes a self-contained HTML report (metrics, equity and drawdown char
 
 ### News in backtests
 
-A backtest may only use news it would have seen on that day, so it needs each item's publication time. `riskaware news-history` keeps such an archive on your own machine (`~/.riskaware/news`, never in the repository), and `--news` replays it through the same clustering and two-source check used in live trading. An item stamped after 16:00 New York time becomes visible the next day.
+A backtest may only use news it would have seen on that day, so it needs each item's publication time. News for 2026 ships with the package: 16,945 items for the 64 stocks of the built-in lists (Benzinga headlines, titles only, and SEC 8-K filings, January 1 to November 11, 2026). For other years, `riskaware news-history` keeps an archive on your own machine (`~/.riskaware/news`, never in the repository). `--news` replays both through the same clustering and two-source check used in live trading. Each day sees only items published before its close (16:00 New York, 13:00 on early-close days), and orders fill the next day.
 
 ```bash
+riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset megacap --start 2026-01-02 --news   # 2026: nothing to download
 riskaware news-history build --preset core --contact-email you@example.com   # SEC 8-K filings since 2018
 riskaware news-history build --symbols AAPL,NVDA --source benzinga             # with your own BENZINGA_API_KEY
 riskaware news-history import my_news.csv --tz America/New_York               # timestamp, symbol, headline[, source, url, sentiment]
@@ -229,11 +236,14 @@ riskaware backtest --strategy examples/strategies/news_earnings_drift.py --prese
 
 | Source | What goes into the archive | Cost |
 |---|---|---|
+| Bundled with the package | 2026 Benzinga headlines (titles only) and SEC 8-K filings for the 64 stocks of the built-in lists | free, already installed |
 | SEC EDGAR | every 8-K (earnings, officer changes, deals, impairments, restatements) with SEC's acceptance time | free; SEC asks for a contact email |
 | Benzinga | headlines from your own news API key | your Benzinga plan |
 | CSV | any news you have the right to use | — |
 
-The `core` preset is SPY, QQQ, AAPL, MSFT, NVDA, AMZN, GOOGL, META and TSLA. SPY and QQQ are funds, not companies, so the SEC archive has little or nothing for them; the FOMC, CPI and jobs calendar already drives the regime in every backtest. Benzinga counts as one publisher, so a Benzinga-only story stays single-source until an SEC filing or a second publisher backs it. Benzinga's terms do not allow redistribution: the archive stays on your machine, so do not commit or share it. Details: [docs/news-history.md](docs/news-history.md).
+The `core` preset is SPY, QQQ, AAPL, MSFT, NVDA, AMZN, GOOGL, META and TSLA. SPY and QQQ are funds, not companies, so the SEC archive has little or nothing for them; the FOMC, CPI and jobs calendar already drives the regime in every backtest. Benzinga counts as one publisher, so a Benzinga-only story stays single-source until an SEC filing or a second publisher backs it. What you download or import stays on your machine. Details: [docs/news-history.md](docs/news-history.md).
+
+**More history.** We keep a much larger archive, about 3.2 million Benzinga headlines from 2011 to 2026. It is far too big to ship in the package, so the package carries 2026 for the built-in lists. If you need more years or more stocks, open an issue and we will look at how to provide them, for example as a separate download.
 
 ## 📚 Strategy library
 
@@ -299,7 +309,7 @@ class MyDip(Strategy):
         return signals
 ```
 
-A strategy only says what it wants and how sure it is; the risk manager decides the size and enforces the cash floor, caps and regime rules, so your strategy inherits the same protection. `ctx.market` has the regime, VIX and upcoming events; `ctx.quality(sym)` and `ctx.news(sym)` give the earnings verdict and the verified news in live runs; `ctx.news` also works in backtests run with `--news`. See [docs/custom-strategies.md](docs/custom-strategies.md).
+A strategy only says what it wants and how sure it is; the risk manager decides the size and enforces the cash floor, caps and regime rules, so your strategy inherits the same protection. `ctx.market` has the regime, VIX and upcoming events; `ctx.quality(sym)` and `ctx.news(sym)` give the earnings verdict and the verified news in live runs; `ctx.news` also works in backtests run with `--news`. See [docs/custom-strategies.md](docs/custom-strategies.md). Or describe the strategy and let an AI write it in the [strategy lab](#-strategy-lab).
 
 ## 🔌 Brokers
 
@@ -368,7 +378,8 @@ llm:
 | `riskaware run [--dry-run] [--live]` | one trading cycle |
 | `riskaware schedule [--print-cron]` | run every trading day at `execution.run_time` (New York) |
 | `riskaware portfolio` | account, positions, open orders |
-| `riskaware backtest [--news]` | backtest and compare strategies (`--news` replays the local news archive) |
+| `riskaware backtest [--news]` | backtest and compare strategies (`--news` replays the news; 2026 ships with the package) |
+| `riskaware lab FILE [--check-only] [--save NAME]` | check a strategy for look-ahead and side effects, then backtest it in a separate process |
 | `riskaware news-history build / import / status / show` | local point-in-time news archive for backtests |
 | `riskaware strategies` / `new-strategy` | list built-ins / create a strategy file |
 | `riskaware brokers` | supported brokers and their requirements |

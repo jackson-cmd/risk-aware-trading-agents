@@ -8,6 +8,8 @@ backtester: "what had been published about SYMBOL by the close of DAY?"
 
 The archive is one JSON Lines file per symbol. Items come from:
 
+* the package itself: 2026 headlines for the stocks of the built-in watchlists
+  (Benzinga headlines, titles only, and SEC 8-K filings), read-only, see ``BUNDLE_PATH``;
 * SEC EDGAR 8-K filings (``riskaware news-history build``), public and stamped
   with the time SEC accepted them;
 * your own Benzinga API key (``--source benzinga``), kept local;
@@ -16,21 +18,31 @@ The archive is one JSON Lines file per symbol. Items come from:
 Backtests use the same clustering and cross-source verification as live
 trading, so a story still needs two independent publishers or an SEC filing
 before it counts as confirmed.
+
+No look-ahead: for day t the backtest decides at that day's close (16:00 New
+York, 13:00 on early-close days) and only sees items published strictly before
+it; orders fill on t+1. A timestamp that could be read two ways is read the
+later way: a date without a time counts as the end of that day, and a time
+without a zone as New York time. Items dated in the future are dropped.
 """
 
 from __future__ import annotations
 
 import bisect
 import csv
+import gzip
 import json
 import logging
 import re
+from collections import Counter
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta, timezone
+from functools import lru_cache
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from .. import marketcal as mc
 from ..config import RISKAWARE_HOME, NewsConfig
 from ..types import NewsItem
 from .relevance import company_names
@@ -39,6 +51,11 @@ from .verify import NewsReport, analyze_news
 log = logging.getLogger(__name__)
 NY = ZoneInfo("America/New_York")
 DEFAULT_ROOT = RISKAWARE_HOME / "news"
+#: Headlines that ship with the package (titles only), read-only; see ``load_bundle``.
+BUNDLE_PATH = Path(__file__).with_name("data") / "news_2026.jsonl.gz"
+#: An item stamped later than this after the moment it is added is bad data and is dropped.
+MAX_FUTURE = timedelta(days=1)
+_DATE_ONLY = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 #: Columns of the CSV import format. ``timestamp`` and ``symbol`` and ``headline`` are required.
 CSV_COLUMNS = ("timestamp", "symbol", "headline", "source", "url", "sentiment")
@@ -47,10 +64,21 @@ _HEADLINE_ALIASES = ("headline", "title")
 _SOURCE_ALIASES = ("source", "publisher")
 
 
-def _parse_time(value: str, assume_tz: ZoneInfo | timezone = timezone.utc) -> datetime | None:
+def _parse_time(value: str, assume_tz: ZoneInfo | timezone = NY) -> datetime | None:
+    """A UTC datetime, read so that a wrong guess can only make an item visible later, never earlier.
+
+    A date without a time ("2026-03-05") is read as 23:59:59 New York time that day, so the item is first
+    visible the next trading day. A time without a zone is read in ``assume_tz`` (New York by default: if the
+    file was really in UTC, New York time only delays the item by a few hours).
+    """
     value = (value or "").strip()
     if not value:
         return None
+    if _DATE_ONLY.fullmatch(value):
+        try:
+            return datetime.combine(date.fromisoformat(value), time(23, 59, 59), NY).astimezone(timezone.utc)
+        except ValueError:
+            return None
     text = value.replace("Z", "+00:00") if value.endswith("Z") else value
     try:
         dt = datetime.fromisoformat(text)
@@ -108,19 +136,69 @@ class SymbolStats:
     first: datetime | None
     last: datetime | None
     feeds: dict[str, int]
+    bundled: int = 0  # items that come from the package, not from your own archive
+
+
+@lru_cache(maxsize=4)
+def _load_bundle(path: str, mtime: float) -> dict[str, tuple[dict, ...]]:
+    out: dict[str, list[dict]] = {}
+    with gzip.open(path, "rt", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if line:
+                rec = json.loads(line)
+                out.setdefault(rec["symbol"], []).append(rec)
+    return {sym: tuple(sorted(recs, key=lambda r: r["ts"])) for sym, recs in out.items()}
+
+
+def load_bundle(path: str | Path = BUNDLE_PATH) -> dict[str, tuple[dict, ...]]:
+    """The headlines that ship with the package, by symbol, oldest first (empty if the file is missing)."""
+    p = Path(path)
+    if not p.is_file():
+        return {}
+    return _load_bundle(str(p), p.stat().st_mtime)
 
 
 class NewsArchive:
-    """One JSON Lines file per symbol, sorted by publication time, de-duplicated."""
+    """One JSON Lines file per symbol, sorted by publication time, de-duplicated.
 
-    def __init__(self, root: str | Path | None = None):
+    Reads also include the headlines bundled with the package (``bundled=True``); writes and deletes only touch
+    your own files.
+    """
+
+    def __init__(self, root: str | Path | None = None, bundled: bool = True, bundle_path: str | Path | None = None):
         self.root = Path(root).expanduser() if root else DEFAULT_ROOT
+        self.bundled = bundled
+        self.bundle_path = Path(bundle_path) if bundle_path else BUNDLE_PATH
         self._mem: dict[str, list[dict]] = {}
 
     def path(self, symbol: str) -> Path:
         return self.root / f"{_safe_name(symbol)}.jsonl"
 
+    def bundle(self) -> dict[str, tuple[dict, ...]]:
+        return load_bundle(self.bundle_path) if self.bundled else {}
+
+    def records(self, symbol: str) -> list[dict]:
+        """Your records and the bundled ones for a symbol, oldest first; your copy of an item wins."""
+        local = self._read(symbol)
+        extra = self.bundle().get(symbol.upper(), ())
+        if not extra:
+            return list(local)
+        seen = {_key(r) for r in local}
+        return sorted([*local, *(r for r in extra if _key(r) not in seen)], key=lambda r: r["ts"])
+
+    def bundle_info(self) -> dict | None:
+        """What the bundled file holds: item and symbol counts, first and last item, items per feed."""
+        b = self.bundle()
+        if not b:
+            return None
+        recs = [r for v in b.values() for r in v]
+        return {"path": str(self.bundle_path), "items": len(recs), "symbols": len(b),
+                "first": _parse_time(min(r["ts"] for r in recs)), "last": _parse_time(max(r["ts"] for r in recs)),
+                "feeds": dict(Counter(r.get("feed", "?") for r in recs))}
+
     def _read(self, symbol: str) -> list[dict]:
+        """Your own records (the local file only)."""
         sym = symbol.upper()
         if sym not in self._mem:
             p = self.path(sym)
@@ -140,10 +218,17 @@ class NewsArchive:
     def add(self, items: Iterable[NewsItem]) -> int:
         """Store items (those without a timestamp or symbol are skipped). Returns how many were new."""
         by_sym: dict[str, list[dict]] = {}
+        limit = datetime.now(timezone.utc) + MAX_FUTURE
+        future = 0
         for it in items:
             if it.published is None or not it.symbol or not it.title:
                 continue
+            if it.published > limit:  # a timestamp in the future is an error in the source
+                future += 1
+                continue
             by_sym.setdefault(it.symbol.upper(), []).append(item_to_record(it))
+        if future:
+            log.warning("skipped %d items dated in the future", future)
         added = 0
         for sym, recs in by_sym.items():
             current = self._read(sym)
@@ -168,26 +253,30 @@ class NewsArchive:
         return added
 
     def items(self, symbol: str) -> list[NewsItem]:
-        return [record_to_item(r) for r in self._read(symbol)]
+        return [record_to_item(r) for r in self.records(symbol)]
 
-    def symbols(self) -> list[str]:
+    def local_symbols(self) -> list[str]:
         if not self.root.exists():
             return []
         return sorted(p.stem.replace("_", "^") for p in self.root.glob("*.jsonl"))
 
+    def symbols(self) -> list[str]:
+        return sorted(set(self.local_symbols()) | set(self.bundle()))
+
     def stats(self) -> list[SymbolStats]:
         out = []
         for sym in self.symbols():
-            recs = self._read(sym)
+            recs = self.records(sym)
             feeds: dict[str, int] = {}
             for r in recs:
                 feeds[r.get("feed", "?")] = feeds.get(r.get("feed", "?"), 0) + 1
             out.append(SymbolStats(sym, len(recs), _parse_time(recs[0]["ts"]) if recs else None,
-                                   _parse_time(recs[-1]["ts"]) if recs else None, feeds))
+                                   _parse_time(recs[-1]["ts"]) if recs else None, feeds,
+                                   bundled=len(recs) - len(self._read(sym))))
         return out
 
     def remove(self, symbol: str, feed: str | None = None) -> int:
-        """Delete a symbol's items (all of them, or only those from one feed)."""
+        """Delete a symbol's items from your archive (all of them, or one feed); bundled items stay."""
         recs = self._read(symbol)
         keep = [] if feed is None else [r for r in recs if r.get("feed") != feed]
         removed = len(recs) - len(keep)
@@ -210,13 +299,15 @@ def _pick(row: dict, names: tuple[str, ...]) -> str:
     return ""
 
 
-def read_csv(path: str | Path, default_source: str | None = None, assume_tz: str = "UTC",
+def read_csv(path: str | Path, default_source: str | None = None, assume_tz: str = "America/New_York",
              feed: str = "import") -> list[NewsItem]:
     """Read a news CSV. Required columns: a timestamp, ``symbol`` and ``headline``.
 
     Timestamps may be ISO 8601 (``2024-05-02T16:31:00Z``, ``2024-05-02 12:31:00-04:00``) or RFC 2822.
-    Times without a zone are read in ``assume_tz`` (``UTC`` by default; pass ``America/New_York``
-    for exchange-time exports). ``symbol`` may hold several tickers separated by ``,``, ``;`` or ``|``.
+    Times without a zone are read in ``assume_tz`` (New York by default, the safe guess: a UTC time read as
+    New York time only shows up later, while a New York time read as UTC would show up hours early). A date
+    without a time counts as the end of that day. ``symbol`` may hold several tickers separated by ``,``,
+    ``;`` or ``|``.
     """
     tz: ZoneInfo | timezone = timezone.utc if assume_tz.upper() == "UTC" else ZoneInfo(assume_tz)
     p = Path(path).expanduser()
@@ -248,17 +339,19 @@ def read_csv(path: str | Path, default_source: str | None = None, assume_tz: str
 
 
 # ------------------------------------------------------------- point-in-time view
-def decision_time(day: date, close: time = time(16, 0)) -> datetime:
-    """The moment a backtest decides for ``day``: the New York close, in UTC."""
+def decision_time(day: date, close: time | None = None) -> datetime:
+    """The moment a backtest decides for ``day``: that day's New York close (13:00 on early-close days), in UTC."""
+    if close is None:
+        close = time(13, 0) if mc.early_close(day) else time(16, 0)
     return datetime.combine(day, close, NY).astimezone(timezone.utc)
 
 
 class PointInTimeNews:
     """What the news looked like at the close of a given day, using only items published before it.
 
-    A backtest decides at the close of day t and fills on t+1, so an item stamped after
-    16:00 New York time on day t is first visible on t+1. Stories go through the same relevance
-    filter as live trading (``news.relevance_filter``): ``names(symbol)`` gives the company names to
+    A backtest decides at the close of day t and fills on t+1, so an item stamped at or after the close
+    (16:00 New York time, 13:00 on early-close days) is first visible on t+1. Stories go through the same
+    relevance filter as live trading (``news.relevance_filter``): ``names(symbol)`` gives the company names to
     look for; by default only the built-in aliases are used, so a backtest needs no network.
     """
 
@@ -270,7 +363,7 @@ class PointInTimeNews:
         self._times: dict[str, list[float]] = {}
         self._names: dict[str, list[str]] = {}
         for sym in symbols if symbols is not None else archive.symbols():
-            items = [i for i in archive.items(sym) if i.published is not None]
+            items = sorted((i for i in archive.items(sym) if i.published is not None), key=lambda i: i.published)
             if items:
                 key = sym.upper()
                 self._items[key] = items
@@ -292,15 +385,23 @@ class PointInTimeNews:
                 out[i.feed] = out.get(i.feed, 0) + 1
         return out
 
+    def coverage(self) -> tuple[datetime | None, datetime | None]:
+        """The first and the last publication time among the loaded items."""
+        firsts = [v[0] for v in self._times.values() if v]
+        lasts = [v[-1] for v in self._times.values() if v]
+        if not firsts:
+            return None, None
+        return (datetime.fromtimestamp(min(firsts), timezone.utc), datetime.fromtimestamp(max(lasts), timezone.utc))
+
     def visible(self, symbol: str, cutoff: datetime) -> list[NewsItem]:
-        """Items published in the lookback window that ends at ``cutoff`` (inclusive)."""
+        """Items published in the lookback window that ends at ``cutoff``, strictly before ``cutoff``."""
         sym = symbol.upper()
         times = self._times.get(sym)
         if not times:
             return []
         lo = bisect.bisect_left(times, (cutoff - timedelta(hours=self.cfg.lookback_hours)).timestamp())
-        hi = bisect.bisect_right(times, cutoff.timestamp())
-        return self._items[sym][lo:hi]
+        hi = bisect.bisect_left(times, cutoff.timestamp())  # an item stamped exactly at the close is after it
+        return list(self._items[sym][lo:hi])
 
     def report(self, symbol: str, day: date) -> NewsReport | None:
         cutoff = decision_time(day)

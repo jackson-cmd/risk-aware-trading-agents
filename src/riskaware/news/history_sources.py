@@ -7,9 +7,8 @@ SEC EDGAR
     refused with HTTP 403.
 
 Benzinga
-    Uses your own Benzinga news API key (``BENZINGA_API_KEY``). The items are
-    written to your local archive only. Benzinga's terms do not allow
-    redistributing its content, so never commit the archive or share it.
+    Uses your own Benzinga news API key (``BENZINGA_API_KEY``). Headlines go to
+    your local archive, outside the repository.
 """
 
 from __future__ import annotations

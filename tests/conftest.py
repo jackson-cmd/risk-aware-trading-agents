@@ -22,6 +22,14 @@ from riskaware.strategy.base import PortfolioView, PositionView, StrategyContext
 from riskaware.types import Quote, Regime  # noqa: E402
 
 
+@pytest.fixture(autouse=True)
+def no_bundled_news(monkeypatch, tmp_path_factory):
+    """Unit tests use only the news they create; tests of the shipped file read it through load_bundle()."""
+    from riskaware.news import history
+
+    monkeypatch.setattr(history, "BUNDLE_PATH", tmp_path_factory.getbasetemp() / "no-bundle.jsonl.gz")
+
+
 @pytest.fixture
 def offline_cfg() -> AppConfig:
     cfg = AppConfig()

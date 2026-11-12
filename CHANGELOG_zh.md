@@ -2,6 +2,15 @@
 
 [English](CHANGELOG.md)
 
+## 0.6.0（2026-11-12）
+
+- 安装包自带 2026 年新闻：内置股票池 64 只股票的 16,945 条，2026 年 1 月 1 日到 11 月 11 日（Benzinga 标题 16,249 条，只有标题、时间和股票代码；SEC 8-K 公告 696 份），放在 `riskaware/news/data/news_2026.jsonl.gz`（0.7 MB）。回测加 `--news` 时会和你自己的新闻库一起读；`news.bundled: false` 可以不用它。只有 Benzinga 给新闻标了这只股票、并且标题提到这家公司或代码时才算这只股票的新闻；机器生成的价格汇总没有收。`scripts/build_news_bundle.py` 可以重新生成这个文件。
+- 策略实验室：MCP 新工具 `strategy_guide` 和 `backtest_code`，让 Claude、Codex 或 Gemini 根据大白话描述把策略写成代码并回测。代码先检查（代码里不能写日期和股票代码，只能 import 白名单里的模块，不能读写文件、联网、用 `eval`、`getattr` 或私有属性），再放到单独的进程里跑：没有任何 API key，有时间上限，系统支持时还有 CPU 上限；策略代码运行时，审计钩子会拒绝联网、开子进程和访问文件。出错时返回策略里出错的行。`save_as` 把策略存到 `~/.riskaware/strategies/ai/`，之后 `list_strategies`、看板和 `agents_create` 都能用。命令行用 `riskaware lab 文件` 也一样。
+- 回测不偷看未来：每天只能看到收盘时刻之前发布的新闻，提前收盘的日子收盘时刻是 13:00；只有日期没有时间的，算那天结束时发布；没有时区的时间按美东时间读（CSV 导入以前默认按 UTC）；日期在未来的新闻被丢掉。指标行现在只存当天数值的副本，`ctx.history()` 返回副本，策略没法再通过背后的数组摸到之后的价格。每条规则都有新测试，另有一个测试把数据截断在每一天重算指标，证明指标没有用到之后的数据。
+- 看板的回测页新增 **回放新闻** 开关；保存下来的 AI 策略会出现在回测页和创建智能体的策略列表里。
+- MCP 的 `backtest` 工具支持 `news=True`；回测只加载要交易的股票的新闻。
+- `news-history status` 把自带的新闻单独列一栏，并打印自带数据的概况。
+
 ## 0.5.0（2026-11-12）
 
 - 不需要 API key：`--llm claude-cli[:模型]`、`codex-cli[:模型]` 和 `gemini-cli[:模型]` 通过 Claude Code、OpenAI Codex、Google 的 Gemini CLI 或 Antigravity 做每次复核，走你已经登录的订阅。工具在一个空的临时文件夹里运行，关掉它的工具调用，要求同样严格的 JSON schema；`--llm-command` 或 `RISKAWARE_*_CLI` 可以换成别的可执行文件或包装脚本。看板的 LLM 选择和 `riskaware llm-check` 也都支持。
