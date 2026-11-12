@@ -74,6 +74,9 @@ class AgentSpec(BaseModel):
     cash: float = Field(100_000.0, gt=0)
     note: str = ""
     enabled: bool = True
+    llm: str | None = None  # None: as in the main config; "off"; or provider:model, e.g. openai:gpt-5.6-luna
+    llm_base_url: str | None = None
+    llm_key_env: str | None = None
     created: str = Field(default_factory=lambda: mc.now_ny().date().isoformat())
 
     @field_validator("name")
@@ -97,6 +100,25 @@ class AgentSpec(BaseModel):
     @classmethod
     def _symbols(cls, v: list[str]) -> list[str]:
         return [s.strip().upper() for s in v if s.strip()]
+
+    @field_validator("llm")
+    @classmethod
+    def _llm(cls, v: str | None) -> str | None:
+        if v is None or not v.strip():
+            return None
+        v = v.strip()
+        if v.lower() in ("off", "none", "no"):
+            return "off"
+        from .llm import parse_choice
+
+        kind, model = parse_choice(v)
+        return f"{kind}:{model}"
+
+    @property
+    def llm_label(self) -> str:
+        if self.llm is None:
+            return "config"
+        return "off" if self.llm == "off" else self.llm.split(":", 1)[1]
 
     @property
     def universe_label(self) -> str:
@@ -260,6 +282,36 @@ class Arena:
         spec = self.get(name)
         self.add(spec.model_copy(update={"enabled": enabled}), overwrite=True)
 
+    def set_llm(self, name: str, choice: str | None, base_url: str | None = None, key_env: str | None = None
+                ) -> AgentSpec:
+        """Give an agent an LLM review (``provider:model``), turn it off (``off``) or follow the config (None)."""
+        spec = self.get(name)
+        new = AgentSpec(**{**spec.model_dump(), "llm": choice, "llm_base_url": base_url, "llm_key_env": key_env})
+        return self.add(new, overwrite=True)
+
+    def decisions(self, name: str, symbol: str | None = None, limit: int = 50,
+                  with_prompts: bool = False) -> list[dict[str, Any]]:
+        """The agent's latest decisions, each with its LLM review (bull, bear, judge) when there was one."""
+        from .journal import Journal
+
+        jpath = self.dir(name) / "journal.db"
+        if not jpath.is_file():
+            return []
+        j = Journal(jpath)
+        try:
+            rows = j.recent_decisions(limit, symbol)
+            reviews: dict[tuple[int, str], dict[str, Any]] = {}
+            for r in j.llm_reviews(limit * 4, symbol):
+                reviews.setdefault((r["run_id"], r["symbol"]), r)
+        finally:
+            j.close()
+        for row in rows:
+            rv = reviews.get((row["run_id"], row["symbol"]))
+            if rv and not with_prompts:
+                rv = {k: v for k, v in rv.items() if k not in ("system_prompt", "prompt", "raw")}
+            row["llm"] = rv
+        return rows
+
     # per-agent wiring ----------------------------------------------------------------------
     def dir(self, name: str) -> Path:
         return self.root / name
@@ -277,6 +329,12 @@ class Arena:
         c.broker = BrokerConfig(name="paper", options={"account_file": str(self.account_file(spec.name)),
                                                        "starting_cash": spec.cash})
         c.execution.mode = "paper"
+        if spec.llm == "off":
+            c.llm.enabled = False
+        elif spec.llm:
+            from .llm import llm_config
+
+            c.llm = llm_config(spec.llm, base=c.llm, base_url=spec.llm_base_url, key_env=spec.llm_key_env)
         return c
 
     def broker_for(self, spec: AgentSpec, quote_fn: Callable[[list[str]], dict[str, Quote]] | None = None):
@@ -436,6 +494,8 @@ class Arena:
             rows.append({
                 "name": spec.name, "strategy": spec.strategy, "profile": spec.profile,
                 "universe": spec.universe_label, "enabled": spec.enabled, "note": spec.note,
+                "llm": (spec.llm_label if spec.llm and spec.llm != "off"
+                        else (self.base_cfg.llm.model if spec.llm is None and self.base_cfg.llm.enabled else None)),
                 "created": spec.created, "start_cash": spec.cash, "equity": equity,
                 "return": equity / spec.cash - 1, "day": equity / prev - 1 if len(eq) else 0.0,
                 "max_drawdown": mdd, "days": len(eq), "curve": curve,

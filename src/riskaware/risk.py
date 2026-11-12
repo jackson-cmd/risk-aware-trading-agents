@@ -231,7 +231,7 @@ class RiskManager:
             for sig in buys:
                 decision.rejected.append((sig, "drawdown pause"))
             buys = []
-        new_today = buys_today = 0
+        new_today, buys_today = pf.new_positions_today, pf.buys_today  # earlier runs today count too
         for sig in buys:
             sym = sig.symbol
             if sym in sold_qty:

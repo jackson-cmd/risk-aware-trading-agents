@@ -297,3 +297,18 @@ def test_state_text_in_chinese():
     assert state_text("waiting until 15:40 New York", "zh") == "等到纽约时间 15:40"
     assert state_text("Sat 2026-11-14 is not a trading day", "zh") == "今天不是交易日"
     assert state_text("due", "en") == "due"
+
+
+def test_daily_new_position_limit_holds_across_runs(arena):
+    arena.add(AgentSpec(name="a", strategy="buy_and_hold", cash=10_000_000))  # big enough that sizes fit
+    limit = arena.config_for(arena.get("a")).risk_profile().max_new_positions_per_day
+    cash_like = {"SGOV", "IEF"}
+
+    def stocks():
+        return {s for s in arena.account_state("a")["positions"] if s not in cash_like}
+
+    arena.run(quote_fn=fake_quotes, data_factory=data_factory)
+    first = stocks()
+    assert len(first) == limit  # six candidates, the limit binds
+    arena.run(quote_fn=fake_quotes, data_factory=data_factory)  # a second run the same day opens nothing new
+    assert stocks() == first

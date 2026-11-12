@@ -37,8 +37,12 @@ class AnthropicProvider:
         if cfg.base_url:
             kwargs["base_url"] = cfg.base_url
         self.client = anthropic.Anthropic(**kwargs)
+        self.last_raw: str | None = None
+        self.last_error: str | None = None
+        self.last_usage: dict[str, Any] = {}
 
     def complete_json(self, system: str, user: str, schema: dict[str, Any]) -> dict[str, Any] | None:
+        self.last_raw, self.last_error, self.last_usage = None, None, {}
         a = self.anthropic
         request: dict[str, Any] = dict(
             model=self.model,
@@ -53,25 +57,36 @@ class AnthropicProvider:
             else:
                 response = self.client.messages.create(**request)
         except a.RateLimitError:
+            self.last_error = "rate limit reached"
             log.warning("Claude rate limit reached; skipping the LLM review")
             return None
         except a.APIStatusError as exc:
+            self.last_error = f"API error {exc.status_code}: {exc.message}"
             log.warning("Claude API error %s: %s", exc.status_code, exc.message)
             return None
         except a.APIConnectionError as exc:
+            self.last_error = f"cannot reach the Claude API: {exc}"
             log.warning("cannot reach the Claude API: %s", exc)
             return None
+        usage = getattr(response, "usage", None)
+        if usage is not None:
+            self.last_usage = {"input_tokens": getattr(usage, "input_tokens", None),
+                               "output_tokens": getattr(usage, "output_tokens", None)}
         if response.stop_reason == "refusal":
             details = getattr(response, "stop_details", None)
+            self.last_error = f"declined ({getattr(details, 'category', None)})"
             log.info("Claude declined the review (%s)", getattr(details, "category", None))
             return None
         if response.stop_reason == "max_tokens":
+            self.last_error = "hit max_tokens"
             log.info("Claude review hit max_tokens; ignored")
             return None
         text = next((b.text for b in response.content if b.type == "text"), None)
+        self.last_raw = text
         if not text:
             return None
         try:
             return json.loads(text)
         except json.JSONDecodeError:
+            self.last_error = "the reply was not JSON"
             return None

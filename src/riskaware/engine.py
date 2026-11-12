@@ -69,6 +69,7 @@ class CycleReport:
     errors: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     run_id: int | None = None
+    llm_reviews: list[Any] = field(default_factory=list)
 
 
 def reference_price(q: Quote | None, max_spread: float = 0.01) -> float | None:
@@ -237,8 +238,12 @@ class TradingEngine:
                 last_trim_price=meta.last_trim_price if meta else None,
                 peak_price=meta.peak_price if meta else px)
         peak = max(state.peak_equity if state else 0.0, equity)
+        metas = [state.positions.get(s) for s in views] if state else []
+        iso = today.isoformat()
         return PortfolioView(equity=equity, cash=account.cash, cash_equivalents=cash_eq, treasury_value=treasury,
-                             positions=views, peak_equity=peak)
+                             positions=views, peak_equity=peak,
+                             new_positions_today=sum(1 for m in metas if m and m.first_entry == iso),
+                             buys_today=sum(1 for m in metas if m and m.last_entry == iso))
 
     def context(self, portfolio: PortfolioView, universe: list[str], mode: str) -> StrategyContext:
         today = self.data.market.day if self.data.market else date.today()
@@ -366,6 +371,10 @@ class TradingEngine:
                                         cash=account.cash, stock_exposure=pf.stock_exposure,
                                         fear_greed=market.fear_greed, vix=market.vix)
         report.run_id = run_id
+        if self.reviewer is not None:
+            report.llm_reviews = self.reviewer.pop_records()
+            for rec in report.llm_reviews:
+                self.journal.log_llm_review(run_id, rec)
         rejected = {id(sig): why for sig, why in decision.rejected}
         accepted_syms = {(o.symbol, o.side.value) for o in decision.orders}
         for sig in signals:

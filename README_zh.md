@@ -14,7 +14,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![默认模拟盘](https://img.shields.io/badge/%E9%BB%98%E8%AE%A4-%E6%A8%A1%E6%8B%9F%E7%9B%98-orange.svg)](#-安全机制)
-[![版本 0.3.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.3.0-e5534b.svg)](CHANGELOG_zh.md)
+[![版本 0.4.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.4.0-e5534b.svg)](CHANGELOG_zh.md)
 [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器)
 [![11 个策略](https://img.shields.io/badge/%E7%AD%96%E7%95%A5-11%20%E4%B8%AA-8957e5.svg)](#-策略库)
 [![10 家券商](https://img.shields.io/badge/%E5%88%B8%E5%95%86-10%20%E5%AE%B6-0969da.svg)](#-支持的券商)
@@ -37,17 +37,17 @@
 
 ## 🆕 新功能
 
-<sub>最新版本 **0.3.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>最新版本 **0.4.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
 
-| | 0.3.0 新加入 |
+| | 0.4.0 新加入 |
 |---|---|
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🤖 模拟盘智能体**：给任意策略起个名字，配上风险档位和初始资金，它就用免费价格在自己的模拟账户里交易。可以几个一起跑。[怎么用 →](#-模拟盘智能体) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **⏰ 每天自动交易**：`riskaware agents schedule --install` 会在 macOS、Linux 或 Windows 上装一个后台任务，每个交易日纽约时间 15:40 之后让每个智能体交易一次，电脑睡眠醒来会补跑。[细节 →](docs/zh/agents.md#每日自动运行是怎么工作的) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏆 智能体排行榜**：所有智能体和 SPY 对比排名，能看净值曲线、持仓、订单和每个决策的理由；在网页看板上就能新建、运行、暂停或重置智能体。[看看 →](#-模拟盘智能体) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔗 给 Claude 用的 MCP 服务器**：在 Claude、Cursor 或任何 MCP 客户端里问市场状态、信号、新闻和回测，或者让它新建、运行模拟盘智能体。没有任何工具能碰实盘账户。[怎么配置 →](#-mcp-服务器) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🖥️ 全新网页看板**：深色交易终端风格，有市场状态卡片、恐慌贪婪仪表盘、迷你走势图、宏观事件时间线和顶部导航，中英文都支持。[看截图 ↑](#-风险感知交易智能体--risk-aware-trading-agents) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧠 每个智能体都能配 LLM**：给任意模拟盘智能体配上 GPT（比如 `gpt-5.6-luna`）、Claude，或者用 Ollama 跑的免费本地模型。多方、空方和裁判复核每一笔买入，最多把信心分调整 ±0.15 或者否决，不能自己发起交易。[怎么用 →](#-模拟盘智能体) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔍 每个决定是怎么做出来的都能看**：技术形态和理由、风控的结论、多方空方和裁判的意见，以及发给模型的完整 prompt 和原始回复，在看板的「决策」页或者用 `riskaware agents why 名字` 查看。所有东西都留在你自己的电脑上。[细节 →](docs/zh/agents.md#每个智能体配一个-llm) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏠 免费的本地模型**：`ollama:qwen2.5:3b` 在你自己的电脑上运行；`riskaware llm-check ollama:qwen2.5:3b` 一条命令测试 key 或模型能不能用。[怎么配置 →](docs/zh/agents.md#每个智能体配一个-llm) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **📰 新闻更干净、更难造假**：讲其他公司或大盘的新闻不再算到这只股票头上；辟谣会抵消它否认的传言；只有公司自己的 8-K 公告或通稿才能因为新闻触发强制卖出，媒体报道只能挡住买入。[原理 →](#-主要功能) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🛡️ 修复**：LLM 的回复改用严格的 JSON schema 输出；同一天跑好几次时，每日新开仓上限也能守住。[更新记录 →](CHANGELOG_zh.md) |
 
-<sub>0.2.0 加入了期权回测（`aggressive_calls`、`wheel`）和四个股票策略，详见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>0.3.0 加入了每天自动跑的模拟盘智能体、MCP 服务器和新看板；0.2.0 加入了期权回测和四个股票策略。详见[更新记录](CHANGELOG_zh.md)。</sub>
 
 ## 📸 截图一览
 
@@ -55,8 +55,9 @@
 
 <table>
 <tr><td width="50%"><a href="site/assets/dashboard_zh.jpg"><img src="site/assets/dashboard_zh.jpg" alt="市场"></a><br><sub><b>市场</b> — 市场状态、恐慌贪婪、VIX、板块广度和宏观日历</sub></td><td width="50%"><a href="site/assets/agents_zh.jpg"><img src="site/assets/agents_zh.jpg" alt="智能体"></a><br><sub><b>智能体</b> — 模拟盘智能体排行榜，和 SPY 对比</sub></td></tr>
-<tr><td width="50%"><a href="site/assets/agent_detail_zh.jpg"><img src="site/assets/agent_detail_zh.jpg" alt="智能体详情"></a><br><sub><b>智能体详情</b> — 持仓、订单和每个决策的理由</sub></td><td width="50%"><a href="site/assets/signals_zh.jpg"><img src="site/assets/signals_zh.jpg" alt="信号"></a><br><sub><b>信号</b> — 策略今天会买什么、卖什么，附信心分和理由</sub></td></tr>
-<tr><td width="50%"><a href="site/assets/backtest_zh.jpg"><img src="site/assets/backtest_zh.jpg" alt="回测"></a><br><sub><b>回测</b> — 任意策略和 SPY 对比，含回撤和每笔交易</sub></td><td width="50%"><a href="site/assets/news_zh.jpg"><img src="site/assets/news_zh.jpg" alt="交叉验证新闻"></a><br><sub><b>交叉验证新闻</b> — 两家独立媒体、公司自己的通稿或 SEC 公告报道了才算确认</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/decisions_zh.jpg"><img src="site/assets/decisions_zh.jpg" alt="它是怎么决定的"></a><br><sub><b>它是怎么决定的</b> — 技术形态、风控结论，以及 LLM 的多方、空方意见和裁判结论</sub></td><td width="50%"><a href="site/assets/agent_detail_zh.jpg"><img src="site/assets/agent_detail_zh.jpg" alt="智能体详情"></a><br><sub><b>智能体详情</b> — 持仓、订单和每个决策的理由</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/signals_zh.jpg"><img src="site/assets/signals_zh.jpg" alt="信号"></a><br><sub><b>信号</b> — 策略今天会买什么、卖什么，附信心分和理由</sub></td><td width="50%"><a href="site/assets/backtest_zh.jpg"><img src="site/assets/backtest_zh.jpg" alt="回测"></a><br><sub><b>回测</b> — 任意策略和 SPY 对比，含回撤和每笔交易</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/news_zh.jpg"><img src="site/assets/news_zh.jpg" alt="交叉验证新闻"></a><br><sub><b>交叉验证新闻</b> — 两家独立媒体、公司自己的通稿或 SEC 公告报道了才算确认</sub></td></tr>
 </table>
 
 ---
@@ -73,13 +74,13 @@
 - **低买高卖。** 回踩 **EMA 50 / 100 / 200** 时买入；RSI(2) 和 z-score 均值回归；**财报过关才抄底**（看营收增长、利润率、自由现金流、负债、EPS 是否超预期）；强势行情里做突破和趋势延续。股价远远高于 EMA50 时分批止盈，跌破下行的 EMA50 时趋势减仓。
 - **不恐慌卖出。** 市场处于不确定或避险状态时只持有、不卖出，只在强支撑位买入。只有公司自己在 8-K 公告或通稿里确认的重大利空（破产、退市、财报重述），或者你设置的硬止损，才会触发强制卖出。
 - **风控优先。** **现金加短期国债始终不低于 30%**；单只股票、单个板块、高波动"小博大"仓位都有上限；按波动率决定仓位大小；分批建仓；保守档另配国债仓位；闲置现金自动买短期国债 ETF；回撤过大自动暂停买入；一键停止交易。
-- **新闻交叉验证。** 汇总 Finviz（免费）、Google News、Nasdaq、Seeking Alpha、Yahoo 的 RSS，以及公司自己的 **SEC 8-K 公告**。一条新闻被两家独立媒体报道、公司自己发了通稿，或者有 SEC 公告佐证，才算"已确认"，上面的风险信号会挡住新的买入。但只有公司自己的 8-K 公告，或者公司通稿证实了独立媒体先报道的消息，才会触发强制卖出，所以一条假新闻，或者一份假通稿加上别家的转载，都没法让它清仓。辟谣会抵消它所否认的那条新闻，不会被当成确认。
+- **新闻交叉验证。** 汇总 Finviz（免费）、Google News、Nasdaq、Seeking Alpha、Yahoo 的 RSS，以及公司自己的 **SEC 8-K 公告**。一条新闻只算到它提到的那家公司头上；被两家独立媒体报道、公司自己发了通稿，或者有 SEC 公告佐证，才算"已确认"，上面的风险信号会挡住新的买入。但只有公司自己的 8-K 公告，或者公司通稿证实了独立媒体先报道的消息，才会触发强制卖出，所以一条假新闻、一份假通稿加上别家的转载，或者别家公司的坏消息，都没法让它清仓。辟谣会抵消它所否认的那条新闻，不会被当成确认。
 - **10 家券商，统一接口。** 内置模拟盘，以及 **Alpaca、盈透（IBKR）、Public.com、嘉信（Schwab）、tastytrade、Tradier、富途/moomoo、老虎证券、长桥**。
 - **期权策略（回测）。** 一个激进的买 call 策略和 wheel（卖现金担保 put 加备兑 call），有权利金上限，卖 put 的保证金不占现金底线，支持行权和到期结算。
 - **什么都能回测，包括你自己的策略。** 只要写一个 Python 方法，同一个策略对象就能在回测、模拟盘和实盘里运行，并且走同一套风控。多个策略可以并排对比，生成 HTML 报告。
 - **每天自动跑的模拟盘智能体。** 几个策略可以同时跑，每个都有自己的模拟账户，用免费价格交易。后台任务每个交易日让它们交易一次，排行榜拿它们和 SPY 对比。
 - **能在 Claude 里用（MCP）。** `riskaware mcp` 让 Claude、Cursor 或任何 MCP 客户端都能查市场状态、信号、新闻、回测，以及管理模拟盘智能体。
-- **可选的 LLM 复核。** 多头分析师、空头分析师和风控裁判（Claude 用 Anthropic 官方 SDK，也支持任何 OpenAI 兼容模型，比如 GPT、DeepSeek、通义千问或本地 Ollama）可以把信心分最多调高或调低 0.15，或者否决一笔买入。它们不能自己发起交易，也不能改任何限额。新闻只作为加了引号的不可信文本交给它们。
+- **可选的 LLM 复核，每个智能体单独设置。** 多头分析师、空头分析师和风控裁判（GPT、Claude、任何 OpenAI 兼容模型比如 DeepSeek 或通义千问，或者用 Ollama 跑的免费本地模型）可以把信心分最多调高或调低 0.15，或者否决一笔买入。它们不能自己发起交易，也不能改任何限额。新闻只作为加了引号的不可信文本交给它们；每次的 prompt 和回复都存在本地日志里，每个决定是怎么做出来的都能看到。
 - **中英双语。** 命令行、网页看板、回测报告和文档都支持中文和英文。
 
 ## 🚀 快速开始
@@ -114,12 +115,15 @@ riskaware --lang zh dashboard         # 网页看板，右上角可切换中英�
 riskaware agents init                                    # steady、momentum、breakout、fear-buyer
 riskaware agents add dips --strategy rsi2 --universe tech --cash 25000
 riskaware agents add mine --strategy my_dip.py:MyDip --profile aggressive
+riskaware agents add luna --strategy risk_aware --llm openai:gpt-5.6-luna   # 配一个 LLM 复核
+riskaware agents add local --strategy risk_aware --llm ollama:qwen2.5:3b    # 免费的本地模型
 riskaware agents run                                     # 让所有活跃的智能体现在交易一次
+riskaware agents why luna                                # 它是怎么决定的：形态、风控、多方/空方/裁判
 riskaware agents                                         # 排行榜
 riskaware agents schedule --install                      # 以后每个交易日自动运行
 ```
 
-后台任务（macOS 上是 LaunchAgent，Linux 上是一行 crontab，Windows 上是计划任务）在工作日每 15 分钟唤醒一次，每个交易日纽约时间 15:40 之后、收盘之前，让每个智能体交易一次。它会跳过节假日，电脑睡眠醒来会补跑，某个智能体出错也不影响其他的。每个智能体的账户、日志和每天的净值都存在 `~/.riskaware/arena/名字/`。网页看板的「智能体」页能看到排行榜，也能新建、运行、暂停、重置和删除智能体。详见 [docs/zh/agents.md](docs/zh/agents.md)。
+后台任务（macOS 上是 LaunchAgent，Linux 上是一行 crontab，Windows 上是计划任务）在工作日每 15 分钟唤醒一次，每个交易日纽约时间 15:40 之后、收盘之前，让每个智能体交易一次。它会跳过节假日，电脑睡眠醒来会补跑，某个智能体出错也不影响其他的。每个智能体的账户、日志和每天的净值都存在 `~/.riskaware/arena/名字/`。网页看板的「智能体」页能看到排行榜，也能新建、运行、暂停、重置和删除智能体；其中的「决策」页显示每个决定是怎么做出来的，包括 LLM 的多方、空方意见和结论，以及发给它的完整 prompt。用 GPT 需要在 `.env` 里设置 `OPENAI_API_KEY`；用本地模型需要装 [Ollama](https://ollama.com)（`ollama pull qwen2.5:3b`）。详见 [docs/zh/agents.md](docs/zh/agents.md)。
 
 <img src="site/assets/agents_zh.jpg" width="820" alt="智能体页面：模拟盘智能体排行榜，显示净值、收益、相对 SPY 的表现和运行状态">
 
@@ -132,7 +136,7 @@ pip install -e ".[mcp]"
 claude mcp add riskaware -- riskaware mcp
 ```
 
-一共十个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`agents_leaderboard`、`agent_detail`、`agents_create` 和 `agents_run`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。Claude Desktop 和其他客户端的配置方法见 [docs/zh/agents.md](docs/zh/agents.md#在-claude-里使用mcp)。
+一共十一个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`agents_leaderboard`、`agent_detail`、`agent_decisions`、`agents_create` 和 `agents_run`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。Claude Desktop 和其他客户端的配置方法见 [docs/zh/agents.md](docs/zh/agents.md#在-claude-里使用mcp)。
 
 ## 🧠 工作原理
 
