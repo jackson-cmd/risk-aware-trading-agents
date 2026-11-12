@@ -44,7 +44,7 @@
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧠 每个智能体都能配 LLM**：给任意模拟盘智能体配上 GPT（比如 `gpt-5.6-luna`）、Claude，或者用 Ollama 跑的免费本地模型。多方、空方和裁判复核每一笔买入，最多把信心分调整 ±0.15 或者否决，不能自己发起交易。[怎么用 →](#-模拟盘智能体) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔍 每个决定是怎么做出来的都能看**：技术形态和理由、风控的结论、多方空方和裁判的意见，以及发给模型的完整 prompt 和原始回复，在看板的「决策」页或者用 `riskaware agents why 名字` 查看。所有东西都留在你自己的电脑上。[细节 →](docs/zh/agents.md#每个智能体配一个-llm) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏠 免费的本地模型**：`ollama:qwen2.5:3b` 在你自己的电脑上运行；`riskaware llm-check ollama:qwen2.5:3b` 一条命令测试 key 或模型能不能用。[怎么配置 →](docs/zh/agents.md#每个智能体配一个-llm) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **📰 新闻更干净**：讲其他公司或大盘的新闻不再算到这只股票头上，一家公司的风险信号不会落到另一家身上。[原理 →](#-主要功能) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **📰 新闻更干净、更难造假**：讲其他公司或大盘的新闻不再算到这只股票头上；辟谣会抵消它否认的传言；只有公司自己的 8-K 公告或通稿才能因为新闻触发强制卖出，媒体报道只能挡住买入。[原理 →](#-主要功能) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🛡️ 修复**：LLM 的回复改用严格的 JSON schema 输出；同一天跑好几次时，每日新开仓上限也能守住。[更新记录 →](CHANGELOG_zh.md) |
 
 <sub>0.3.0 加入了每天自动跑的模拟盘智能体、MCP 服务器和新看板；0.2.0 加入了期权回测和四个股票策略。详见[更新记录](CHANGELOG_zh.md)。</sub>
@@ -57,7 +57,7 @@
 <tr><td width="50%"><a href="site/assets/dashboard_zh.jpg"><img src="site/assets/dashboard_zh.jpg" alt="市场"></a><br><sub><b>市场</b> — 市场状态、恐慌贪婪、VIX、板块广度和宏观日历</sub></td><td width="50%"><a href="site/assets/agents_zh.jpg"><img src="site/assets/agents_zh.jpg" alt="智能体"></a><br><sub><b>智能体</b> — 模拟盘智能体排行榜，和 SPY 对比</sub></td></tr>
 <tr><td width="50%"><a href="site/assets/decisions_zh.jpg"><img src="site/assets/decisions_zh.jpg" alt="它是怎么决定的"></a><br><sub><b>它是怎么决定的</b> — 技术形态、风控结论，以及 LLM 的多方、空方意见和裁判结论</sub></td><td width="50%"><a href="site/assets/agent_detail_zh.jpg"><img src="site/assets/agent_detail_zh.jpg" alt="智能体详情"></a><br><sub><b>智能体详情</b> — 持仓、订单和每个决策的理由</sub></td></tr>
 <tr><td width="50%"><a href="site/assets/signals_zh.jpg"><img src="site/assets/signals_zh.jpg" alt="信号"></a><br><sub><b>信号</b> — 策略今天会买什么、卖什么，附信心分和理由</sub></td><td width="50%"><a href="site/assets/backtest_zh.jpg"><img src="site/assets/backtest_zh.jpg" alt="回测"></a><br><sub><b>回测</b> — 任意策略和 SPY 对比，含回撤和每笔交易</sub></td></tr>
-<tr><td width="50%"><a href="site/assets/news_zh.jpg"><img src="site/assets/news_zh.jpg" alt="交叉验证新闻"></a><br><sub><b>交叉验证新闻</b> — 两家独立媒体或 SEC 文件都报道了才算确认</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/news_zh.jpg"><img src="site/assets/news_zh.jpg" alt="交叉验证新闻"></a><br><sub><b>交叉验证新闻</b> — 两家独立媒体、公司自己的通稿或 SEC 公告报道了才算确认</sub></td></tr>
 </table>
 
 ---
@@ -72,9 +72,9 @@
 
 - **看宏观的市场状态判断。** 综合 VIX 及其期限结构（VIX/VIX3M）、板块广度、信用偏好（HYG 对 IEF）、避险需求、用免费数据自算的恐慌贪婪指数（同时显示 CNN 恐慌贪婪指数作参考），以及 **FOMC 议息、CPI、非农、PPI、GDP、PCE** 的发布日历，把市场分成四种状态：偏多、中性、不确定、避险。
 - **低买高卖。** 回踩 **EMA 50 / 100 / 200** 时买入；RSI(2) 和 z-score 均值回归；**财报过关才抄底**（看营收增长、利润率、自由现金流、负债、EPS 是否超预期）；强势行情里做突破和趋势延续。股价远远高于 EMA50 时分批止盈，跌破下行的 EMA50 时趋势减仓。
-- **不恐慌卖出。** 市场处于不确定或避险状态时只持有、不卖出，只在强支撑位买入。只有经过确认的重大利空（造假、破产、退市、财报重述），或者你设置的硬止损，才会触发强制卖出。
+- **不恐慌卖出。** 市场处于不确定或避险状态时只持有、不卖出，只在强支撑位买入。只有公司自己在 8-K 公告或通稿里确认的重大利空（破产、退市、财报重述），或者你设置的硬止损，才会触发强制卖出。
 - **风控优先。** **现金加短期国债始终不低于 30%**；单只股票、单个板块、高波动"小博大"仓位都有上限；按波动率决定仓位大小；分批建仓；保守档另配国债仓位；闲置现金自动买短期国债 ETF；回撤过大自动暂停买入；一键停止交易。
-- **新闻交叉验证。** 汇总 Finviz（免费）、Google News、Nasdaq、Seeking Alpha、Yahoo 的 RSS，以及公司自己的 **SEC 8-K 公告**。一条新闻只有被两家独立媒体报道，或者有 SEC 公告佐证，才算"已确认"，而且只算到它提到的那家公司头上。一条假新闻没法让它买入或卖出，一家公司的坏消息也不会落到另一家身上。
+- **新闻交叉验证。** 汇总 Finviz（免费）、Google News、Nasdaq、Seeking Alpha、Yahoo 的 RSS，以及公司自己的 **SEC 8-K 公告**。一条新闻只算到它提到的那家公司头上；被两家独立媒体报道、公司自己发了通稿，或者有 SEC 公告佐证，才算"已确认"，上面的风险信号会挡住新的买入。但只有公司自己的 8-K 公告，或者公司通稿证实了独立媒体先报道的消息，才会触发强制卖出，所以一条假新闻、一份假通稿加上别家的转载，或者别家公司的坏消息，都没法让它清仓。辟谣会抵消它所否认的那条新闻，不会被当成确认。
 - **10 家券商，统一接口。** 内置模拟盘，以及 **Alpaca、盈透（IBKR）、Public.com、嘉信（Schwab）、tastytrade、Tradier、富途/moomoo、老虎证券、长桥**。
 - **期权策略（回测）。** 一个激进的买 call 策略和 wheel（卖现金担保 put 加备兑 call），有权利金上限，卖 put 的保证金不占现金底线，支持行权和到期结算。
 - **什么都能回测，包括你自己的策略。** 只要写一个 Python 方法，同一个策略对象就能在回测、模拟盘和实盘里运行，并且走同一套风控。多个策略可以并排对比，生成 HTML 报告。
@@ -168,7 +168,7 @@ flowchart TB
 | 🟡 **不确定** | FOMC 议息前两天、CPI 和非农发布前一天、VIX 20–30、恐慌指数 < 35、下跌趋势 | 只在 EMA100 / EMA200 支撑买 | **不卖：持有** | 50% |
 | 🔴 **避险** | VIX ≥ 30、跌破 EMA200 且 VIX 期限倒挂、信用紧张 | 只抄优质股和宽基 ETF，小批量 | **不卖：持有** | 35% |
 
-紧急卖出（经过确认的严重利空，或者档位里的硬止损）在任何状态下都有效。
+紧急卖出（公司自己在 8-K 公告或通稿里确认的严重利空，或者档位里的硬止损）在任何状态下都有效。
 
 ### 风险档位
 
