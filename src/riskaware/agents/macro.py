@@ -47,6 +47,7 @@ class MarketState:
     macro_score: float = 0.0  # -1..1 tailwind for trend buys
     dip_tailwind: float = 0.0  # -1..1, positive when fear is high (better for buying dips)
     cnn_fear_greed: float | None = None
+    risk_free: float = 0.04  # annual rate used to price options
 
     @property
     def fear_label(self) -> str:

@@ -1,25 +1,60 @@
 <div align="center">
 
-# Risk-Aware Trading Agents
+# 📈 Risk-Aware Trading Agents
 
-**AI trading agents for US stocks that read the macro calendar, the fear index and verified news before they buy, and keep 30% in cash no matter what.**
+### AI trading agents for US stocks that check the macro calendar, the fear index and verified news before they buy
 
-**English** · [简体中文](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/)
+*Buy when others are afraid · keep 30% in cash · never panic-sell*
+
+**Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · 11 strategies including options · backtest your own · paper and live trading on 10 brokers · English and 中文**
+
+[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Quick start](#-quick-start) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#safety)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
+[![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#-safety)
+[![Version 0.2.0](https://img.shields.io/badge/version-0.2.0-e5534b.svg)](CHANGELOG.md)
+[![11 strategies](https://img.shields.io/badge/strategies-11-8957e5.svg)](#-strategy-library)
+[![10 brokers](https://img.shields.io/badge/brokers-10-0969da.svg)](#-brokers)
+[![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
 <img src="site/assets/dashboard_en.jpg" width="820" alt="Dashboard: market regime, VIX, fear and greed, sector breadth">
 
 </div>
 
+---
+
+## Contents
+
+- [🆕 What's new](#-whats-new) · [💡 The idea](#-the-idea) · [✨ Highlights](#-highlights) · [🚀 Quick start](#-quick-start)
+- [🧠 How it works](#-how-it-works): [Market regimes](#what-the-agent-does-in-each-regime) · [Risk profiles](#risk-profiles)
+- [📊 Backtest](#-backtest) · [📚 Strategy library](#-strategy-library): [Options](#options-backtest-only) · [🧩 Write your own strategy](#-write-your-own-strategy)
+- [🔌 Brokers](#-brokers) · [🔒 Safety](#-safety) · [🔧 Configuration](#-configuration) · [💻 CLI](#-cli) · [📁 Project layout](#-project-layout)
+- [🧭 Roadmap](#-roadmap) · [🤝 Contributing](#-contributing) · [❗ Disclaimer](#-disclaimer) · [📜 License](#-license)
+
+## 🆕 What's new
+
+<sub>Latest release **0.2.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
+
+| | New in 0.2.0 |
+|---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🎯 Options in the backtester**: long calls and puts, cash-secured puts and covered calls, priced with Black-Scholes and marked every day, with expiry, assignment and call-away. [How it works →](#options-backtest-only) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔥 `aggressive_calls`**: buys ~0.6-delta calls 45–60 days out on pullbacks in strong uptrends; takes profit at +100%, stops at -50%. High risk: a -40% drawdown in the 2018–2026 backtest. [See the results →](#-strategy-library) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔄 `wheel`**: sells cash-secured puts near support, then covered calls above cost. 14.1% a year at a 1.12 Sharpe from 2018 to 2026 (aggressive profile, $1M). [See the results →](#-strategy-library) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **📈 Four new stock strategies**: `momentum_rotation`, `donchian_breakout`, `bollinger_reversion` and `fear_greed_dca`, all under the same 30% cash floor. [Compare them →](#-strategy-library) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🛡️ Risk limits for options**: a premium budget per profile, put collateral kept out of the cash floor, and shares behind a written call that cannot be sold. [The rules →](#options-backtest-only) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧩 Options in your own strategy**: attach an `OptionSpec` to a signal to open a contract, name its `option_key` to close it. [Write one →](docs/custom-strategies.md#options-backtest-only) |
+
+---
+
+## 💡 The idea
+
 Most trading bots either chase every signal or need a quant team to configure. This one follows a simple, explainable discipline that long-term investors already use: buy quality stocks when they pull back to their moving averages, add when fear is high and the earnings still hold up, trim when prices run too far, never panic-sell into uncertainty, and always keep a cash reserve. Four agents check the market, the calendar, the company and the news; a deterministic risk manager has the final word on every order.
 
 > Not financial advice. It starts in paper mode, and live trading needs three explicit switches.
 
-## Highlights
+## ✨ Highlights
 
 - **Macro-aware market regimes.** VIX and its term structure (VIX/VIX3M), sector breadth, credit appetite (HYG vs IEF), safe-haven demand, a fear-and-greed gauge computed from free data (and CNN's Fear & Greed for reference), and the **FOMC, CPI, jobs report, PPI, GDP and PCE** calendar put the market in one of four regimes: risk-on, neutral, uncertain, risk-off.
 - **Buy low, sell high.** Pullbacks to **EMA 50 / 100 / 200**, RSI(2) and z-score mean reversion, **quality dips that must pass an earnings check** (revenue growth, margins, free cash flow, leverage, EPS beats), breakouts and trend continuation in strong markets. Take-profit trims when a stock runs far above EMA50; trend exits after a break of a falling EMA50.
@@ -27,11 +62,12 @@ Most trading bots either chase every signal or need a quant team to configure. T
 - **Risk first.** A **30% cash + T-bill floor**, position, sector and speculative ("lottery ticket") caps, volatility-scaled sizes, buying in tranches, a Treasury sleeve for conservative profiles, idle cash parked in a T-bill ETF, a drawdown pause, a kill switch.
 - **Cross-verified news.** Finviz (free), Google News, Nasdaq, Seeking Alpha and Yahoo RSS plus the company's own **SEC 8-K filings**. A story only counts when two independent publishers or an SEC filing carry it, so a single fake headline cannot make the agent buy or sell.
 - **10 brokers, one interface.** Built-in paper account, **Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers, Longbridge**.
+- **Options strategies (backtest).** An aggressive call-buying strategy and the wheel (cash-secured puts and covered calls), with premium caps, put collateral outside the cash floor, assignment and expiry.
 - **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report.
 - **Optional LLM review.** A bull analyst, a bear analyst and a risk judge (Claude through the official Anthropic SDK, or any OpenAI-compatible model such as GPT, DeepSeek, Qwen or a local Ollama model) can nudge conviction by at most ±0.15 or veto a buy. They can never create a trade or change a limit. News reaches them only as quoted, untrusted text.
 - **Bilingual.** CLI, dashboard, reports and docs in English and 中文.
 
-## Quick start
+## 🚀 Quick start
 
 ```bash
 git clone https://github.com/jackson-cmd/risk-aware-trading-agents
@@ -52,7 +88,7 @@ riskaware dashboard                   # web UI (English / 中文)
 
 No account or API key is needed for any of the commands above. Add `--lang zh` to any command for Chinese output.
 
-## How it works
+## 🧠 How it works
 
 ```mermaid
 flowchart TB
@@ -99,7 +135,7 @@ Emergency exits (a confirmed severe red flag, or the profile's hard stop) work i
 
 Every limit can be overridden in `riskaware.yaml`. Positions are built in tranches (50% / 25% / 25% of the target); a later tranche needs a deeper support touch or a winning position, and trimmed positions can be rebuilt on the next pullback.
 
-## Backtest
+## 📊 Backtest
 
 Built-in strategy, balanced profile, the 55-stock `megacap` list, $100k, signals at the close and fills the next day, 5 bps slippage, January 2018 to November 2026:
 
@@ -125,7 +161,42 @@ riskaware backtest --synthetic                     # offline demo, no download
 
 Every run writes a self-contained HTML report (metrics, equity and drawdown charts with regime shading, monthly returns, every trade with its reason) plus CSV files.
 
-## Write your own strategy
+## 📚 Strategy library
+
+Every built-in strategy runs through the same risk manager, so all of them keep the cash floor. Backtest any of them with `riskaware backtest --strategy NAME`; compare several with `--compare a,b,c`.
+
+| Strategy | Type | Idea |
+|---|---|---|
+| `risk_aware` | stocks (default) | the multi-agent strategy described above |
+| `momentum_rotation` | stocks | each month hold the strongest names by 6-month relative strength, above EMA200 |
+| `donchian_breakout` | stocks | Turtle-style: 55-day highs on volume, exit on a 20-day low |
+| `bollinger_reversion` | stocks | buy closes below the lower Bollinger band in uptrends, sell at the middle band |
+| `fear_greed_dca` | stocks / ETFs | buy in steps when fear is high, trim in extreme greed |
+| `ema_bounce`, `rsi2`, `golden_cross`, `buy_and_hold` | stocks | simple references and baselines |
+| `aggressive_calls` | options | buy ~0.6-delta calls 45–60 days out on pullbacks in strong uptrends; +100% take profit, -50% stop |
+| `wheel` | options | sell ~0.25-delta cash-secured puts near support; after assignment, sell covered calls above cost |
+
+Backtests from January 2018 to November 2026 on the `megacap` list:
+
+| Strategy | Profile, capital | CAGR | Sharpe | Max drawdown | Worst year |
+|---|---|---|---|---|---|
+| `wheel` | aggressive, $1M | 14.1% | 1.12 | -21.7% | +5.8% |
+| `momentum_rotation` | balanced, $100k | 12.5% | 0.91 | -18.2% | -8.2% |
+| `risk_aware` | balanced, $100k | 10.4% | 0.84 | -18.2% | -3.8% |
+| `donchian_breakout` | balanced, $100k | 9.8% | 0.86 | -12.6% | -6.7% |
+| `aggressive_calls` | aggressive, $100k | 6.7% | 0.30 | -40.3% | -24.7% |
+| `bollinger_reversion` | balanced, $100k | 4.5% | 0.58 | -4.4% | +0.8% |
+| SPY buy & hold | | 14.1% | 0.66 | -33.7% | -18.2% |
+
+### Options (backtest only)
+
+Option strategies open long calls or puts, cash-secured puts and covered calls. The risk manager caps the premium in long options (`options_sleeve`: 0% conservative, 3% balanced, 12% aggressive; `options_per_trade`: 0 / 1% / 3%), keeps put collateral out of the 30% cash floor and inside the single-stock cap, and never lets shares that back a written call be sold. Expiring options settle at intrinsic value; written puts are assigned into shares, covered calls are called away.
+
+There is no free archive of historical option quotes, so the backtester prices options with Black-Scholes on a modelled implied volatility (VIX for index ETFs; realized volatility, a 10% volatility premium and a VIX scaling for stocks) and pays half of a 4% bid-ask spread plus $0.65 per contract. The results move with these assumptions: without the 10% volatility premium the wheel drops to a 0.81 Sharpe and `aggressive_calls` ranges from 3% to 15% a year depending on spread and volatility, always with a drawdown near -40%. Treat option backtests as the shape of a strategy, not a forecast. `riskaware run` skips option orders in this version.
+
+Written puts need cash for 100 shares per contract inside the single-stock cap, so the wheel only trades names whose strike × 100 fits (about $10k per name on a $100k aggressive account); test it with `--cash 1000000` or a list of lower-priced names.
+
+## 🧩 Write your own strategy
 
 ```bash
 riskaware new-strategy my_dip          # creates my_dip.py from a template
@@ -156,7 +227,7 @@ class MyDip(Strategy):
 
 A strategy only says what it wants and how sure it is; the risk manager decides the size and enforces the cash floor, caps and regime rules, so your strategy inherits the same protection. `ctx.market` has the regime, VIX and upcoming events; `ctx.quality(sym)` and `ctx.news(sym)` give the earnings verdict and the verified news in live runs. See [docs/custom-strategies.md](docs/custom-strategies.md).
 
-## Brokers
+## 🔌 Brokers
 
 | Broker | `broker.name` | Paper trading | Install | Status |
 |---|---|---|---|---|
@@ -173,7 +244,7 @@ A strategy only says what it wants and how sure it is; the risk manager decides 
 
 Setup for each broker (keys, gateways, paper accounts) is in [docs/brokers.md](docs/brokers.md). Reports from live use of the SDK-based adapters are very welcome.
 
-## Safety
+## 🔒 Safety
 
 - `riskaware run` uses the paper account unless you change the broker; `--dry-run` previews without sending anything.
 - A live order needs `execution.mode: live` in the config **and** `--live` on the command line **and** a typed confirmation (or `--yes`).
@@ -182,7 +253,7 @@ Setup for each broker (keys, gateways, paper accounts) is in [docs/brokers.md](d
 - Every run, decision and order is written to a local SQLite journal (`~/.riskaware/journal.db`), visible in the dashboard.
 - API keys stay in `.env` (see [.env.example](.env.example)); they are never written to the config or the journal.
 
-## Configuration
+## 🔧 Configuration
 
 `riskaware init` writes a commented `riskaware.yaml`; every key is optional.
 
@@ -208,7 +279,7 @@ llm:
 
 `riskaware config` prints the resolved configuration; `riskaware doctor` checks data sources and the broker connection.
 
-## CLI
+## 💻 CLI
 
 | Command | What it does |
 |---|---|
@@ -229,7 +300,7 @@ llm:
 | `riskaware halt` / `resume` | kill switch |
 | `riskaware dashboard` | web dashboard |
 
-## Project layout
+## 📁 Project layout
 
 ```
 src/riskaware/
@@ -247,21 +318,21 @@ site/          bilingual project website (GitHub Pages)
 docs/          design notes and guides (English and Chinese)
 ```
 
-## Roadmap
+## 🧭 Roadmap
 
 - Point-in-time fundamentals from SEC XBRL for backtests
-- Options overlay (covered calls, protective puts)
+- Live option orders (option chains from each broker), protective puts and collars
 - More brokers (Webull, E*TRADE) and crypto / HK / A-share markets
 - Walk-forward parameter studies
 
-## Contributing
+## 🤝 Contributing
 
 Issues and pull requests are welcome: new brokers, data sources, strategies, translations. Run `pip install -e ".[dev]" && pytest` before you open a PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Disclaimer
+## ❗ Disclaimer
 
 This software is for research and education. It is not investment advice, and nothing in it is a recommendation to buy or sell any security. Trading involves risk of loss. You are responsible for every order your account sends; test with paper trading first.
 
-## License
+## 📜 License
 
 [MIT](LICENSE)

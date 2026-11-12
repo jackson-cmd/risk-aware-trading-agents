@@ -346,6 +346,11 @@ class TradingEngine:
                 prices[s] = float(px)
         risk = RiskManager(self.profile, u, self.cfg.execution, manage_cash=self.cfg.execution.manage_cash_vehicle)
         decision = risk.plan(signals, ctx, prices)
+        option_orders = [o for o in decision.orders if o.is_option]
+        if option_orders:
+            decision.orders = [o for o in decision.orders if not o.is_option]
+            report.notes.append(f"{len(option_orders)} option order(s) skipped: options are backtest-only in this "
+                                f"version (use `riskaware backtest`)")
         report.decision = decision
         report.notes += decision.notes
         checked = guards.check(decision.orders, quotes, pf.equity, self.profile.max_position)

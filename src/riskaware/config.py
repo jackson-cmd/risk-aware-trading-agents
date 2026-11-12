@@ -67,6 +67,9 @@ class RiskProfile(_Model):
     drawdown_pause: float | None = 0.20
     drawdown_pause_days: int = 10
     min_order_value: float = 100.0
+    options_sleeve: float = Field(0.03, ge=0.0, le=0.5, description="max premium in long options")
+    options_per_trade: float = Field(0.01, ge=0.0, le=0.2, description="max premium per long option trade")
+    short_put_collateral_max: float = Field(0.25, ge=0.0, le=0.7, description="max cash set aside for written puts")
     regime_size: dict[str, float] = Field(
         default_factory=lambda: {"RISK_ON": 1.0, "NEUTRAL": 0.75, "UNCERTAIN": 0.5, "RISK_OFF": 0.35}
     )
@@ -103,6 +106,7 @@ PROFILE_PRESETS: dict[str, dict[str, Any]] = {
         speculative_sleeve=0.0, speculative_max_names=0, min_conviction=0.65, min_quality_for_dip=70,
         take_profit_trigger=0.20, hard_stop=0.25, breakouts_enabled=False, risk_per_position=0.005,
         max_new_positions_per_day=2, drawdown_pause=0.15,
+        options_sleeve=0.0, options_per_trade=0.0, short_put_collateral_max=0.15,
         regime_size={"RISK_ON": 1.0, "NEUTRAL": 0.7, "UNCERTAIN": 0.4, "RISK_OFF": 0.25},
     ),
     "balanced": dict(),
@@ -111,6 +115,7 @@ PROFILE_PRESETS: dict[str, dict[str, Any]] = {
         speculative_sleeve=0.07, speculative_max_names=3, min_conviction=0.52, min_quality_for_dip=50,
         take_profit_trigger=0.30, hard_stop=0.35, breakouts_enabled=True, risk_per_position=0.01,
         max_new_positions_per_day=4, drawdown_pause=0.30,
+        options_sleeve=0.12, options_per_trade=0.03, short_put_collateral_max=0.35,
         regime_size={"RISK_ON": 1.0, "NEUTRAL": 0.8, "UNCERTAIN": 0.6, "RISK_OFF": 0.45},
     ),
 }
@@ -290,6 +295,15 @@ class NotifyConfig(_Model):
     events: list[str] = Field(default_factory=lambda: ["orders", "errors", "regime"])
 
 
+class OptionsConfig(_Model):
+    """How the backtester prices and fills options (Black-Scholes on modelled implied volatility)."""
+
+    half_spread: float = Field(0.02, ge=0.0, le=0.2, description="paid on top of the model price per fill")
+    commission_per_contract: float = 0.65
+    iv_premium: float = Field(1.1, gt=0.5, le=2.0, description="implied over realized volatility")
+    min_premium: float = 0.05
+
+
 class StrategyConfig(_Model):
     name: str = "risk_aware"
     params: dict[str, Any] = Field(default_factory=dict)
@@ -322,6 +336,7 @@ class AppConfig(_Model):
     execution: ExecutionConfig = Field(default_factory=ExecutionConfig)
     notify: NotifyConfig = Field(default_factory=NotifyConfig)
     strategy: StrategyConfig = Field(default_factory=StrategyConfig)
+    options: OptionsConfig = Field(default_factory=OptionsConfig)
     backtest: BacktestConfig = Field(default_factory=BacktestConfig)
 
     source_path: str | None = Field(None, exclude=True)
