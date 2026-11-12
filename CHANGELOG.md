@@ -1,5 +1,7 @@
 # Changelog
 
+[中文](CHANGELOG_zh.md)
+
 ## 0.2.0 (2026-11-12)
 
 - Options in the backtester: Black-Scholes pricing on modelled implied volatility, long calls and puts, cash-secured puts, covered calls, daily marks, expiry, assignment and call-away (#1).
