@@ -21,7 +21,18 @@ st.set_page_config(page_title="Risk-Aware Trading Agents", page_icon="📈", lay
 if "lang" not in st.session_state:
     st.session_state.lang = "zh" if os.environ.get("RISKAWARE_LANG", "en") == "zh" else "en"
 LANG = st.session_state.lang
-P = ui.palette(getattr(st.context.theme, "type", "dark"))
+def theme_kind() -> str:
+    """The theme Streamlit actually renders. A configured base wins (``riskaware dashboard`` runs with
+    --theme.base dark): on the first load st.context.theme still reports the browser's own preference, and a light
+    page under the dark theme's light text left the page white and the labels unreadable until a second refresh."""
+    base = st.get_option("theme.base")
+    if base in ("light", "dark"):
+        return base
+    kind = getattr(st.context.theme, "type", None)
+    return kind if kind in ("light", "dark") else "dark"
+
+
+P = ui.palette(theme_kind())
 st.html(ui.css(P))  # styles only
 
 
