@@ -6,20 +6,21 @@
 
 *Buy when others are afraid · keep 30% in cash · never panic-sell*
 
-**Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · 11 strategies including options · backtest your own · paper and live trading on 10 brokers · English and 中文**
+**Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · daily paper-trading agents · an MCP server for Claude · 11 strategies including options · backtest your own · paper and live trading on 10 brokers · English and 中文**
 
-[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Quick start](#-quick-start) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
+[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#-safety)
-[![Version 0.2.0](https://img.shields.io/badge/version-0.2.0-e5534b.svg)](CHANGELOG.md)
+[![Version 0.3.0](https://img.shields.io/badge/version-0.3.0-e5534b.svg)](CHANGELOG.md)
+[![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server)
 [![11 strategies](https://img.shields.io/badge/strategies-11-8957e5.svg)](#-strategy-library)
 [![10 brokers](https://img.shields.io/badge/brokers-10-0969da.svg)](#-brokers)
 [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
-<img src="site/assets/dashboard_en.jpg" width="820" alt="Dashboard: market regime, VIX, fear and greed, sector breadth">
+<img src="site/assets/dashboard_en.jpg" width="820" alt="Dashboard: market regime card, fear and greed gauge, VIX, sector breadth and the macro calendar">
 
 </div>
 
@@ -28,6 +29,7 @@
 ## Contents
 
 - [🆕 What's new](#-whats-new) · [💡 The idea](#-the-idea) · [✨ Highlights](#-highlights) · [🚀 Quick start](#-quick-start)
+- [🤖 Paper-trading agents](#-paper-trading-agents) · [🔗 MCP server](#-mcp-server)
 - [🧠 How it works](#-how-it-works): [Market regimes](#what-the-agent-does-in-each-regime) · [Risk profiles](#risk-profiles)
 - [📊 Backtest](#-backtest) · [📚 Strategy library](#-strategy-library): [Options](#options-backtest-only) · [🧩 Write your own strategy](#-write-your-own-strategy)
 - [🔌 Brokers](#-brokers) · [🔒 Safety](#-safety) · [🔧 Configuration](#-configuration) · [💻 CLI](#-cli) · [📁 Project layout](#-project-layout)
@@ -35,16 +37,17 @@
 
 ## 🆕 What's new
 
-<sub>Latest release **0.2.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
+<sub>Latest release **0.3.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
 
-| | New in 0.2.0 |
+| | New in 0.3.0 |
 |---|---|
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🎯 Options in the backtester**: long calls and puts, cash-secured puts and covered calls, priced with Black-Scholes and marked every day, with expiry, assignment and call-away. [How it works →](#options-backtest-only) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔥 `aggressive_calls`**: buys ~0.6-delta calls 45–60 days out on pullbacks in strong uptrends; takes profit at +100%, stops at -50%. High risk: a -40% drawdown in the 2018–2026 backtest. [See the results →](#-strategy-library) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔄 `wheel`**: sells cash-secured puts near support, then covered calls above cost. 14.1% a year at a 1.12 Sharpe from 2018 to 2026 (aggressive profile, $1M). [See the results →](#-strategy-library) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **📈 Four new stock strategies**: `momentum_rotation`, `donchian_breakout`, `bollinger_reversion` and `fear_greed_dca`, all under the same 30% cash floor. [Compare them →](#-strategy-library) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🛡️ Risk limits for options**: a premium budget per profile, put collateral kept out of the cash floor, and shares behind a written call that cannot be sold. [The rules →](#options-backtest-only) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧩 Options in your own strategy**: attach an `OptionSpec` to a signal to open a contract, name its `option_key` to close it. [Write one →](docs/custom-strategies.md#options-backtest-only) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🤖 Paper-trading agents**: give any strategy a name, a risk profile and starting cash, and it trades its own paper account on free prices. Run several side by side. [How it works →](#-paper-trading-agents) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **⏰ Trades every day by itself**: `riskaware agents schedule --install` sets up a background job on macOS, Linux or Windows that trades each agent once per trading day after 15:40 New York time, and catches up after the laptop sleeps. [Details →](docs/agents.md#how-the-daily-run-works) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏆 Agents leaderboard**: every agent ranked against SPY with equity curves, positions, orders and the reason behind each decision; create, run, pause or reset agents from the dashboard. [See it →](#-paper-trading-agents) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔗 MCP server for Claude**: ask Claude, Cursor or any MCP client about the market regime, signals, news and backtests, or let it create and run paper agents. No tool can touch a live account. [Set it up →](#-mcp-server) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🖥️ A new dashboard**: a dark trading-terminal look with a regime card, a fear-and-greed gauge, sparklines, an event timeline and top navigation, in English and 中文. [Screenshot ↑](#-risk-aware-trading-agents) |
+
+<sub>0.2.0 added options to the backtester (`aggressive_calls`, `wheel`) and four stock strategies; see the [changelog](CHANGELOG.md).</sub>
 
 ---
 
@@ -64,6 +67,8 @@ Most trading bots either chase every signal or need a quant team to configure. T
 - **10 brokers, one interface.** Built-in paper account, **Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers, Longbridge**.
 - **Options strategies (backtest).** An aggressive call-buying strategy and the wheel (cash-secured puts and covered calls), with premium caps, put collateral outside the cash floor, assignment and expiry.
 - **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report.
+- **Daily paper-trading agents.** Run several strategies side by side, each on its own paper account with free prices. A background job trades them every trading day, and a leaderboard compares them with SPY.
+- **Works with Claude (MCP).** `riskaware mcp` gives Claude, Cursor or any MCP client the regime, signals, news, backtests and the paper agents.
 - **Optional LLM review.** A bull analyst, a bear analyst and a risk judge (Claude through the official Anthropic SDK, or any OpenAI-compatible model such as GPT, DeepSeek, Qwen or a local Ollama model) can nudge conviction by at most ±0.15 or veto a buy. They can never create a trade or change a limit. News reaches them only as quoted, untrusted text.
 - **Bilingual.** CLI, dashboard, reports and docs in English and 中文.
 
@@ -72,7 +77,7 @@ Most trading bots either chase every signal or need a quant team to configure. T
 ```bash
 git clone https://github.com/jackson-cmd/risk-aware-trading-agents
 cd risk-aware-trading-agents
-pip install -e ".[dashboard]"        # Python 3.10+
+pip install -e ".[dashboard,mcp]"    # Python 3.10+
 ```
 
 ```bash
@@ -83,10 +88,41 @@ riskaware analyze NVDA                # what every agent thinks about one stock
 riskaware news AAPL                   # cross-verified headlines
 riskaware backtest --compare buy_and_hold,ema_bounce
 riskaware run                         # one paper-trading cycle (built-in paper account)
+riskaware agents init                 # four starter paper-trading agents
+riskaware agents run                  # let them trade once now
+riskaware agents schedule --install   # ...and every trading day from now on
 riskaware dashboard                   # web UI (English / 中文)
 ```
 
 No account or API key is needed for any of the commands above. Add `--lang zh` to any command for Chinese output.
+
+## 🤖 Paper-trading agents
+
+An agent is a strategy with its own paper account. Pick a strategy (built-in or your own file), a risk profile, a stock list and the starting cash, and the agent trades that account once every trading day on free Yahoo Finance prices. Run several side by side and see which one beats SPY. Agents only ever use the built-in paper account, never a broker.
+
+```bash
+riskaware agents init                                    # steady, momentum, breakout, fear-buyer
+riskaware agents add dips --strategy rsi2 --universe tech --cash 25000
+riskaware agents add mine --strategy my_dip.py:MyDip --profile aggressive
+riskaware agents run                                     # trade every active agent now
+riskaware agents                                         # the leaderboard
+riskaware agents schedule --install                      # every trading day, by itself
+```
+
+The daily job (a LaunchAgent on macOS, a crontab line on Linux, a scheduled task on Windows) wakes every 15 minutes on weekdays and trades each agent once per trading day after 15:40 New York time, before the close. It skips holidays, catches up after the laptop sleeps, and keeps going when one agent fails. Each agent keeps its account, journal and daily equity in `~/.riskaware/arena/NAME/`. The **Agents** page of the dashboard shows the leaderboard and lets you create, run, pause, reset and delete agents. More in [docs/agents.md](docs/agents.md).
+
+<img src="site/assets/agents_en.jpg" width="820" alt="Agents page: a leaderboard of paper-trading agents with equity, return, comparison with SPY and status">
+
+## 🔗 MCP server
+
+`riskaware mcp` serves the agents over the Model Context Protocol, so Claude, Cursor or any MCP client can use them:
+
+```bash
+pip install -e ".[mcp]"
+claude mcp add riskaware -- riskaware mcp
+```
+
+Ten tools: `market_regime`, `scan`, `analyze_stock`, `stock_news`, `list_strategies`, `backtest`, `agents_leaderboard`, `agent_detail`, `agents_create` and `agents_run`. They are read-only or act on local paper accounts; no tool can send an order to a broker. Then just ask, for example "What regime is the market in, and what is coming up this week?" or "Backtest the wheel on megacap with $1M since 2018." Setup for Claude Desktop and other clients is in [docs/agents.md](docs/agents.md#use-it-from-claude-mcp).
 
 ## 🧠 How it works
 
@@ -298,6 +334,9 @@ llm:
 | `riskaware strategies` / `new-strategy` | list built-ins / create a strategy file |
 | `riskaware brokers` | supported brokers and their requirements |
 | `riskaware halt` / `resume` | kill switch |
+| `riskaware agents [init\|add\|run\|list\|show\|pause\|resume\|reset\|remove]` | paper-trading agents |
+| `riskaware agents schedule --install` | trade the agents every trading day |
+| `riskaware mcp` | MCP server for Claude and other assistants |
 | `riskaware dashboard` | web dashboard |
 
 ## 📁 Project layout
@@ -313,7 +352,10 @@ src/riskaware/
   engine.py    paper / live cycle, guards, journal, state
   backtest/    backtester, metrics, HTML report
   llm/         optional bull / bear / judge review
-  dashboard/   Streamlit app
+  dashboard/   Streamlit app (pages, theme, charts)
+  arena.py     paper-trading agents: accounts, daily runs, leaderboard
+  scheduler.py the daily background job (launchd, cron, Task Scheduler)
+  mcp_server.py  tools for Claude and other MCP clients
 site/          bilingual project website (GitHub Pages)
 docs/          design notes and guides (English and Chinese)
 ```

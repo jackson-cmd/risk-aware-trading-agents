@@ -2,6 +2,14 @@
 
 [English](CHANGELOG.md)
 
+## 0.3.0（2026-11-12）
+
+- 模拟盘智能体：给任意策略（内置的或你自己的文件）起个名字，配上风险档位、股票池和初始资金，它就在自己的本地模拟账户里每个交易日自动交易。命令：`riskaware agents init | add | run | list | show | pause | resume | reset | remove`（#5）。
+- 不用服务器的每日运行：`riskaware agents schedule --install` 会在 macOS 上装一个 LaunchAgent，在 Linux 上加一行 crontab，在 Windows 上建一个计划任务。每个智能体每个交易日在纽约时间 `execution.run_time` 之后交易一次，电脑睡眠醒来会补跑，节假日自动跳过；出错的智能体最多重试三次，不会影响其他智能体。
+- MCP 服务器：`riskaware mcp` 让 Claude、Cursor 或任何 MCP 客户端都能查市场状态、扫描信号、分析个股、看新闻、回测，以及管理模拟盘智能体。没有任何工具能碰实盘账户。
+- 新看板：深色交易终端风格，顶部导航，市场状态卡片、恐慌贪婪仪表盘、带迷你走势的指标卡、宏观事件时间线、带净值曲线和操作按钮的智能体排行榜，回测结果在页面刷新后保留。`riskaware dashboard` 会隐藏 Streamlit 的 Deploy 按钮。
+- `TradingEngine` 新增 `state_root` 参数，多个账户可以各自保存持仓记录。
+
 ## 0.2.0（2026-11-12）
 
 - 回测支持期权：在模型估算的隐含波动率上用 Black-Scholes 定价，支持买入看涨和看跌、卖现金担保看跌、卖备兑看涨，每天估值，处理到期、行权和备兑股票被买走（#1）。
