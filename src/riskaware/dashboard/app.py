@@ -621,8 +621,11 @@ def page_backtest() -> None:
 
 def page_news() -> None:
     cfg = get_config()
-    H(ui.section(T("news.title"), L("a story counts only when two independent publishers or an SEC filing carry it",
-                                          "只有两家独立媒体或 SEC 文件都报道了，才算确认")))
+    H(ui.section(T("news.title"), L("a story counts when two independent outlets, the company's own release or its SEC "
+                                    "filing carry it; only the company's 8-K, or its release confirming earlier "
+                                    "reports, can force a sale",
+                                    "两家独立媒体、公司自己的通稿或 SEC 公告报道了才算确认；"
+                                    "只有公司自己的 8-K 公告，或证实了先前报道的公司通稿，才能触发强制卖出")))
     c1, c2 = st.columns([3, 1], vertical_alignment="bottom")
     sym = c1.text_input(L("Symbol", "股票代码"), "AAPL").strip().upper()
     if not (c2.button(L("Fetch news", "获取新闻"), type="primary", width="stretch", icon=":material/newspaper:")
@@ -650,10 +653,15 @@ def page_news() -> None:
     ]) + "</div>")
     if rep.red_flags_unconfirmed:
         st.warning(f"{T('news.flags')} ({T('news.status.unconfirmed')}): {', '.join(rep.red_flags_unconfirmed)}")
+    if rep.red_flags_denied:
+        st.info(f"{T('news.flags')} ({T('news.denied')}): {', '.join(rep.red_flags_denied)}")
     st.dataframe(pd.DataFrame([{
-        L("Status", "状态"): ("✅ " if c.status.value != "UNCONFIRMED" else "· ") + T("news.status." + c.status.value.lower()),
+        L("Status", "状态"): ("✅ " if c.status.value != "UNCONFIRMED" else "· ") + T("news.status." + c.status.value.lower())
+        + (" · " + T("news.denial") if c.denial else ""),
         L("Sentiment", "情绪"): round(c.sentiment, 2), L("Headline", "标题"): c.headline,
-        L("Publishers", "来源"): ", ".join(c.publishers[:5]), L("Flags", "风险"): ", ".join(c.red_flags)}
+        L("Publishers", "来源"): ", ".join(c.publishers[:5]),
+        L("Flags", "风险"): ", ".join(c.live_flags)
+        + (f" ({T('news.denied')}: {', '.join(c.cleared_flags)})" if c.cleared_flags else "")}
         for c in rep.top(60)]), hide_index=True, width="stretch", column_config={
         L("Headline", "标题"): st.column_config.TextColumn(width="large")})
     st.caption(T("news.sources") + ": " + ", ".join(f"{k} {v}" for k, v in rep.sources.items())

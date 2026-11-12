@@ -303,21 +303,26 @@ def news(symbol: str, show_all: bool = typer.Option(False, "--all", help="Show s
     if rep.off_topic:
         console.print(f"[dim]{rep.off_topic} " + ("headlines about other companies or the market were ignored"
                                                   if S.lang == "en" else "条讲其他公司或大盘的新闻已忽略") + "[/]")
-    if rep.red_flags_confirmed or rep.red_flags_unconfirmed:
+    if rep.red_flags_confirmed or rep.red_flags_unconfirmed or rep.red_flags_denied:
         console.print(f"[bold red]{T('news.flags')}:[/] confirmed {rep.red_flags_confirmed}, "
-                      f"single-source {rep.red_flags_unconfirmed}")
+                      f"single-source {rep.red_flags_unconfirmed}"
+                      + (f", {T('news.denied')} {rep.red_flags_denied}" if rep.red_flags_denied else ""))
     tbl = Table(show_lines=False)
     tbl.add_column("")
     tbl.add_column("Sent.", justify="right")
     tbl.add_column("Headline")
     tbl.add_column("Publishers")
     shown = rep.clusters if show_all else [x for x in rep.clusters if x.confirmed]
-    order = {"PRIMARY": 0, "CONFIRMED": 1, "UNCONFIRMED": 2, "OPINION": 3}
+    order = {"PRIMARY": 0, "ISSUER": 1, "CONFIRMED": 2, "UNCONFIRMED": 3, "OPINION": 4}
+    badge = {"PRIMARY": "[green]●[/]", "ISSUER": "[green]◆[/]", "CONFIRMED": "[green]✓[/]",
+             "UNCONFIRMED": "[yellow]?[/]", "OPINION": "[dim]~[/]"}
     for cl in sorted(shown, key=lambda x: (order[x.status.value], -(x.last_seen.timestamp() if x.last_seen else 0)))[:40]:
-        badge = {"PRIMARY": "[green]●[/]", "CONFIRMED": "[green]✓[/]", "UNCONFIRMED": "[yellow]?[/]", "OPINION": "[dim]~[/]"}
         color = "green" if cl.sentiment > 0.1 else "red" if cl.sentiment < -0.1 else "white"
+        note = (" ⚑" + ",".join(cl.live_flags) if cl.live_flags else "") + \
+               (f" ✗{T('news.denied')}:" + ",".join(cl.cleared_flags) if cl.cleared_flags else "") + \
+               (" ↩ " + T("news.denial") if cl.denial else "")
         tbl.add_row(badge[cl.status.value], f"[{color}]{cl.sentiment:+.2f}[/]", cl.headline[:100],
-                    ", ".join(cl.publishers[:4]) + (" ⚑" + ",".join(cl.red_flags) if cl.red_flags else ""))
+                    ", ".join(cl.publishers[:4]) + note)
     console.print(tbl)
     if not show_all:
         console.print("[dim]--all shows single-source and opinion stories too[/]")
@@ -388,6 +393,8 @@ def analyze(symbol: str) -> None:
             nl.append(f"  [{cl.status.value.lower()}] {cl.headline[:90]} ({cl.sentiment:+.2f})")
         if news_rep.red_flags_confirmed or news_rep.red_flags_unconfirmed:
             nl.append(f"[red]{T('news.flags')}: {news_rep.red_flags_confirmed or ''} {news_rep.red_flags_unconfirmed or ''}[/]")
+        if news_rep.red_flags_denied:
+            nl.append(f"[dim]{T('news.denied')}: {', '.join(news_rep.red_flags_denied)}[/]")
         console.print(Panel("\n".join(nl), title=T("analyze.news"), expand=False))
     sigs = res["signals"]
     if sigs:

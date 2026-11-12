@@ -147,7 +147,7 @@ override the risk manager.
 |---|---|---|
 | `take_profit` | `RISK_ON`, `NEUTRAL` | gain at least 25%, held at least 10 days, and price 4 ATR above EMA50 or RSI(14) at least 78: sell one third |
 | `trend_exit` | `RISK_ON`, `NEUTRAL` | gain at least 10% and three closes below a falling EMA50: sell half |
-| `thesis_break` | all (if emergency exits enabled) | a confirmed severe red flag (fraud, bankruptcy, going concern, delisting, restatement) |
+| `thesis_break` | all (if emergency exits enabled) | a severe red flag the company itself backs: its 8-K carries the item (bankruptcy, delisting notice, non-reliance), or its own press release confirms a bankruptcy, going-concern doubt, delisting, restatement or auditor exit that independent outlets reported first (see §7) |
 | `hard_stop` | all (if enabled) | loss beyond the profile's hard stop (30% balanced) |
 
 There is no ordinary stop-loss. Position sizing and diversification bound the
@@ -191,12 +191,50 @@ the agent trims its biggest winners back to the floor, but only in `RISK_ON` and
 Sources: Finviz quote-page news (free), Google News RSS, Nasdaq RSS, Seeking
 Alpha RSS, Yahoo Finance RSS and SEC EDGAR 8-K filings. Items are de-duplicated,
 then clustered by title similarity and shared event keywords within 72 hours.
-A cluster is `CONFIRMED` when at least two independent publishers report it, or
-`PRIMARY` when an SEC filing or a press wire carries it; a single publisher is
-`UNCONFIRMED`, and listicles or "should you buy" pieces are `OPINION`.
-Unconfirmed news gets a fifth of the weight of confirmed news, and an
-unconfirmed red flag never triggers a sell. A lone fake headline or press
-release therefore cannot make the agent buy or sell.
+Each cluster is graded by who carries it:
+
+| Status | Carried by |
+|---|---|
+| `PRIMARY` | the company's own SEC 8-K filing |
+| `ISSUER` | the company's own press release on a press-release wire (Business Wire, PR Newswire, GlobeNewswire, Internet Wire, Accesswire, Newsfile, ...) |
+| `CONFIRMED` | at least two independent outlets (outlets owned by one group count once) |
+| `UNCONFIRMED` | a single outlet |
+| `OPINION` | listicles and "should you buy" pieces, ignored |
+
+A press wire is the company's own channel. Outlets that rewrite a release do not
+confirm it, several wires carrying one release are still one source, and anyone
+with a wire account can post a release in a company's name.
+
+Unconfirmed news gets a fifth of the weight of confirmed news. What a red flag
+does depends on who backs it:
+
+| Red flag on | Effect |
+|---|---|
+| a single outlet | a small conviction penalty; never a sell |
+| two independent outlets, or a company release that is the first word on the story | blocks new buys; no forced sale |
+| the company's 8-K item (1.03 bankruptcy, 3.01 delisting notice, 4.02 non-reliance) | emergency exit (`thesis_break`) |
+| the company's own release confirming what at least two independent outlets reported an hour or more earlier | emergency exit for bankruptcy, going concern, delisting, restatement and auditor exits, unless a denial disputes it |
+
+A release that is the first word on a story, plus the outlets that repeat it, is
+exactly what a planted release looks like, so it never forces a sale on its own;
+the sale waits for the 8-K. A story with a severe red flag never scores above
+-0.5, even when its words sound neutral. Allegations made by others (fraud, SEC charges,
+short-seller reports, probes, data breaches) never force a sale: a company release
+that mentions one is a response to it. The profile's hard stop is the backstop.
+
+Negation and denials. A red-flag phrase does not count when its own clause negates
+or denies it: "denies bankruptcy report", "is not filing for Chapter 11", "has no
+plans to file", "the rumor is false", "calls the report baseless", "finds fake
+release". A court or a regulator rejecting something is still news ("judge rejects
+the bankruptcy plan"). Denials form their own clusters, so a denial is never
+counted as a publisher of the story it denies, however similar the words. A
+denial clears the red flags of the story it names (or, when it calls a release or
+story fake without naming it, of the red-flag stories of the 24 hours before) if it
+is at least as well sourced: a single outlet can clear a single-source rumor; a
+story from two outlets or a company release takes the company's own statement or
+release, or two outlets reporting the denial. Nothing clears an 8-K, and the
+company's denial does not clear allegations made by others. Cleared stories drop
+out of the news score and are listed in `red_flags_denied`.
 
 ## 8. Brokers
 
@@ -251,7 +289,8 @@ at a paper environment.
 Offline unit tests with synthetic data cover indicators, calendar rules, regime
 classification, each buy setup and exit, risk constraints (cash floor never
 breached, caps, no sells in `UNCERTAIN`/`RISK_OFF`), sizing and tranches, news
-clustering and confirmation (including a single fake headline), the paper
+clustering and confirmation (a single fake headline, a fake press release that
+other outlets repeat, denials and negation, abbreviations such as "Ch. 11"), the paper
 broker, mocked REST adapters (Alpaca, Public, Tradier), the guards, the
 journal, custom strategy loading and an end-to-end backtest. Live checks: a real
 backtest on Yahoo data, and a paper order placed and cancelled on an Alpaca
