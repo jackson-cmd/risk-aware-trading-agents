@@ -57,6 +57,26 @@ strategy:
 
 Unknown parameters raise an error, so a typo cannot silently fall back to a default.
 
+## Options (backtest only)
+
+Open an option by attaching an `OptionSpec` to a signal; close one by naming its key.
+
+```python
+from riskaware.types import OptionSpec, Side
+
+# buy a ~0.6-delta call about 50 days out
+Signal("NVDA", Action.BUY, 0.8, "pullback", option=OptionSpec("C", target_delta=0.6, dte=50))
+# write a cash-secured put, or a covered call that stays above your cost
+Signal("KO", Action.SELL, 0.7, "near support", option=OptionSpec("P", 0.25, 35, Side.SELL))
+Signal("KO", Action.SELL, 0.7, "income", option=OptionSpec("C", 0.25, 35, Side.SELL, min_strike=pos.avg_cost))
+# close any open option (long or written)
+for key, op in ctx.portfolio.options.items():
+    if op.pnl_pct >= 1.0 or op.dte <= 10:
+        signals.append(Signal(op.underlying, Action.SELL, 1.0, "exit", option_key=key))
+```
+
+`ctx.portfolio.options` maps a key to `underlying, right, strike, expiry, contracts` (negative when written), `entry_price, mark, dte, days_held, pnl_pct` (for written options, the share of the premium kept). The risk manager picks the contract count from the profile's option limits, and option exits are allowed in every regime because options expire. See `riskaware/strategy/options_strategies.py` for two complete examples.
+
 ## Tips
 
 - Return few, high-conviction signals; the risk manager rejects the rest and the backtest report lists why.

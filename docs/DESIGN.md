@@ -25,7 +25,8 @@ follows. User-facing docs live in the README and the other files in `docs/`.
 7. Friendly: `pip install`, `riskaware init`, `riskaware scan`, readable
    explanations for every decision, a dashboard, and bilingual docs.
 
-Non-goals: options, crypto, intraday trading, high-frequency execution,
+Options are supported in backtests only (since 0.2.0; see the README's strategy library).
+Non-goals: live option orders for now, crypto, intraday trading, high-frequency execution,
 short selling, and leverage.
 
 ## 2. Architecture

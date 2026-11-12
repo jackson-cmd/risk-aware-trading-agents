@@ -11,9 +11,10 @@ from typing import Any
 
 from .base import Strategy
 from .examples import BUILTIN_EXAMPLES
+from .options_strategies import OPTION_STRATEGIES
 from .risk_aware import RiskAwareStrategy
 
-BUILTIN: dict[str, type[Strategy]] = {"risk_aware": RiskAwareStrategy, **BUILTIN_EXAMPLES}
+BUILTIN: dict[str, type[Strategy]] = {"risk_aware": RiskAwareStrategy, **BUILTIN_EXAMPLES, **OPTION_STRATEGIES}
 
 
 def list_strategies() -> dict[str, str]:

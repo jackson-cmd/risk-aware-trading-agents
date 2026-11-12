@@ -30,9 +30,17 @@ from ..config import AppConfig, ExecutionConfig, RiskProfile
 from ..data.events import EventCalendar
 from ..data.prices import PriceProvider
 from ..news.history import PointInTimeNews
+from ..options.pricing import bs_price, model_iv, year_fraction
 from ..risk import PlannedOrder, RiskManager
-from ..strategy.base import PortfolioView, PositionView, Strategy, StrategyContext, SymbolData
-from ..types import Side
+from ..strategy.base import (
+    OptionPositionView,
+    PortfolioView,
+    PositionView,
+    Strategy,
+    StrategyContext,
+    SymbolData,
+)
+from ..types import OptionContract, Side
 from ..universe import MACRO_SYMBOLS
 from . import metrics as M
 
@@ -51,6 +59,16 @@ class Holding:
     last_trim: int | None = None
     last_trim_price: float | None = None
     peak_price: float = 0.0
+
+
+@dataclass
+class OptionHolding:
+    contract: OptionContract
+    contracts: int  # positive long, negative written
+    entry_price: float
+    entry_idx: int
+    iv: float
+    mark: float = 0.0
 
 
 @dataclass
@@ -157,11 +175,16 @@ class Backtester:
             notes.append(f"No data for {bt.cash_yield_symbol}: cash earns nothing.")
 
         x = ExecutionConfig(order_type="LIMIT", limit_offset=bt.max_chase, allow_fractional=False)
-        risk = RiskManager(prof, cfg.universe, x, manage_cash=True)
+        risk = RiskManager(prof, cfg.universe, x, manage_cash=True, options=cfg.options)
+        rate = (cash_ret.rolling(63, min_periods=10).mean() * 252).clip(0.0, 0.08).fillna(0.02)
+        vix_s = macro["vix"]
+        oc = cfg.options
         weights = cfg.scoring.weights()
         strategy.on_start(trade_syms)
 
         cash = initial_cash
+        collateral = 0.0
+        opts: dict[str, OptionHolding] = {}
         holdings: dict[str, Holding] = {}
         pending: list[PlannedOrder] = []
         peak = initial_cash
@@ -170,6 +193,142 @@ class Backtester:
         rejections: dict[str, int] = {}
         slip = bt.slippage_bps / 10_000
         n_days = len(days)
+
+        def last_close(sym: str, ts: pd.Timestamp) -> float | None:
+            sd = sym_data.get(sym)
+            if sd is None:
+                return None
+            j = sd.index.searchsorted(ts, side="right") - 1
+            return float(sd.arr[j, sd.cols["close"]]) if j >= 0 else None
+
+        def iv_at(sym: str, ts: pd.Timestamp) -> float | None:
+            sd = sym_data.get(sym)
+            j = sd.index.searchsorted(ts, side="right") - 1 if sd is not None else -1
+            if j < 0:
+                return None
+            v = vix_s.get(ts)
+            return model_iv(sym, float(sd.arr[j, sd.cols["vol20"]]), float(sd.arr[j, sd.cols["vol60"]]),
+                            None if v is None or pd.isna(v) else float(v), oc.iv_premium)
+
+        def record(ts, symbol, side, qty, price, mult, tag, reason, pnl=np.nan, held=np.nan, commission=0.0):
+            trades.append(dict(date=ts, symbol=symbol, side=side, qty=qty, price=price, value=qty * price * mult,
+                               commission=commission, tag=tag, reason=reason, pnl=pnl, holding_days=held))
+
+        def add_shares(sym: str, qty: float, px: float, t_idx: int) -> None:
+            h_ = holdings.get(sym)
+            if h_ is None:
+                holdings[sym] = Holding(qty=qty, avg_cost=px, first_entry=t_idx, last_entry=t_idx,
+                                        last_entry_price=px, tranches=1, peak_price=px)
+            else:
+                h_.avg_cost = (h_.avg_cost * h_.qty + px * qty) / (h_.qty + qty)
+                h_.qty += qty
+                h_.last_entry, h_.last_entry_price = t_idx, px
+
+        def fill_option(order: PlannedOrder, ts: pd.Timestamp, t_idx: int) -> None:
+            nonlocal cash, collateral
+            day = ts.date()
+            r = float(rate.get(ts, 0.02))
+            if order.option_key:
+                h_ = opts.get(order.option_key)
+                if h_ is None:
+                    return
+                c = h_.contract
+                b = bar(c.underlying, ts)
+                if b is None:
+                    return
+                mid = bs_price(b[0], c.strike, year_fraction(day, c.expiry), r, h_.iv, c.right)
+                n = abs(h_.contracts)
+                fee = oc.commission_per_contract * n
+                if h_.contracts > 0:
+                    px = mid * (1 - oc.half_spread)
+                    cash += px * 100 * n - fee
+                    pnl = (px - h_.entry_price) * 100 * n - fee
+                    record(ts, c.key, "SELL", n, px, 100, "option_close", order.reason, pnl, t_idx - h_.entry_idx, fee)
+                else:
+                    px = mid * (1 + oc.half_spread)
+                    cash -= px * 100 * n + fee
+                    if c.right == "P":
+                        collateral -= c.strike * 100 * n
+                    pnl = (h_.entry_price - px) * 100 * n - fee
+                    record(ts, c.key, "BUY", n, px, 100, "option_close", order.reason, pnl, t_idx - h_.entry_idx, fee)
+                del opts[order.option_key]
+                return
+            c = order.option
+            b = bar(c.underlying, ts)
+            if b is None or c.expiry <= day:
+                return
+            iv = order.iv or iv_at(c.underlying, ts) or 0.3
+            mid = bs_price(b[0], c.strike, year_fraction(day, c.expiry), r, iv, c.right)
+            n = int(order.qty)
+            if order.side == Side.BUY:
+                px = mid * (1 + oc.half_spread)
+                if px < 0.01:
+                    return
+                unit = px * 100 + oc.commission_per_contract
+                n = min(n, int((cash - collateral) // unit))
+                if n < 1:
+                    return
+                cash -= unit * n
+                signed = n
+            else:
+                px = mid * (1 - oc.half_spread)
+                if px < 0.01:
+                    return
+                if c.right == "P":
+                    n = min(n, int((cash - collateral) // (c.strike * 100)))
+                    collateral += c.strike * 100 * max(n, 0)
+                else:
+                    held = holdings.get(c.underlying)
+                    covered = sum(-o.contracts * 100 for o in opts.values()
+                                  if o.contract.underlying == c.underlying and o.contract.right == "C" and o.contracts < 0)
+                    n = min(n, int(((held.qty if held else 0) - covered) // 100))
+                if n < 1:
+                    return
+                cash += (px * 100 - oc.commission_per_contract) * n
+                signed = -n
+            fee = oc.commission_per_contract * n
+            h_ = opts.get(c.key)
+            if h_ is None:
+                opts[c.key] = OptionHolding(c, signed, px, t_idx, iv, mid)
+            else:
+                total = h_.contracts + signed
+                h_.entry_price = (h_.entry_price * abs(h_.contracts) + px * n) / max(abs(total), 1)
+                h_.contracts = total
+            record(ts, c.key, "BUY" if signed > 0 else "SELL", n, px, 100, "option_open", order.reason,
+                   commission=fee)
+
+        def settle(key: str, h_: OptionHolding, spot: float, ts: pd.Timestamp, t_idx: int) -> None:
+            nonlocal cash, collateral
+            c = h_.contract
+            n = abs(h_.contracts)
+            intrinsic = c.intrinsic(spot)
+            held_days = t_idx - h_.entry_idx
+            if h_.contracts > 0:
+                cash += intrinsic * 100 * n
+                record(ts, key, "SELL", n, intrinsic, 100, "option_expiry", "expired" if intrinsic == 0 else
+                       "exercised for intrinsic value", (intrinsic - h_.entry_price) * 100 * n, held_days)
+            elif c.right == "P":
+                collateral -= c.strike * 100 * n
+                if intrinsic > 0:
+                    cash -= c.strike * 100 * n
+                    add_shares(c.underlying, 100 * n, c.strike, t_idx)
+                    record(ts, c.underlying, "BUY", 100 * n, c.strike, 1, "assignment", f"put assigned ({key})")
+                record(ts, key, "BUY", n, 0.0, 100, "option_expiry",
+                       "assigned" if intrinsic > 0 else "expired worthless", h_.entry_price * 100 * n, held_days)
+            else:
+                held = holdings.get(c.underlying)
+                if intrinsic > 0 and held is not None and held.qty >= 100 * n:
+                    cash += c.strike * 100 * n
+                    record(ts, c.underlying, "SELL", 100 * n, c.strike, 1, "called_away", f"call assigned ({key})",
+                           (c.strike - held.avg_cost) * 100 * n, t_idx - held.first_entry)
+                    held.qty -= 100 * n
+                    if held.qty <= 1e-9:
+                        del holdings[c.underlying]
+                elif intrinsic > 0:
+                    cash -= intrinsic * 100 * n
+                record(ts, key, "BUY", n, 0.0, 100, "option_expiry",
+                       "called away" if intrinsic > 0 else "expired worthless", h_.entry_price * 100 * n, held_days)
+            del opts[key]
 
         def bar(sym: str, ts: pd.Timestamp) -> tuple[float, float, float, float] | None:
             sd = sym_data.get(sym)
@@ -186,6 +345,9 @@ class Backtester:
         for t_idx, ts in enumerate(days):
             # 1. fills ------------------------------------------------------
             for order in pending:
+                if order.is_option:
+                    fill_option(order, ts, t_idx)
+                    continue
                 b = bar(order.symbol, ts)
                 if b is None:
                     continue
@@ -200,8 +362,8 @@ class Backtester:
                         continue
                     qty = order.qty
                     commission = max(bt.commission_min, bt.commission_per_share * qty) if qty else 0.0
-                    if qty * px + commission > cash:
-                        qty = math.floor((cash - bt.commission_min) / (px * (1 + 1e-9)))
+                    if qty * px + commission > cash - collateral:
+                        qty = math.floor((cash - collateral - bt.commission_min) / (px * (1 + 1e-9)))
                         commission = max(bt.commission_min, bt.commission_per_share * qty)
                     if qty <= 0:
                         continue
@@ -234,7 +396,11 @@ class Backtester:
                         px = lim
                     else:
                         continue
-                    qty = min(order.qty, h_.qty)
+                    covered = sum(-o.contracts * 100 for o in opts.values()
+                                  if o.contract.underlying == order.symbol and o.contract.right == "C" and o.contracts < 0)
+                    qty = min(order.qty, h_.qty - covered)
+                    if qty <= 0:
+                        continue
                     commission = max(bt.commission_min, bt.commission_per_share * qty)
                     cash += qty * px - commission
                     pnl = (px - h_.avg_cost) * qty - commission
@@ -249,26 +415,40 @@ class Backtester:
                         h_.last_trim_price = px
             pending = []
 
-            # 2. cash yield, 3. mark to market ------------------------------------
+            # 2. cash yield; expiring options settle first (assignment can add or remove shares)
             cash *= 1.0 + float(cash_ret.get(ts, 0.0))
+            day_now = ts.date()
+            for key, h_ in list(opts.items()):
+                if day_now >= h_.contract.expiry:
+                    b = bar(h_.contract.underlying, ts)
+                    spot = b[3] if b else last_close(h_.contract.underlying, ts)
+                    if spot is not None:
+                        settle(key, h_, spot, ts, t_idx)
+
+            # 3. mark to market ---------------------------------------------------
             closes: dict[str, float] = {}
             value = 0.0
             for s, h_ in holdings.items():
                 b = bar(s, ts)
-                px = b[3] if b else h_.last_entry_price
-                if b is None:
-                    sd = sym_data[s]
-                    j = sd.index.searchsorted(ts, side="right") - 1
-                    if j >= 0:
-                        px = float(sd.arr[j, sd.cols["close"]])
+                px = b[3] if b else (last_close(s, ts) or h_.last_entry_price)
                 closes[s] = px
                 h_.peak_price = max(h_.peak_price, px)
                 value += h_.qty * px
-            equity = cash + value
+            option_value = 0.0
+            for h_ in opts.values():
+                c = h_.contract
+                spot = closes.get(c.underlying) or last_close(c.underlying, ts)
+                if spot is None:
+                    continue
+                h_.iv = iv_at(c.underlying, ts) or h_.iv
+                h_.mark = bs_price(spot, c.strike, year_fraction(day_now, c.expiry), float(rate.get(ts, 0.02)),
+                                   h_.iv, c.right)
+                option_value += h_.contracts * 100 * h_.mark
+            equity = cash + value + option_value
             peak = max(peak, equity)
             stock_val = sum(h_.qty * closes[s] for s, h_ in holdings.items() if s != tsym)
             rec_equity.append(equity)
-            rec_cash.append(cash / equity if equity > 0 else 1.0)
+            rec_cash.append((cash - collateral) / equity if equity > 0 else 1.0)
             rec_expo.append(stock_val / equity if equity > 0 else 0.0)
             rec_pos.append(sum(1 for s in holdings if s != tsym))
             if progress and (t_idx % 50 == 0 or t_idx == n_days - 1):
@@ -279,6 +459,7 @@ class Backtester:
             # 4. decide ---------------------------------------------------------
             mrow = macro.loc[ts]
             market = _fast_state(mrow, ts.date())
+            market.risk_free = float(rate.get(ts, 0.02))
             positions = {}
             for s, h_ in holdings.items():
                 if s == tsym:
@@ -291,8 +472,15 @@ class Backtester:
                     days_since_trim=None if h_.last_trim is None else t_idx - h_.last_trim,
                     last_trim_price=h_.last_trim_price, peak_price=h_.peak_price)
             tval = holdings[tsym].qty * closes[tsym] if tsym and tsym in holdings else 0.0
+            option_views = {
+                key: OptionPositionView(key=key, underlying=h_.contract.underlying, right=h_.contract.right,
+                                        strike=h_.contract.strike, expiry=h_.contract.expiry, contracts=h_.contracts,
+                                        entry_price=h_.entry_price, mark=h_.mark, dte=h_.contract.dte(ts.date()),
+                                        days_held=t_idx - h_.entry_idx)
+                for key, h_ in opts.items()}
             pf = PortfolioView(equity=equity, cash=cash, cash_equivalents=0.0, treasury_value=tval,
-                               positions=positions, peak_equity=peak)
+                               positions=positions, peak_equity=peak, options=option_views,
+                               option_collateral=collateral)
             day = ts.date()
 
             def rows(sym: str, _ts=ts):
@@ -338,6 +526,10 @@ class Backtester:
         bench_metrics = M.summarize(bench_eq, rf)
         regimes = macro["regime"].reindex(idx).map(lambda r: to_regime(r).value)
         final = {s: h_.qty for s, h_ in holdings.items()}
+        final.update({k: h_.contracts for k, h_ in opts.items()})
+        if any(t["tag"].startswith("option") for t in trades):
+            notes.append("Options are priced with Black-Scholes on modelled implied volatility (realized volatility "
+                         "and VIX), paying half the bid-ask spread; there are no historical option quotes.")
         return BacktestResult(
             strategy=strategy.name, profile=prof.name, start=idx[0].date(), end=idx[-1].date(),
             initial_cash=initial_cash, equity=equity_s, benchmark=bench_eq, cash_ratio=cash_ratio,
