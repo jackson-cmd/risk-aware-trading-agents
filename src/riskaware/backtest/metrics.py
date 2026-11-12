@@ -64,7 +64,7 @@ def summarize(equity: pd.Series, rf_daily: pd.Series | None = None, trades: pd.D
         out["min_cash_ratio"] = float(cash_ratio.min())
         out["avg_cash_ratio"] = float(cash_ratio.mean())
     if trades is not None and not trades.empty:
-        sells = trades[(trades["side"] == "SELL") & trades["pnl"].notna() & ~trades["tag"].isin(["treasury_rebalance"])]
+        sells = trades[trades["pnl"].notna() & ~trades["tag"].isin(["treasury_rebalance"])]
         out["trades"] = float(len(trades))
         out["round_trips"] = float(len(sells))
         if len(sells):
@@ -74,7 +74,11 @@ def summarize(equity: pd.Series, rf_daily: pd.Series | None = None, trades: pd.D
             gross_win = wins["pnl"].sum()
             gross_loss = -losses["pnl"].sum()
             out["profit_factor"] = gross_win / gross_loss if gross_loss > 0 else math.inf
-            out["avg_holding_days"] = float(np.average(sells["holding_days"], weights=sells["value"].abs()))
+            held = sells.dropna(subset=["holding_days"])
+            w = held["value"].abs()
+            if len(held):
+                out["avg_holding_days"] = float(np.average(held["holding_days"], weights=w) if w.sum() > 0
+                                                else held["holding_days"].mean())
         traded = trades["value"].abs().sum()
         out["turnover"] = float(traded / equity.mean() / years / 2)
     return out
@@ -109,7 +113,7 @@ METRIC_LABELS = {
     "win_rate": ("Win rate (closed)", "pct"),
     "profit_factor": ("Profit factor", "num"),
     "avg_holding_days": ("Avg holding (days)", "int"),
-    "round_trips": ("Closing sells", "int"),
+    "round_trips": ("Closed trades", "int"),
     "trades": ("Orders filled", "int"),
     "turnover": ("Turnover / year", "pct"),
 }

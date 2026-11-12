@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 (2026-11-12)
+
+- Options in the backtester: Black-Scholes pricing on modelled implied volatility, long calls and puts, cash-secured puts, covered calls, daily marks, expiry, assignment and call-away (#1).
+- Risk limits for options: premium sleeve and per-trade cap per profile, put collateral kept out of the cash floor and inside the single-stock cap, shares behind written calls protected from sells.
+- New strategies: `aggressive_calls` and `wheel` (options), `momentum_rotation`, `donchian_breakout`, `bollinger_reversion`, `fear_greed_dca` (stocks).
+- Live and paper runs skip option orders with a note; options are backtest-only for now.
+- Fixes: a written covered call could be planned on shares sold in the same cycle; average holding time crashed when every closed trade had zero value.
+
 ## 0.1.0 (2026-11-11)
 
 First public release.

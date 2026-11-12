@@ -16,10 +16,10 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 
-from .config import ExecutionConfig, RiskProfile, UniverseConfig
+from .config import ExecutionConfig, OptionsConfig, RiskProfile, UniverseConfig
 from .sizing import shares_for, target_weight, tranche_weight
 from .strategy.base import PortfolioView, StrategyContext
-from .types import Action, Regime, Side, Signal
+from .types import Action, OptionContract, Regime, Side, Signal
 from .universe import sector_of
 
 
@@ -36,10 +36,18 @@ class PlannedOrder:
     target_weight: float | None = None
     tranche: int | None = None
     setups: list[str] = field(default_factory=list)
+    option: OptionContract | None = None  # set for orders that open an option position
+    option_key: str | None = None  # set for orders that close an option position
+    iv: float | None = None  # modelled implied volatility used to price an option order
+
+    @property
+    def is_option(self) -> bool:
+        return self.option is not None or self.option_key is not None
 
     @property
     def value(self) -> float:
-        return self.qty * (self.limit_price or self.price)
+        mult = 100 if self.is_option else 1
+        return self.qty * mult * (self.limit_price or self.price)
 
 
 @dataclass
@@ -59,10 +67,11 @@ class RiskDecision:
 class RiskManager:
     def __init__(self, profile: RiskProfile, universe: UniverseConfig | None = None,
                  execution: ExecutionConfig | None = None, manage_cash: bool = True,
-                 regime_rules: bool = True):
+                 regime_rules: bool = True, options: OptionsConfig | None = None):
         self.p = profile
         self.u = universe or UniverseConfig()
         self.x = execution or ExecutionConfig()
+        self.opt = options or OptionsConfig()
         self.manage_cash = manage_cash
         self.regime_rules = regime_rules
 
@@ -103,14 +112,17 @@ class RiskManager:
 
         cash = pf.cash  # raw cash
         cash_eq = pf.cash_equivalents
+        collateral = pf.option_collateral  # cash promised to written puts: not free, not part of the floor
         floor_value = p.cash_floor * equity
+        option_signals = [s for s in signals if s.is_option]
+        signals = [s for s in signals if not s.is_option]
         weights = {s: pos.value / equity for s, pos in pf.positions.items()}
         sector_w: dict[str, float] = {}
         for s, w in weights.items():
             sector_w[self._sector(s)] = sector_w.get(self._sector(s), 0.0) + w
         spec_names = {s for s in pf.positions if self.is_speculative(s, ctx)}
         spec_w = sum(weights[s] for s in spec_names)
-        stock_w = sum(weights.values())
+        stock_w = sum(weights.values()) + collateral / equity  # written puts can turn into stock
         n_positions = len(pf.positions)
         max_stock = p.max_equity_exposure
         decision.budget = {"equity": equity, "cash_floor_value": floor_value, "stock_exposure": stock_w,
@@ -138,9 +150,10 @@ class RiskManager:
                 qty = round(pos.qty * frac, 4)
             else:
                 qty = max(1.0, math.floor(pos.qty * frac)) if pos.qty >= 1 else pos.qty
-            qty = min(qty, pos.qty)
+            qty = min(qty, pos.qty - pf.covered_shares(sig.symbol))
             if qty <= 0:
-                decision.rejected.append((sig, "position too small to trim"))
+                why = "shares are covered by written calls" if pf.covered_shares(sig.symbol) else "position too small to trim"
+                decision.rejected.append((sig, why))
                 continue
             price = prices.get(sig.symbol, pos.price)
             tag = sig.details.get("tag") or (sig.setups[0] if sig.setups else "exit")
@@ -166,7 +179,8 @@ class RiskManager:
                 w = weights.get(sym, 0.0)
                 if w > p.max_position * 1.5:
                     excess = (w - p.max_position) * equity
-                    qty = shares_for(excess, pos.price, self.x.allow_fractional)
+                    qty = min(shares_for(excess, pos.price, self.x.allow_fractional),
+                              pos.qty - pf.covered_shares(sym))
                     if qty > 0:
                         price = prices.get(sym, pos.price)
                         decision.orders.append(PlannedOrder(sym, Side.SELL, qty, price, self._limit(Side.SELL, price),
@@ -179,7 +193,7 @@ class RiskManager:
                         stock_w -= dw
 
         # restore the cash floor when rising prices pushed it below (sell high, never in a falling market)
-        cash_total = cash + cash_eq
+        cash_total = cash + cash_eq - collateral
         shortfall = floor_value - cash_total
         if shortfall > 0.02 * equity and ((not self.regime_rules) or regime.allows_discretionary_sells):
             need = shortfall + 0.01 * equity
@@ -193,7 +207,7 @@ class RiskManager:
                 qty = shares_for(take, price, self.x.allow_fractional)
                 if qty <= 0 and pos.qty >= 1:
                     qty = 1.0
-                qty = min(qty, pos.qty)
+                qty = min(qty, pos.qty - pf.covered_shares(sym))
                 if qty <= 0:
                     continue
                 decision.orders.append(PlannedOrder(sym, Side.SELL, qty, price, self._limit(Side.SELL, price),
@@ -277,7 +291,7 @@ class RiskManager:
                 ("position cap", p.max_position - cur_w),
                 ("sector cap", p.max_sector - sector_w.get(sector, 0.0)),
                 ("stock budget", max_stock - stock_w),
-                ("cash floor", (cash + cash_eq - floor_value) / equity),
+                ("cash floor", (cash + cash_eq - collateral - floor_value) / equity),
             ]
             if spec:
                 if pos is None and len(spec_names) >= p.speculative_max_names:
@@ -316,11 +330,104 @@ class RiskManager:
                 spec_w += dw
                 spec_names.add(sym)
 
-        # 3. treasury sleeve and T-bill cash management ------------------------
+        # 3. options --------------------------------------------------------------
+        if option_signals:
+            sold_now: dict[str, float] = {}
+            for order in decision.orders:
+                if order.side == Side.SELL and not order.is_option:
+                    sold_now[order.symbol] = sold_now.get(order.symbol, 0.0) + order.qty
+            cash, collateral, stock_w = self._plan_options(option_signals, ctx, decision, cash, cash_eq, collateral,
+                                                           equity, stock_w, floor_value, max_stock, sold_now)
+
+        # 4. treasury sleeve and T-bill cash management ------------------------
         if self.manage_cash:
-            self._treasury_and_cash(ctx, prices, decision, cash, cash_eq, equity)
+            self._treasury_and_cash(ctx, prices, decision, cash - collateral, cash_eq, equity)
         decision.budget["stock_exposure_after"] = stock_w
         return decision
+
+    def _plan_options(self, signals: list[Signal], ctx: StrategyContext, decision: RiskDecision, cash: float,
+                      cash_eq: float, collateral: float, equity: float, stock_w: float, floor_value: float,
+                      max_stock: float, sold_now: dict[str, float] | None = None) -> tuple[float, float, float]:
+        """Option exits are always allowed (options expire); opens must fit the premium sleeve,
+        the per-trade cap, the put collateral cap, the stock budget and the cash floor."""
+        from .options.pricing import choose_contract, model_iv
+
+        p, pf, o = self.p, ctx.portfolio, self.opt
+        long_value = pf.long_option_value
+        planned_calls: dict[str, int] = {}
+        for sig in (s for s in signals if s.option_key):
+            op = pf.options.get(sig.option_key)
+            if op is None:
+                decision.rejected.append((sig, "no such option position"))
+                continue
+            side = Side.SELL if op.is_long else Side.BUY
+            decision.orders.append(PlannedOrder(op.underlying, side, abs(op.contracts), op.mark, None, sig.reason,
+                                                "option_close", sig.strength, setups=sig.setups, option_key=op.key))
+            if op.is_long:
+                cash += op.value
+                long_value -= op.value
+            else:
+                cash += op.value  # value is negative: buying back costs cash
+                if op.right == "P":
+                    collateral -= op.strike * 100 * abs(op.contracts)
+                    stock_w -= op.strike * 100 * abs(op.contracts) / equity
+        opens = sorted((s for s in signals if s.option is not None and not s.option_key), key=lambda s: -s.strength)
+        for sig in opens:
+            spec = sig.option
+            if sig.strength < p.min_conviction:
+                decision.rejected.append((sig, f"conviction {sig.strength:.2f} < {p.min_conviction:.2f}"))
+                continue
+            row = ctx.row(sig.symbol)
+            spot = row.get("close") if row is not None else math.nan
+            if row is None or math.isnan(spot) or spot <= 0:
+                decision.rejected.append((sig, "no price"))
+                continue
+            iv = model_iv(sig.symbol, row.get("vol20"), row.get("vol60"), ctx.market.vix, o.iv_premium)
+            contract, price, _delta = choose_contract(sig.symbol, spec, spot, ctx.day, iv, ctx.market.risk_free)
+            if price < o.min_premium:
+                decision.rejected.append((sig, "option premium too small"))
+                continue
+            free = cash + cash_eq - collateral - floor_value
+            if spec.side == Side.BUY:
+                if p.options_sleeve <= 0:
+                    decision.rejected.append((sig, f"the {p.name} profile does not buy options"))
+                    continue
+                budget = min(p.options_per_trade * p.size_multiplier(ctx.market.regime) * equity,
+                             p.options_sleeve * equity - long_value, free)
+                unit = price * (1 + o.half_spread) * 100 + o.commission_per_contract
+                n = int(budget // unit) if budget > 0 else 0
+                n = min(n, spec.contracts) if spec.contracts else n
+                if n < 1:
+                    decision.rejected.append((sig, "options premium budget used up"))
+                    continue
+                cost = n * unit
+                cash -= cost
+                long_value += cost
+            elif spec.right == "P":
+                per = contract.strike * 100
+                room = min(p.short_put_collateral_max * equity - collateral, free, (max_stock - stock_w) * equity,
+                           p.max_position * equity)
+                n = int(room // per) if room > 0 else 0
+                n = min(n, spec.contracts) if spec.contracts else n
+                if n < 1:
+                    decision.rejected.append((sig, "no room to secure another put"))
+                    continue
+                collateral += n * per
+                stock_w += n * per / equity
+                cash += n * (price * (1 - o.half_spread) * 100 - o.commission_per_contract)
+            else:
+                pos = pf.positions.get(sig.symbol)
+                held = int(pos.qty - (sold_now or {}).get(sig.symbol, 0.0)) if pos else 0
+                uncovered = held - pf.covered_shares(sig.symbol) - planned_calls.get(sig.symbol, 0) * 100
+                n = min(spec.contracts or 10**6, uncovered // 100)
+                if n < 1:
+                    decision.rejected.append((sig, "a covered call needs 100 uncovered shares per contract"))
+                    continue
+                planned_calls[sig.symbol] = planned_calls.get(sig.symbol, 0) + n
+                cash += n * (price * (1 - o.half_spread) * 100 - o.commission_per_contract)
+            decision.orders.append(PlannedOrder(sig.symbol, spec.side, n, price, None, sig.reason, "option_open",
+                                                sig.strength, setups=sig.setups, option=contract, iv=iv))
+        return cash, collateral, stock_w
 
     def _treasury_and_cash(self, ctx: StrategyContext, prices: dict[str, float], decision: RiskDecision,
                            cash: float, cash_eq: float, equity: float) -> None:

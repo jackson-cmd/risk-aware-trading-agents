@@ -174,6 +174,48 @@ class Signal:
     target_weight: float | None = None
     emergency: bool = False
     details: dict[str, Any] = field(default_factory=dict)
+    option: OptionSpec | None = None  # open an option position on ``symbol`` instead of trading shares
+    option_key: str | None = None  # close this option position (long or short)
+
+    @property
+    def is_option(self) -> bool:
+        return self.option is not None or self.option_key is not None
+
+
+@dataclass(frozen=True)
+class OptionContract:
+    underlying: str
+    right: str  # "C" or "P"
+    strike: float
+    expiry: date
+
+    @property
+    def key(self) -> str:
+        return f"{self.underlying} {self.expiry:%Y-%m-%d} {self.strike:g}{self.right}"
+
+    def dte(self, day: date) -> int:
+        return (self.expiry - day).days
+
+    def intrinsic(self, spot: float) -> float:
+        return max(spot - self.strike, 0.0) if self.right == "C" else max(self.strike - spot, 0.0)
+
+
+@dataclass
+class OptionSpec:
+    """An option a strategy wants to open. The risk manager picks the contract count.
+
+    ``side`` BUY opens a long option; SELL writes one (cash-secured put or covered call).
+    The strike is chosen for ``target_delta`` (absolute value) and kept inside
+    ``min_strike`` / ``max_strike``; the expiry is the monthly one closest to ``dte`` days.
+    """
+
+    right: str
+    target_delta: float = 0.5
+    dte: int = 45
+    side: Side = Side.BUY
+    min_strike: float | None = None
+    max_strike: float | None = None
+    contracts: int | None = None
 
 
 @dataclass

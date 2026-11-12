@@ -57,6 +57,26 @@ strategy:
 
 传入未定义的参数会直接报错，拼错参数名不会悄悄用回默认值。
 
+## 期权（目前只支持回测）
+
+在信号里附上 `OptionSpec` 就是开一个期权仓位；写上 `option_key` 就是平掉对应的期权。
+
+```python
+from riskaware.types import OptionSpec, Side
+
+# 买入大约 50 天后到期、delta 约 0.6 的看涨期权
+Signal("NVDA", Action.BUY, 0.8, "回调", option=OptionSpec("C", target_delta=0.6, dte=50))
+# 卖现金担保看跌期权；卖备兑看涨期权，行权价不低于持仓成本
+Signal("KO", Action.SELL, 0.7, "接近支撑", option=OptionSpec("P", 0.25, 35, Side.SELL))
+Signal("KO", Action.SELL, 0.7, "收租", option=OptionSpec("C", 0.25, 35, Side.SELL, min_strike=pos.avg_cost))
+# 平掉任意一个期权（买入的或卖出的都可以）
+for key, op in ctx.portfolio.options.items():
+    if op.pnl_pct >= 1.0 or op.dte <= 10:
+        signals.append(Signal(op.underlying, Action.SELL, 1.0, "离场", option_key=key))
+```
+
+`ctx.portfolio.options` 的每一项包含 `underlying, right, strike, expiry, contracts`（卖出的期权为负数）、`entry_price, mark, dte, days_held, pnl_pct`（卖出的期权表示已经赚到的权利金比例）。张数由风控按档位里的期权限额决定；期权会到期，所以任何市场状态下都允许平仓。完整示例见 `riskaware/strategy/options_strategies.py`。
+
 ## 建议
 
 - 少而精：只发信心高的信号，其余会被风控拦下，回测报告里会列出原因。

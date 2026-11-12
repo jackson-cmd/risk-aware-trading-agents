@@ -27,6 +27,7 @@ Most trading bots either chase every signal or need a quant team to configure. T
 - **Risk first.** A **30% cash + T-bill floor**, position, sector and speculative ("lottery ticket") caps, volatility-scaled sizes, buying in tranches, a Treasury sleeve for conservative profiles, idle cash parked in a T-bill ETF, a drawdown pause, a kill switch.
 - **Cross-verified news.** Finviz (free), Google News, Nasdaq, Seeking Alpha and Yahoo RSS plus the company's own **SEC 8-K filings**. A story only counts when two independent publishers or an SEC filing carry it, so a single fake headline cannot make the agent buy or sell.
 - **10 brokers, one interface.** Built-in paper account, **Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers, Longbridge**.
+- **Options strategies (backtest).** An aggressive call-buying strategy and the wheel (cash-secured puts and covered calls), with premium caps, put collateral outside the cash floor, assignment and expiry.
 - **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report.
 - **Optional LLM review.** A bull analyst, a bear analyst and a risk judge (Claude through the official Anthropic SDK, or any OpenAI-compatible model such as GPT, DeepSeek, Qwen or a local Ollama model) can nudge conviction by at most ±0.15 or veto a buy. They can never create a trade or change a limit. News reaches them only as quoted, untrusted text.
 - **Bilingual.** CLI, dashboard, reports and docs in English and 中文.
@@ -124,6 +125,41 @@ riskaware backtest --synthetic                     # offline demo, no download
 ```
 
 Every run writes a self-contained HTML report (metrics, equity and drawdown charts with regime shading, monthly returns, every trade with its reason) plus CSV files.
+
+## Strategy library
+
+Every built-in strategy runs through the same risk manager, so all of them keep the cash floor. Backtest any of them with `riskaware backtest --strategy NAME`; compare several with `--compare a,b,c`.
+
+| Strategy | Type | Idea |
+|---|---|---|
+| `risk_aware` | stocks (default) | the multi-agent strategy described above |
+| `momentum_rotation` | stocks | each month hold the strongest names by 6-month relative strength, above EMA200 |
+| `donchian_breakout` | stocks | Turtle-style: 55-day highs on volume, exit on a 20-day low |
+| `bollinger_reversion` | stocks | buy closes below the lower Bollinger band in uptrends, sell at the middle band |
+| `fear_greed_dca` | stocks / ETFs | buy in steps when fear is high, trim in extreme greed |
+| `ema_bounce`, `rsi2`, `golden_cross`, `buy_and_hold` | stocks | simple references and baselines |
+| `aggressive_calls` | options | buy ~0.6-delta calls 45–60 days out on pullbacks in strong uptrends; +100% take profit, -50% stop |
+| `wheel` | options | sell ~0.25-delta cash-secured puts near support; after assignment, sell covered calls above cost |
+
+Backtests from January 2018 to November 2026 on the `megacap` list:
+
+| Strategy | Profile, capital | CAGR | Sharpe | Max drawdown | Worst year |
+|---|---|---|---|---|---|
+| `wheel` | aggressive, $1M | 14.1% | 1.12 | -21.7% | +5.8% |
+| `momentum_rotation` | balanced, $100k | 12.5% | 0.91 | -18.2% | -8.2% |
+| `risk_aware` | balanced, $100k | 10.4% | 0.84 | -18.2% | -3.8% |
+| `donchian_breakout` | balanced, $100k | 9.8% | 0.86 | -12.6% | -6.7% |
+| `aggressive_calls` | aggressive, $100k | 6.7% | 0.30 | -40.3% | -24.7% |
+| `bollinger_reversion` | balanced, $100k | 4.5% | 0.58 | -4.4% | +0.8% |
+| SPY buy & hold | | 14.1% | 0.66 | -33.7% | -18.2% |
+
+### Options (backtest only)
+
+Option strategies open long calls or puts, cash-secured puts and covered calls. The risk manager caps the premium in long options (`options_sleeve`: 0% conservative, 3% balanced, 12% aggressive; `options_per_trade`: 0 / 1% / 3%), keeps put collateral out of the 30% cash floor and inside the single-stock cap, and never lets shares that back a written call be sold. Expiring options settle at intrinsic value; written puts are assigned into shares, covered calls are called away.
+
+There is no free archive of historical option quotes, so the backtester prices options with Black-Scholes on a modelled implied volatility (VIX for index ETFs; realized volatility, a 10% volatility premium and a VIX scaling for stocks) and pays half of a 4% bid-ask spread plus $0.65 per contract. The results move with these assumptions: without the 10% volatility premium the wheel drops to a 0.81 Sharpe and `aggressive_calls` ranges from 3% to 15% a year depending on spread and volatility, always with a drawdown near -40%. Treat option backtests as the shape of a strategy, not a forecast. `riskaware run` skips option orders in this version.
+
+Written puts need cash for 100 shares per contract inside the single-stock cap, so the wheel only trades names whose strike × 100 fits (about $10k per name on a $100k aggressive account); test it with `--cash 1000000` or a list of lower-priced names.
 
 ## Write your own strategy
 
@@ -250,7 +286,7 @@ docs/          design notes and guides (English and Chinese)
 ## Roadmap
 
 - Point-in-time fundamentals from SEC XBRL for backtests
-- Options overlay (covered calls, protective puts)
+- Live option orders (option chains from each broker), protective puts and collars
 - More brokers (Webull, E*TRADE) and crypto / HK / A-share markets
 - Walk-forward parameter studies
 

@@ -123,6 +123,38 @@ class PositionView:
 
 
 @dataclass
+class OptionPositionView:
+    key: str
+    underlying: str
+    right: str
+    strike: float
+    expiry: date
+    contracts: int  # positive = long, negative = written (short)
+    entry_price: float  # premium per share at entry
+    mark: float  # model price per share now
+    dte: int
+    days_held: int
+
+    @property
+    def is_long(self) -> bool:
+        return self.contracts > 0
+
+    @property
+    def value(self) -> float:
+        """Market value: positive for long options, negative (a liability) for written ones."""
+        return self.contracts * 100 * self.mark
+
+    @property
+    def pnl_pct(self) -> float:
+        """Long: mark / entry - 1. Written: share of the premium kept (1.0 = expires worthless)."""
+        if self.entry_price <= 0:
+            return 0.0
+        if self.is_long:
+            return self.mark / self.entry_price - 1.0
+        return (self.entry_price - self.mark) / self.entry_price
+
+
+@dataclass
 class PortfolioView:
     equity: float
     cash: float
@@ -130,6 +162,21 @@ class PortfolioView:
     treasury_value: float = 0.0
     positions: dict[str, PositionView] = field(default_factory=dict)
     peak_equity: float = 0.0
+    options: dict[str, OptionPositionView] = field(default_factory=dict)
+    option_collateral: float = 0.0  # cash set aside for written puts; it cannot count toward the floor
+
+    @property
+    def free_cash(self) -> float:
+        return self.cash + self.cash_equivalents - self.option_collateral
+
+    @property
+    def long_option_value(self) -> float:
+        return sum(o.value for o in self.options.values() if o.is_long)
+
+    def covered_shares(self, symbol: str) -> int:
+        """Shares already promised to written calls on ``symbol``."""
+        return sum(-o.contracts * 100 for o in self.options.values()
+                   if o.underlying == symbol and o.right == "C" and not o.is_long)
 
     @property
     def cash_total(self) -> float:
