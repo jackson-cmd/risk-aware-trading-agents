@@ -185,6 +185,7 @@ class NewsItem:
     published: datetime | None
     symbol: str | None = None
     summary: str = ""
+    sentiment: float | None = None  # supplied by the data source (e.g. an imported CSV); None = score the headline
 
 
 @dataclass

@@ -49,6 +49,7 @@ news:
   finviz: true                  # free Finviz quote-page headlines / Finviz 免费新闻
   feeds: [google, nasdaq, seekingalpha, yahoo, sec]
   min_independent_sources: 2    # a story counts only when two independent publishers carry it / 两家独立媒体报道才算确认
+  # archive_dir: ~/.riskaware/news  # local news history for backtests (riskaware news-history) / 回测用的本地新闻库
 
 llm:
   enabled: {llm_enabled}        # optional bull/bear/judge review / 可选的多空辩论复核
@@ -66,3 +67,4 @@ backtest:
   initial_cash: 100000
   slippage_bps: 5
   commission_per_share: 0.0
+  news: false                   # replay the local news archive in backtests (or pass --news) / 回测时回放本地新闻库

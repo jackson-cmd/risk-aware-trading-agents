@@ -224,6 +224,12 @@ class NewsConfig(_Model):
     similarity_threshold: float = 0.34
     max_symbols_per_run: int = 25
     request_interval: float = 1.0
+    archive_dir: str = Field(str(RISKAWARE_HOME / "news"), description="local news history for backtests")
+    benzinga_key_env: str = "BENZINGA_API_KEY"
+
+    @property
+    def archive_path(self) -> Path:
+        return Path(self.archive_dir).expanduser()
 
 
 class ScoringConfig(_Model):
@@ -306,6 +312,7 @@ class BacktestConfig(_Model):
     cash_yield_symbol: str | None = "BIL"
     output_dir: str = "backtests"
     warmup_days: int = 320
+    news: bool = False  # replay the local news archive (riskaware news-history) in backtests
 
 
 class AppConfig(_Model):

@@ -27,7 +27,7 @@
 - **风控优先。** **现金加短期国债始终不低于 30%**；单只股票、单个板块、高波动"小博大"仓位都有上限；按波动率决定仓位大小；分批建仓；保守档另配国债仓位；闲置现金自动买短期国债 ETF；回撤过大自动暂停买入；一键停止交易。
 - **新闻交叉验证。** 汇总 Finviz（免费）、Google News、Nasdaq、Seeking Alpha、Yahoo 的 RSS，以及公司自己的 **SEC 8-K 公告**。一条新闻只有被两家独立媒体报道，或者有 SEC 公告佐证，才算"已确认"。一条假新闻没法让它买入或卖出。
 - **10 家券商，统一接口。** 内置模拟盘，以及 **Alpaca、盈透（IBKR）、Public.com、嘉信（Schwab）、tastytrade、Tradier、富途/moomoo、老虎证券、长桥**。
-- **什么都能回测，包括你自己的策略。** 只要写一个 Python 方法，同一个策略对象就能在回测、模拟盘和实盘里运行，并且走同一套风控。多个策略可以并排对比，生成 HTML 报告。
+- **什么都能回测，包括你自己的策略。** 只要写一个 Python 方法，同一个策略对象就能在回测、模拟盘和实盘里运行，并且走同一套风控。多个策略可以并排对比，生成 HTML 报告；还能从本地新闻库按发布时间回放新闻（SEC 8-K 公告、你自己的 Benzinga key 或 CSV）。
 - **可选的 LLM 复核。** 多头分析师、空头分析师和风控裁判（Claude 用 Anthropic 官方 SDK，也支持任何 OpenAI 兼容模型，比如 GPT、DeepSeek、通义千问或本地 Ollama）可以把信心分最多调高或调低 0.15，或者否决一笔买入。它们不能自己发起交易，也不能改任何限额。新闻只作为加了引号的不可信文本交给它们。
 - **中英双语。** 命令行、网页看板、回测报告和文档都支持中文和英文。
 
@@ -114,7 +114,7 @@ flowchart TB
 
 <img src="site/assets/backtest_equity_zh.png" width="820" alt="净值曲线与 SPY 对比，底色为市场状态">
 
-请客观看待这组数字：长牛市里它因为始终留 30% 以上现金，收益比指数低；市场下跌时它的亏损大约只有指数的一半。股票池是今天的大盘股，有幸存者偏差；回测没有用新闻和财报数据（没有免费的历史时点数据）；过去的表现不代表未来。用 `riskaware backtest --compare buy_and_hold` 可以自己复现。
+请客观看待这组数字：长牛市里它因为始终留 30% 以上现金，收益比指数低；市场下跌时它的亏损大约只有指数的一半。股票池是今天的大盘股，有幸存者偏差；这组数字没有用新闻和财报数据（新闻可以从本地新闻库回放，见下文）；过去的表现不代表未来。用 `riskaware backtest --compare buy_and_hold` 可以自己复现。
 
 ```bash
 riskaware backtest --strategy risk_aware --compare buy_and_hold,ema_bounce,rsi2 --start 2018-01-01 --open
@@ -124,6 +124,27 @@ riskaware backtest --synthetic                             # 离线演示，不�
 ```
 
 每次回测都会生成一个独立的 HTML 报告（各项指标、带市场状态底色的净值和回撤图、月度收益、每笔交易和理由）以及 CSV 文件。
+
+### 用新闻回测
+
+回测只能用当天已经能看到的新闻，所以每条新闻都要有发布时间。`riskaware news-history` 在你自己的电脑上建一个这样的新闻库（`~/.riskaware/news`，不进代码仓库），回测加 `--news` 就会按天回放，走的是和实盘一样的聚类和两家来源交叉验证。美东时间 16:00 以后发布的新闻，回测要到第二天才能看到。
+
+```bash
+riskaware news-history build --preset core --contact-email you@example.com   # 2018 年以来的 SEC 8-K 公告
+riskaware news-history build --symbols AAPL,NVDA --source benzinga             # 用你自己的 BENZINGA_API_KEY
+riskaware news-history import my_news.csv --tz America/New_York               # 列：timestamp, symbol, headline[, source, url, sentiment]
+riskaware news-history status
+riskaware news-history show NVDA --date 2024-05-22                             # 回测在那天收盘时看到了什么
+riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset core --news --compare buy_and_hold
+```
+
+| 来源 | 存进新闻库的内容 | 费用 |
+|---|---|---|
+| SEC EDGAR | 每一份 8-K（财报、高管变动、并购、减值、财报重述），带 SEC 受理时间 | 免费；SEC 要求注明联系邮箱 |
+| Benzinga | 用你自己的新闻 API key 拉到的标题 | 你的 Benzinga 套餐 |
+| CSV | 任何你有权使用的新闻 | — |
+
+`core` 股票池是 SPY、QQQ、AAPL、MSFT、NVDA、AMZN、GOOGL、META、TSLA。SPY、QQQ 是基金不是公司，SEC 新闻库里基本没有它们的公告；议息、CPI、非农日历本来就在每次回测里决定市场状态。Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或第二家媒体佐证之前都算"单一来源"。Benzinga 的条款不允许再分发：新闻库只留在你的电脑上，不要提交到仓库或分享。详见 [docs/zh/news-history.md](docs/zh/news-history.md)。
 
 ## 写你自己的策略
 
@@ -154,7 +175,7 @@ class MyDip(Strategy):
         return signals
 ```
 
-策略只负责说"想做什么、有多大把握"；买多少由风控决定，现金底线、各种上限和市场状态规则也由风控执行，所以你的策略自动得到同样的保护。`ctx.market` 里有市场状态、VIX 和即将到来的事件；实盘时 `ctx.quality(sym)` 和 `ctx.news(sym)` 给出财报评分和验证过的新闻。详见 [docs/zh/custom-strategies.md](docs/zh/custom-strategies.md)。
+策略只负责说"想做什么、有多大把握"；买多少由风控决定，现金底线、各种上限和市场状态规则也由风控执行，所以你的策略自动得到同样的保护。`ctx.market` 里有市场状态、VIX 和即将到来的事件；实盘时 `ctx.quality(sym)` 和 `ctx.news(sym)` 给出财报评分和验证过的新闻；回测加 `--news` 时 `ctx.news` 也能用。详见 [docs/zh/custom-strategies.md](docs/zh/custom-strategies.md)。
 
 ## 支持的券商
 
@@ -226,7 +247,8 @@ llm:
 | `riskaware run [--dry-run] [--live]` | 跑一次交易循环 |
 | `riskaware schedule [--print-cron]` | 每个交易日在 `execution.run_time`（美东时间）自动运行 |
 | `riskaware portfolio` | 账户、持仓、未成交订单 |
-| `riskaware backtest` | 回测和策略对比 |
+| `riskaware backtest [--news]` | 回测和策略对比（`--news` 回放本地新闻库） |
+| `riskaware news-history build / import / status / show` | 回测用的本地历史新闻库 |
 | `riskaware strategies` / `new-strategy` | 列出内置策略 / 生成策略模板 |
 | `riskaware brokers` | 支持的券商及所需配置 |
 | `riskaware halt` / `resume` | 一键停止 / 恢复交易 |

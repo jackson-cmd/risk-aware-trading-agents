@@ -217,7 +217,7 @@ class StrategyContext:
         return self._memo("quality", symbol, self._quality)
 
     def news(self, symbol: str):
-        """Verified news report (live and paper only; None in backtests)."""
+        """Verified news report; in backtests only with a local news archive (``riskaware news-history``)."""
         return self._memo("news", symbol, self._news)
 
     def days_to_earnings(self, symbol: str) -> int | None:

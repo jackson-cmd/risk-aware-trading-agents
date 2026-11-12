@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- News in backtests: `riskaware news-history` builds a local, point-in-time news archive (`~/.riskaware/news`) from SEC EDGAR 8-K filings, your own Benzinga API key, or any CSV, and `riskaware backtest --news` replays it through the same clustering and two-source verification used live. Items stamped after the 16:00 New York close become visible the next day.
+- `news-history show SYMBOL --date DAY` prints exactly what a backtest saw at that close.
+- New `core` universe preset (SPY, QQQ and the seven largest US stocks) and an example news strategy (`examples/strategies/news_earnings_drift.py`).
+- `NewsItem.sentiment`: a sentiment score supplied by the data source (for example an imported CSV) overrides the headline lexicon.
+- Confirmed severe news (bankruptcy, delisting, restatement) now triggers the emergency exit in backtests too, when an archive is used.
+
 ## 0.1.0 (2026-11-11)
 
 First public release.

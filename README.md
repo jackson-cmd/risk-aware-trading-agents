@@ -27,7 +27,7 @@ Most trading bots either chase every signal or need a quant team to configure. T
 - **Risk first.** A **30% cash + T-bill floor**, position, sector and speculative ("lottery ticket") caps, volatility-scaled sizes, buying in tranches, a Treasury sleeve for conservative profiles, idle cash parked in a T-bill ETF, a drawdown pause, a kill switch.
 - **Cross-verified news.** Finviz (free), Google News, Nasdaq, Seeking Alpha and Yahoo RSS plus the company's own **SEC 8-K filings**. A story only counts when two independent publishers or an SEC filing carry it, so a single fake headline cannot make the agent buy or sell.
 - **10 brokers, one interface.** Built-in paper account, **Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers, Longbridge**.
-- **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report.
+- **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report, and replay point-in-time news (SEC 8-K filings, your own Benzinga key or a CSV) from a local archive.
 - **Optional LLM review.** A bull analyst, a bear analyst and a risk judge (Claude through the official Anthropic SDK, or any OpenAI-compatible model such as GPT, DeepSeek, Qwen or a local Ollama model) can nudge conviction by at most ±0.15 or veto a buy. They can never create a trade or change a limit. News reaches them only as quoted, untrusted text.
 - **Bilingual.** CLI, dashboard, reports and docs in English and 中文.
 
@@ -114,7 +114,7 @@ Built-in strategy, balanced profile, the 55-stock `megacap` list, $100k, signals
 
 <img src="site/assets/backtest_equity_en.png" width="820" alt="Equity curve versus SPY with regime shading">
 
-Read it honestly: in a long bull market the agent earns less than the index because it keeps at least 30% in cash, and it loses roughly half as much when markets fall. The list is today's large caps, so it carries survivorship bias; backtests use neither news nor fundamentals (no free point-in-time archive), and past results do not predict future ones. Reproduce it with `riskaware backtest --compare buy_and_hold`.
+Read it honestly: in a long bull market the agent earns less than the index because it keeps at least 30% in cash, and it loses roughly half as much when markets fall. The list is today's large caps, so it carries survivorship bias; these numbers use neither news nor fundamentals (news can be replayed from a local archive, see below), and past results do not predict future ones. Reproduce it with `riskaware backtest --compare buy_and_hold`.
 
 ```bash
 riskaware backtest --strategy risk_aware --compare buy_and_hold,ema_bounce,rsi2 --start 2018-01-01 --open
@@ -124,6 +124,27 @@ riskaware backtest --synthetic                     # offline demo, no download
 ```
 
 Every run writes a self-contained HTML report (metrics, equity and drawdown charts with regime shading, monthly returns, every trade with its reason) plus CSV files.
+
+### News in backtests
+
+A backtest may only use news it would have seen on that day, so it needs each item's publication time. `riskaware news-history` keeps such an archive on your own machine (`~/.riskaware/news`, never in the repository), and `--news` replays it through the same clustering and two-source check used in live trading. An item stamped after 16:00 New York time becomes visible the next day.
+
+```bash
+riskaware news-history build --preset core --contact-email you@example.com   # SEC 8-K filings since 2018
+riskaware news-history build --symbols AAPL,NVDA --source benzinga             # with your own BENZINGA_API_KEY
+riskaware news-history import my_news.csv --tz America/New_York               # timestamp, symbol, headline[, source, url, sentiment]
+riskaware news-history status
+riskaware news-history show NVDA --date 2024-05-22                             # what the backtest saw at that close
+riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset core --news --compare buy_and_hold
+```
+
+| Source | What goes into the archive | Cost |
+|---|---|---|
+| SEC EDGAR | every 8-K (earnings, officer changes, deals, impairments, restatements) with SEC's acceptance time | free; SEC asks for a contact email |
+| Benzinga | headlines from your own news API key | your Benzinga plan |
+| CSV | any news you have the right to use | — |
+
+The `core` preset is SPY, QQQ, AAPL, MSFT, NVDA, AMZN, GOOGL, META and TSLA. SPY and QQQ are funds, not companies, so the SEC archive has little or nothing for them; the FOMC, CPI and jobs calendar already drives the regime in every backtest. Benzinga counts as one publisher, so a Benzinga-only story stays single-source until an SEC filing or a second publisher backs it. Benzinga's terms do not allow redistribution: the archive stays on your machine, so do not commit or share it. Details: [docs/news-history.md](docs/news-history.md).
 
 ## Write your own strategy
 
@@ -154,7 +175,7 @@ class MyDip(Strategy):
         return signals
 ```
 
-A strategy only says what it wants and how sure it is; the risk manager decides the size and enforces the cash floor, caps and regime rules, so your strategy inherits the same protection. `ctx.market` has the regime, VIX and upcoming events; `ctx.quality(sym)` and `ctx.news(sym)` give the earnings verdict and the verified news in live runs. See [docs/custom-strategies.md](docs/custom-strategies.md).
+A strategy only says what it wants and how sure it is; the risk manager decides the size and enforces the cash floor, caps and regime rules, so your strategy inherits the same protection. `ctx.market` has the regime, VIX and upcoming events; `ctx.quality(sym)` and `ctx.news(sym)` give the earnings verdict and the verified news in live runs; `ctx.news` also works in backtests run with `--news`. See [docs/custom-strategies.md](docs/custom-strategies.md).
 
 ## Brokers
 
@@ -223,7 +244,8 @@ llm:
 | `riskaware run [--dry-run] [--live]` | one trading cycle |
 | `riskaware schedule [--print-cron]` | run every trading day at `execution.run_time` (New York) |
 | `riskaware portfolio` | account, positions, open orders |
-| `riskaware backtest` | backtest and compare strategies |
+| `riskaware backtest [--news]` | backtest and compare strategies (`--news` replays the local news archive) |
+| `riskaware news-history build / import / status / show` | local point-in-time news archive for backtests |
 | `riskaware strategies` / `new-strategy` | list built-ins / create a strategy file |
 | `riskaware brokers` | supported brokers and their requirements |
 | `riskaware halt` / `resume` | kill switch |
