@@ -2,6 +2,14 @@
 
 [中文](CHANGELOG_zh.md)
 
+## Unreleased
+
+- News in backtests: `riskaware news-history` builds a local, point-in-time news archive (`~/.riskaware/news`) from SEC EDGAR 8-K filings, your own Benzinga API key, or any CSV, and `riskaware backtest --news` replays it through the same clustering and two-source verification used live. Items stamped after the 16:00 New York close become visible the next day.
+- `news-history show SYMBOL --date DAY` prints exactly what a backtest saw at that close.
+- New `core` universe preset (SPY, QQQ and the seven largest US stocks) and an example news strategy (`examples/strategies/news_earnings_drift.py`).
+- `NewsItem.sentiment`: a sentiment score supplied by the data source (for example an imported CSV) overrides the headline lexicon.
+- The `thesis_break` emergency exit now also works in backtests that use an archive, under the same rule as live trading: the company's own 8-K or press release must carry the severe flag.
+
 ## 0.4.0 (2026-11-12)
 
 - **Behavior change: emergency sells on news need the company itself.** A severe red flag now triggers the `thesis_break` exit only when the company's own SEC 8-K carries the item, or when its own press release confirms what at least two independent outlets reported an hour or more earlier, and no denial disputes it. Red flags confirmed by two independent outlets still block new buys and pull the news score down, but no longer force a sale. Allegations made by others (fraud, SEC charges, short-seller reports) never force a sale on their own; the profile's hard stop is the backstop.

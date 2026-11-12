@@ -2,6 +2,14 @@
 
 [English](CHANGELOG.md)
 
+## 未发布
+
+- 回测可以用新闻了：`riskaware news-history` 在本机建一个按发布时间存的新闻库（`~/.riskaware/news`），来源可以是 SEC EDGAR 8-K 公告、你自己的 Benzinga API key 或任何 CSV；`riskaware backtest --news` 按天回放，走和实盘一样的聚类和两家来源交叉验证。美东 16:00 收盘后发布的新闻，第二天才看得到。
+- `news-history show 代码 --date 日期` 打印回测在那天收盘时看到的新闻。
+- 新的 `core` 股票池（SPY、QQQ 和美股最大的七只股票）和一个用新闻的示例策略（`examples/strategies/news_earnings_drift.py`）。
+- `NewsItem.sentiment`：数据源自带的情绪分（例如导入的 CSV）会代替标题情绪词典。
+- 用新闻库回测时，`thesis_break` 紧急卖出在回测里也会触发，规则和实盘一样：严重利空要出现在公司自己的 8-K 或通稿里。
+
 ## 0.4.0（2026-11-12）
 
 - **行为变化：新闻触发的紧急卖出要公司自己确认。** 严重利空只有在公司自己的 SEC 8-K 公告里出现对应条目，或者公司自己的通稿证实了至少两家独立媒体提前一小时以上报道的消息、并且没有辟谣时，才会触发 `thesis_break` 清仓。两家独立媒体确认的风险信号仍会挡住新的买入、拉低新闻分，但不再强制卖出。别人提出的指控（造假、SEC 起诉、做空报告）本身不会触发强制卖出，兜底靠档位里的硬止损。

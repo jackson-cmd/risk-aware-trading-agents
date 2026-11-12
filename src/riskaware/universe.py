@@ -87,7 +87,16 @@ DIVIDEND_DEFENSIVE: dict[str, str] = {
     "HON": "Industrials", "UNP": "Industrials", "JPM": "Financials",
 }
 
+# the index ETFs plus the largest names: a small universe for news backtests
+CORE: dict[str, str] = {
+    "SPY": "Broad Market", "QQQ": "Broad Market",
+    "AAPL": "Technology", "MSFT": "Technology", "NVDA": "Technology",
+    "AMZN": "Consumer Discretionary", "TSLA": "Consumer Discretionary",
+    "GOOGL": "Communication Services", "META": "Communication Services",
+}
+
 PRESETS: dict[str, dict[str, str]] = {
+    "core": CORE,
     "megacap": MEGACAP,
     "tech": TECH_GROWTH,
     "defensive": DIVIDEND_DEFENSIVE,

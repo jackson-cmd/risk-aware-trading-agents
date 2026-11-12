@@ -218,7 +218,7 @@ def classify_cluster(items: list[NewsItem], min_sources: int = 2) -> NewsCluster
             w = 1.0
         else:
             text = f"{it.title}. {it.summary if not it.summary.startswith('analysis') else ''}"
-            s = lx.sentiment(text)
+            s = it.sentiment if it.sentiment is not None else lx.sentiment(text)
             f, sev = lx.red_flags(it.title)
             flags.extend(f)
             severe = severe or sev
