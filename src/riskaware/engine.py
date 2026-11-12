@@ -192,7 +192,10 @@ class TradingEngine:
             return None
         self._news_budget -= 1
         items = self.news_collector.collect(symbol, self.cfg.news.lookback_hours)
-        return analyze_news(symbol, items, self.cfg.news, sources=dict(self.news_collector.last_status))
+        from .news.relevance import company_names
+
+        return analyze_news(symbol, items, self.cfg.news, sources=dict(self.news_collector.last_status),
+                            names=company_names(symbol, self.data.cache))
 
     def days_to_earnings(self, symbol: str, today: date) -> int | None:
         if is_etf(symbol):

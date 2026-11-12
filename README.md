@@ -8,7 +8,7 @@
 
 **Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · daily paper-trading agents · an MCP server for Claude · 11 strategies including options · backtest your own · paper and live trading on 10 brokers · English and 中文**
 
-[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
+[中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Screenshots](#-screenshots) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
@@ -28,7 +28,7 @@
 
 ## Contents
 
-- [🆕 What's new](#-whats-new) · [💡 The idea](#-the-idea) · [✨ Highlights](#-highlights) · [🚀 Quick start](#-quick-start)
+- [🆕 What's new](#-whats-new) · [📸 Screenshots](#-screenshots) · [💡 The idea](#-the-idea) · [✨ Highlights](#-highlights) · [🚀 Quick start](#-quick-start)
 - [🤖 Paper-trading agents](#-paper-trading-agents) · [🔗 MCP server](#-mcp-server)
 - [🧠 How it works](#-how-it-works): [Market regimes](#what-the-agent-does-in-each-regime) · [Risk profiles](#risk-profiles)
 - [📊 Backtest](#-backtest) · [📚 Strategy library](#-strategy-library): [Options](#options-backtest-only) · [🧩 Write your own strategy](#-write-your-own-strategy)
@@ -48,6 +48,16 @@
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🖥️ A new dashboard**: a dark trading-terminal look with a regime card, a fear-and-greed gauge, sparklines, an event timeline and top navigation, in English and 中文. [Screenshot ↑](#-risk-aware-trading-agents) |
 
 <sub>0.2.0 added options to the backtester (`aggressive_calls`, `wheel`) and four stock strategies; see the [changelog](CHANGELOG.md).</sub>
+
+## 📸 Screenshots
+
+Every page of the dashboard (`riskaware dashboard`), in English and 中文. Click a picture to open it full size.
+
+<table>
+<tr><td width="50%"><a href="site/assets/dashboard_en.jpg"><img src="site/assets/dashboard_en.jpg" alt="Market"></a><br><sub><b>Market</b> — the regime, fear and greed, VIX, breadth and the macro calendar</sub></td><td width="50%"><a href="site/assets/agents_en.jpg"><img src="site/assets/agents_en.jpg" alt="Agents"></a><br><sub><b>Agents</b> — paper-trading agents ranked against SPY</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/agent_detail_en.jpg"><img src="site/assets/agent_detail_en.jpg" alt="Agent details"></a><br><sub><b>Agent details</b> — positions, orders and the reason behind every decision</sub></td><td width="50%"><a href="site/assets/signals_en.jpg"><img src="site/assets/signals_en.jpg" alt="Signals"></a><br><sub><b>Signals</b> — what a strategy would buy or sell today, with conviction and reasons</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/backtest_en.jpg"><img src="site/assets/backtest_en.jpg" alt="Backtest"></a><br><sub><b>Backtest</b> — any strategy against SPY, with drawdowns and every trade</sub></td><td width="50%"><a href="site/assets/news_en.jpg"><img src="site/assets/news_en.jpg" alt="Cross-verified news"></a><br><sub><b>Cross-verified news</b> — a story counts only when two publishers or an SEC filing carry it</sub></td></tr>
+</table>
 
 ---
 

@@ -592,15 +592,18 @@ def page_backtest() -> None:
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=results[0].benchmark.index, y=results[0].benchmark, name="SPY",
                              line=dict(color=P["neutral"], width=1.4, dash="dot")))
-    for r in results:
-        fig.add_trace(go.Scatter(x=r.equity.index, y=r.equity, name=r.strategy, line=dict(width=2)))
+    colors = [P[k] for k in ("accent", "warn", "violet", "cyan", "up", "down")]
+    for i, r in enumerate(results):
+        fig.add_trace(go.Scatter(x=r.equity.index, y=r.equity, name=r.strategy,
+                                 line=dict(width=2, color=colors[i % len(colors)])))
     fig.update_layout(**ui.plotly_layout(P, 400, T("bt.equity"), yaxis=dict(type="log" if log_y else "linear",
                                                                              gridcolor=P["line"])))
     st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False})
     fig = go.Figure()
-    for r in results:
+    for i, r in enumerate(results):
         dd = drawdown_series(r.equity) * 100
-        fig.add_trace(go.Scatter(x=dd.index, y=dd, name=r.strategy, fill="tozeroy", line=dict(width=1.2)))
+        fig.add_trace(go.Scatter(x=dd.index, y=dd, name=r.strategy, fill="tozeroy",
+                                 line=dict(width=1.2, color=colors[i % len(colors)])))
     fig.update_layout(**ui.plotly_layout(P, 240, T("bt.drawdown") + " %"))
     st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False})
     from riskaware.backtest.metrics import METRIC_LABELS, fmt_metric
@@ -625,14 +628,17 @@ def page_news() -> None:
     if not (c2.button(L("Fetch news", "获取新闻"), type="primary", width="stretch", icon=":material/newspaper:")
             and sym):
         return
+    from riskaware.news.relevance import company_names
     from riskaware.news.sources import NewsCollector
     from riskaware.news.verify import analyze_news
     from riskaware.utils import DiskCache
 
     with st.spinner("Finviz + RSS + SEC…"):
-        col = NewsCollector((["finviz"] if cfg.news.finviz else []) + cfg.news.feeds, DiskCache(cfg.data.cache_path),
+        cache = DiskCache(cfg.data.cache_path)
+        col = NewsCollector((["finviz"] if cfg.news.finviz else []) + cfg.news.feeds, cache,
                             cfg.data.contact_email, cfg.news.request_interval)
-        rep = analyze_news(sym, col.collect(sym, cfg.news.lookback_hours), cfg.news, sources=col.last_status)
+        rep = analyze_news(sym, col.collect(sym, cfg.news.lookback_hours), cfg.news, sources=col.last_status,
+                           names=company_names(sym, cache))
     H('<div class="ra-grid ra-g4">' + "".join([
         ui.kpi(T("news.score"), f"{rep.score:+.2f}", L("-1 bearish · +1 bullish", "-1 利空 · +1 利好"), "",
                ui.tone(rep.score)),
@@ -650,7 +656,9 @@ def page_news() -> None:
         L("Publishers", "来源"): ", ".join(c.publishers[:5]), L("Flags", "风险"): ", ".join(c.red_flags)}
         for c in rep.top(60)]), hide_index=True, width="stretch", column_config={
         L("Headline", "标题"): st.column_config.TextColumn(width="large")})
-    st.caption(T("news.sources") + ": " + ", ".join(f"{k} {v}" for k, v in rep.sources.items()))
+    st.caption(T("news.sources") + ": " + ", ".join(f"{k} {v}" for k, v in rep.sources.items())
+               + (L(f" · {rep.off_topic} headlines about other companies or the market were ignored",
+                    f" · 已忽略 {rep.off_topic} 条讲其他公司或大盘的新闻") if rep.off_topic else ""))
 
 
 def page_account() -> None:
