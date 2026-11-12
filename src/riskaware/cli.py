@@ -728,6 +728,49 @@ def mcp() -> None:
     serve()
 
 
+def _tokens(usage: dict) -> int | None:
+    if not usage:
+        return None
+    if usage.get("total_tokens"):
+        return int(usage["total_tokens"])
+    parts = [usage.get(k) for k in ("input_tokens", "output_tokens", "prompt_tokens", "completion_tokens")]
+    return sum(int(x) for x in parts if x) or None
+
+
+@app.command("llm-check")
+def llm_check(choice: str = typer.Argument("openai:gpt-5.6-luna", help="provider:model, e.g. ollama:qwen2.5:3b"),
+              base_url: Optional[str] = typer.Option(None, "--base-url"),
+              key_env: Optional[str] = typer.Option(None, "--key-env")) -> None:
+    """Send one sample review to an LLM and show its answer: checks a key or a local model. / 测试 LLM 连接"""
+    from .llm import llm_config, make_reviewer
+    from .types import Action, Signal
+
+    try:
+        c = llm_config(choice, base=cfg().llm, base_url=base_url, key_env=key_env)
+        reviewer = make_reviewer(c)
+    except (ValueError, RuntimeError) as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(1) from exc
+
+    class _Market:
+        regime = "NEUTRAL"
+        vix, fear_greed, event_risk = 17.5, 45.0, 0.2
+        reasons = ["VIX 17.5", "SPY above a rising EMA200"]
+
+    sig = Signal("ACME", Action.BUY, 0.66, "price at the EMA200 major support (+1.2%); 18% below the 52-week high",
+                 setups=["ema200_support"])
+    with console.status(f"Asking {c.model}..."):
+        verdict = reviewer.review(sig, _Market())
+    rec = reviewer.pop_records()[0]
+    if verdict is None:
+        console.print(f"[red]no usable answer from {c.model}[/] ({rec.error}); raw reply: {(rec.raw or '')[:300]}")
+        raise typer.Exit(1)
+    console.print(Panel(f"bull: {verdict.bull_case}\nbear: {verdict.bear_case}\njudge: {verdict.summary}\n"
+                        f"adjustment {verdict.adjustment:+.2f} · veto {verdict.veto} · {rec.latency_ms} ms"
+                        + (f" · {_tokens(rec.usage)} tokens" if _tokens(rec.usage) else ""),
+                        title=f"{c.model} via {c.base_url or c.provider}", expand=False))
+
+
 @app.command("config")
 def show_config() -> None:
     """Print the resolved configuration. / 显示当前配置"""
@@ -761,7 +804,8 @@ def _lb_table(rows: list[dict], title: str) -> Table:
     for r in rows:
         ret, day = r["return"], r["day"]
         bench = r["benchmark_return"]
-        tbl.add_row(str(r["rank"]), r["name"] + ("" if r["enabled"] else " (off)"), r["strategy"],
+        tbl.add_row(str(r["rank"]), r["name"] + ("" if r["enabled"] else " (off)"),
+                    r["strategy"] + (f" + {r['llm']}" if r.get("llm") else ""),
                     _PROFILE_ZH.get(r["profile"], r["profile"]) if zh else r["profile"],
                     fmt_money(r["equity"]), f"[{'green' if ret >= 0 else 'red'}]{ret * 100:+.2f}%[/]",
                     f"[{'green' if day >= 0 else 'red'}]{day * 100:+.2f}%[/]", f"{round(r['max_drawdown'] * 100, 1) + 0.0:.1f}%",
@@ -828,6 +872,10 @@ def agents_add(
     cash: float = typer.Option(100_000.0, help="starting cash"),
     param: Optional[list[str]] = typer.Option(None, "--param", help="strategy parameter key=value (repeatable)"),
     note: str = typer.Option("", help="a short description"),
+    llm: Optional[str] = typer.Option(None, "--llm", help="LLM review: openai:gpt-5.6-luna, ollama:qwen2.5:3b, "
+                                                           "anthropic:MODEL, compat:MODEL, or off"),
+    llm_base_url: Optional[str] = typer.Option(None, "--llm-base-url", help="for compat: or a remote Ollama"),
+    llm_key_env: Optional[str] = typer.Option(None, "--llm-key-env", help="environment variable with the API key"),
     overwrite: bool = typer.Option(False, "--overwrite", help="replace an agent with the same name"),
 ) -> None:
     """Create a paper-trading agent from any strategy, including your own file. / 新建智能体"""
@@ -846,13 +894,69 @@ def agents_add(
         strategy = str(Path(path + ".py").expanduser().resolve()) + cls
     try:
         spec = _arena().add(AgentSpec(name=name, strategy=strategy, profile=profile, preset=universe,
-                                      symbols=(symbols or "").split(","), cash=cash, params=params, note=note),
+                                      symbols=(symbols or "").split(","), cash=cash, params=params, note=note,
+                                      llm=llm, llm_base_url=llm_base_url, llm_key_env=llm_key_env),
                             overwrite=overwrite)
     except Exception as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(1) from exc
     console.print(f"[green]+[/] {spec.name}: {spec.strategy} · {spec.profile} · {spec.universe_label} · "
-                  f"{fmt_money(spec.cash)}")
+                  f"{fmt_money(spec.cash)}" + (f" · LLM {spec.llm}" if spec.llm else ""))
+
+
+@agents_app.command("llm")
+def agents_llm(name: str, choice: str = typer.Argument(..., help="openai:gpt-5.6-luna, ollama:qwen2.5:3b, "
+                                                                  "anthropic:MODEL, compat:MODEL, off, or config"),
+               base_url: Optional[str] = typer.Option(None, "--base-url"),
+               key_env: Optional[str] = typer.Option(None, "--key-env")) -> None:
+    """Give an agent an LLM review board, or turn it off. / 设置智能体的 LLM 复核"""
+    try:
+        spec = _arena().set_llm(name, None if choice == "config" else choice, base_url, key_env)
+    except (KeyError, ValueError) as exc:
+        console.print(f"[red]{exc.args[0] if exc.args else exc}[/]")
+        raise typer.Exit(1) from exc
+    console.print(f"{spec.name}: LLM " + (spec.llm or "as in the config"))
+
+
+@agents_app.command("why")
+def agents_why(name: str, symbol: Optional[str] = typer.Argument(None, help="only this stock"),
+               limit: int = typer.Option(10, "--limit", "-n"),
+               prompt: bool = typer.Option(False, "--prompt", help="also print the prompt sent to the LLM and its "
+                                                                   "raw reply")) -> None:
+    """How an agent made its latest decisions: setups, the risk check and the LLM's bull, bear and judge.
+    / 智能体是怎么做决定的"""
+    arena = _arena()
+    try:
+        arena.get(name)
+    except KeyError as exc:
+        console.print(f"[red]{exc.args[0]}[/]")
+        raise typer.Exit(1) from exc
+    zh = S.lang == "zh"
+    rows = arena.decisions(name, symbol, limit, with_prompts=prompt)
+    if not rows:
+        console.print("No decisions yet." if not zh else "还没有决策记录。")
+        return
+    for r in rows:
+        ok = "[green]" + ("accepted" if not zh else "通过") + "[/]" if r["accepted"] else \
+            "[yellow]" + ("blocked" if not zh else "被拦下") + f"[/] ({r['reject_reason']})"
+        lines = [f"{r['action']} · {'conviction' if not zh else '信心'} {r['strength']:.2f} · {ok}",
+                 f"[dim]{'setups' if not zh else '形态'}:[/] {', '.join(i18n.setup(s, S.lang) for s in r['setups'])}",
+                 f"[dim]{'why' if not zh else '理由'}:[/] {r['reason']}"]
+        rv = r.get("llm")
+        if rv:
+            if rv.get("error") and rv.get("adjustment") is None:
+                lines.append(f"[red]LLM {rv['model']}: {rv['error']}[/]")
+            else:
+                verdict = (f"[red]VETO[/] {rv['veto_reason']}" if rv.get("veto")
+                           else f"{'adjustment' if not zh else '调整'} {rv['adjustment']:+.2f}")
+                lines += [f"[bold]LLM {rv['model']}[/] · {verdict} · {rv['latency_ms']} ms",
+                          f"[green]{'bull' if not zh else '多方'}:[/] {rv['bull']}",
+                          f"[red]{'bear' if not zh else '空方'}:[/] {rv['bear']}",
+                          f"[cyan]{'judge' if not zh else '裁判'}:[/] {rv['summary']}"]
+            if prompt:
+                lines += ["[dim]--- prompt ---[/]", rv.get("prompt") or "", "[dim]--- raw reply ---[/]",
+                          rv.get("raw") or ""]
+        console.print(Panel("\n".join(lines), title=f"{r['symbol']} · {str(r['ts'])[:16]}", expand=False))
 
 
 @agents_app.command("remove")

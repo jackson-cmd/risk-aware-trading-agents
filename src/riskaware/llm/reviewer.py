@@ -6,6 +6,7 @@ import hashlib
 import json
 import logging
 import re
+import time
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -66,6 +67,23 @@ class LLMVerdict:
     provider: str
 
 
+@dataclass
+class ReviewRecord:
+    """Everything about one review, for the journal: what was sent, what came back, what it changed."""
+
+    symbol: str
+    provider: str
+    model: str
+    system: str
+    prompt: str
+    raw: str | None
+    verdict: LLMVerdict | None
+    error: str | None
+    latency_ms: int
+    strength_before: float
+    usage: dict[str, Any]
+
+
 class Provider(Protocol):
     name: str
 
@@ -89,6 +107,15 @@ class LLMReviewer:
         self.provider = provider
         self.cfg = cfg
         self._cache: dict[str, LLMVerdict | None] = {}
+        self.records: list[ReviewRecord] = []
+
+    @property
+    def model(self) -> str:
+        return getattr(self.provider, "model", None) or self.cfg.model
+
+    def pop_records(self) -> list[ReviewRecord]:
+        out, self.records = self.records, []
+        return out
 
     def build_prompt(self, signal: Signal, market: Any, news: Any = None, quality: Any = None) -> str:
         evidence = {
@@ -124,12 +151,21 @@ class LLMReviewer:
         key = hashlib.sha1(prompt.encode()).hexdigest()
         if key in self._cache:
             return self._cache[key]
-        raw = None
+        raw, error = None, None
+        t0 = time.monotonic()
         try:
             raw = self.provider.complete_json(SYSTEM_PROMPT, prompt, SCHEMA)
         except Exception as exc:  # a broken provider must never stop trading logic
+            error = f"{type(exc).__name__}: {exc}"
             log.warning("LLM review failed for %s: %s", signal.symbol, exc)
         verdict = self._validate(raw)
+        if verdict is None and raw is not None and error is None:
+            error = "the reply did not match the schema"
+        self.records.append(ReviewRecord(
+            symbol=signal.symbol, provider=self.provider.name, model=self.model, system=SYSTEM_PROMPT, prompt=prompt,
+            raw=getattr(self.provider, "last_raw", None), verdict=verdict,
+            error=error or getattr(self.provider, "last_error", None), latency_ms=int((time.monotonic() - t0) * 1000),
+            strength_before=float(signal.strength), usage=dict(getattr(self.provider, "last_usage", {}) or {})))
         self._cache[key] = verdict
         return verdict
 

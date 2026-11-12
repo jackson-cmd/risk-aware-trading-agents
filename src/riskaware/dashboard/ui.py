@@ -120,6 +120,8 @@ h1, h2, h3, h4 {{ letter-spacing: -0.02em; }}
 .ra-empty .d {{ color: var(--muted); margin-top:6px; }}
 .up {{ color: var(--up); }} .down {{ color: var(--down); }} .muted {{ color: var(--muted); }}
 .ra-note {{ color: var(--muted); font-size:.8rem; }}
+.ra-bull {{ border-left: 3px solid var(--up); }} .ra-bear {{ border-left: 3px solid var(--down); }}
+.ra-judge {{ border-left: 3px solid var(--accent); }}
 .ra-code {{ font-family:'JetBrains Mono',monospace; font-size:.8rem; background: var(--panel2); border:1px solid var(--line);
   border-radius:8px; padding:8px 10px; color: var(--text); overflow-x:auto; white-space:nowrap; }}
 [data-testid="stTabs"] button[role="tab"] p {{ font-weight:600; }}

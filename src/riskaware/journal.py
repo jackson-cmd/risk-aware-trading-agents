@@ -24,6 +24,11 @@ CREATE TABLE IF NOT EXISTS orders (
   limit_price REAL, tag TEXT, status TEXT, message TEXT, reason TEXT
 );
 CREATE INDEX IF NOT EXISTS orders_coid ON orders(client_order_id);
+CREATE TABLE IF NOT EXISTS llm_reviews (
+  run_id INTEGER, ts TEXT, symbol TEXT, provider TEXT, model TEXT, strength_before REAL, adjustment REAL,
+  veto INTEGER, veto_reason TEXT, bull TEXT, bear TEXT, summary TEXT, system_prompt TEXT, prompt TEXT, raw TEXT,
+  error TEXT, latency_ms INTEGER, usage TEXT
+);
 """
 
 
@@ -56,6 +61,48 @@ class Journal:
         self.db.execute("INSERT INTO orders VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                         (run_id, datetime.now(timezone.utc).isoformat(), client_order_id, broker_order_id, symbol,
                          side, qty, limit_price, tag, status, message, reason))
+
+    def log_llm_review(self, run_id: int, rec: Any) -> None:
+        """Store one LLM review (riskaware.llm.ReviewRecord): the prompt, the raw reply and what it changed."""
+        v = rec.verdict
+        self.db.execute(
+            "INSERT INTO llm_reviews VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (run_id, datetime.now(timezone.utc).isoformat(), rec.symbol, rec.provider, rec.model, rec.strength_before,
+             v.adjustment if v else None, int(v.veto) if v else None, v.veto_reason if v else None,
+             v.bull_case if v else None, v.bear_case if v else None, v.summary if v else None, rec.system,
+             rec.prompt, rec.raw, rec.error, rec.latency_ms, json.dumps(rec.usage or {}, default=str)))
+
+    def llm_reviews(self, limit: int = 50, symbol: str | None = None, run_id: int | None = None
+                    ) -> list[dict[str, Any]]:
+        where, args = [], []
+        if symbol:
+            where.append("symbol = ?")
+            args.append(symbol.upper())
+        if run_id is not None:
+            where.append("run_id = ?")
+            args.append(run_id)
+        sql = "SELECT * FROM llm_reviews" + (" WHERE " + " AND ".join(where) if where else "")
+        cur = self.db.execute(sql + " ORDER BY rowid DESC LIMIT ?", (*args, limit))
+        names = [d[0] for d in cur.description]
+        return [dict(zip(names, r, strict=True)) for r in cur.fetchall()]
+
+    def recent_decisions(self, limit: int = 200, symbol: str | None = None) -> list[dict[str, Any]]:
+        """Decisions with the time of their run, newest first."""
+        sql = ("SELECT d.run_id, r.ts, d.symbol, d.action, d.strength, d.accepted, d.reject_reason, d.reason, "
+               "d.setups FROM decisions d JOIN runs r ON r.id = d.run_id")
+        args: list[Any] = []
+        if symbol:
+            sql += " WHERE d.symbol = ?"
+            args.append(symbol.upper())
+        cur = self.db.execute(sql + " ORDER BY d.run_id DESC, d.strength DESC LIMIT ?", (*args, limit))
+        names = [d[0] for d in cur.description]
+        rows = [dict(zip(names, r, strict=True)) for r in cur.fetchall()]
+        for r in rows:
+            try:
+                r["setups"] = json.loads(r["setups"] or "[]")
+            except ValueError:
+                r["setups"] = []
+        return rows
 
     def commit(self) -> None:
         self.db.commit()

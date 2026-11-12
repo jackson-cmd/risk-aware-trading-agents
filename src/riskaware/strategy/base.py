@@ -164,6 +164,9 @@ class PortfolioView:
     peak_equity: float = 0.0
     options: dict[str, OptionPositionView] = field(default_factory=dict)
     option_collateral: float = 0.0  # cash set aside for written puts; it cannot count toward the floor
+    # filled earlier the same day (live and paper runs), so the daily limits hold across several runs a day
+    new_positions_today: int = 0
+    buys_today: int = 0
 
     @property
     def free_cash(self) -> float:
