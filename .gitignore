@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# secrets and local state
+.env
+*.env
+!.env.example
+riskaware.yaml
+!examples/configs/*.yaml
+tiger_openapi_config.properties
+*_token.json
+
+# outputs
+backtests/
+*.log
+.DS_Store
+.ipynb_checkpoints/

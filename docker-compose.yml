@@ -1,0 +1,23 @@
+# docker compose up -d   -> paper-trading scheduler + dashboard on http://localhost:8501
+services:
+  scheduler:
+    build: .
+    command: ["--config", "/config/riskaware.yaml", "schedule"]
+    env_file: .env
+    volumes:
+      - ./riskaware.yaml:/config/riskaware.yaml:ro
+      - riskaware-data:/data
+    restart: unless-stopped
+  dashboard:
+    build: .
+    entrypoint: ["python", "-m", "streamlit", "run", "/usr/local/lib/python3.12/site-packages/riskaware/dashboard/app.py",
+                 "--server.port", "8501", "--server.address", "0.0.0.0"]
+    environment:
+      RISKAWARE_CONFIG: /config/riskaware.yaml
+    env_file: .env
+    volumes:
+      - ./riskaware.yaml:/config/riskaware.yaml:ro
+      - riskaware-data:/data
+    ports: ["8501:8501"]
+volumes:
+  riskaware-data:

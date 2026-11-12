@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Risk-Aware Trading Agents · 风险感知交易智能体</title>
+<meta name="description" content="Open-source, risk-aware AI trading agents for US stocks: FOMC/CPI/VIX-aware market regimes, EMA 50/100/200 dip buying with earnings checks, cross-verified news, a 30% cash floor, backtesting, and paper/live trading on 10 brokers. 开源美股 AI 交易智能体：看宏观事件和恐慌指数、财报过关才抄底、30% 现金底线、回测、多券商。">
+<meta name="keywords" content="trading agents, AI trading bot, risk management, FOMC, VIX, fear and greed, backtesting, Alpaca, Interactive Brokers, Futu, moomoo, Tiger, Longbridge, Schwab, tastytrade, Tradier, Public, 量化交易, 交易机器人, 美股, 抄底, 风控">
+<meta property="og:title" content="Risk-Aware Trading Agents">
+<meta property="og:description" content="Macro-aware, risk-first AI trading agents for US stocks. Backtest, paper trade, then go live on 10 brokers.">
+<style>
+:root{--bg:#ffffff;--fg:#1f2328;--muted:#59636e;--card:#f6f8fa;--line:#d1d9e0;--accent:#1f6feb;--green:#1a7f37;--amber:#9a6700;--red:#cf222e;--code:#0d1117;--code-fg:#e6edf3}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1117;--fg:#e6edf3;--muted:#9198a1;--card:#151b23;--line:#3d444d;--accent:#4493f8;--green:#3fb950;--amber:#d29922;--red:#f85149;--code:#010409}}
+:root[data-theme="dark"]{--bg:#0d1117;--fg:#e6edf3;--muted:#9198a1;--card:#151b23;--line:#3d444d;--accent:#4493f8;--green:#3fb950;--amber:#d29922;--red:#f85149;--code:#010409}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Helvetica,Arial,sans-serif}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+html[data-lang="en"] [lang="zh"],html[data-lang="zh"] [lang="en"]{display:none!important}
+header{position:sticky;top:0;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:5}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px}
+.brand{font-weight:700;color:var(--fg)}
+nav{display:flex;gap:16px;align-items:center;font-size:14px}
+nav a{color:var(--muted)}
+.toggle{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:4px 12px;cursor:pointer;font:inherit;font-size:14px}
+.hero{padding-top:64px;padding-bottom:40px}
+.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.15;margin:0 0 14px;letter-spacing:-.01em}
+.hero p.lead{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:760px;margin:0 0 26px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:10px 18px;border-radius:8px;border:1px solid var(--line);color:var(--fg);background:var(--card);font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:hover{text-decoration:none;filter:brightness(1.05)}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.pill{font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+section{padding:44px 0;border-top:1px solid var(--line)}
+h2{font-size:26px;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 24px;max-width:760px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.card h3{margin:0 0 6px;font-size:16px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 6px}
+.flow .node{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px}
+.flow .node b{display:block;font-size:13px}
+.flow .arrow{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.03em}
+.tag{display:inline-block;font-weight:700;font-size:13px;padding:1px 8px;border-radius:6px}
+.on{color:var(--green);border:1px solid var(--green)}.neu{color:var(--muted);border:1px solid var(--muted)}.unc{color:var(--amber);border:1px solid var(--amber)}.off{color:var(--red);border:1px solid var(--red)}
+.table-wrap{overflow-x:auto}
+pre{background:var(--code);color:var(--code-fg);border-radius:10px;padding:16px;overflow-x:auto;font-size:14px;line-height:1.5}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.num{font-variant-numeric:tabular-nums}
+img.chart{width:100%;border-radius:10px;border:1px solid var(--line);background:#fff}
+.note{font-size:14px;color:var(--muted)}
+.brokers{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.broker{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--card)}
+.broker b{display:block}.broker span{font-size:13px;color:var(--muted)}
+details{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;background:var(--card)}
+summary{cursor:pointer;font-weight:600}
+footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+@media (max-width:640px){nav .hide-sm{display:none}.hero{padding-top:40px;padding-bottom:28px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="#"><span lang="en">Risk-Aware Trading Agents</span><span lang="zh">风险感知交易智能体</span></a>
+  <nav>
+    <a class="hide-sm" href="#how"><span lang="en">How it works</span><span lang="zh">原理</span></a>
+    <a class="hide-sm" href="#backtest"><span lang="en">Backtest</span><span lang="zh">回测</span></a>
+    <a class="hide-sm" href="#start"><span lang="en">Quick start</span><span lang="zh">快速开始</span></a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+    <button class="toggle" id="langToggle" aria-label="Switch language"><span lang="en">中文</span><span lang="zh">English</span></button>
+  </nav>
+</div></header>
+
+<main>
+<div class="wrap hero">
+  <h1><span lang="en">AI trading agents that check the macro calendar and the fear index before they buy</span><span lang="zh">先看宏观日历和恐慌指数，再决定买不买的 AI 交易智能体</span></h1>
+  <p class="lead"><span lang="en">An open-source, long-only system for US stocks. It buys pullbacks to EMA 50/100/200 and quality dips that pass an earnings check, follows trends when the market is healthy, holds instead of panic-selling when it is not, and always keeps 30% in cash or T-bills. Backtest it, paper trade it, then connect one of 10 brokers.</span><span lang="zh">开源的美股做多系统。回踩 EMA 50/100/200 时买入，财报过关的好公司大跌时抄底；行情好时顺势持有，行情不明朗时只持有、不恐慌卖出；现金加短期国债始终不低于 30%。先回测，再模拟盘，然后接入 10 家券商中的任意一家。</span></p>
+  <div class="cta">
+    <a class="btn primary" href="#start"><span lang="en">Get started</span><span lang="zh">开始使用</span></a>
+    <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents">★ GitHub</a>
+    <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md"><span lang="en">中文文档</span><span lang="zh">中文文档</span></a>
+  </div>
+  <div class="pills">
+    <span class="pill">FOMC · CPI · NFP</span><span class="pill">VIX · VIX3M</span><span class="pill">Fear &amp; Greed</span>
+    <span class="pill">EMA 50/100/200</span><span class="pill">Finviz + RSS</span><span class="pill">Backtesting</span>
+    <span class="pill">Paper trading</span><span class="pill">Bull / bear LLM debate</span><span class="pill">MIT</span>
+  </div>
+</div>
+
+<section id="features"><div class="wrap">
+  <h2><span lang="en">What it does</span><span lang="zh">它能做什么</span></h2>
+  <p class="sub"><span lang="en">Every agent writes down why it said yes or no, so each trade comes with its reasons.</span><span lang="zh">每个智能体都会写下赞成或反对的理由，所以每笔交易都能看到依据。</span></p>
+  <div class="grid">
+    <div class="card"><h3><span lang="en">Macro-aware regimes</span><span lang="zh">看宏观的市场状态</span></h3><p><span lang="en">VIX and its term structure, sector breadth, credit appetite, a fear-and-greed gauge and the FOMC, CPI and jobs-report calendar decide one of four regimes.</span><span lang="zh">根据 VIX 及其期限结构、板块广度、信用利差、恐慌贪婪指数，以及 FOMC、CPI、非农日历，把市场分成四种状态。</span></p></div>
+    <div class="card"><h3><span lang="en">Buy low, sell high</span><span lang="zh">低买高卖</span></h3><p><span lang="en">Pullbacks to EMA 50/100/200, RSI(2) mean reversion, quality dips after an earnings check, breakouts in strong markets; trims winners when they are stretched.</span><span lang="zh">回踩 EMA 50/100/200、RSI(2) 均值回归、财报过关后抄底、强势行情做突破；涨得太远时减仓止盈。</span></p></div>
+    <div class="card"><h3><span lang="en">Risk first</span><span lang="zh">风控优先</span></h3><p><span lang="en">30% cash + T-bill floor, position, sector and speculative caps, volatility-scaled sizes, buying in tranches, Treasury sleeve, drawdown pause, kill switch.</span><span lang="zh">现金加短债 30% 底线，单票、板块、高波动仓位上限，按波动率定仓位，分批建仓，国债仓位，回撤暂停，一键停止。</span></p></div>
+    <div class="card"><h3><span lang="en">No panic selling</span><span lang="zh">不恐慌卖出</span></h3><p><span lang="en">In uncertain or risk-off markets the agent holds and only buys at strong support. Only confirmed disasters (fraud, bankruptcy) can force an exit.</span><span lang="zh">不确定或避险时只持有，只在强支撑位买入。只有经过确认的重大利空（造假、破产）才会强制卖出。</span></p></div>
+    <div class="card"><h3><span lang="en">Cross-verified news</span><span lang="zh">交叉验证新闻</span></h3><p><span lang="en">Finviz, Google News, Nasdaq, Seeking Alpha, Yahoo and SEC 8-K filings. A story counts only when two independent publishers or an SEC filing carry it, so one fake headline cannot move the agent.</span><span lang="zh">汇总 Finviz、Google News、Nasdaq、Seeking Alpha、Yahoo 和 SEC 8-K。只有两家独立媒体或 SEC 文件都报道才算确认，一条假新闻带不动它。</span></p></div>
+    <div class="card"><h3><span lang="en">Your own strategies</span><span lang="zh">写你自己的策略</span></h3><p><span lang="en">Write one Python method, then backtest, compare and paper trade it with the same risk engine. Optional bull / bear / judge LLM review with hard bounds.</span><span lang="zh">只要写一个 Python 方法，就能用同一套风控去回测、对比和模拟盘交易。可选的 LLM 多空辩论复核，影响有硬性上限。</span></p></div>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2><span lang="en">How it works</span><span lang="zh">工作原理</span></h2>
+  <p class="sub"><span lang="en">The same objects run in backtests, paper trading and live trading.</span><span lang="zh">回测、模拟盘和实盘用的是同一套代码。</span></p>
+  <div class="flow">
+    <div class="node"><b><span lang="en">Data</span><span lang="zh">数据</span></b>Yahoo · Finviz · RSS · Fed · BLS</div><span class="arrow">→</span>
+    <div class="node"><b><span lang="en">Agents</span><span lang="zh">智能体</span></b><span lang="en">macro · events · technical · earnings · news</span><span lang="zh">宏观 · 事件 · 技术 · 财报 · 新闻</span></div><span class="arrow">→</span>
+    <div class="node"><b><span lang="en">Strategy</span><span lang="zh">策略</span></b><span lang="en">built-in or yours</span><span lang="zh">内置或自定义</span></div><span class="arrow">→</span>
+    <div class="node"><b><span lang="en">Risk manager</span><span lang="zh">风控</span></b><span lang="en">floor · caps · regime rules</span><span lang="zh">底线 · 上限 · 状态规则</span></div><span class="arrow">→</span>
+    <div class="node"><b><span lang="en">Safety guards</span><span lang="zh">安全开关</span></b><span lang="en">paper by default</span><span lang="zh">默认模拟盘</span></div><span class="arrow">→</span>
+    <div class="node"><b><span lang="en">Broker</span><span lang="zh">券商</span></b>10 adapters</div>
+  </div>
+  <h3 style="margin-top:28px"><span lang="en">What the agent does in each regime</span><span lang="zh">不同市场状态下的做法</span></h3>
+  <div class="table-wrap"><table>
+    <tr><th><span lang="en">Regime</span><span lang="zh">状态</span></th><th><span lang="en">Typical trigger</span><span lang="zh">典型触发条件</span></th><th><span lang="en">Buys</span><span lang="zh">买入</span></th><th><span lang="en">Sells</span><span lang="zh">卖出</span></th><th><span lang="en">Size</span><span lang="zh">仓位</span></th></tr>
+    <tr><td><span class="tag on">RISK-ON</span></td><td><span lang="en">SPY above a rising EMA50 and EMA200, VIX &lt; 20, most sectors above EMA200</span><span lang="zh">SPY 在上行的 EMA50 和 EMA200 之上，VIX &lt; 20，多数板块站上 EMA200</span></td><td><span lang="en">pullbacks, breakouts, dips</span><span lang="zh">回调、突破、抄底</span></td><td><span lang="en">take profit, trend exits</span><span lang="zh">止盈、趋势破位减仓</span></td><td class="num">100%</td></tr>
+    <tr><td><span class="tag neu">NEUTRAL</span></td><td><span lang="en">none of the others</span><span lang="zh">其余情况</span></td><td><span lang="en">EMA support, mean reversion, quality dips</span><span lang="zh">EMA 支撑、均值回归、优质股抄底</span></td><td><span lang="en">take profit</span><span lang="zh">止盈</span></td><td class="num">75%</td></tr>
+    <tr><td><span class="tag unc">UNCERTAIN</span></td><td><span lang="en">FOMC / CPI / jobs-report window, VIX 20–30, fear gauge &lt; 35, downtrend</span><span lang="zh">FOMC、CPI、非农前后，VIX 20–30，恐慌指数 &lt; 35，下跌趋势</span></td><td><span lang="en">EMA100 / EMA200 support only</span><span lang="zh">只在 EMA100 / EMA200 支撑买</span></td><td><span lang="en">none (hold)</span><span lang="zh">不卖（持有）</span></td><td class="num">50%</td></tr>
+    <tr><td><span class="tag off">RISK-OFF</span></td><td><span lang="en">VIX ≥ 30, VIX backwardation below EMA200, credit stress</span><span lang="zh">VIX ≥ 30，跌破 EMA200 且 VIX 期限倒挂，信用紧张</span></td><td><span lang="en">quality dips, broad ETFs, small tranches</span><span lang="zh">只抄优质股和宽基 ETF，小批量</span></td><td><span lang="en">none (hold)</span><span lang="zh">不卖（持有）</span></td><td class="num">35%</td></tr>
+  </table></div>
+</div></section>
+
+<section id="backtest"><div class="wrap">
+  <h2><span lang="en">Backtest, 2018 – 2026</span><span lang="zh">回测：2018 – 2026</span></h2>
+  <p class="sub"><span lang="en">Built-in strategy, balanced profile, 55 large caps, $100k, signals at the close and fills the next day. Shading shows the regime.</span><span lang="zh">内置策略、平衡档、55 只大盘股、10 万美元，收盘出信号、次日成交。底色表示市场状态。</span></p>
+  <img class="chart" lang="en" src="assets/backtest_equity_en.png" alt="Equity curve of the risk-aware strategy versus SPY">
+  <img class="chart" lang="zh" src="assets/backtest_equity_zh.png" alt="风险感知策略与 SPY 的净值曲线">
+  <div class="table-wrap" style="margin-top:16px"><table class="num">
+    <tr><th></th><th>risk_aware</th><th>SPY buy &amp; hold</th></tr>
+    <tr><td><span lang="en">CAGR</span><span lang="zh">年化收益</span></td><td>10.4%</td><td>14.1%</td></tr>
+    <tr><td><span lang="en">Volatility</span><span lang="zh">波动率</span></td><td>9.3%</td><td>19.0%</td></tr>
+    <tr><td><span lang="en">Sharpe</span><span lang="zh">夏普比率</span></td><td>0.84</td><td>0.66</td></tr>
+    <tr><td><span lang="en">Max drawdown</span><span lang="zh">最大回撤</span></td><td>-18.2%</td><td>-33.7%</td></tr>
+    <tr><td><span lang="en">Worst calendar year</span><span lang="zh">最差年份</span></td><td>-3.7%</td><td>-18.2%</td></tr>
+    <tr><td><span lang="en">Average stocks / cash + T-bills</span><span lang="zh">平均股票 / 现金加短债</span></td><td>57% / 39%</td><td>100% / 0%</td></tr>
+  </table></div>
+  <p class="note"><span lang="en">Read this honestly: it earns less than the index in a long bull market and loses about half as much in the bad stretches. The list is today's large caps (survivorship bias), news and fundamentals are not used in backtests, and past results do not predict future ones. Reproduce it with <code>riskaware backtest --compare buy_and_hold</code>.</span><span lang="zh">要客观地看：在长牛市里它赚得比指数少，跌的时候亏得大约只有指数的一半。股票池是今天的大盘股（有幸存者偏差），回测没有用新闻和财报数据，过去的表现也不代表未来。用 <code>riskaware backtest --compare buy_and_hold</code> 可以自己复现。</span></p>
+</div></section>
+
+<section id="start"><div class="wrap">
+  <h2><span lang="en">Quick start</span><span lang="zh">快速开始</span></h2>
+  <p class="sub"><span lang="en">Python 3.10+. No account or API key needed for the first four commands.</span><span lang="zh">需要 Python 3.10+。前四条命令不需要券商账户或 API key。</span></p>
+<pre><code>git clone https://github.com/jackson-cmd/risk-aware-trading-agents
+cd risk-aware-trading-agents
+pip install -e ".[dashboard]"
+
+riskaware init                 # 2-minute wizard / 两分钟配置向导
+riskaware regime               # market regime, VIX, fear &amp; greed, FOMC countdown
+riskaware scan                 # today's signals with reasons
+riskaware backtest --compare buy_and_hold,ema_bounce
+riskaware run                  # paper trading (built-in paper account)
+riskaware dashboard            # web UI, English / 中文</code></pre>
+  <h3><span lang="en">Bring your own strategy</span><span lang="zh">写你自己的策略</span></h3>
+<pre><code>from riskaware.strategy import Strategy, Signal, Action
+
+class Rsi2Dip(Strategy):
+    name = "rsi2_dip"
+    def on_bar(self, ctx):
+        out = []
+        for sym in ctx.universe:
+            row = ctx.row(sym)
+            if row and row["close"] &gt; row["ema200"] and row["rsi2"] &lt; 10:
+                out.append(Signal(sym, Action.BUY, strength=0.7, reason="RSI2 dip"))
+        return out
+
+# riskaware backtest --strategy my_strategy.py --compare risk_aware</code></pre>
+</div></section>
+
+<section id="brokers"><div class="wrap">
+  <h2><span lang="en">Brokers</span><span lang="zh">支持的券商</span></h2>
+  <p class="sub"><span lang="en">Paper trading is the default. Live orders need three explicit switches.</span><span lang="zh">默认是模拟盘。实盘下单需要同时打开三个开关。</span></p>
+  <div class="brokers">
+    <div class="broker"><b>Built-in paper</b><span lang="en">no account needed</span><span lang="zh">无需账户</span></div>
+    <div class="broker"><b>Alpaca</b><span lang="en">paper (tested) + live</span><span lang="zh">模拟盘已实测 + 实盘</span></div>
+    <div class="broker"><b>Interactive Brokers</b><span>TWS / IB Gateway</span></div>
+    <div class="broker"><b>Public.com</b><span lang="en">live only</span><span lang="zh">仅实盘</span></div>
+    <div class="broker"><b>Charles Schwab</b><span>Trader API</span></div>
+    <div class="broker"><b>tastytrade</b><span lang="en">sandbox + live</span><span lang="zh">沙盒 + 实盘</span></div>
+    <div class="broker"><b>Tradier</b><span lang="en">sandbox + live</span><span lang="zh">沙盒 + 实盘</span></div>
+    <div class="broker"><b>Futu / moomoo</b><span lang="en">simulate + real (OpenD)</span><span lang="zh">富途牛牛 模拟 + 实盘</span></div>
+    <div class="broker"><b>Tiger Brokers</b><span lang="en">paper + live</span><span lang="zh">老虎证券 模拟 + 实盘</span></div>
+    <div class="broker"><b>Longbridge</b><span lang="en">paper + live</span><span lang="zh">长桥 模拟 + 实盘</span></div>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <h2>FAQ</h2>
+  <details><summary><span lang="en">Will it place real trades by itself?</span><span lang="zh">它会自己下实盘单吗？</span></summary><p><span lang="en">No. It starts in paper mode. A live order needs <code>execution.mode: live</code> in the config, the <code>--live</code> flag and a confirmation (or <code>--yes</code>). <code>riskaware halt</code> stops all orders.</span><span lang="zh">不会。默认是模拟盘。实盘需要配置文件里写 <code>execution.mode: live</code>、命令加 <code>--live</code>，并手动确认（或加 <code>--yes</code>）。<code>riskaware halt</code> 可以一键停止所有下单。</span></p></details>
+  <details><summary><span lang="en">Do I need paid data?</span><span lang="zh">需要付费数据吗？</span></summary><p><span lang="en">No. Prices come from Yahoo Finance, news from Finviz and public RSS feeds, calendars from the Federal Reserve, BLS and BEA. You can also load your own CSV files.</span><span lang="zh">不需要。价格来自 Yahoo Finance，新闻来自 Finviz 和公开 RSS，宏观日历来自美联储、BLS 和 BEA。也可以导入自己的 CSV 数据。</span></p></details>
+  <details><summary><span lang="en">Why not sell when the market is scary?</span><span lang="zh">市场吓人的时候为什么不卖？</span></summary><p><span lang="en">Panic selling at the bottom is how long-term investors lose most. Losses are bounded up front by diversification, position caps and the cash floor; the agent uses fear to buy quality at support instead.</span><span lang="zh">长期投资者最大的损失，往往来自在底部恐慌卖出。这个系统事先用分散持仓、仓位上限和现金底线控制住亏损，市场恐慌时反而在支撑位买入优质股。</span></p></details>
+  <details><summary><span lang="en">Is this investment advice?</span><span lang="zh">这是投资建议吗？</span></summary><p><span lang="en">No. It is software for research and education. Markets are risky; trade at your own risk.</span><span lang="zh">不是。这是用于研究和学习的软件。市场有风险，交易后果自负。</span></p></details>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <span lang="en">MIT License · Not financial advice · Paper trade first.</span><span lang="zh">MIT 开源协议 · 不构成投资建议 · 请先用模拟盘。</span>
+  · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+</div></footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function setLang(lang) {
+    root.setAttribute("data-lang", lang);
+    root.setAttribute("lang", lang === "zh" ? "zh-CN" : "en");
+    try { localStorage.setItem("rta-lang", lang); } catch (e) {}
+  }
+  var stored = null;
+  try { stored = localStorage.getItem("rta-lang"); } catch (e) {}
+  var param = new URLSearchParams(location.search).get("lang");
+  var initial = param || stored || ((navigator.language || "").toLowerCase().indexOf("zh") === 0 ? "zh" : "en");
+  setLang(initial === "zh" ? "zh" : "en");
+  document.getElementById("langToggle").addEventListener("click", function () {
+    setLang(root.getAttribute("data-lang") === "zh" ? "en" : "zh");
+  });
+})();
+</script>
+</body>
+</html>

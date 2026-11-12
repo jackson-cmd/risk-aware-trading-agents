@@ -1,0 +1,14 @@
+name: Feature or broker request / 功能或券商需求
+description: Suggest a feature, data source, broker or strategy / 建议新功能、数据源、券商或策略
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like? / 你希望增加什么？
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why does it matter for risk-aware trading? / 它对风控交易有什么帮助？

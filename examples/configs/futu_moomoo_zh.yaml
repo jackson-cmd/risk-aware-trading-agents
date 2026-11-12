@@ -1,0 +1,14 @@
+# 富途 / moomoo 模拟交易，中文界面，激进档
+language: zh
+profile: aggressive
+broker:
+  name: futu
+  options: {simulate: true, security_firm: FUTUINC, port: 11111}
+universe:
+  preset: tech
+llm:
+  enabled: true
+  provider: openai
+  model: deepseek-chat
+  base_url: https://api.deepseek.com/v1
+  api_key_env: DEEPSEEK_API_KEY

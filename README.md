@@ -1,0 +1,266 @@
+<div align="center">
+
+# Risk-Aware Trading Agents
+
+**AI trading agents for US stocks that read the macro calendar, the fear index and verified news before they buy, and keep 30% in cash no matter what.**
+
+**English** · [简体中文](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/)
+
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#safety)
+
+<img src="site/assets/dashboard_en.jpg" width="820" alt="Dashboard: market regime, VIX, fear and greed, sector breadth">
+
+</div>
+
+Most trading bots either chase every signal or need a quant team to configure. This one follows a simple, explainable discipline that long-term investors already use: buy quality stocks when they pull back to their moving averages, add when fear is high and the earnings still hold up, trim when prices run too far, never panic-sell into uncertainty, and always keep a cash reserve. Four agents check the market, the calendar, the company and the news; a deterministic risk manager has the final word on every order.
+
+> Not financial advice. It starts in paper mode, and live trading needs three explicit switches.
+
+## Highlights
+
+- **Macro-aware market regimes.** VIX and its term structure (VIX/VIX3M), sector breadth, credit appetite (HYG vs IEF), safe-haven demand, a fear-and-greed gauge computed from free data (and CNN's Fear & Greed for reference), and the **FOMC, CPI, jobs report, PPI, GDP and PCE** calendar put the market in one of four regimes: risk-on, neutral, uncertain, risk-off.
+- **Buy low, sell high.** Pullbacks to **EMA 50 / 100 / 200**, RSI(2) and z-score mean reversion, **quality dips that must pass an earnings check** (revenue growth, margins, free cash flow, leverage, EPS beats), breakouts and trend continuation in strong markets. Take-profit trims when a stock runs far above EMA50; trend exits after a break of a falling EMA50.
+- **No panic selling.** When the regime is uncertain or risk-off the agent holds, does not sell, and only buys at strong support. Only confirmed disasters (fraud, bankruptcy, delisting, restatement) or an optional hard stop can force an exit.
+- **Risk first.** A **30% cash + T-bill floor**, position, sector and speculative ("lottery ticket") caps, volatility-scaled sizes, buying in tranches, a Treasury sleeve for conservative profiles, idle cash parked in a T-bill ETF, a drawdown pause, a kill switch.
+- **Cross-verified news.** Finviz (free), Google News, Nasdaq, Seeking Alpha and Yahoo RSS plus the company's own **SEC 8-K filings**. A story only counts when two independent publishers or an SEC filing carry it, so a single fake headline cannot make the agent buy or sell.
+- **10 brokers, one interface.** Built-in paper account, **Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers, Longbridge**.
+- **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report.
+- **Optional LLM review.** A bull analyst, a bear analyst and a risk judge (Claude through the official Anthropic SDK, or any OpenAI-compatible model such as GPT, DeepSeek, Qwen or a local Ollama model) can nudge conviction by at most ±0.15 or veto a buy. They can never create a trade or change a limit. News reaches them only as quoted, untrusted text.
+- **Bilingual.** CLI, dashboard, reports and docs in English and 中文.
+
+## Quick start
+
+```bash
+git clone https://github.com/jackson-cmd/risk-aware-trading-agents
+cd risk-aware-trading-agents
+pip install -e ".[dashboard]"        # Python 3.10+
+```
+
+```bash
+riskaware init                        # 2-minute wizard: language, risk profile, broker, watchlist
+riskaware regime                      # market regime, VIX, fear & greed, next FOMC / CPI / jobs report
+riskaware scan                        # today's signals, each with its reasons
+riskaware analyze NVDA                # what every agent thinks about one stock
+riskaware news AAPL                   # cross-verified headlines
+riskaware backtest --compare buy_and_hold,ema_bounce
+riskaware run                         # one paper-trading cycle (built-in paper account)
+riskaware dashboard                   # web UI (English / 中文)
+```
+
+No account or API key is needed for any of the commands above. Add `--lang zh` to any command for Chinese output.
+
+## How it works
+
+```mermaid
+flowchart LR
+  D[Prices · VIX · sectors<br/>FOMC / CPI / NFP calendar<br/>earnings · Finviz + RSS + SEC] --> A
+  subgraph A[Agents]
+    M[Macro: regime + fear/greed]
+    E[Events: FOMC, CPI, jobs]
+    T[Technical: EMA 50/100/200,<br/>mean reversion, trend]
+    F[Fundamental: earnings quality]
+    N[News: cross-verified]
+  end
+  A --> S[Strategy<br/>built-in or yours]
+  L[Optional LLM<br/>bull / bear / judge] -. ±0.15 .-> S
+  S --> R[Risk manager<br/>cash floor · caps · tranches · regime rules]
+  R --> G[Safety guards]
+  G --> B[Paper or live broker]
+  R --> X[Backtester]
+```
+
+### What the agent does in each regime
+
+| Regime | Typical trigger | Buys | Sells | Size |
+|---|---|---|---|---|
+| 🟢 **Risk-on** | SPY above a rising EMA50 and EMA200, VIX < 20, most sectors above EMA200 | pullbacks, breakouts, dips | take profit, trend exits | 100% |
+| ⚪ **Neutral** | none of the others | EMA support, mean reversion, quality dips | take profit | 75% |
+| 🟡 **Uncertain** | 2 days before an FOMC decision, the day before CPI or the jobs report, VIX 20–30, fear gauge < 35, downtrend | EMA100 / EMA200 support only | **none: hold** | 50% |
+| 🔴 **Risk-off** | VIX ≥ 30, VIX backwardation below EMA200, credit stress | quality dips and broad ETFs, small tranches | **none: hold** | 35% |
+
+Emergency exits (a confirmed severe red flag, or the profile's hard stop) work in every regime.
+
+### Risk profiles
+
+| | Conservative | Balanced | Aggressive |
+|---|---|---|---|
+| Cash + T-bill floor | 30% | 30% | 30% |
+| Treasury sleeve (IEF) | 15% | 5% | 0% |
+| Max single stock / sector | 5% / 20% | 7% / 25% | 10% / 35% |
+| Speculative sleeve (high-volatility names) | 0% | 3% (2 names) | 7% (3 names) |
+| Minimum conviction | 0.65 | 0.58 | 0.52 |
+| Earnings score needed for a dip buy | 70 | 60 | 50 |
+| Take-profit trigger | +20% | +25% | +30% |
+| Breakout entries | off | off | on |
+
+Every limit can be overridden in `riskaware.yaml`. Positions are built in tranches (50% / 25% / 25% of the target); a later tranche needs a deeper support touch or a winning position, and trimmed positions can be rebuilt on the next pullback.
+
+## Backtest
+
+Built-in strategy, balanced profile, the 55-stock `megacap` list, $100k, signals at the close and fills the next day, 5 bps slippage, January 2018 to November 2026:
+
+| | risk_aware | SPY buy & hold |
+|---|---|---|
+| CAGR | 10.4% | 14.1% |
+| Volatility | 9.3% | 19.0% |
+| Sharpe | 0.84 | 0.66 |
+| Max drawdown | -18.2% | -33.7% |
+| Worst calendar year | -3.7% | -18.2% |
+| Average stocks / cash + T-bills | 57% / 39% | 100% / 0% |
+
+<img src="site/assets/backtest_equity_en.png" width="820" alt="Equity curve versus SPY with regime shading">
+
+Read it honestly: in a long bull market the agent earns less than the index because it keeps at least 30% in cash, and it loses roughly half as much when markets fall. The list is today's large caps, so it carries survivorship bias; backtests use neither news nor fundamentals (no free point-in-time archive), and past results do not predict future ones. Reproduce it with `riskaware backtest --compare buy_and_hold`.
+
+```bash
+riskaware backtest --strategy risk_aware --compare buy_and_hold,ema_bounce,rsi2 --start 2018-01-01 --open
+riskaware backtest --preset etf --profile conservative
+riskaware backtest --symbols AAPL,MSFT,NVDA,COST --cash 25000
+riskaware backtest --synthetic                     # offline demo, no download
+```
+
+Every run writes a self-contained HTML report (metrics, equity and drawdown charts with regime shading, monthly returns, every trade with its reason) plus CSV files.
+
+## Write your own strategy
+
+```bash
+riskaware new-strategy my_dip          # creates my_dip.py from a template
+riskaware backtest --strategy my_dip.py --compare risk_aware,buy_and_hold
+riskaware run --strategy my_dip.py     # paper trade it
+```
+
+```python
+from riskaware.strategy import Action, Signal, Strategy
+
+class MyDip(Strategy):
+    name = "my_dip"
+    default_params = {"rsi_entry": 30, "take_profit": 0.20}
+
+    def on_bar(self, ctx):
+        signals = []
+        for sym in ctx.universe:
+            row = ctx.row(sym)                 # indicators at today's close
+            if row is None:
+                continue
+            pos = ctx.position(sym)
+            if pos is None and row["close"] > row["ema200"] and row["rsi14"] < self.params["rsi_entry"]:
+                signals.append(Signal(sym, Action.BUY, strength=0.7, reason="oversold in an uptrend"))
+            elif pos and pos.gain >= self.params["take_profit"]:
+                signals.append(Signal(sym, Action.SELL, strength=0.8, fraction=0.5, reason="take profit"))
+        return signals
+```
+
+A strategy only says what it wants and how sure it is; the risk manager decides the size and enforces the cash floor, caps and regime rules, so your strategy inherits the same protection. `ctx.market` has the regime, VIX and upcoming events; `ctx.quality(sym)` and `ctx.news(sym)` give the earnings verdict and the verified news in live runs. See [docs/custom-strategies.md](docs/custom-strategies.md).
+
+## Brokers
+
+| Broker | `broker.name` | Paper trading | Install | Status |
+|---|---|---|---|---|
+| Built-in paper account | `paper` | always | built in | tested |
+| Alpaca | `alpaca` | yes | built in | **tested on a paper account** (orders, fills, cancels, full cycle) |
+| Public.com | `public` | no (live only) | built in | unit-tested against the documented API |
+| Tradier | `tradier` | sandbox | built in | unit-tested against the documented API |
+| Interactive Brokers | `ibkr` | paper account | `.[ibkr]` | written against `ib_async` |
+| Charles Schwab | `schwab` | no | `.[schwab]` | written against `schwab-py` |
+| tastytrade | `tastytrade` | cert sandbox | `.[tastytrade]` | written against the `tastytrade` SDK |
+| Futu / moomoo | `futu` | simulate | `.[futu]` | written against `futu-api` (OpenD) |
+| Tiger Brokers | `tiger` | paper account | `.[tiger]` | written against `tigeropen` |
+| Longbridge | `longbridge` | paper account | `.[longbridge]` | written against `longport` |
+
+Setup for each broker (keys, gateways, paper accounts) is in [docs/brokers.md](docs/brokers.md). Reports from live use of the SDK-based adapters are very welcome.
+
+## Safety
+
+- `riskaware run` uses the paper account unless you change the broker; `--dry-run` previews without sending anything.
+- A live order needs `execution.mode: live` in the config **and** `--live` on the command line **and** a typed confirmation (or `--yes`).
+- Guards: limit price within a band of the quote, a per-order value cap, a maximum number of orders per run, no trading on market holidays, and deterministic client order ids so a rerun on the same day cannot duplicate an order.
+- `riskaware halt` blocks all order submission until `riskaware resume`.
+- Every run, decision and order is written to a local SQLite journal (`~/.riskaware/journal.db`), visible in the dashboard.
+- API keys stay in `.env` (see [.env.example](.env.example)); they are never written to the config or the journal.
+
+## Configuration
+
+`riskaware init` writes a commented `riskaware.yaml`; every key is optional.
+
+```yaml
+language: en                 # en | zh
+profile: balanced            # conservative | balanced | aggressive
+profile_overrides:
+  cash_floor: 0.30           # cash + T-bill ETF never below 30%
+  hard_stop: 0.30            # emergency exit after a 30% loss (null = never)
+broker:
+  name: alpaca
+  options: {paper: true}
+universe:
+  preset: megacap            # megacap | tech | defensive | etf | sectors (combine with +)
+  symbols: [PLTR, SHOP]
+  cash_vehicle: SGOV         # idle cash goes into T-bills
+news:
+  min_independent_sources: 2
+llm:
+  enabled: false
+  provider: anthropic        # or openai (any OpenAI-compatible endpoint)
+```
+
+`riskaware config` prints the resolved configuration; `riskaware doctor` checks data sources and the broker connection.
+
+## CLI
+
+| Command | What it does |
+|---|---|
+| `riskaware init` | config wizard |
+| `riskaware doctor` | check packages, data sources, broker |
+| `riskaware regime` | market regime and upcoming macro events |
+| `riskaware calendar [--earnings] [--refresh]` | FOMC, CPI, jobs report, PPI, GDP, PCE, earnings dates |
+| `riskaware scan` | today's signals |
+| `riskaware analyze SYMBOL` | technical, earnings, news and the decision for one stock |
+| `riskaware news SYMBOL [--all]` | cross-verified news |
+| `riskaware plan` | preview today's orders against your account |
+| `riskaware run [--dry-run] [--live]` | one trading cycle |
+| `riskaware schedule [--print-cron]` | run every trading day at `execution.run_time` (New York) |
+| `riskaware portfolio` | account, positions, open orders |
+| `riskaware backtest` | backtest and compare strategies |
+| `riskaware strategies` / `new-strategy` | list built-ins / create a strategy file |
+| `riskaware brokers` | supported brokers and their requirements |
+| `riskaware halt` / `resume` | kill switch |
+| `riskaware dashboard` | web dashboard |
+
+## Project layout
+
+```
+src/riskaware/
+  agents/      macro regime, technical setups, earnings quality, news
+  data/        prices (Yahoo, CSV, synthetic), FOMC/BLS/BEA calendar, fundamentals, CNN Fear & Greed
+  news/        Finviz + RSS + SEC sources, clustering and cross-source verification
+  strategy/    Strategy interface, the risk-aware strategy, examples, loader
+  risk.py      the risk manager (cash floor, caps, tranches, regime rules)
+  brokers/     paper + 9 broker adapters
+  engine.py    paper / live cycle, guards, journal, state
+  backtest/    backtester, metrics, HTML report
+  llm/         optional bull / bear / judge review
+  dashboard/   Streamlit app
+site/          bilingual project website (GitHub Pages)
+docs/          design notes and guides (English and Chinese)
+```
+
+## Roadmap
+
+- Point-in-time fundamentals from SEC XBRL for backtests
+- Options overlay (covered calls, protective puts)
+- More brokers (Webull, E*TRADE) and crypto / HK / A-share markets
+- Walk-forward parameter studies
+
+## Contributing
+
+Issues and pull requests are welcome: new brokers, data sources, strategies, translations. Run `pip install -e ".[dev]" && pytest` before you open a PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Disclaimer
+
+This software is for research and education. It is not investment advice, and nothing in it is a recommendation to buy or sell any security. Trading involves risk of loss. You are responsible for every order your account sends; test with paper trading first.
+
+## License
+
+[MIT](LICENSE)

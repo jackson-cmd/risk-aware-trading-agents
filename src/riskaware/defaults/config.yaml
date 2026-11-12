@@ -1,0 +1,68 @@
+# Risk-Aware Trading Agents configuration / 配置文件
+# Every key is optional: delete what you do not need and the defaults apply.
+# 所有字段都可以省略，省略的用默认值。API key 等密钥放在 .env 里，不要写在这里。
+
+language: {language}            # en | zh  (CLI, dashboard and reports / 命令行、看板和报告的语言)
+profile: {profile}              # conservative | balanced | aggressive  (保守 | 平衡 | 激进)
+
+# Override any limit of the chosen profile / 覆盖档位里的任何限制
+profile_overrides:
+  cash_floor: 0.30              # cash + T-bill ETF never below 30% of the account / 现金+短债始终不低于 30%
+  # max_position: 0.07          # largest single stock / 单只股票上限
+  # max_sector: 0.25            # largest sector / 单个板块上限
+  # speculative_sleeve: 0.03    # high-volatility "lottery" names in total / 高波动小博大仓位合计上限
+  # hard_stop: 0.30             # emergency exit after a 30% loss (null = never) / 亏损 30% 紧急止损（null 为不设）
+
+broker:
+  name: {broker}                # paper | alpaca | public | tradier | ibkr | schwab | tastytrade | futu | tiger | longbridge
+  options: {broker_options}
+
+execution:
+  mode: paper                   # dry-run | paper | live   (live also needs the --live flag / 实盘还需要 --live 参数)
+  order_type: LIMIT             # LIMIT | MARKET
+  limit_offset: 0.003           # buy limit = ask x 1.003, sell limit = bid x 0.997
+  max_orders_per_run: 12
+  run_time: "15:40"             # America/New_York, used by `riskaware schedule` / 定时运行时间（美东）
+  allow_fractional: false
+
+universe:
+  preset: {preset}              # megacap | tech | defensive | etf | sectors | none  (can combine: megacap+etf)
+  symbols: {symbols}            # extra symbols / 额外关注的股票
+  exclude: []
+  cash_vehicle: SGOV            # T-bill ETF that holds idle cash (null = keep raw cash) / 闲置现金买短期国债 ETF
+  treasury_symbol: IEF          # Treasury sleeve for the conservative profile / 保守档的国债仓位
+
+data:
+  price_source: yfinance        # yfinance | csv
+  csv_dir: null                 # folder of SYMBOL.csv files when price_source is csv
+  contact_email: {contact}      # SEC EDGAR and BLS ask scripts to identify themselves / SEC 和 BLS 要求注明联系邮箱
+
+macro:
+  vix_uncertain: 20             # VIX at or above -> uncertain / VIX 超过 20 视为不确定
+  vix_risk_off: 30              # VIX at or above -> risk-off / VIX 超过 30 视为避险
+  use_cnn_fear_greed: true
+  events:
+    enabled: true               # FOMC / CPI / jobs report windows put the agent in hold mode / 议息、CPI、非农前进入持有模式
+
+news:
+  enabled: true
+  finviz: true                  # free Finviz quote-page headlines / Finviz 免费新闻
+  feeds: [google, nasdaq, seekingalpha, yahoo, sec]
+  min_independent_sources: 2    # a story counts only when two independent publishers carry it / 两家独立媒体报道才算确认
+
+llm:
+  enabled: {llm_enabled}        # optional bull/bear/judge review / 可选的多空辩论复核
+  provider: {llm_provider}      # anthropic (official SDK) | openai (any OpenAI-compatible endpoint: OpenAI, DeepSeek, Ollama...)
+  model: {llm_model}
+  base_url: null                # e.g. http://localhost:11434/v1 for Ollama, https://api.deepseek.com/v1 for DeepSeek
+  api_key_env: OPENAI_API_KEY   # env var holding the key for the openai provider
+
+strategy:
+  name: risk_aware              # built-in, or path/to/my_strategy.py:MyStrategy
+  params: {{}}
+
+backtest:
+  start: "2018-01-01"
+  initial_cash: 100000
+  slippage_bps: 5
+  commission_per_share: 0.0
