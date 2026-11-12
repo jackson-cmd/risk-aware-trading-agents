@@ -96,13 +96,9 @@ def universe_name(u: str) -> str:
 
 
 def schedule_state(s: str) -> str:
-    if LANG != "zh":
-        return s
-    if s.startswith("waiting until"):
-        return "等到纽约时间 " + s.split("until", 1)[1].replace("New York", "").strip()
-    if s.endswith("is not a trading day"):
-        return "今天不是交易日"
-    return {"due": "正在运行时段", "the market has closed for today": "今天已收盘"}.get(s, s)
+    from riskaware.arena import state_text
+
+    return state_text(s, LANG)
 
 
 def agent_note(spec) -> str:

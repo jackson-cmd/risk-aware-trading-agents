@@ -145,6 +145,17 @@ class QuoteCache:
         return {s: self.quotes[s] for s in symbols if s in self.quotes}
 
 
+def state_text(state: str, lang: str = "en") -> str:
+    """The scheduler state from ``due`` in English or Chinese."""
+    if lang != "zh":
+        return state
+    if state.startswith("waiting until"):
+        return "等到纽约时间 " + state.split("until", 1)[1].replace("New York", "").strip()
+    if state.endswith("is not a trading day"):
+        return "今天不是交易日"
+    return {"due": "正在运行时段", "the market has closed for today": "今天已收盘"}.get(state, state)
+
+
 def due(now: datetime, run_time: str = "15:40", lead_minutes: int = 20) -> tuple[bool, str]:
     """Whether a scheduled run should trade now (New York time): a trading day, after run_time, before the close.
 

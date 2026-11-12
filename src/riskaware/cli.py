@@ -735,7 +735,7 @@ def _lb_table(rows: list[dict], title: str) -> Table:
         tbl.add_row(str(r["rank"]), r["name"] + ("" if r["enabled"] else " (off)"), r["strategy"],
                     _PROFILE_ZH.get(r["profile"], r["profile"]) if zh else r["profile"],
                     fmt_money(r["equity"]), f"[{'green' if ret >= 0 else 'red'}]{ret * 100:+.2f}%[/]",
-                    f"[{'green' if day >= 0 else 'red'}]{day * 100:+.2f}%[/]", f"{r['max_drawdown'] * 100:.1f}%",
+                    f"[{'green' if day >= 0 else 'red'}]{day * 100:+.2f}%[/]", f"{round(r['max_drawdown'] * 100, 1) + 0.0:.1f}%",
                     "n/a" if bench is None else f"{(ret - bench) * 100:+.2f} pp", fmt_pct(r["invested"]),
                     str(r["days"]), r["last_run"] or "-")
     return tbl
@@ -762,12 +762,16 @@ def agents_list() -> None:
         bench = arena.benchmark()
     console.print(_lb_table(arena.leaderboard(bench), "Paper-trading agents" if S.lang == "en" else "模拟盘智能体"))
     st = arena.schedule_status()
+    from .arena import state_text
     from .scheduler import installed
 
-    console.print(("Daily run: " if S.lang == "en" else "每日运行：")
-                  + ("[green]installed[/]" if installed() else "[yellow]not installed[/] (`riskaware agents schedule "
-                                                                "--install`)")
-                  + f" · {st['run_time']} New York · {st['state']}")
+    zh = S.lang == "zh"
+    on = installed()
+    console.print(("每日运行：" if zh else "Daily run: ")
+                  + (f"[green]{'已开启' if zh else 'installed'}[/]" if on else
+                     f"[yellow]{'未开启' if zh else 'not installed'}[/] (`riskaware agents schedule --install`)")
+                  + (f" · 纽约时间 {st['run_time']} · " if zh else f" · {st['run_time']} New York · ")
+                  + state_text(st["state"], S.lang))
 
 
 @agents_app.command("init")
@@ -974,12 +978,20 @@ def agents_schedule(install: bool = typer.Option(False, "--install", help="run t
         arena.log(f"scheduler installed: {what}")
         console.print(f"[green]installed[/] {what}")
     st = arena.schedule_status()
-    console.print(f"{'installed' if scheduler.installed() else 'not installed'} · trades after {st['run_time']} "
-                  f"New York, once per trading day · next trading day {st['next_day']} · now: {st['state']}")
+    from .arena import state_text
+
+    on = scheduler.installed()
+    if S.lang == "zh":
+        console.print(f"{'已开启' if on else '未开启'} · 每个交易日纽约时间 {st['run_time']} 之后交易一次 · "
+                      f"下一个交易日 {st['next_day']} · 现在：{state_text(st['state'], 'zh')}")
+    else:
+        console.print(f"{'installed' if on else 'not installed'} · trades after {st['run_time']} New York, once per "
+                      f"trading day · next trading day {st['next_day']} · now: {st['state']}")
     last = st["last_run"]
     if last:
-        console.print(f"last run {last.get('date')}: done {', '.join(last.get('done', [])) or '-'}")
-    console.print(f"log: {arena.log_file}")
+        done = ", ".join(last.get("done", [])) or "-"
+        console.print(f"上次运行 {last.get('date')}：{done}" if S.lang == "zh" else f"last run {last.get('date')}: {done}")
+    console.print(f"{'日志' if S.lang == 'zh' else 'log'}: {arena.log_file}")
 
 
 @agents_app.command("log")

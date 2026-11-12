@@ -288,3 +288,11 @@ def test_stale_lock_from_a_crash_is_ignored(arena):
     old = datetime.now().timestamp() - 4 * 3600
     os.utime(arena.root / "run.lock", (old, old))
     assert arena.run(quote_fn=fake_quotes, data_factory=data_factory)[0].ok
+
+
+def test_state_text_in_chinese():
+    from riskaware.arena import state_text
+
+    assert state_text("waiting until 15:40 New York", "zh") == "等到纽约时间 15:40"
+    assert state_text("Sat 2026-11-14 is not a trading day", "zh") == "今天不是交易日"
+    assert state_text("due", "en") == "due"
