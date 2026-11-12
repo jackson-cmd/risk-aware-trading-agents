@@ -14,7 +14,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![默认模拟盘](https://img.shields.io/badge/%E9%BB%98%E8%AE%A4-%E6%A8%A1%E6%8B%9F%E7%9B%98-orange.svg)](#-安全机制)
-[![版本 0.4.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.4.0-e5534b.svg)](CHANGELOG_zh.md)
+[![版本 0.5.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.5.0-e5534b.svg)](CHANGELOG_zh.md)
 [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器)
 [![11 个策略](https://img.shields.io/badge/%E7%AD%96%E7%95%A5-11%20%E4%B8%AA-8957e5.svg)](#-策略库)
 [![10 家券商](https://img.shields.io/badge/%E5%88%B8%E5%95%86-10%20%E5%AE%B6-0969da.svg)](#-支持的券商)
@@ -37,10 +37,12 @@
 
 ## 🆕 新功能
 
-<sub>最新版本 **0.4.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>最新版本 **0.5.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
 
-| | 0.4.0 新加入 |
+| | 0.5.0 和 0.4.0 新加入 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔑 不需要 API key**：智能体的复核可以走你的 Claude、ChatGPT 或 Gemini 订阅，用你已经登录的命令行工具：`--llm claude-cli`、`--llm codex-cli` 或 `--llm gemini-cli`（Gemini CLI 或 Antigravity）。[怎么用 →](docs/zh/agents.md#不需要-api-key用你的订阅) |
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔌 一条命令接上 MCP**：`riskaware mcp-setup claude-desktop`（或 `claude-code`、`codex`、`gemini`、`antigravity`）把智能体接到对应的应用里，用大白话问行情、让智能体运行。[怎么配置 →](#-mcp-服务器) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧠 每个智能体都能配 LLM**：给任意模拟盘智能体配上 GPT（比如 `gpt-5.6-luna`）、Claude，或者用 Ollama 跑的免费本地模型。多方、空方和裁判复核每一笔买入，最多把信心分调整 ±0.15 或者否决，不能自己发起交易。[怎么用 →](#-模拟盘智能体) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔍 每个决定是怎么做出来的都能看**：技术形态和理由、风控的结论、多方空方和裁判的意见，以及发给模型的完整 prompt 和原始回复，在看板的「决策」页或者用 `riskaware agents why 名字` 查看。所有东西都留在你自己的电脑上。[细节 →](docs/zh/agents.md#每个智能体配一个-llm) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🏠 免费的本地模型**：`ollama:qwen2.5:3b` 在你自己的电脑上运行；`riskaware llm-check ollama:qwen2.5:3b` 一条命令测试 key 或模型能不能用。[怎么配置 →](docs/zh/agents.md#每个智能体配一个-llm) |
@@ -123,20 +125,20 @@ riskaware agents                                         # 排行榜
 riskaware agents schedule --install                      # 以后每个交易日自动运行
 ```
 
-后台任务（macOS 上是 LaunchAgent，Linux 上是一行 crontab，Windows 上是计划任务）在工作日每 15 分钟唤醒一次，每个交易日纽约时间 15:40 之后、收盘之前，让每个智能体交易一次。它会跳过节假日，电脑睡眠醒来会补跑，某个智能体出错也不影响其他的。每个智能体的账户、日志和每天的净值都存在 `~/.riskaware/arena/名字/`。网页看板的「智能体」页能看到排行榜，也能新建、运行、暂停、重置和删除智能体；其中的「决策」页显示每个决定是怎么做出来的，包括 LLM 的多方、空方意见和结论，以及发给它的完整 prompt。用 GPT 需要在 `.env` 里设置 `OPENAI_API_KEY`；用本地模型需要装 [Ollama](https://ollama.com)（`ollama pull qwen2.5:3b`）。详见 [docs/zh/agents.md](docs/zh/agents.md)。
+后台任务（macOS 上是 LaunchAgent，Linux 上是一行 crontab，Windows 上是计划任务）在工作日每 15 分钟唤醒一次，每个交易日纽约时间 15:40 之后、收盘之前，让每个智能体交易一次。它会跳过节假日，电脑睡眠醒来会补跑，某个智能体出错也不影响其他的。每个智能体的账户、日志和每天的净值都存在 `~/.riskaware/arena/名字/`。网页看板的「智能体」页能看到排行榜，也能新建、运行、暂停、重置和删除智能体；其中的「决策」页显示每个决定是怎么做出来的，包括 LLM 的多方、空方意见和结论，以及发给它的完整 prompt。用 GPT 需要在 `.env` 里设置 `OPENAI_API_KEY`；用本地模型需要装 [Ollama](https://ollama.com)（`ollama pull qwen2.5:3b`）；`--llm claude-cli`、`codex-cli` 或 `gemini-cli` 则通过命令行工具用你的 Claude、ChatGPT 或 Gemini 订阅，不需要 API key。详见 [docs/zh/agents.md](docs/zh/agents.md)。
 
 <img src="site/assets/agents_zh.jpg" width="820" alt="智能体页面：模拟盘智能体排行榜，显示净值、收益、相对 SPY 的表现和运行状态">
 
 ## 🔗 MCP 服务器
 
-`riskaware mcp` 通过 Model Context Protocol 提供这些智能体的能力，Claude、Cursor 或任何 MCP 客户端都能直接用：
+`riskaware mcp` 通过 Model Context Protocol 提供这些智能体的能力，Claude、Codex、Gemini、Cursor 或任何 MCP 客户端都能直接用，走你的订阅，不需要 API key。`riskaware mcp-setup` 会打印（加 `--apply` 则直接执行）接入那一步：
 
 ```bash
 pip install -e ".[mcp]"
-claude mcp add riskaware -- riskaware mcp
+riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex（用你的 ChatGPT 登录）、gemini、antigravity
 ```
 
-一共十一个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`agents_leaderboard`、`agent_detail`、`agent_decisions`、`agents_create` 和 `agents_run`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。Claude Desktop 和其他客户端的配置方法见 [docs/zh/agents.md](docs/zh/agents.md#在-claude-里使用mcp)。
+一共十一个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`agents_leaderboard`、`agent_detail`、`agent_decisions`、`agents_create` 和 `agents_run`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。ChatGPT 本身只能连远程服务器，所以 OpenAI 这边用 Codex，它走你的 ChatGPT 登录。详见 [docs/zh/agents.md](docs/zh/agents.md#在-claudechatgpt-或-gemini-里使用mcp)。
 
 ## 🧠 工作原理
 

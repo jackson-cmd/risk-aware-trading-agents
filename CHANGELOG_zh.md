@@ -2,6 +2,11 @@
 
 [English](CHANGELOG.md)
 
+## 0.5.0（2026-11-12）
+
+- 不需要 API key：`--llm claude-cli[:模型]`、`codex-cli[:模型]` 和 `gemini-cli[:模型]` 通过 Claude Code、OpenAI Codex、Google 的 Gemini CLI 或 Antigravity 做每次复核，走你已经登录的订阅。工具在一个空的临时文件夹里运行，关掉它的工具调用，要求同样严格的 JSON schema；`--llm-command` 或 `RISKAWARE_*_CLI` 可以换成别的可执行文件或包装脚本。看板的 LLM 选择和 `riskaware llm-check` 也都支持。
+- `riskaware mcp-setup claude-desktop | claude-code | codex | gemini | antigravity [--apply]` 打印或直接执行把 MCP 服务器接到对应应用的那一步（Claude Desktop 的配置文件会就地修改并留备份）。
+
 ## 0.4.0（2026-11-12）
 
 - **行为变化：新闻触发的紧急卖出要公司自己确认。** 严重利空只有在公司自己的 SEC 8-K 公告里出现对应条目，或者公司自己的通稿证实了至少两家独立媒体提前一小时以上报道的消息、并且没有辟谣时，才会触发 `thesis_break` 清仓。两家独立媒体确认的风险信号仍会挡住新的买入、拉低新闻分，但不再强制卖出。别人提出的指控（造假、SEC 起诉、做空报告）本身不会触发强制卖出，兜底靠档位里的硬止损。

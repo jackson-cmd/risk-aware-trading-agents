@@ -2,6 +2,11 @@
 
 [中文](CHANGELOG_zh.md)
 
+## 0.5.0 (2026-11-12)
+
+- No API key needed: `--llm claude-cli[:MODEL]`, `codex-cli[:MODEL]` and `gemini-cli[:MODEL]` run each review through Claude Code, OpenAI Codex, Google's Gemini CLI or Antigravity, on the plan you are logged in to. The tool runs in an empty temporary folder with its tools off and the same strict JSON schema; `--llm-command` / `RISKAWARE_*_CLI` choose a different executable or wrapper. Also in the dashboard's LLM picker and `riskaware llm-check`.
+- `riskaware mcp-setup claude-desktop | claude-code | codex | gemini | antigravity [--apply]` prints or runs the one step that connects the MCP server to that app (Claude Desktop's config is edited in place with a backup).
+
 ## 0.4.0 (2026-11-12)
 
 - **Behavior change: emergency sells on news need the company itself.** A severe red flag now triggers the `thesis_break` exit only when the company's own SEC 8-K carries the item, or when its own press release confirms what at least two independent outlets reported an hour or more earlier, and no denial disputes it. Red flags confirmed by two independent outlets still block new buys and pull the news score down, but no longer force a sale. Allegations made by others (fraud, SEC charges, short-seller reports) never force a sale on their own; the profile's hard stop is the backstop.

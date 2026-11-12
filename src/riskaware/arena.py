@@ -77,6 +77,7 @@ class AgentSpec(BaseModel):
     llm: str | None = None  # None: as in the main config; "off"; or provider:model, e.g. openai:gpt-5.6-luna
     llm_base_url: str | None = None
     llm_key_env: str | None = None
+    llm_command: str | None = None  # claude-cli / codex-cli / gemini-cli: the executable or a wrapper
     created: str = Field(default_factory=lambda: mc.now_ny().date().isoformat())
 
     @field_validator("name")
@@ -118,7 +119,12 @@ class AgentSpec(BaseModel):
     def llm_label(self) -> str:
         if self.llm is None:
             return "config"
-        return "off" if self.llm == "off" else self.llm.split(":", 1)[1]
+        if self.llm == "off":
+            return "off"
+        kind, model = self.llm.split(":", 1)
+        if kind.endswith("-cli"):  # a subscription: say which one
+            return kind if model == "default" else f"{kind} {model}"
+        return model
 
     @property
     def universe_label(self) -> str:
@@ -282,11 +288,12 @@ class Arena:
         spec = self.get(name)
         self.add(spec.model_copy(update={"enabled": enabled}), overwrite=True)
 
-    def set_llm(self, name: str, choice: str | None, base_url: str | None = None, key_env: str | None = None
-                ) -> AgentSpec:
+    def set_llm(self, name: str, choice: str | None, base_url: str | None = None, key_env: str | None = None,
+                command: str | None = None) -> AgentSpec:
         """Give an agent an LLM review (``provider:model``), turn it off (``off``) or follow the config (None)."""
         spec = self.get(name)
-        new = AgentSpec(**{**spec.model_dump(), "llm": choice, "llm_base_url": base_url, "llm_key_env": key_env})
+        new = AgentSpec(**{**spec.model_dump(), "llm": choice, "llm_base_url": base_url, "llm_key_env": key_env,
+                           "llm_command": command})
         return self.add(new, overwrite=True)
 
     def decisions(self, name: str, symbol: str | None = None, limit: int = 50,
@@ -334,7 +341,8 @@ class Arena:
         elif spec.llm:
             from .llm import llm_config
 
-            c.llm = llm_config(spec.llm, base=c.llm, base_url=spec.llm_base_url, key_env=spec.llm_key_env)
+            c.llm = llm_config(spec.llm, base=c.llm, base_url=spec.llm_base_url, key_env=spec.llm_key_env,
+                               command=spec.llm_command)
         return c
 
     def broker_for(self, spec: AgentSpec, quote_fn: Callable[[list[str]], dict[str, Quote]] | None = None):
