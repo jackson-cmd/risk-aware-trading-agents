@@ -11,6 +11,7 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -136,8 +137,9 @@ class MarketData:
 
 class TradingEngine:
     def __init__(self, cfg: AppConfig, strategy: Strategy | None = None, broker: Broker | None = None,
-                 data: MarketData | None = None, journal: Journal | None = None):
+                 data: MarketData | None = None, journal: Journal | None = None, state_root: Path | None = None):
         self.cfg = cfg
+        self.state_root = state_root
         self.profile = cfg.risk_profile()
         self.strategy = strategy or load_strategy(cfg.strategy.name, cfg.strategy.params)
         self._broker = broker
@@ -313,7 +315,7 @@ class TradingEngine:
             return report
         report.account = account
         today = mc.now_ny().date()
-        state = StateStore(broker.name, account.account_id)
+        state = StateStore(broker.name, account.account_id, root=self.state_root)
         report.notes += state.reconcile(positions, broker.get_order, today)
 
         universe = self.universe()
