@@ -2,6 +2,11 @@
 
 [中文](CHANGELOG_zh.md)
 
+## Unreleased
+
+- News: a story only counts toward a stock when its headline or summary names the company or its ticker; SEC filings always count. Before, a search for "COST stock" pulled in every article about costs, and another company's news could pin a confirmed red flag (for example an executive departure) on the wrong stock. Built-in names for every stock in the bundled lists, Yahoo's company name for the rest (cached). `news.relevance_filter: false` turns it off.
+- Dashboard: the backtest charts keep one color per strategy; screenshot gallery in the READMEs and on the website.
+
 ## 0.3.0 (2026-11-12)
 
 - Paper-trading agents: name any strategy (built-in or your own file) with a risk profile, a stock list and starting cash, and it trades its own local paper account every trading day. `riskaware agents init | add | run | list | show | pause | resume | reset | remove` (#5).

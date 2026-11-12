@@ -35,6 +35,7 @@ class NewsReport:
     severe_confirmed: bool
     total_items: int
     sources: dict[str, str] = field(default_factory=dict)
+    off_topic: int = 0
 
     @property
     def has_news(self) -> bool:
@@ -189,12 +190,24 @@ def classify_cluster(items: list[NewsItem], min_sources: int = 2) -> NewsCluster
 
 
 def analyze_news(symbol: str, items: list[NewsItem], cfg: NewsConfig | None = None,
-                 now: datetime | None = None, sources: dict[str, str] | None = None) -> NewsReport:
+                 now: datetime | None = None, sources: dict[str, str] | None = None,
+                 names: list[str] | None = None) -> NewsReport:
+    """Cluster, verify and score the news for one symbol.
+
+    With ``names`` (see ``relevance.company_names``) stories that name neither the company nor its ticker are
+    dropped first and counted in ``off_topic``.
+    """
     cfg = cfg or NewsConfig()
     now = now or datetime.now(timezone.utc)
     cutoff = now - timedelta(hours=cfg.lookback_hours)
     fresh = [i for i in items if i.published is None or i.published >= cutoff]
     fresh = _dedupe(fresh)
+    off_topic = 0
+    if names is not None and cfg.relevance_filter:
+        from .relevance import is_relevant
+
+        kept = [i for i in fresh if is_relevant(i, symbol, names)]
+        off_topic, fresh = len(fresh) - len(kept), kept
     clusters = [classify_cluster(g, cfg.min_independent_sources)
                 for g in cluster_items(fresh, cfg.similarity_threshold, cfg.lookback_hours)]
     num = den = 0.0
@@ -221,5 +234,5 @@ def analyze_news(symbol: str, items: list[NewsItem], cfg: NewsConfig | None = No
         unconfirmed=sum(c.status == NewsStatus.UNCONFIRMED for c in clusters),
         opinion=sum(c.status == NewsStatus.OPINION for c in clusters),
         red_flags_confirmed=sorted(flags_c), red_flags_unconfirmed=sorted(flags_u - flags_c),
-        severe_confirmed=severe_c, total_items=len(fresh), sources=dict(sources or {}),
+        severe_confirmed=severe_c, total_items=len(fresh), sources=dict(sources or {}), off_topic=off_topic,
     )

@@ -283,21 +283,26 @@ def calendar(days: int = typer.Option(45, help="Days ahead"),
 @app.command()
 def news(symbol: str, show_all: bool = typer.Option(False, "--all", help="Show single-source and opinion stories")) -> None:
     """Cross-verified news for one symbol (Finviz + RSS + SEC filings). / 交叉验证新闻"""
+    from .news.relevance import company_names
     from .news.sources import NewsCollector
     from .news.verify import analyze_news
     from .utils import DiskCache
 
     c = cfg()
     symbol = symbol.upper()
-    collector = NewsCollector((["finviz"] if c.news.finviz else []) + c.news.feeds, DiskCache(c.data.cache_path),
+    cache = DiskCache(c.data.cache_path)
+    collector = NewsCollector((["finviz"] if c.news.finviz else []) + c.news.feeds, cache,
                               c.data.contact_email, c.news.request_interval)
     with console.status(f"Collecting news for {symbol}..."):
         items = collector.collect(symbol, c.news.lookback_hours)
-        rep = analyze_news(symbol, items, c.news, sources=collector.last_status)
+        rep = analyze_news(symbol, items, c.news, sources=collector.last_status, names=company_names(symbol, cache))
     console.print(f"[bold]{T('news.title')}: {symbol}[/]  {T('news.score')} {rep.score:+.2f} · "
                   f"{rep.confirmed} {T('news.status.confirmed')} / {rep.unconfirmed} {T('news.status.unconfirmed')} / "
                   f"{rep.opinion} {T('news.status.opinion')}")
     console.print(f"[dim]{T('news.sources')}: " + ", ".join(f"{k} {v}" for k, v in rep.sources.items()) + "[/]")
+    if rep.off_topic:
+        console.print(f"[dim]{rep.off_topic} " + ("headlines about other companies or the market were ignored"
+                                                  if S.lang == "en" else "条讲其他公司或大盘的新闻已忽略") + "[/]")
     if rep.red_flags_confirmed or rep.red_flags_unconfirmed:
         console.print(f"[bold red]{T('news.flags')}:[/] confirmed {rep.red_flags_confirmed}, "
                       f"single-source {rep.red_flags_unconfirmed}")
