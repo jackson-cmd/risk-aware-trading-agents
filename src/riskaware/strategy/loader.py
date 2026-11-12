@@ -34,11 +34,19 @@ def _pick_class(module: Any, class_name: str | None, origin: str) -> type[Strate
     return found[0]
 
 
+def split_spec(spec: str) -> tuple[str, str]:
+    """Split "file.py:Class" or "pkg.module:Class" without breaking Windows drive letters ("C:\\x.py")."""
+    head, sep, tail = spec.rpartition(":")
+    if sep and tail.isidentifier() and not (len(head) == 1 and head.isalpha()):
+        return head, tail
+    return spec, ""
+
+
 def load_strategy(spec: str, params: dict[str, Any] | None = None) -> Strategy:
     params = params or {}
     if spec in BUILTIN:
         return BUILTIN[spec](**params)
-    target, _, class_name = spec.partition(":")
+    target, class_name = split_spec(spec)
     path = Path(target).expanduser()
     if target.endswith(".py") or path.is_file():
         if not path.is_file():

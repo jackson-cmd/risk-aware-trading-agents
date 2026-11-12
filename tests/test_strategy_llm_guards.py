@@ -24,6 +24,16 @@ def test_builtin_strategies_load_and_reject_unknown_params():
         load_strategy("does_not_exist")
 
 
+def test_strategy_spec_parsing_handles_windows_paths():
+    from riskaware.strategy.loader import split_spec
+
+    assert split_spec(r"C:\\Users\\me\\dip.py") == (r"C:\\Users\\me\\dip.py", "")
+    assert split_spec(r"C:\\Users\\me\\dip.py:Dip") == (r"C:\\Users\\me\\dip.py", "Dip")
+    assert split_spec("strategies/dip.py:Dip") == ("strategies/dip.py", "Dip")
+    assert split_spec("my_pkg.strats:Dip") == ("my_pkg.strats", "Dip")
+    assert split_spec("risk_aware") == ("risk_aware", "")
+
+
 def test_user_strategy_from_template_file(tmp_path):
     path = tmp_path / "my_strat.py"
     path.write_text(STRATEGY_TEMPLATE.format(path=path.name, cls="MyStrat", name="my_strat"), encoding="utf-8")
