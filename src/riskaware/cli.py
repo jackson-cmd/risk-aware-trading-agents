@@ -13,6 +13,7 @@ from typing import Optional
 
 import typer
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.prompt import Confirm, Prompt
 from rich.table import Table
@@ -675,7 +676,8 @@ def brokers() -> None:
         mod = mods.get(key)
         ok = mod is None or importlib.util.find_spec(mod) is not None
         tbl.add_row(key, spec["label"], spec["paper"],
-                    f'pip install "risk-aware-trading-agents[{spec["install"]}]"' if spec["install"] else "built in",
+                    escape(f'pip install "risk-aware-trading-agents[{spec["install"]}]"') if spec["install"]
+                    else "built in",
                     ", ".join(spec["env"]) or "-", "[green]ready[/]" if ok else "[dim]missing[/]")
     console.print(tbl)
 
@@ -702,7 +704,7 @@ def resume() -> None:
 def dashboard(port: int = typer.Option(8501)) -> None:
     """Open the web dashboard (needs the [dashboard] extra). / 打开网页看板"""
     if importlib.util.find_spec("streamlit") is None:
-        console.print('Install it first: pip install "risk-aware-trading-agents[dashboard]"')
+        console.print('Install it first: pip install "risk-aware-trading-agents[dashboard]"', markup=False)
         raise typer.Exit(1)
     import subprocess
 
@@ -721,7 +723,7 @@ def dashboard(port: int = typer.Option(8501)) -> None:
 def mcp() -> None:
     """Serve the agents to Claude or any MCP client over stdio (needs the [mcp] extra). / MCP 服务器"""
     if importlib.util.find_spec("mcp") is None:
-        console.print('Install it first: pip install "risk-aware-trading-agents[mcp]"', style="red")
+        console.print('Install it first: pip install "risk-aware-trading-agents[mcp]"', style="red", markup=False)
         raise typer.Exit(1)
     from .mcp_server import main as serve
 
@@ -752,8 +754,8 @@ def mcp_setup(client: str = typer.Argument(..., help="claude-code, claude-deskto
         console.print(f"[red]choose one of {', '.join(ms.CLIENTS)}[/]")
         raise typer.Exit(1)
     if importlib.util.find_spec("mcp") is None:
-        console.print('The server needs the MCP extra first: pip install "risk-aware-trading-agents[mcp]"',
-                      style="yellow")
+        typer.echo('The server needs the MCP extra first: pip install "risk-aware-trading-agents[mcp]"',
+                   err=True)  # stderr, so the command printed below can be copied or piped as it is
     if do_apply:
         try:
             console.print(ms.apply(client, tool))

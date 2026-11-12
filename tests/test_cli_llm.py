@@ -160,7 +160,20 @@ def test_mcp_setup_commands_and_desktop_config(tmp_path, monkeypatch):
 
 def test_cli_mcp_setup_prints_a_command():
     res = CliRunner().invoke(app, ["mcp-setup", "codex"])
-    assert res.exit_code == 0 and res.output.startswith("codex mcp add riskaware -- ")
+    # stdout is only the command (a hint about the [mcp] extra may go to stderr)
+    assert res.exit_code == 0 and res.stdout.startswith("codex mcp add riskaware -- ")
     res = CliRunner().invoke(app, ["mcp-setup", "claude-desktop"])
     assert res.exit_code == 0 and '"riskaware"' in res.output
     assert CliRunner().invoke(app, ["mcp-setup", "chatgpt"]).exit_code == 1
+
+
+def test_install_hints_keep_the_extra_name(monkeypatch):
+    """Rich markup must not eat "[ibkr]" or "[mcp]" from the pip commands it prints."""
+    res = CliRunner().invoke(app, ["brokers"], env={"COLUMNS": "220"})
+    assert res.exit_code == 0 and 'risk-aware-trading-agents[ibkr]' in res.output
+    import importlib.util as iu
+
+    real = iu.find_spec
+    monkeypatch.setattr(iu, "find_spec", lambda name, *a, **k: None if name == "mcp" else real(name, *a, **k))
+    res = CliRunner().invoke(app, ["mcp-setup", "codex"])
+    assert 'risk-aware-trading-agents[mcp]' in res.stderr and res.stdout.startswith("codex mcp add riskaware")
