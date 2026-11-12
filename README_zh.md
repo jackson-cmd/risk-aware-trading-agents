@@ -8,7 +8,7 @@
 
 **FOMC · CPI · 非农 · VIX 决定市场状态 · 回踩 EMA 50 / 100 / 200 时买入 · 财报过关才抄底 · Finviz + RSS + SEC 新闻交叉验证 · 每天自动跑的模拟盘智能体 · 给 Claude 用的 MCP 服务器 · 11 个策略（含期权）· 回测你自己的策略 · 10 家券商的模拟盘和实盘 · 中文和 English**
 
-[English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [快速开始](#-快速开始) · [模拟盘智能体](#-模拟盘智能体) · [MCP](#-mcp-服务器) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
+[English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [截图](#-截图一览) · [快速开始](#-快速开始) · [模拟盘智能体](#-模拟盘智能体) · [MCP](#-mcp-服务器) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
@@ -28,7 +28,7 @@
 
 ## 目录
 
-- [🆕 新功能](#-新功能) · [💡 设计思路](#-设计思路) · [✨ 主要功能](#-主要功能) · [🚀 快速开始](#-快速开始)
+- [🆕 新功能](#-新功能) · [📸 截图一览](#-截图一览) · [💡 设计思路](#-设计思路) · [✨ 主要功能](#-主要功能) · [🚀 快速开始](#-快速开始)
 - [🤖 模拟盘智能体](#-模拟盘智能体) · [🔗 MCP 服务器](#-mcp-服务器)
 - [🧠 工作原理](#-工作原理)：[市场状态](#不同市场状态下的做法) · [风险档位](#风险档位)
 - [📊 回测](#-回测) · [📚 策略库](#-策略库)：[期权](#期权目前只支持回测) · [🧩 写你自己的策略](#-写你自己的策略)
@@ -48,6 +48,16 @@
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🖥️ 全新网页看板**：深色交易终端风格，有市场状态卡片、恐慌贪婪仪表盘、迷你走势图、宏观事件时间线和顶部导航，中英文都支持。[看截图 ↑](#-风险感知交易智能体--risk-aware-trading-agents) |
 
 <sub>0.2.0 加入了期权回测（`aggressive_calls`、`wheel`）和四个股票策略，详见[更新记录](CHANGELOG_zh.md)。</sub>
+
+## 📸 截图一览
+
+网页看板（`riskaware dashboard`）的每一页，中英文都有。点图片可以看大图。
+
+<table>
+<tr><td width="50%"><a href="site/assets/dashboard_zh.jpg"><img src="site/assets/dashboard_zh.jpg" alt="市场"></a><br><sub><b>市场</b> — 市场状态、恐慌贪婪、VIX、板块广度和宏观日历</sub></td><td width="50%"><a href="site/assets/agents_zh.jpg"><img src="site/assets/agents_zh.jpg" alt="智能体"></a><br><sub><b>智能体</b> — 模拟盘智能体排行榜，和 SPY 对比</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/agent_detail_zh.jpg"><img src="site/assets/agent_detail_zh.jpg" alt="智能体详情"></a><br><sub><b>智能体详情</b> — 持仓、订单和每个决策的理由</sub></td><td width="50%"><a href="site/assets/signals_zh.jpg"><img src="site/assets/signals_zh.jpg" alt="信号"></a><br><sub><b>信号</b> — 策略今天会买什么、卖什么，附信心分和理由</sub></td></tr>
+<tr><td width="50%"><a href="site/assets/backtest_zh.jpg"><img src="site/assets/backtest_zh.jpg" alt="回测"></a><br><sub><b>回测</b> — 任意策略和 SPY 对比，含回撤和每笔交易</sub></td><td width="50%"><a href="site/assets/news_zh.jpg"><img src="site/assets/news_zh.jpg" alt="交叉验证新闻"></a><br><sub><b>交叉验证新闻</b> — 两家独立媒体或 SEC 文件都报道了才算确认</sub></td></tr>
+</table>
 
 ---
 
