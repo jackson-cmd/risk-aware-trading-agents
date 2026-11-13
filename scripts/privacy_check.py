@@ -72,14 +72,18 @@ def identity_markers() -> dict[str, str]:
     return marks
 
 
-def _public_handle_uses(text: str, handle: str) -> str:
-    """Drop the places where a GitHub handle is public anyway: URL path segments, <handle>.github.io, noreply."""
+def _public_handle_uses(text: str, handle: str, path: str = "") -> str:
+    """Drop the places where a GitHub handle is public anyway: URL path segments, <handle>.github.io, noreply, the MCP
+    Registry name io.github.<handle>/<repo>, and the maintainers list of Glama's claim file (glama.json)."""
     h = re.escape(handle)
     text = re.sub(rf"(?<=/){h}(?=[/.\"')\s]|$)", "", text)
     text = re.sub(rf"(?<![\w-]){h}(?=/[\w.-])", "", text)          # an OWNER/REPO slug
 
     text = re.sub(rf"{h}\.github\.io", "", text)
     text = re.sub(rf"\+{h}@users\.noreply\.github\.com", "", text)
+    text = re.sub(rf"io\.github\.{h}/", "", text)
+    if path == "glama.json" or path.endswith("/glama.json"):
+        text = re.sub(r'"maintainers"\s*:\s*\[[^\]]*\]', "", text)
     return text
 
 
@@ -130,7 +134,7 @@ def check(files: list[tuple[str, str]], staged: bool) -> list[str]:
             if re.search(pattern, text):
                 problems.append(f"{path}: contains a {label}")
         for label, value in marks.items():
-            seen = _public_handle_uses(text, value) if label == "your global git name" else text
+            seen = _public_handle_uses(text, value, path) if label == "your global git name" else text
             if value and value in seen:
                 problems.append(f"{path}: contains {label}")
     return problems
