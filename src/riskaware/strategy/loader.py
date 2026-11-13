@@ -13,8 +13,10 @@ from .base import Strategy
 from .examples import BUILTIN_EXAMPLES
 from .options_strategies import OPTION_STRATEGIES
 from .risk_aware import RiskAwareStrategy
+from .swing import SWING_STRATEGIES
 
-BUILTIN: dict[str, type[Strategy]] = {"risk_aware": RiskAwareStrategy, **BUILTIN_EXAMPLES, **OPTION_STRATEGIES}
+BUILTIN: dict[str, type[Strategy]] = {"risk_aware": RiskAwareStrategy, **BUILTIN_EXAMPLES, **OPTION_STRATEGIES,
+                                      **SWING_STRATEGIES}
 
 
 def list_strategies() -> dict[str, str]:

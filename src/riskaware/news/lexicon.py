@@ -3,6 +3,7 @@ and publisher reliability. Plain regular expressions, so every decision is expla
 
 from __future__ import annotations
 
+import functools
 import re
 
 # (pattern, weight). Multi-word phrases come first so they win over single words.
@@ -279,6 +280,7 @@ def reliability(publisher: str) -> float:
     return 0.4
 
 
+@functools.lru_cache(maxsize=1 << 16)  # pure functions of one headline: a backtest scores each many times
 def sentiment(text: str) -> float:
     """Score in [-1, 1] from weighted phrase matches; phrases are consumed so they count once.
 
@@ -343,6 +345,7 @@ def _negated(low: str, start: int, end: int) -> bool:
     return any(rx(p).search(after) for p in NEGATED_AFTER)
 
 
+@functools.lru_cache(maxsize=1 << 16)
 def is_hoax(text: str) -> bool:
     """The headline says a release, story or post is fake ("finds fake release", "bankruptcy rumor a hoax")."""
     low = rx(AUTHORITY_VERB).sub(" ", _prepare(text))
@@ -351,6 +354,11 @@ def is_hoax(text: str) -> bool:
 
 def _flag_hits(text: str) -> list[tuple[str, bool, bool]]:
     """(flag, severe, negated) for every red-flag phrase in the headline, severe flags first."""
+    return list(_flag_hits_cached(text))
+
+
+@functools.lru_cache(maxsize=1 << 16)
+def _flag_hits_cached(text: str) -> tuple[tuple[str, bool, bool], ...]:
     low = _prepare(text)
     hoax = is_hoax(low)
     hits = []
@@ -358,7 +366,7 @@ def _flag_hits(text: str) -> list[tuple[str, bool, bool]]:
         for name, pattern in table.items():
             for m in rx(pattern).finditer(low):
                 hits.append((name, severe, hoax or _negated(low, m.start(), m.end())))
-    return hits
+    return tuple(hits)
 
 
 def red_flags(text: str) -> tuple[list[str], bool]:
@@ -383,6 +391,7 @@ def denied_flags(text: str) -> list[str]:
     return out
 
 
+@functools.lru_cache(maxsize=1 << 16)
 def is_denial(text: str) -> bool:
     """The headline denies, rejects or retracts a report, or calls it fake. Such a headline is never
     counted as a publisher that confirms the story it denies."""
@@ -392,17 +401,28 @@ def is_denial(text: str) -> bool:
     return any(rx(p).search(low) for p in DENIAL_PATTERNS)
 
 
+@functools.lru_cache(maxsize=1 << 16)
 def is_opinion(title: str) -> bool:
     low = title.lower().strip()
     return any(rx(p).search(low) for p in OPINION_PATTERNS)
 
 
 def event_types(text: str) -> list[str]:
+    return list(_event_types(text))
+
+
+@functools.lru_cache(maxsize=1 << 16)
+def _event_types(text: str) -> tuple[str, ...]:
     low = text.lower()
-    return [name for name, pattern in EVENT_TYPES.items() if rx(pattern).search(low)]
+    return tuple(name for name, pattern in EVENT_TYPES.items() if rx(pattern).search(low))
 
 
 def tokens(text: str) -> set[str]:
+    return set(_tokens(text))
+
+
+@functools.lru_cache(maxsize=1 << 16)
+def _tokens(text: str) -> frozenset[str]:
     words = re.findall(r"[a-z0-9$%.]+", text.lower())
     out = set()
     for w in words:
@@ -412,4 +432,4 @@ def tokens(text: str) -> set[str]:
         if w.endswith("s") and len(w) > 4 and not w.endswith("ss"):
             w = w[:-1]
         out.add(w)
-    return out
+    return frozenset(out)

@@ -1405,6 +1405,11 @@ def news_history_remove(
     console.print(f"removed {n}")
 
 
+from .research.cli import app as research_app  # noqa: E402 - registered last, after the shared state above
+
+app.add_typer(research_app, name="research")
+
+
 def main() -> None:
     logging.captureWarnings(True)
     app()

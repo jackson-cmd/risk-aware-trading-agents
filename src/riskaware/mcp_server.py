@@ -26,8 +26,11 @@ INSTRUCTIONS = (
     "scan and analyze_stock show the signals and why; backtest tests any built-in strategy on history. To test a "
     "strategy the user describes in words, read strategy_guide, write the Strategy class, and run it with "
     "backtest_code; fix the problems it reports and run it again. The agents_* tools manage paper-trading agents "
-    "that run on simulated money every trading day. Nothing here is investment advice and no tool can trade a "
-    "real account."
+    "that run on simulated money every trading day. For experiments that others can repeat (papers, strategy "
+    "research), read research_guide: market_day shows everything known at any 2026 close, run_experiment tests a "
+    "strategy on the frozen 2026 market with a look-ahead check and saves a citable record, and "
+    "trading_session_start / trading_session_step let you trade the period yourself. Nothing here is investment "
+    "advice and no tool can trade a real account."
 )
 
 
@@ -285,10 +288,169 @@ def agents_run(names: list[str] | None = None, dry_run: bool = False) -> dict[st
                      for r in runs]}
 
 
+# ------------------------------------------------------------------------------------------- research
+_VIEW: list[Any] = []
+
+
+def _market_view():
+    if not _VIEW:
+        from .research.day import MarketView
+
+        _VIEW.append(MarketView())
+    return _VIEW[0]
+
+
+def research_guide() -> dict[str, Any]:
+    """Read this first for experiments on the frozen 2026 market: what data ships with the package (daily bars
+    2024 to November 2026, the VIX term structure, 2026 news), how a backtest decides and fills (after the close,
+    at the next open: swing trading), the look-ahead rules and check, how to write a strategy, the five baseline
+    swing strategies, what a saved record holds, and advice for papers."""
+    from .research.guide import guide
+
+    return guide()
+
+
+def market_day(day: str, symbols: list[str] | None = None, news: bool = True, headlines: int = 3) -> dict[str, Any]:
+    """Everything known at the close of one day of the bundled period (2024-01-02 to 2026-11-11; news in 2026):
+    the market regime, VIX, VIX9D, VIX3M, VVIX and the term structure, fear & greed, breadth, credit stress, the
+    macro events of the next two weeks; and per stock its prices and returns, indicators (EMAs, RSI, MACD, ATR, ADX,
+    Bollinger, 52-week high), technical setups and the news published before the close (score, verified status,
+    red flags, headlines, last earnings release). Nothing after that close is visible. Without symbols it lists all
+    64 stocks in a compact table; name up to 10 symbols for the full detail with headlines. A weekend or holiday
+    shows the close before it."""
+    view = _market_view()
+    try:
+        if symbols:
+            snap = view.snapshot(day, symbols=[s.upper() for s in symbols[:10]], news=news, headlines=headlines)
+            return _plain(snap)
+        snap = view.snapshot(day, news=news, headlines=0)
+    except (ValueError, KeyError) as exc:
+        return {"ok": False, "error": str(exc.args[0]) if exc.args else str(exc)}
+    rows = []
+    for sym, st in snap["stocks"].items():
+        i, t, n = st.get("indicators", {}), st.get("technical", {}), st.get("news") or {}
+        rows.append({"symbol": sym, "sector": st.get("sector"), "close": st.get("close_as_traded"),
+                     "ret_1d": st.get("return_1d"), "ret_5d": st.get("return_5d"), "ret_21d": st.get("return_21d"),
+                     "rsi14": i.get("rsi14"), "rsi2": i.get("rsi2"), "vs_ema50_pct": st["vs_ema_pct"].get("ema50"),
+                     "vs_ema200_pct": st["vs_ema_pct"].get("ema200"), "atr_pct": i.get("atr_pct"),
+                     "off_52w_high": i.get("dd252"), "setups": sorted(t.get("setups", {})),
+                     "ta_score": t.get("score"), "news_score": n.get("score"), "stories": n.get("stories"),
+                     "red_flags": (n.get("red_flags_confirmed") or []) + (n.get("red_flags_single_source") or [])})
+    snap["stocks"] = rows
+    snap["detail"] = "call market_day with symbols=[...] (up to 10) for indicators, setups and headlines"
+    return _plain(snap)
+
+
+def run_experiment(strategy: str | None = None, code: str | None = None, params: dict[str, Any] | None = None,
+                   start: str | None = None, end: str | None = None, universe: str | None = "megacap",
+                   symbols: list[str] | None = None, news: bool = True, execution: str = "plain",
+                   max_positions: int = 10, position_size: float | None = None, split: str | None = None,
+                   leak_check: bool = True, label: str | None = None,
+                   extra_news: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Run an experiment on the frozen 2026 market and save a record (see research_guide).
+
+    Give either strategy (a built-in name such as swing_rsi2, swing_trend, swing_breakout, swing_pullback,
+    swing_news, risk_aware, rsi2, momentum_rotation; or the path of a saved strategy) or code (one Strategy class,
+    as in strategy_guide; it is checked and runs in a separate process). Signals at each close, market orders at the
+    next open. execution='plain' trades exactly what the strategy says (equal-size positions, at most max_positions);
+    'risk_aware' adds the package's risk manager. split='2026-07-01' also reports the parts before and after. The
+    leak check re-runs it with a random future after three cut days and compares the decisions. extra_news adds
+    headlines ({ts, symbol, headline, source}) for counterfactual or robustness tests. Returns the metrics, SPY and
+    the equal-weight universe, beta, alpha, t-statistic and bootstrap intervals, the leak-check verdict, the best and
+    worst trades, and the folder of the record (manifest with data hashes, metrics, equity, trades, decisions,
+    report.md, chart)."""
+    from pathlib import Path
+
+    settings = {"start": start, "end": end, "universe": None if symbols else universe,
+                "symbols": [s.upper() for s in symbols] if symbols else None, "news": news, "execution": execution,
+                "max_positions": max_positions, "position_size": position_size, "split": split,
+                "leak_check": leak_check, "label": label, "extra_news": extra_news, "params": params or {}}
+    if code is None and strategy and strategy.endswith(".py") and Path(strategy).expanduser().is_file():
+        code = Path(strategy).expanduser().read_text(encoding="utf-8")
+    if code is not None:
+        from .lab import backtest_code as _lab
+
+        settings["strategy"] = "code"
+        return _lab(code, symbols=symbols, universe=None if symbols else universe, start=start or "2026-01-02",
+                    end=end, news=news, research=settings, timeout=900.0)
+    from .research.experiment import Experiment
+    from .research.experiment import run_experiment as _run
+
+    try:
+        res = _run(Experiment(strategy=strategy or "risk_aware", **settings))
+    except (ValueError, KeyError, FileNotFoundError) as exc:
+        return {"ok": False, "error": str(exc)}
+    return {"ok": True, **_plain(res.summary())}
+
+
+def list_experiments(limit: int = 20) -> dict[str, Any]:
+    """Saved research experiments and trading sessions, newest first: strategy, period, return, Sharpe, SPY and the
+    look-ahead verdict, with the folder of each record."""
+    from .research.agent import list_sessions
+    from .research.experiment import list_runs
+
+    return {"experiments": _plain(list_runs(limit)), "trading_sessions": _plain(list_sessions(limit))}
+
+
+def experiment_report(run_id: str) -> dict[str, Any]:
+    """The report (markdown, ready to paste), manifest and file list of one saved experiment."""
+    from .research.experiment import load_report
+
+    try:
+        return _plain(load_report(run_id))
+    except FileNotFoundError as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def trading_session_start(start: str | None = None, end: str | None = None, universe: str | None = "core",
+                          symbols: list[str] | None = None, news: bool = True, blind: bool = False,
+                          decide_every: int = 5, max_positions: int = 5, cash: float = 100_000.0,
+                          max_news: int = 3) -> dict[str, Any]:
+    """Trade the frozen market yourself, one decision at a time (an LLM-agent experiment). Returns the rules and
+    the first observation: the market, your portfolio, and per stock the main indicators and the news published
+    before that close. Answer with trading_session_step. decide_every=5 decides once a week (about 44 steps for
+    2026); 1 decides every day. blind=True hides tickers, company names and dates so that you cannot recall what
+    happened. Orders fill at the next open; long only; at most max_positions stocks."""
+    from .research.agent import session_start
+
+    try:
+        return _plain(session_start(start=start, end=end, universe=None if symbols else universe, symbols=symbols,
+                                    news=news, blind=blind, decide_every=decide_every, max_positions=max_positions,
+                                    cash=cash, max_news=max_news))
+    except (ValueError, KeyError) as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def trading_session_step(session_id: str, orders: list[dict[str, Any]] | None = None,
+                         note: str | None = None) -> dict[str, Any]:
+    """Send the orders for the current step and get the next observation (or, after the last step, the result
+    with its saved record). Each order: {"symbol", "action": "buy" | "sell" | "target", "weight" (share of equity
+    for buy and target), "fraction" (share of the position for sell, 1 = all), "reason"}. An empty list holds."""
+    from .research.agent import session_step
+
+    try:
+        return _plain(session_step(session_id, orders or [], note))
+    except (ValueError, FileNotFoundError) as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def trading_session_status(session_id: str) -> dict[str, Any]:
+    """Settings, steps sent so far and the record folder (when finished) of a trading session."""
+    from .research.agent import session_status
+
+    try:
+        return _plain(session_status(session_id))
+    except (ValueError, FileNotFoundError) as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 TOOLS = [market_regime, scan, analyze_stock, stock_news, list_strategies, backtest, strategy_guide, backtest_code,
-         agents_leaderboard, agent_detail, agent_decisions, agents_create, agents_run]
+         agents_leaderboard, agent_detail, agent_decisions, agents_create, agents_run, research_guide, market_day,
+         run_experiment, list_experiments, experiment_report, trading_session_start, trading_session_step,
+         trading_session_status]
 READ_ONLY = {"market_regime", "scan", "analyze_stock", "stock_news", "list_strategies", "backtest", "strategy_guide",
-             "agents_leaderboard", "agent_detail", "agent_decisions"}
+             "agents_leaderboard", "agent_detail", "agent_decisions", "research_guide", "market_day",
+             "list_experiments", "experiment_report", "trading_session_status"}
 
 
 def build_server():

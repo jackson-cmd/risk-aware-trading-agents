@@ -6,7 +6,7 @@
 
 *Buy when others are afraid · keep 30% in cash · never panic-sell*
 
-**Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · daily paper-trading agents · an MCP server for Claude · 11 strategies including options · backtest your own · paper and live trading on 10 brokers · English and 中文**
+**Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · daily paper-trading agents · an MCP server for Claude · 16 strategies including options · a frozen 2026 market for research · backtest your own · paper and live trading on 10 brokers · English and 中文**
 
 📊 **2026 backtest with news: +15.9% vs SPY +12.1% · max drawdown -5.3% vs -8.9% · Sharpe 1.70 vs 0.77** · [details](#2026-so-far-with-news)
 
@@ -16,9 +16,9 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#-safety)
-[![Version 0.6.3](https://img.shields.io/badge/version-0.6.3-e5534b.svg)](CHANGELOG.md)
+[![Version 0.7.0](https://img.shields.io/badge/version-0.7.0-e5534b.svg)](CHANGELOG.md)
 [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server)
-[![11 strategies](https://img.shields.io/badge/strategies-11-8957e5.svg)](#-strategy-library)
+[![16 strategies](https://img.shields.io/badge/strategies-16-8957e5.svg)](#-strategy-library)
 [![10 brokers](https://img.shields.io/badge/brokers-10-0969da.svg)](#-brokers)
 [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
@@ -31,7 +31,7 @@
 ## Contents
 
 - [🆕 What's new](#-whats-new) · [📸 Screenshots](#-screenshots) · [💡 The idea](#-the-idea) · [✨ Highlights](#-highlights) · [🚀 Quick start](#-quick-start)
-- [🤖 Paper-trading agents](#-paper-trading-agents) · [🔗 MCP server](#-mcp-server) · [🧪 Strategy lab](#-strategy-lab)
+- [🤖 Paper-trading agents](#-paper-trading-agents) · [🔗 MCP server](#-mcp-server) · [🧪 Strategy lab](#-strategy-lab) · [🔬 Research kit](#-research-kit)
 - [🧠 How it works](#-how-it-works): [Market regimes](#what-the-agent-does-in-each-regime) · [Risk profiles](#risk-profiles)
 - [📊 Backtest](#-backtest): [News in backtests](#news-in-backtests) · [📚 Strategy library](#-strategy-library): [Options](#options-backtest-only) · [🧩 Write your own strategy](#-write-your-own-strategy)
 - [🔌 Brokers](#-brokers) · [🔒 Safety](#-safety) · [🔧 Configuration](#-configuration) · [💻 CLI](#-cli) · [📁 Project layout](#-project-layout)
@@ -39,10 +39,11 @@
 
 ## 🆕 What's new
 
-<sub>Latest release **0.6.3** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
+<sub>Latest release **0.7.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
 
-| | New in 0.6 and 0.5 |
+| | New in 0.7, 0.6 and 0.5 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔬 A frozen 2026 market for research**: everything the agents saw in 2026 ships with the package, point in time: daily prices since 2024, the VIX term structure, 16,945 headlines and SEC filings, every indicator and regime reading. Ask what was known at any close, have Claude turn a strategy you describe into code and test it, or let an LLM trade the year step by step, blind if you like. Every run gets a look-ahead check and a record with data hashes, ready for a paper. Five common swing strategies tested with and without news: trend following made **+21.1%** against SPY's +12.1%. [How →](#-research-kit) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **⏳ Long runs keep going in the background**: start a scan, a backtest, an agents run or a news fetch on the dashboard, then open another page or reload: it keeps running, a bar at the top of every page shows how far it is, and one click takes you back to the result. A long backtest can be stopped halfway. |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **❓ Every number explains itself**: click the ? next to any card, column or field on the dashboard and a popup says what it is, how it is calculated (straight from the code: the regime rules, the six parts of the risk score, the technical (TA) score, conviction, the news score, Sharpe and the rest) and how to use it, in English and 中文. The Signals page now also shows conviction's four parts: technical (TA), earnings, news and macro. [See it →](#-screenshots) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔎 The news behind every backtest trade**: the dashboard's Backtest page now has a **News the backtest saw** panel. Pick a trade and it shows the headlines the backtest had seen at that close, which of them were confirmed, the news score, and the order the strategy placed the next day. [How →](docs/news-history.md#see-what-a-backtest-saw) |
@@ -86,6 +87,7 @@ Most trading bots either chase every signal or need a quant team to configure. T
 - **Backtest anything, including your own strategy.** Write one Python method; the same strategy object runs in backtests, paper and live trading with the same risk engine. Compare strategies side by side with an HTML report, and replay point-in-time news: 2026 headlines and SEC filings ship with the package, and other years come from a local archive (SEC 8-K filings, your own Benzinga key or a CSV).
 - **Daily paper-trading agents.** Run several strategies side by side, each on its own paper account with free prices. A background job trades them every trading day, and a leaderboard compares them with SPY.
 - **Works with Claude (MCP).** `riskaware mcp` gives Claude, Cursor or any MCP client the regime, signals, news, backtests and the paper agents. Describe a strategy in words and the AI writes it as code and backtests it, checked for look-ahead.
+- **A frozen 2026 market for research.** Point-in-time prices, VIX, news and indicators ship with the package. Every experiment is checked for look-ahead and saved with its data hashes, and LLMs can run experiments or trade the year over MCP.
 - **Optional LLM review, per agent.** A bull analyst, a bear analyst and a risk judge (GPT, Claude, any OpenAI-compatible model such as DeepSeek or Qwen, or a free local model through Ollama) can nudge conviction by at most ±0.15 or veto a buy. They can never create a trade or change a limit. News reaches them only as quoted, untrusted text, and every prompt and reply is kept in the local journal so you can see how each decision was made.
 - **Bilingual.** CLI, dashboard, reports and docs in English and 中文.
 
@@ -142,7 +144,7 @@ pip install -e ".[mcp]"
 riskaware mcp-setup claude-desktop --apply   # or: claude-code, codex (your ChatGPT login), gemini, antigravity
 ```
 
-Thirteen tools: `market_regime`, `scan`, `analyze_stock`, `stock_news`, `list_strategies`, `backtest`, `strategy_guide`, `backtest_code`, `agents_leaderboard`, `agent_detail`, `agent_decisions`, `agents_create` and `agents_run`. They are read-only or act on local paper accounts; no tool can send an order to a broker. Then just ask, for example "What regime is the market in, and what is coming up this week?" or "Backtest the wheel on megacap with $1M since 2018." ChatGPT itself only connects to remote servers, so on the OpenAI side use Codex, which runs on your ChatGPT login. More in [docs/agents.md](docs/agents.md#use-it-from-claude-chatgpt-or-gemini-mcp).
+Twenty-one tools: `market_regime`, `scan`, `analyze_stock`, `stock_news`, `list_strategies`, `backtest`, `strategy_guide`, `backtest_code`, `agents_leaderboard`, `agent_detail`, `agent_decisions`, `agents_create` and `agents_run`, and for research `research_guide`, `market_day`, `run_experiment`, `list_experiments`, `experiment_report`, `trading_session_start`, `trading_session_step` and `trading_session_status`. They are read-only or act on local paper accounts; no tool can send an order to a broker. Then just ask, for example "What regime is the market in, and what is coming up this week?" or "Backtest the wheel on megacap with $1M since 2018." ChatGPT itself only connects to remote servers, so on the OpenAI side use Codex, which runs on your ChatGPT login. More in [docs/agents.md](docs/agents.md#use-it-from-claude-chatgpt-or-gemini-mcp).
 
 ## 🧪 Strategy lab
 
@@ -151,6 +153,36 @@ Describe a strategy in plain words and let the AI build it. Over MCP, Claude, Co
 > Write a strategy that buys two-day pullbacks in uptrends when the recent news is positive, and sells after 10 days or at +8%. Backtest it on the tech list for 2026 with news.
 
 `save_as` keeps a strategy that works: it then shows up on the dashboard and can run as a paper agent. For code from anywhere else, `riskaware lab my_strategy.py --preset tech` does the same checks and backtest. More in [docs/strategy-lab.md](docs/strategy-lab.md).
+
+## 🔬 Research kit
+
+The whole of 2026 ships with the package, frozen, for experiments that anyone can repeat: daily prices since 2024 for the 64 stocks and 25 ETFs, the VIX term structure, 16,945 headlines and SEC filings, and every indicator and regime reading the agents use, each as it was known at that day's close.
+
+```bash
+riskaware research day 2026-04-08 --symbols NVDA,TSLA           # everything known at that close
+riskaware research run --strategy swing_trend --split 2026-07-01
+riskaware research trade --llm ollama:qwen2.5:3b --universe core --blind
+```
+
+- **Point in time.** Signals at the close, orders at the next open: swing trading on daily bars. A headline counts only after it was published, and indicators only look back.
+- **A look-ahead check on every run.** The run is repeated with every price and headline after three cut days replaced by random ones, and the decisions before each cut must not change.
+- **A record for papers.** Each run saves its data hashes, code, settings, metrics, bootstrap intervals, trades and every decision.
+- **Made for LLMs.** Over MCP, describe a strategy and Claude writes and tests it (`run_experiment`), looks at any day (`market_day`), or trades the year step by step (`trading_session_start`), blind if you like: no tickers, company names or dates.
+
+Five common swing strategies, 2026-01-02 to 2026-11-11 on the 56 megacaps, at most 10 equal positions:
+
+| Strategy | Without news | With news | Sharpe | Max drawdown |
+|---|---:|---:|---:|---:|
+| Trend following (EMA20 / EMA50 cross) | **+21.1%** | +19.6% | **1.44** | **-4.7%** |
+| Post-news drift (without news: the same trade on a price jump) | +15.7% | +4.4% | 1.01 | -9.8% |
+| Connors RSI(2) | +12.7% | +10.8% | 0.85 | -7.9% |
+| Pullback in an uptrend | +2.3% | +1.7% | -0.13 | -4.4% |
+| 20-day breakout | -0.3% | -3.5% | -0.15 | -15.6% |
+| SPY buy and hold | +12.1% | | 0.77 | -8.9% |
+
+<img src="site/assets/research_baselines.png" width="820" alt="Five swing strategies in 2026, with and without news">
+
+Sharpe and drawdown are without news. Trend following beat SPY with half its drawdown. The news filter made every strategy slightly worse, and buying on positive headlines did worse than buying the same price move without them. Every interval overlaps, and every run passed the look-ahead check. Definitions, the full table with 95% intervals, and advice for papers in [docs/research.md](docs/research.md).
 
 ## 🧠 How it works
 
@@ -278,6 +310,7 @@ Every built-in strategy runs through the same risk manager, so all of them keep 
 | `bollinger_reversion` | stocks | buy closes below the lower Bollinger band in uptrends, sell at the middle band |
 | `fear_greed_dca` | stocks / ETFs | buy in steps when fear is high, trim in extreme greed |
 | `ema_bounce`, `rsi2`, `golden_cross`, `buy_and_hold` | stocks | simple references and baselines |
+| `swing_trend`, `swing_rsi2`, `swing_breakout`, `swing_pullback`, `swing_news` | stocks | five textbook swing strategies with a news switch, the [research kit](#-research-kit)'s baselines |
 | `aggressive_calls` | options | buy ~0.6-delta calls 45–60 days out on pullbacks in strong uptrends; +100% take profit, -50% stop |
 | `wheel` | options | sell ~0.25-delta cash-secured puts near support; after assignment, sell covered calls above cost |
 
@@ -402,6 +435,7 @@ llm:
 | `riskaware backtest [--news]` | backtest and compare strategies (`--news` replays the news; 2026 ships with the package) |
 | `riskaware lab FILE [--check-only] [--save NAME]` | check a strategy for look-ahead and side effects, then backtest it in a separate process |
 | `riskaware news-history build / import / status / show` | local point-in-time news archive for backtests |
+| `riskaware research day / run / baselines / trade / runs / data` | the frozen 2026 market: any day's data, experiments with a look-ahead check, LLM trading |
 | `riskaware strategies` / `new-strategy` | list built-ins / create a strategy file |
 | `riskaware brokers` | supported brokers and their requirements |
 | `riskaware halt` / `resume` | kill switch |
@@ -417,11 +451,12 @@ src/riskaware/
   agents/      macro regime, technical setups, earnings quality, news
   data/        prices (Yahoo, CSV, synthetic), FOMC/BLS/BEA calendar, fundamentals, CNN Fear & Greed
   news/        Finviz + RSS + SEC sources, clustering and cross-source verification
-  strategy/    Strategy interface, the risk-aware strategy, examples, loader
+  strategy/    Strategy interface, the risk-aware strategy, examples, swing baselines, loader
   risk.py      the risk manager (cash floor, caps, tranches, regime rules)
   brokers/     paper + 9 broker adapters
   engine.py    paper / live cycle, guards, journal, state
   backtest/    backtester, metrics, HTML report
+  research/    the frozen 2026 market, point-in-time days, experiments, look-ahead check, LLM trading sessions
   llm/         optional bull / bear / judge review
   dashboard/   Streamlit app (pages, theme, charts)
   arena.py     paper-trading agents: accounts, daily runs, leaderboard
