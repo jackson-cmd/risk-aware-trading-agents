@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "risk-aware-trading-agents"
 version = "0.7.0"
-description = "Risk-aware AI trading agents for US stocks: FOMC/CPI/VIX-aware market regimes, EMA 50/100/200 dip buying, earnings-quality checks, cross-verified news (Finviz + RSS), a 30% cash floor, backtesting, and paper/live trading on Alpaca, Interactive Brokers, Public, Schwab, Tradier, tastytrade, Futu/moomoo, Tiger and Longbridge."
+description = "Risk-aware AI trading agents for US stocks, with news backtesting that cannot see the future: FOMC/CPI/VIX-aware market regimes, EMA 50/100/200 dip buying with earnings checks, cross-verified news (Finviz + RSS + SEC), a 30% cash floor, a point-in-time 2026 research dataset with a look-ahead check, LLM agents over MCP, and paper/live trading on Alpaca, Interactive Brokers, Public, Schwab, Tradier, tastytrade, Futu/moomoo, Tiger and Longbridge."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -16,7 +16,9 @@ keywords = [
   "stock-trading", "backtesting", "risk-management", "portfolio-management", "fomc", "vix",
   "fear-and-greed", "mean-reversion", "ema", "alpaca", "interactive-brokers", "ibkr", "futu",
   "moomoo", "tiger-brokers", "longbridge", "schwab", "tradier", "tastytrade", "public-com",
-  "paper-trading", "quant", "finviz", "mcp", "mcp-server",
+  "paper-trading", "quant", "finviz", "mcp", "mcp-server", "news-backtesting", "look-ahead-bias",
+  "point-in-time", "financial-news", "sentiment-analysis", "llm-agents", "trading-benchmark", "swing-trading",
+  "sec-edgar", "research-dataset",
 ]
 classifiers = [
   "Development Status :: 4 - Beta",

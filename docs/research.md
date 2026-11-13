@@ -1,4 +1,4 @@
-# Research kit: the frozen 2026 market
+# Research kit: a point-in-time 2026 market for backtests and LLM trading agents
 
 [中文](zh/research.md)
 

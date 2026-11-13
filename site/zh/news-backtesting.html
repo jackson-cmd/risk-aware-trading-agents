@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用新闻回测交易策略，不用未来函数 · 风险感知交易智能体</title>
+<meta name="description" content="怎样用新闻标题和 SEC 公告回测股票交易策略，又不引入未来函数（look-ahead bias）：按发布时间回放新闻、以 16:00 收盘为界、次日开盘成交，并用防偷看检查证明回测没有看到未来。免费开源。">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-backtesting.html">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-backtesting.html">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-backtesting.html">
+<meta property="og:title" content="用新闻回测交易策略，不用未来函数">
+<meta property="og:description" content="按发布时间回放新闻的股票回测，每次实验都会换上随机的未来数据再跑一遍，证明没有偷看。自带 2026 年的新闻标题和 SEC 公告。">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/research_baselines.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"用新闻回测交易策略，不用未来函数","description":"怎样用新闻标题和 SEC 公告回测股票交易策略而不引入未来函数：按发布时间回放新闻，并用防偷看检查验证。","inLanguage":"zh-CN","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-backtesting.html","image":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/research_baselines.png","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["新闻回测","未来函数","按时间点的数据","量化交易"],"isPartOf":{"@type":"WebSite","name":"风险感知交易智能体","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="../?lang=zh">风险感知交易智能体</a>
+  <nav>
+    <a href="../?lang=zh#backtest">回测</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md">GitHub</a>
+    <a href="../news-backtesting.html" hreflang="en" lang="en">English</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+<p class="crumbs"><a href="../?lang=zh">首页</a> › 指南</p>
+<h1>用新闻回测交易策略，不用未来函数</h1>
+<p class="lead">新闻策略的回测最容易自欺欺人。只要回测让策略提前读到还没发布的标题，或者读到交易所用的那个收盘之后才出来的报道，结果就会好得不真实，实盘里根本做不到。风险感知交易智能体是一个开源的 Python 项目，它按每条新闻的发布时间回放新闻，并对每次实验做防偷看检查。</p>
+<div class="cta">
+  <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents">在 GitHub 上获取</a>
+  <a class="btn" href="point-in-time-market-data.html">2026 年数据集</a>
+  <a class="btn" href="llm-trading-agents.html">测试 LLM 智能体</a>
+</div>
+
+<h2>新闻回测通常在哪里偷看了未来</h2>
+<p>大多数新闻回测的「未来函数」都出在几个很平常的地方：</p>
+<ul>
+  <li><b>只有日期，没有时间。</b>很多数据集只记哪一天，或者只记抓取的时间。下午 4:05 发的财报，就会被当成 4 点收盘时已经知道的消息。</li>
+  <li><b>时区。</b>把 UTC 时间当成纽约时间，每条新闻都会提前四五个小时。</li>
+  <li><b>用已经反应过新闻的价格成交。</b>看到标题后按当天收盘价成交，等于假设你比所有人都先读到了它。</li>
+  <li><b>事后修改和错误日期。</b>文章发布后又被改过，或者日期被错标成了未来。</li>
+  <li><b>设定里带着后见之明。</b>挑选自己已经知道表现好的股票、日期或规则；LLM 也可能凭记忆这样做。</li>
+</ul>
+
+<h2>这个项目怎样回放新闻</h2>
+<pre>第 t 天 16:00（纽约）          收盘之后                              第 t+1 天 09:30
+    股票收盘       ->   策略看到第 t 天及以前的数据          ->   订单按开盘价成交
+                        和 16:00 之前发布的新闻                   （加 5 个基点滑点）</pre>
+<ul>
+  <li>策略每天收盘后做一次决定，订单在下一个交易日开盘成交。持仓一般拿几天到几周：这是基于日线的波段交易。</li>
+  <li>一条标题从它发布之后的第一个收盘起才算数：纽约时间 16:00 之前（提前收盘日是 13:00）发布的算当天，之后发布的算下一个交易日。</li>
+  <li>只有日期的条目算在那天结束时；没有时区的时间按纽约时间处理；日期在未来的条目直接丢掉。</li>
+  <li>新闻和实盘一样要过检查：标题只算在它点名的公司头上；两家独立媒体、公司自己的通稿或它的 SEC 公告都报道了，才算已确认。</li>
+</ul>
+
+<h2>试一下</h2>
+<pre>git clone https://github.com/jackson-cmd/risk-aware-trading-agents
+cd risk-aware-trading-agents
+pip install -e ".[dashboard,mcp]"        # 需要 Python 3.10+
+
+riskaware backtest --strategy risk_aware --preset megacap --start 2026-01-02 --news
+riskaware research run --strategy swing_trend --split 2026-07-01   # 带防偷看检查，并保存实验记录
+riskaware research day 2026-04-08 --symbols NVDA,TSLA              # 那天收盘时已知的全部信息</pre>
+<p>2026 年的新闻随安装包提供，什么都不用下载。想测自己的想法，可以写一个小的 Python 类，也可以直接用一句话告诉 Claude，让它来写代码（见 <a href="llm-trading-agents.html">LLM 智能体和 MCP</a>）。</p>
+
+<h2>证明没有偷看：防偷看检查</h2>
+<p>时间戳的规则写对了，也可能因为一个 bug 漏出未来数据。所以每次研究实验都会再跑三遍：每一遍把某个切点之后的每个价格和每条标题都换成随机的，其中包括编造的好消息、坏消息和破产公告。只用了该知道的信息的策略，在每个切点之前做出的决定会完全一样；只要切点之前有一个决定变了，检查就判失败，并写出第一个变化的日期和决定。项目的测试里故意埋了这样一个 bug（一个读到第二天收盘价的指标），用来证明检查能抓到。</p>
+
+<h2>2026 年的结果</h2>
+<p>五种常见的波段策略，56 只大盘股，2026 年 1 月 2 日到 11 月 11 日，最多 10 个等额仓位，次日开盘成交：</p>
+<div class="table-wrap"><table>
+  <tr><th>策略</th><th class="num">不开新闻</th><th class="num">开新闻</th><th class="num">Sharpe</th><th class="num">最大回撤</th></tr>
+  <tr><td>趋势跟随（EMA20 上穿 EMA50）</td><td class="num">+21.1%</td><td class="num">+19.6%</td><td class="num">1.44</td><td class="num">-4.7%</td></tr>
+  <tr><td>新闻后的惯性（不开新闻时：改由价格异动触发）</td><td class="num">+15.7%</td><td class="num">+4.4%</td><td class="num">1.01</td><td class="num">-9.8%</td></tr>
+  <tr><td>Connors RSI(2) 均值回归</td><td class="num">+12.7%</td><td class="num">+10.8%</td><td class="num">0.85</td><td class="num">-7.9%</td></tr>
+  <tr><td>上升趋势中买回调</td><td class="num">+2.3%</td><td class="num">+1.7%</td><td class="num">-0.13</td><td class="num">-4.4%</td></tr>
+  <tr><td>20 日突破</td><td class="num">-0.3%</td><td class="num">-3.5%</td><td class="num">-0.15</td><td class="num">-15.6%</td></tr>
+  <tr><td>SPY 买入持有</td><td class="num">+12.1%</td><td class="num"></td><td class="num">0.77</td><td class="num">-8.9%</td></tr>
+</table></div>
+<p class="note">Sharpe 和回撤是不开新闻时的数字。用 <code>riskaware research baselines</code> 可以复现。</p>
+<img class="chart" src="../assets/research_baselines.png" alt="五种波段策略 2026 年的表现，开和不开新闻，与 SPY 对比" loading="lazy">
+<p>加新闻过滤让每个策略都略差一点；按正面标题买入，也不如按同样幅度的价格异动买入。原因是只有一个标题来源，多数报道只有单一出处，过滤器多半是在对噪音做反应。项目自己的风险感知智能体加新闻后好一些（+15.9%，不加是 +15.4%，SPY 是 +12.1%），但十个月的数据不足以有把握地区分这些数字：95% 区间彼此重叠。所有运行都通过了防偷看检查。</p>
+
+<h2>其他年份的新闻</h2>
+<p><code>riskaware news-history</code> 会在你自己的电脑上建一个按时间点记录的新闻库：2018 年以来的 SEC 8-K 公告可以免费下载（带 SEC 受理的时间），Benzinga 标题可以用你自己的 API key 下载，任何包含时间、代码和标题的 CSV 也能导入。<code>riskaware news-history show NVDA --date 2024-05-22</code> 会列出回测在那天收盘时看到的全部新闻。详见 <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/news-history.md">docs/zh/news-history.md</a>。</p>
+
+<h2>常见问题</h2>
+<h3>支持日内交易吗？</h3>
+<p>不支持。决策在每天收盘之后，订单在下一个交易日开盘成交，所以测的是基于日线的波段和中线交易，不是日内交易。</p>
+<h3>能用我自己的新闻吗？</h3>
+<p>能：导入一个包含发布时间、代码和标题的 CSV，或者只给某一次实验加几条标题，看策略对一条从没发生过的新闻怎么反应。</p>
+<h3>能让 AI 帮我写策略吗？</h3>
+<p>能。通过 MCP，Claude、Codex 或 Gemini 会把策略写成代码；代码先检查有没有写日期、股票代码和副作用，再在单独的进程里运行。</p>
+
+<h2>更多指南</h2>
+<div class="more">
+  <a href="point-in-time-market-data.html">按时间点记录的 2026 年数据<span>价格、VIX 和新闻，附 SHA-256 哈希</span></a>
+  <a href="llm-trading-agents.html">测试 LLM 交易智能体<span>一步一步、可盲测、通过 MCP</span></a>
+  <a href="../?lang=zh">风险感知交易智能体<span>智能体、券商和看板</span></a>
+</div>
+</main>
+
+<footer><div class="wrap">MIT 开源协议 · 不构成投资建议 · 请先用模拟盘 · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="../news-backtesting.html" hreflang="en">English</a></div></footer>
+</body>
+</html>

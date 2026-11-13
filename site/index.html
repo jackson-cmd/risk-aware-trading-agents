@@ -3,11 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Risk-Aware Trading Agents · 风险感知交易智能体</title>
-<meta name="description" content="Open-source, risk-aware AI trading agents for US stocks: FOMC/CPI/VIX-aware market regimes, EMA 50/100/200 dip buying with earnings checks, cross-verified news, a 30% cash floor, backtesting, and paper/live trading on 10 brokers. 开源美股 AI 交易智能体：看宏观事件和恐慌指数、财报过关才抄底、30% 现金底线、回测、多券商。">
-<meta name="keywords" content="trading agents, AI trading bot, risk management, FOMC, VIX, fear and greed, backtesting, Alpaca, Interactive Brokers, Futu, moomoo, Tiger, Longbridge, Schwab, tastytrade, Tradier, Public, 量化交易, 交易机器人, 美股, 抄底, 风控">
-<meta property="og:title" content="Risk-Aware Trading Agents">
-<meta property="og:description" content="Macro-aware, risk-first AI trading agents for US stocks. Backtest, paper trade, then go live on 10 brokers.">
+<title>Risk-Aware Trading Agents · AI stock trading agents and news backtesting without look-ahead · 风险感知交易智能体</title>
+<meta name="description" content="Open-source AI trading agents for US stocks with news backtesting that cannot see the future: a point-in-time 2026 dataset of prices, VIX and news, a look-ahead check on every run, LLM agents over MCP, FOMC/CPI/VIX-aware regimes, and paper/live trading on 10 brokers. 开源美股 AI 交易智能体：不用未来函数的新闻回测、按时间点记录的 2026 年数据、MCP 智能体、10 家券商。">
+<meta name="keywords" content="news backtesting, backtest with news, look-ahead bias, point-in-time data, historical news dataset, stock market dataset 2026, LLM trading agent, AI trading agents, trading agent benchmark, MCP server, swing trading, backtesting, risk management, FOMC, VIX, fear and greed, Alpaca, Interactive Brokers, Futu, moomoo, Tiger, Longbridge, Schwab, tastytrade, Tradier, Public, 新闻回测, 未来函数, 量化交易, 交易机器人, 美股, 抄底, 风控">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/">
+<meta property="og:title" content="Risk-Aware Trading Agents: AI trading agents and news backtesting without look-ahead">
+<meta property="og:description" content="Macro-aware, risk-first AI trading agents for US stocks, a point-in-time 2026 dataset for news backtesting with a look-ahead check, LLM agents over MCP, and paper/live trading on 10 brokers.">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/dashboard_en.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Risk-Aware Trading Agents", "description": "Open-source AI trading agents for US stocks with news backtesting that cannot see the future: market regimes from FOMC, CPI and VIX, dip buying with earnings checks, cross-verified news, a point-in-time 2026 research dataset with a look-ahead check, LLM agents over MCP, and paper and live trading on 10 brokers.", "codeRepository": "https://github.com/jackson-cmd/risk-aware-trading-agents", "url": "https://jackson-cmd.github.io/risk-aware-trading-agents/", "programmingLanguage": "Python", "license": "https://opensource.org/licenses/MIT", "keywords": ["AI trading agents", "news backtesting", "look-ahead bias", "point-in-time data", "LLM trading agents", "MCP server", "backtesting", "swing trading", "risk management", "VIX", "paper trading"]}</script>
 <style>
 :root{--bg:#ffffff;--fg:#1f2328;--muted:#59636e;--card:#f6f8fa;--line:#d1d9e0;--accent:#1f6feb;--green:#1a7f37;--amber:#9a6700;--red:#cf222e;--code:#0d1117;--code-fg:#e6edf3}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1117;--fg:#e6edf3;--muted:#9198a1;--card:#151b23;--line:#3d444d;--accent:#4493f8;--green:#3fb950;--amber:#d29922;--red:#f85149;--code:#010409}}
@@ -39,6 +45,7 @@ h2{font-size:26px;margin:0 0 8px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
 .card h3{margin:0 0 6px;font-size:16px}
 .card p{margin:0;color:var(--muted);font-size:15px}
+a.card{color:var(--fg)}a.card:hover{text-decoration:none;border-color:var(--accent)}
 .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 6px}
 .flow .node{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px}
 .flow .node b{display:block;font-size:13px}
@@ -73,6 +80,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
     <a class="hide-sm" href="#how"><span lang="en">How it works</span><span lang="zh">原理</span></a>
     <a class="hide-sm" href="#backtest"><span lang="en">Backtest</span><span lang="zh">回测</span></a>
     <a class="hide-sm" href="#start"><span lang="en">Quick start</span><span lang="zh">快速开始</span></a>
+    <a class="hide-sm" href="#guides"><span lang="en">Guides</span><span lang="zh">指南</span></a>
     <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
     <button class="toggle" id="langToggle" aria-label="Switch language"><span lang="en">中文</span><span lang="zh">English</span></button>
   </nav>
@@ -250,6 +258,19 @@ class Rsi2Dip(Strategy):
   </div>
 </div></section>
 
+<section id="guides"><div class="wrap">
+  <h2><span lang="en">Guides</span><span lang="zh">指南</span></h2>
+  <p class="sub"><span lang="en">Longer answers to the questions people search for.</span><span lang="zh">大家常搜的几个问题，这里有更完整的回答。</span></p>
+  <div class="grid">
+    <a class="card" href="news-backtesting.html" lang="en"><h3>Backtest with news, without look-ahead bias</h3><p>Point-in-time news replay, a 16:00 cutoff, orders at the next open, and a check that proves it.</p></a>
+    <a class="card" href="zh/news-backtesting.html" lang="zh"><h3>用新闻回测，不用未来函数</h3><p>按发布时间回放新闻、以 16:00 收盘为界、次日开盘成交，并用防偷看检查证明。</p></a>
+    <a class="card" href="point-in-time-market-data.html" lang="en"><h3>Point-in-time market data for 2026</h3><p>Daily prices since 2024, the VIX term structure, 16,945 headlines and SEC filings, with SHA-256 hashes.</p></a>
+    <a class="card" href="zh/point-in-time-market-data.html" lang="zh"><h3>按时间点记录的 2026 年美股数据</h3><p>2024 年起的日线、VIX 期限结构、16,945 条标题和 SEC 公告，附 SHA-256 哈希。</p></a>
+    <a class="card" href="llm-trading-agents.html" lang="en"><h3>Test LLM trading agents</h3><p>Let any model trade 2026 step by step on point-in-time data, blind if you like, from Python or over MCP.</p></a>
+    <a class="card" href="zh/llm-trading-agents.html" lang="zh"><h3>测试 LLM 交易智能体</h3><p>让任何模型在按时间点记录的数据上一步一步交易 2026 年，可以盲测，支持 Python 和 MCP。</p></a>
+  </div>
+</div></section>
+
 <section id="faq"><div class="wrap">
   <h2>FAQ</h2>
   <details><summary><span lang="en">Will it place real trades by itself?</span><span lang="zh">它会自己下实盘单吗？</span></summary><p><span lang="en">No. It starts in paper mode. A live order needs <code>execution.mode: live</code> in the config, the <code>--live</code> flag and a confirmation (or <code>--yes</code>). <code>riskaware halt</code> stops all orders.</span><span lang="zh">不会。默认是模拟盘。实盘需要配置文件里写 <code>execution.mode: live</code>、命令加 <code>--live</code>，并手动确认（或加 <code>--yes</code>）。<code>riskaware halt</code> 可以一键停止所有下单。</span></p></details>
@@ -262,6 +283,7 @@ class Rsi2Dip(Strategy):
 <footer><div class="wrap">
   <span lang="en">MIT License · Not financial advice · Paper trade first.</span><span lang="zh">MIT 开源协议 · 不构成投资建议 · 请先用模拟盘。</span>
   · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+  · <span lang="en"><a href="news-backtesting.html">News backtesting</a> · <a href="point-in-time-market-data.html">2026 market data</a> · <a href="llm-trading-agents.html">LLM trading agents</a></span><span lang="zh"><a href="zh/news-backtesting.html">新闻回测</a> · <a href="zh/point-in-time-market-data.html">2026 年数据</a> · <a href="zh/llm-trading-agents.html">LLM 交易智能体</a></span>
 </div></footer>
 
 <script>
