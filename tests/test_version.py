@@ -43,7 +43,8 @@ def test_release_notes_link_to_the_tag():
     links = re.findall(r"\]\(([^)\s]+)\)", text)
     assert links and all(re.match(r"^(https?:|#)", u) for u in links), "every link is absolute"
     assert f"https://github.com/owner/repo/blob/{tag}/" in text
-    assert f"@{tag}" in text
+    assert f"pip install risk-aware-trading-agents=={version}" in text
+    assert f"docker pull ghcr.io/owner/repo:{version}" in text
     prev = rn.previous_version(version, ROOT)
     assert prev and f"https://github.com/owner/repo/compare/v{prev}...{tag}" in text
     assert rn.absolute_links("[a](docs/x.md) [b](#y) [c](https://z) [d](.github/C.md)", "v1", "o/r") == \

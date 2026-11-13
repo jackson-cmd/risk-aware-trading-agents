@@ -61,7 +61,7 @@ broker:
 
 ## 盈透 Interactive Brokers（`ibkr`）
 
-先 `pip install -e ".[ibkr]"`，启动 TWS 或 IB Gateway，在 API 设置里勾选 "ActiveX and Socket Clients"。
+先 `pip install "risk-aware-trading-agents[ibkr]"`，启动 TWS 或 IB Gateway，在 API 设置里勾选 "ActiveX and Socket Clients"。
 
 ```yaml
 broker:
@@ -71,7 +71,7 @@ broker:
 
 ## 嘉信 Charles Schwab（`schwab`）
 
-先 `pip install -e ".[schwab]"`。在 developer.schwab.com 创建应用，回调地址填 `https://127.0.0.1:8182`。
+先 `pip install "risk-aware-trading-agents[schwab]"`。在 developer.schwab.com 创建应用，回调地址填 `https://127.0.0.1:8182`。
 
 ```bash
 SCHWAB_API_KEY=...
@@ -82,7 +82,7 @@ SCHWAB_APP_SECRET=...
 
 ## tastytrade（`tastytrade`）
 
-先 `pip install -e ".[tastytrade]"`，在 tastytrade 的 API 设置里创建 OAuth 应用。
+先 `pip install "risk-aware-trading-agents[tastytrade]"`，在 tastytrade 的 API 设置里创建 OAuth 应用。
 
 ```bash
 TASTYTRADE_CLIENT_SECRET=...
@@ -97,7 +97,7 @@ broker:
 
 ## 富途 / moomoo（`futu`）
 
-先 `pip install -e ".[futu]"`，下载并登录 OpenD（富途牛牛或 moomoo）。
+先 `pip install "risk-aware-trading-agents[futu]"`，下载并登录 OpenD（富途牛牛或 moomoo）。
 
 ```yaml
 broker:
@@ -109,7 +109,7 @@ broker:
 
 ## 老虎证券（`tiger`）
 
-先 `pip install -e ".[tiger]"`。从老虎开放平台下载 `tiger_openapi_config.properties`，放到 `~/.riskaware/tiger/`。
+先 `pip install "risk-aware-trading-agents[tiger]"`。从老虎开放平台下载 `tiger_openapi_config.properties`，放到 `~/.riskaware/tiger/`。
 
 ```yaml
 broker:
@@ -119,7 +119,7 @@ broker:
 
 ## 长桥（`longbridge`）
 
-先 `pip install -e ".[longbridge]"`。在长桥开放平台创建应用；模拟账户有自己单独的 access token。
+先 `pip install "risk-aware-trading-agents[longbridge]"`。在长桥开放平台创建应用；模拟账户有自己单独的 access token。
 
 ```bash
 LONGPORT_APP_KEY=...

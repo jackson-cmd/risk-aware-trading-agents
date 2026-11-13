@@ -8,7 +8,7 @@ Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnin
 
 [🌐 Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [中文说明 → README_zh.md](README_zh.md) · [🚀 Quick start](#-quick-start) · [🆕 What's new](#-whats-new) · [🔬 Research kit](#-research-kit) · [🔗 MCP](#-mcp-server) · [📸 Screenshots](#-screenshots) · [Changelog](CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![Version 0.7.1](https://img.shields.io/badge/version-0.7.1-e5534b.svg)](CHANGELOG.md) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.1](https://img.shields.io/badge/pypi-0.7.1-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
 <img src="site/assets/demo_en.gif" alt="A 16-second tour: the market regime, today's signals, how a decision was made, paper-trading agents ranked against SPY, a backtest, the news a backtest saw, cross-verified news, and a research run with its look-ahead check" width="100%">
 
@@ -19,7 +19,7 @@ Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnin
 ## 🚀 Quick start
 
 ```bash
-pip install "risk-aware-trading-agents[dashboard,mcp] @ git+https://github.com/jackson-cmd/risk-aware-trading-agents"   # Python 3.10+
+pip install "risk-aware-trading-agents[dashboard,mcp]"   # Python 3.10+
 riskaware dashboard          # the web UI on http://localhost:8501, English and 中文
 ```
 
@@ -39,7 +39,7 @@ riskaware agents schedule --install   # ...and every trading day from now on
 riskaware research run -s swing_trend # a strategy on the frozen 2026 market, with a look-ahead check
 ```
 
-No account or API key is needed for any of these. Add `--lang zh` to any command for Chinese output. To change the code, clone the repository and install it with `pip install -e ".[dashboard,mcp]"`.
+No account or API key is needed for any of these. Add `--lang zh` to any command for Chinese output. For the newest code before it is released, use `pip install "risk-aware-trading-agents[dashboard,mcp] @ git+https://github.com/jackson-cmd/risk-aware-trading-agents"`; to change the code, clone the repository and run `pip install -e ".[dashboard,mcp]"`.
 
 **Docker**, for x86-64 and ARM:
 
@@ -74,7 +74,7 @@ For the daily paper-trading scheduler as well, put `riskaware.yaml` (from `riska
 
 ## 🆕 What's new
 
-- **0.7.1** · 🐳 **Docker image and Codespaces**: run the dashboard or the MCP server from `ghcr.io/jackson-cmd/risk-aware-trading-agents` without installing Python, or open the repository in GitHub Codespaces with everything installed. [How →](#-quick-start)
+- **0.7.1** · 📦 **On PyPI and Docker**: `pip install risk-aware-trading-agents`, or run the dashboard or the MCP server from `ghcr.io/jackson-cmd/risk-aware-trading-agents` without installing Python; GitHub Codespaces opens the repository with everything installed. [How →](#-quick-start)
 - **0.7.0** · 🔬 **A frozen 2026 market for research**: point-in-time prices, VIX and news for the whole year ship with the package. Ask what was known at any close, let Claude turn a strategy you describe into code and test it, or let an LLM trade the year step by step. Every run gets a look-ahead check and a record for papers; trend following made **+21.1%** against SPY's +12.1%. [How →](#-research-kit)
 - **0.6.3** · ⏳ **Long runs keep going in the background**: scans, backtests, agent runs and news fetches go on when you switch pages or reload, and a bar takes you back to the result.
 - **0.6.2** · ❓ **Every number explains itself**: a ? next to every card, column and field says what it is, how it is calculated and how to use it, in English and 中文. [See it →](#-screenshots)
@@ -211,7 +211,7 @@ The daily job (a LaunchAgent on macOS, a crontab line on Linux, a scheduled task
 `riskaware mcp` serves the agents over the Model Context Protocol, so Claude, Codex, Gemini, Cursor or any MCP client can use them, on your plan and without an API key. `riskaware mcp-setup` prints (or, with `--apply`, runs) the one step that connects it:
 
 ```bash
-pip install -e ".[mcp]"
+pip install "risk-aware-trading-agents[mcp]"
 riskaware mcp-setup claude-desktop --apply   # or: claude-code, codex (your ChatGPT login), gemini, antigravity
 ```
 

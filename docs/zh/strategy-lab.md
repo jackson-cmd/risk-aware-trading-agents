@@ -5,7 +5,7 @@
 ## 准备
 
 ```bash
-pip install -e ".[mcp]"
+pip install "risk-aware-trading-agents[mcp]"
 riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex（用你的 ChatGPT 账号）、gemini、antigravity
 ```
 

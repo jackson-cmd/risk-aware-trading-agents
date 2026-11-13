@@ -53,7 +53,7 @@ riskaware llm-check ollama:qwen2.5:3b                     # one sample review: i
 |---|---|---|
 | `openai:MODEL` | OpenAI, e.g. `gpt-5.6-luna` (reasoning switched off, so a review takes a few seconds) | `OPENAI_API_KEY` in `.env` |
 | `ollama:MODEL` | a free local model on your computer, e.g. `qwen2.5:3b` | [Ollama](https://ollama.com): `ollama pull qwen2.5:3b`, then `ollama serve` |
-| `anthropic:MODEL` | Claude through the official SDK | `pip install -e ".[llm]"` and `ANTHROPIC_API_KEY` |
+| `anthropic:MODEL` | Claude through the official SDK | `pip install "risk-aware-trading-agents[llm]"` and `ANTHROPIC_API_KEY` |
 | `compat:MODEL` | any OpenAI-compatible server (DeepSeek, Groq, OpenRouter, vLLM, LM Studio) | `--llm-base-url` and `--llm-key-env` |
 
 Replies are requested in strict JSON schema mode, so the model has to answer in the expected shape; a reply that still does not fit is ignored, and the trade goes ahead on the rules alone. In a quick comparison on one day of buy candidates, `gpt-5.6-luna` answered in about 2.5 seconds with adjustments between -0.04 and +0.05, while the 3B local model took about 7.5 seconds and mostly answered +0.00: a small local model is free and private but adds little judgment.
@@ -111,7 +111,7 @@ The job runs in the folder where you installed it, so it uses that folder's `ris
 The MCP server lets an AI app ask the agents questions and run them, on your own plan and without an API key. It needs the `mcp` extra; then one command connects each app (it prints the step, and `--apply` runs it):
 
 ```bash
-pip install -e ".[mcp]"
+pip install "risk-aware-trading-agents[mcp]"
 riskaware mcp-setup claude-desktop --apply    # Claude Desktop: edits its config (keeps a backup); restart the app
 riskaware mcp-setup claude-code --apply       # Claude Code: claude mcp add -s user riskaware -- ...
 riskaware mcp-setup codex --apply             # OpenAI Codex, on your ChatGPT login

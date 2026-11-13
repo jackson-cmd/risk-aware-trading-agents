@@ -35,8 +35,8 @@ ruff check src tests
    在 PR 里同时改 `pyproject.toml` 和 `src/riskaware/__init__.py` 的版本号，在 `CHANGELOG.md` 和 `docs/zh/CHANGELOG.md` 加上这一版的说明，并更新两份 README 的版本徽章；有一处对不上，`tests/test_version.py` 就会失败。
 2. Merge it. When CI passes on main, `.github/workflows/release.yml` tags the commit `vX.Y.Z`, publishes a GitHub release whose notes are that changelog section, attaches the wheel and the source archive, and pushes the Docker image `ghcr.io/jackson-cmd/risk-aware-trading-agents` (tags `X.Y.Z`, `X.Y` and `latest`). Nothing else to do.
    合并即可。main 上的 CI 通过后，`.github/workflows/release.yml` 会给这个提交打上 `vX.Y.Z` 标签，用那一节更新说明发布 GitHub Release，附上 wheel 和源码包，并推送 Docker 镜像 `ghcr.io/jackson-cmd/risk-aware-trading-agents`（标签 `X.Y.Z`、`X.Y` 和 `latest`），不用手动操作。
-3. PyPI uploads run once the repository variable `PYPI_PUBLISH` is `true` and the PyPI project trusts this workflow (trusted publisher: workflow `release.yml`, environment `pypi`). To publish an existing release again, for example right after setting that up, run the workflow by hand with its tag: `gh workflow run release.yml -f tag=vX.Y.Z`.
-   仓库变量 `PYPI_PUBLISH` 设为 `true`、并且 PyPI 项目信任这个工作流（可信发布者：工作流 `release.yml`，环境 `pypi`）之后，才会上传到 PyPI。要重新发布已有的版本（比如刚配好 PyPI），手动运行这个工作流并带上标签：`gh workflow run release.yml -f tag=vX.Y.Z`。
+3. The upload to PyPI is on: the repository variable `PYPI_PUBLISH` is `true`, and the PyPI project trusts this workflow (trusted publisher: workflow `release.yml`, environment `pypi`). A version number can go to PyPI only once. To publish an existing release again, run the workflow by hand with its tag: `gh workflow run release.yml -f tag=vX.Y.Z` (add `-f rebuild_image=true` to push its Docker image again).
+   PyPI 上传已经开启：仓库变量 `PYPI_PUBLISH` 是 `true`，PyPI 项目也信任这个工作流（可信发布者：工作流 `release.yml`，环境 `pypi`）。同一个版本号只能往 PyPI 传一次。要重新发布已有的版本，手动运行这个工作流并带上标签：`gh workflow run release.yml -f tag=vX.Y.Z`（加 `-f rebuild_image=true` 会重新推送它的 Docker 镜像）。
 
 ## Adding a broker / 接入新券商
 
