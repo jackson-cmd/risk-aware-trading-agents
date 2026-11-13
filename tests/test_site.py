@@ -1,4 +1,4 @@
-"""The website: the Search Console verification must stay, and the social card must fit GitHub's limits."""
+"""The website: the Search Console and Bing Webmaster verifications must stay, and the social card must fit GitHub's limits."""
 
 from __future__ import annotations
 
@@ -13,6 +13,12 @@ SITE = ROOT / "site"
 def test_search_console_verification_stays():
     assert (SITE / "google3ed451f05041f5f9.html").read_text(encoding="utf-8").startswith("google-site-verification:")
     assert '<meta name="google-site-verification"' in (SITE / "index.html").read_text(encoding="utf-8")
+
+
+def test_bing_webmaster_verification_stays():
+    """Bing re-checks this tag in the home page's <head>; removing it or changing the code drops the verification."""
+    head = (SITE / "index.html").read_text(encoding="utf-8").split("</head>", 1)[0]
+    assert '<meta name="msvalidate.01" content="38CA98D01ECA41B71334E56072B086B7">' in head
 
 
 def test_social_card_fits_github_and_link_previews():
