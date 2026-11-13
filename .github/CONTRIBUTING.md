@@ -12,6 +12,7 @@ git clone https://github.com/jackson-cmd/risk-aware-trading-agents
 cd risk-aware-trading-agents
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,dashboard,llm]"
+scripts/install_git_hook.sh # privacy check before every commit / 每次提交前自动做隐私检查
 pytest                      # offline, about a minute
 ruff check src tests
 ```
@@ -24,8 +25,8 @@ ruff check src tests
   风控说了算。策略和 LLM 只能提建议，不能绕过现金底线、各类上限和市场状态规则。
 - Paper first. Nothing may place a live order without `execution.mode: live`, `--live` and a confirmation.
   默认模拟盘。没有 `execution.mode: live`、`--live` 和确认，任何代码都不能下实盘单。
-- No secrets in code, tests, logs or screenshots.
-  代码、测试、日志和截图里不能出现密钥、账户号。
+- No secrets in code, tests, logs or screenshots. The pre-commit hook refuses API keys and tokens, credential files, files over 3 MB, and your home-folder path, login name and global git name or e-mail; run `python scripts/privacy_check.py --all` to check the whole tree.
+  代码、测试、日志和截图里不能出现密钥、账户号。提交钩子会拦下 API key 和 token、凭证文件、超过 3 MB 的文件，以及你的主目录路径、登录名和全局 git 名字或邮箱；`python scripts/privacy_check.py --all` 可以检查整个仓库。
 - Keep user-facing text in both languages (`src/riskaware/i18n.py`, README / README_zh, docs / docs/zh).
   面向用户的文字请同时更新中英文（`i18n.py`、两份 README、docs 和 docs/zh）。
 

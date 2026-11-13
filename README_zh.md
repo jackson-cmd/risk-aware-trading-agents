@@ -511,7 +511,7 @@ src/riskaware/      Python 包本体
 tests/              离线测试（pytest）
 docs/               使用指南和设计说明；docs/zh/ 是中文指南和中文更新记录
 examples/           示例配置、示例策略、.env.example
-scripts/            重建自带的行情和新闻数据
+scripts/            重建自带的行情和新闻数据、生成发版说明、隐私检查和它的提交钩子
 site/               中英双语项目网站和指南（GitHub Pages）
 docker/             Dockerfile 和 docker-compose.yml
 .devcontainer/      GitHub Codespaces 和 VS Code 开发容器配置

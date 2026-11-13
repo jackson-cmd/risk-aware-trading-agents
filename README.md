@@ -508,7 +508,7 @@ src/riskaware/      the package
 tests/              offline test suite (pytest)
 docs/               guides and design notes; docs/zh/ holds the Chinese guides and changelog
 examples/           example configs, example strategies, .env.example
-scripts/            rebuild the bundled market and news data
+scripts/            rebuild the bundled market and news data, release notes, the privacy check and its git hook
 site/               bilingual project website and guides (GitHub Pages)
 docker/             Dockerfile and docker-compose.yml
 .devcontainer/      GitHub Codespaces and VS Code dev container
