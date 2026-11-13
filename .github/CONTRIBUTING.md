@@ -3,6 +3,8 @@
 Thanks for helping. Brokers, data sources, strategies, translations and bug reports are all welcome.
 感谢参与！新券商、数据源、策略、翻译和问题反馈都非常欢迎。
 
+Please follow the [code of conduct](CODE_OF_CONDUCT.md). 参与时请遵守[行为准则](CODE_OF_CONDUCT.md)。
+
 ## Setup / 开发环境
 
 ```bash
@@ -26,6 +28,13 @@ ruff check src tests
   代码、测试、日志和截图里不能出现密钥、账户号。
 - Keep user-facing text in both languages (`src/riskaware/i18n.py`, README / README_zh, docs / docs/zh).
   面向用户的文字请同时更新中英文（`i18n.py`、两份 README、docs 和 docs/zh）。
+
+## Releasing / 发布新版本
+
+1. In the PR, bump the version in `pyproject.toml` and `src/riskaware/__init__.py`, add its section to `CHANGELOG.md` and `docs/zh/CHANGELOG.md`, and update the version badge in both READMEs. `tests/test_version.py` fails if any of them disagree.
+   在 PR 里同时改 `pyproject.toml` 和 `src/riskaware/__init__.py` 的版本号，在 `CHANGELOG.md` 和 `docs/zh/CHANGELOG.md` 加上这一版的说明，并更新两份 README 的版本徽章；有一处对不上，`tests/test_version.py` 就会失败。
+2. Merge it. When CI passes on main, `.github/workflows/release.yml` tags the commit `vX.Y.Z` and publishes a GitHub release whose notes are that changelog section. Nothing else to do.
+   合并即可。main 上的 CI 通过后，`.github/workflows/release.yml` 会给这个提交打上 `vX.Y.Z` 标签，并用那一节更新说明发布 GitHub Release，不用手动操作。
 
 ## Adding a broker / 接入新券商
 

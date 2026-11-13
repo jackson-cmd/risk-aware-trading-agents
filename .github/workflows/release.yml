@@ -1,0 +1,42 @@
+name: Release
+
+# When CI passes on main and pyproject.toml carries a version that has no tag yet, tag that commit vX.Y.Z and
+# publish a GitHub release whose notes are the version's section of CHANGELOG.md. A version bump in a merged PR is
+# all it takes; pushes that keep the version do nothing.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SHA }}
+      - name: Tag and release a new version
+        run: |
+          version=$(python3 scripts/release_notes.py --version)
+          tag="v$version"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+            echo "$tag already exists: nothing to release"
+            exit 0
+          fi
+          python3 scripts/release_notes.py "$version" > notes.md
+          gh release create "$tag" --target "$SHA" --title "$tag" --notes-file notes.md --latest
+          echo "released $tag at $SHA"
