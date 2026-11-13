@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import html
+import itertools
 import math
 from collections.abc import Sequence
 
@@ -68,6 +69,36 @@ h1, h2, h3, h4 {{ letter-spacing: -0.02em; }}
 .ra-brand h1 {{ font-size: 1.45rem; margin:0; padding:0; font-weight:800; }}
 .ra-brand .sub {{ color: var(--muted); font-size: .86rem; margin-top:2px; }}
 .ra-section {{ display:flex; align-items:baseline; justify-content:space-between; margin: 26px 0 10px; }}
+.ra-q {{ display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; margin:0 0 0 6px;
+  padding:0; border-radius:50%; border:1px solid var(--line2); background:transparent; color:var(--muted);
+  font:700 11px/1 Inter, system-ui, sans-serif; cursor:pointer; vertical-align:middle; text-transform:none;
+  letter-spacing:0; flex:none; }}
+.ra-q:hover, .ra-q:focus-visible {{ color:var(--text); border-color:var(--accent); outline:none; }}
+.ra-legend {{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 16px; margin:2px 0 8px; color:var(--muted);
+  font-size:.8rem; }}
+.ra-legend > span {{ display:inline-flex; align-items:center; }}
+.ra-kpi {{ position:relative; }}
+.ra-kpi .stats .ra-note {{ white-space:nowrap; }}
+.ra-kpi .stats .ra-q, .ra-kpi .sub .ra-q {{ width:14px; height:14px; font-size:9px; margin-left:4px; }}
+.ra-kpi > .label:has(> .ra-q) {{ padding-right:22px; }}
+.ra-kpi > .label > .ra-q {{ position:absolute; top:12px; right:12px; margin:0; }}
+.ra-pop {{ display:none; }}
+.ra-pop:popover-open {{ display:block; position:fixed; inset:auto; top:50%; left:50%; transform:translate(-50%, -50%);
+  width:min(480px, 92vw); max-height:82vh; overflow:auto; margin:0; padding:18px 20px 16px; border-radius:14px;
+  border:1px solid var(--line2); background:var(--panel); color:var(--text); box-shadow:0 24px 70px rgba(0,0,0,.45);
+  font:400 .9rem/1.55 Inter, system-ui, sans-serif; text-align:left; text-transform:none; letter-spacing:normal;
+  white-space:normal; }}
+.ra-pop::backdrop {{ background:rgba(0,0,0,.38); }}
+.ra-pop .t {{ font-weight:800; font-size:1.02rem; margin:0 26px 4px 0; }}
+.ra-pop .h {{ color:var(--accent); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+  margin:12px 0 2px; }}
+.ra-pop ul {{ margin:2px 0 0 18px; padding:0; }}
+.ra-pop li {{ margin:2px 0; }}
+.ra-pop code {{ font-family:'JetBrains Mono', ui-monospace, monospace; font-size:.82rem; background:var(--panel2);
+  padding:1px 5px; border-radius:5px; }}
+.ra-pop .x {{ position:absolute; top:12px; right:12px; width:24px; height:24px; border:0; border-radius:8px;
+  background:transparent; color:var(--muted); font-size:16px; cursor:pointer; }}
+.ra-pop .x:hover {{ background:var(--panel2); color:var(--text); }}
 .ra-section h3 {{ font-size: 1.02rem; font-weight: 700; margin:0; padding:0; }}
 .ra-section .hint {{ color: var(--muted); font-size: .82rem; }}
 .ra-card {{ background: linear-gradient(180deg, color-mix(in srgb, var(--panel2) 70%, transparent), var(--panel));
@@ -192,9 +223,53 @@ def sparkline(values: Sequence[float], p: dict[str, str], width: int = 120, heig
                   width, height, stretch=stretch)
 
 
-def kpi(label: str, value: str, sub: str = "", spark: str = "", sub_class: str = "muted", help_text: str = "") -> str:
+_TIP_IDS = itertools.count(1)
+
+
+def _rich(text: str) -> str:
+    """Plain text to HTML: lines starting with "- " become a list, `code` stays code, other lines paragraphs."""
+    out, items = [], []
+    for line in (text or "").strip().splitlines():
+        line = line.strip()
+        if line.startswith("- "):
+            items.append(line[2:])
+            continue
+        if items:
+            out.append("<ul>" + "".join(f"<li>{_code(x)}</li>" for x in items) + "</ul>")
+            items = []
+        if line:
+            out.append(f"<div>{_code(line)}</div>")
+    if items:
+        out.append("<ul>" + "".join(f"<li>{_code(x)}</li>" for x in items) + "</ul>")
+    return "".join(out)
+
+
+def _code(text: str) -> str:
+    parts = esc(text).split("`")
+    return "".join(f"<code>{x}</code>" if i % 2 else x for i, x in enumerate(parts))
+
+
+def tip(entry: dict | None, headings: Sequence[str] = ("What it is", "How it is calculated", "How to use it")) -> str:
+    """A ? button that opens a popup (the browser's Popover API: click to open, click outside or Esc to close).
+
+    ``entry`` has ``title`` and up to three texts ``what``, ``how`` and ``use``; see dashboard/glossary.py.
+    """
+    if not entry:
+        return ""
+    pid = f"ra-tip-{next(_TIP_IDS)}"
+    secs = "".join(f'<div class="h">{esc(h)}</div>{_rich(entry[k])}'
+                   for k, h in zip(("what", "how", "use"), headings, strict=True) if entry.get(k))
+    return (f'<button type="button" class="ra-q" popovertarget="{pid}" title="{esc(entry["title"])}">?</button>'
+            f'<div id="{pid}" popover="auto" class="ra-pop" role="dialog" aria-label="{esc(entry["title"])}">'
+            f'<button type="button" class="x" popovertarget="{pid}" popovertargetaction="hide" aria-label="close">×'
+            f'</button><div class="t">{esc(entry["title"])}</div>{secs}</div>')
+
+
+def kpi(label: str, value: str, sub: str = "", spark: str = "", sub_class: str = "muted", help_text: str = "",
+        info: str = "") -> str:
+    """A number card. ``info`` is markup from ``tip()`` shown as a ? next to the label."""
     title = f' title="{esc(help_text)}"' if help_text else ""
-    return (f'<div class="ra-card ra-kpi"{title}><div class="label">{esc(label)}</div><div class="value">{value}</div>'
+    return (f'<div class="ra-card ra-kpi"{title}><div class="label">{esc(label)}{info}</div><div class="value">{value}</div>'
             f'<div class="sub {sub_class}" style="margin-top:6px">{sub}</div>'
             + (f'<div style="margin-top:8px">{spark}</div>' if spark else "") + "</div>")
 
@@ -240,8 +315,9 @@ def gauge(value: float | None, p: dict[str, str], label: str = "", size: int = 2
                   w, h, label)
 
 
-def section(title: str, hint: str = "") -> str:
-    return f'<div class="ra-section"><h3>{esc(title)}</h3><div class="hint">{esc(hint)}</div></div>'
+def section(title: str, hint: str = "", info: str = "") -> str:
+    """A section header; ``info`` is markup from ``tip()`` shown as a ? after the title."""
+    return f'<div class="ra-section"><h3>{esc(title)}{info}</h3><div class="hint">{esc(hint)}</div></div>'
 
 
 def brand(title: str, sub: str, right: str = "") -> str:

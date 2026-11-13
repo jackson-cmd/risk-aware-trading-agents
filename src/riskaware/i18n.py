@@ -41,7 +41,7 @@ M: dict[str, tuple[str, str]] = {
     "market.term_short": ("VIX / VIX3M", "VIX 期限结构"),
     "market.fg_short": ("Fear & greed", "恐慌贪婪"),
     "market.cnn_short": ("CNN F&G", "CNN 恐慌贪婪"),
-    "market.breadth_short": ("Sector breadth", "板块广度"),
+    "market.breadth_short": ("Breadth", "板块广度"),
     "market.risk_short": ("Risk score", "风险分"),
     "market.why": ("Why", "依据"),
     "market.policy": ("What the agent does now", "智能体当前的做法"),
