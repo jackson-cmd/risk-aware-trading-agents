@@ -16,7 +16,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#-safety)
-[![Version 0.6.2](https://img.shields.io/badge/version-0.6.2-e5534b.svg)](CHANGELOG.md)
+[![Version 0.6.3](https://img.shields.io/badge/version-0.6.3-e5534b.svg)](CHANGELOG.md)
 [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server)
 [![11 strategies](https://img.shields.io/badge/strategies-11-8957e5.svg)](#-strategy-library)
 [![10 brokers](https://img.shields.io/badge/brokers-10-0969da.svg)](#-brokers)
@@ -39,10 +39,11 @@
 
 ## 🆕 What's new
 
-<sub>Latest release **0.6.2** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
+<sub>Latest release **0.6.3** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
 
 | | New in 0.6 and 0.5 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **⏳ Long runs keep going in the background**: start a scan, a backtest, an agents run or a news fetch on the dashboard, then open another page or reload: it keeps running, a bar at the top of every page shows how far it is, and one click takes you back to the result. A long backtest can be stopped halfway. |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **❓ Every number explains itself**: click the ? next to any card, column or field on the dashboard and a popup says what it is, how it is calculated (straight from the code: the regime rules, the six parts of the risk score, the technical (TA) score, conviction, the news score, Sharpe and the rest) and how to use it, in English and 中文. The Signals page now also shows conviction's four parts: technical (TA), earnings, news and macro. [See it →](#-screenshots) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔎 The news behind every backtest trade**: the dashboard's Backtest page now has a **News the backtest saw** panel. Pick a trade and it shows the headlines the backtest had seen at that close, which of them were confirmed, the news score, and the order the strategy placed the next day. [How →](docs/news-history.md#see-what-a-backtest-saw) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 2026 news in the box**: 16,945 news items for the 64 stocks of the built-in lists ship with the package (Benzinga headlines, titles only, and SEC 8-K filings, January to November 2026), so `riskaware backtest --news`, or the new **Replay news** switch on the dashboard's Backtest page, works with nothing to download. In 2026 so far the built-in agent with news returned **+15.9%** against SPY's +12.1%, with a max drawdown of **-5.3%** against -8.9%. [Results →](#2026-so-far-with-news) |

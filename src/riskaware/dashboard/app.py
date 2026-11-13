@@ -146,6 +146,95 @@ def arena():
     return Arena(base_cfg=get_config())
 
 
+# ------------------------------------------------------------------------------------------ jobs
+@st.cache_resource(show_spinner=False)
+def job_board():
+    """Background jobs of this dashboard process: they keep running when you switch pages or reload."""
+    from riskaware.dashboard.jobs import JobBoard
+
+    return JobBoard()
+
+
+JOB_PAGES = {"scan": "signals", "backtest": "backtest", "agents": "agents", "news": "news"}
+
+
+def start_job(kind: str, fn, label: str) -> bool:
+    try:
+        job_board().start(kind, fn, label)
+    except RuntimeError:
+        st.warning(L("The last one is still running: wait for it or stop it.", "上一次还在运行：等它跑完，或者先停止。"))
+        return False
+    return True
+
+
+def job_status(kind: str, stoppable: bool = False):
+    """(job, fresh): the latest job of ``kind``, with a live progress line while it runs. ``fresh`` is True the
+    first time a finished job's result is shown."""
+    board = job_board()
+    job = board.get(kind)
+    if job is None:
+        return None, False
+    if job.running:
+        _job_live(kind, stoppable)
+        return job, False
+    fresh = board.mark_seen(kind)
+    if job.error:
+        st.error(f"{job.label}: {job.error}")
+        with st.expander(L("Details", "详情")):
+            st.code(job.trace or job.error, language=None)
+    elif job.cancelled:
+        st.info(L(f"{job.label}: stopped.", f"{job.label}：已停止。"))
+    return job, fresh
+
+
+@st.fragment(run_every=1.0)
+def _job_live(kind: str, stoppable: bool) -> None:
+    job = job_board().get(kind)
+    if job is None or not job.running:
+        st.rerun()  # the whole page, which now shows the result
+        return
+    text = (f"⏳ {job.label} · {job.message or L('working…', '进行中…')} · {int(job.elapsed())} s · "
+            + L("keeps running if you open another page", "切到别的页面也会继续跑"))
+    if job.progress is not None:
+        st.progress(job.progress, text=text)
+    else:
+        st.info(text)
+    if stoppable and st.button(L("Stop", "停止"), key=f"stop_{kind}_{job.id}", icon=":material/stop_circle:"):
+        job_board().stop(kind)
+
+
+def jobs_banner(current: str) -> None:
+    """Jobs started on other pages that still run, or finished and wait to be looked at, with a link to them."""
+    if any(j.running or not j.seen for j in job_board().all()):
+        _jobs_banner_live(current)
+
+
+@st.fragment(run_every=2.0)
+def _jobs_banner_live(current: str) -> None:
+    for j in job_board().all():
+        if JOB_PAGES.get(j.kind) == current or not (j.running or not j.seen):
+            continue
+        if j.running:
+            done = f"{j.progress:.0%}" if j.progress is not None else f"{int(j.elapsed())} s"
+            text = f"⏳ {j.label} · {done} · " + L("still running", "还在运行")
+        elif j.ok:
+            text = f"✅ {j.label} · " + L("done: open it to see the result", "完成了，点开看结果")
+        else:
+            text = f"⚠️ {j.label} · " + (L("stopped", "已停止") if j.cancelled else L("failed", "出错了"))
+        page = PAGE_BY_PATH.get(JOB_PAGES.get(j.kind, ""))
+        if page is not None:
+            st.page_link(page, label=text)
+        else:
+            st.caption(text)
+
+
+def run_agents(a, names, ctx):
+    """Run agents as a job. With several agents the progress line names the one trading; one agent's name is
+    already in the job's label."""
+    many = not names or len(names) > 1
+    return a.run(names, progress=lambda n: ctx.report(message=f"→ {n}" if many else None))
+
+
 def universe_name(u: str) -> str:
     return L("default list", "默认股票池") if u == "default" else u
 
@@ -456,15 +545,8 @@ def _agent_detail(a, name: str, bench: pd.Series | None) -> None:
                + (f" · {agent_note(spec)}" if spec.note else ""))
     c1, c2, c3, c4, c5, _ = st.columns([1, 1, 1, 1, 1, 1])
     if c1.button(L("Run now", "现在运行"), key=f"run_{name}", icon=":material/play_arrow:", type="primary"):
-        with st.spinner(L(f"Running {name}…", f"正在运行 {name}…")):
-            try:
-                res = a.run([name])
-            except RuntimeError as exc:
-                res = []
-                st.warning(str(exc))
-        for r in res:
-            (st.success if r.ok else st.error)(r.summary())
-        load_benchmark.clear()
+        if start_job("agents", lambda ctx, _n=name: run_agents(a, [_n], ctx), L(f"Run {name}", f"运行 {name}")):
+            st.rerun()  # the progress line sits at the top of the page
     if c2.button(L("Resume", "恢复") if not spec.enabled else L("Pause", "暂停"), key=f"pause_{name}",
                  icon=":material/pause:" if spec.enabled else ":material/play_circle:"):
         a.set_enabled(name, not spec.enabled)
@@ -582,16 +664,12 @@ def page_agents() -> None:
             _create_agent_form(a)
         if agents and b2.button(L("Run all now", "全部现在运行"), icon=":material/play_arrow:", type="primary",
                                 width="stretch"):
-            with st.status(L("Running agents…", "正在运行智能体…"), expanded=True) as box:
-                try:
-                    runs = a.run(progress=lambda n: box.write(f"→ {n}"))
-                except RuntimeError as exc:
-                    box.update(label=str(exc), state="error")
-                else:
-                    for r in runs:
-                        box.write(("✅ " if r.ok else "❌ ") + r.summary())
-                    box.update(label=L("Done", "完成"), state="complete")
-            load_benchmark.clear()
+            start_job("agents", lambda ctx: run_agents(a, None, ctx), L("Run all agents", "运行全部智能体"))
+    job, fresh = job_status("agents")
+    if fresh:
+        load_benchmark.clear()
+        for r in job.result or []:
+            (st.success if r.ok else st.error)(r.summary())
     if not agents:
         H(ui.empty("🤖", L("No agents yet", "还没有智能体"),
                          L("Start with four agents of different temperaments, or create your own from any strategy.",
@@ -646,13 +724,28 @@ def page_signals() -> None:
                               help=L("Leave empty to scan the stock list in your config.", "留空就扫描配置里的股票池。"))
         go_ = st.button(L("Run scan", "开始扫描"), type="primary", icon=":material/radar:")
     if go_:
-        from riskaware.engine import TradingEngine
         from riskaware.strategy import load_strategy
 
-        with st.spinner(L("Running the agents…", "智能体分析中…")):
-            eng = TradingEngine(get_config(profile), strategy=load_strategy(strat, {}))
-            syms = [s.strip().upper() for s in extra.split(",") if s.strip()] or None
-            market, signals, _ = eng.scan(syms)
+        cfg = get_config(profile).model_copy(deep=True)
+        syms = [s.strip().upper() for s in extra.split(",") if s.strip()] or None
+        fetching = L("prices, the macro calendar and news", "读取价格、宏观日历和新闻")
+        try:
+            strategy = load_strategy(strat, {})
+        except Exception as exc:  # noqa: BLE001 - a broken strategy file is shown, not raised
+            st.error(str(exc))
+        else:
+            def work(ctx, cfg=cfg, strategy=strategy, syms=syms):
+                from riskaware.engine import TradingEngine
+
+                ctx.report(message=fetching)
+                market, signals, _ = TradingEngine(cfg, strategy=strategy).scan(syms)
+                return {"market": market, "signals": signals}
+
+            start_job("scan", work, L(f"Scan · {strat} · {profile_name(profile)}", f"扫描 · {strat} · {profile_name(profile)}"))
+    job, _ = job_status("scan")
+    if job is not None and job.ok:
+        market, signals = job.result["market"], job.result["signals"]
+        st.caption(job.label)
         H(f'<div style="margin:6px 0 10px">{ui.pill(regime_label(market.regime.value), ui.regime_color(market.regime.value, P))}</div>')
         if not signals:
             H(ui.empty("🧘", T("scan.none"), L("The agents only act on setups that pass every check.",
@@ -721,40 +814,43 @@ def page_backtest() -> None:
 
         bcfg = get_config(profile).model_copy(deep=True)
         bcfg.universe.preset = preset
-        cache = DiskCache(bcfg.data.cache_path)
-        pit = None
-        if news:
-            from riskaware.news.history import NewsArchive, PointInTimeNews
-            from riskaware.news.relevance import company_names
-
-            pit = PointInTimeNews(NewsArchive(bcfg.news.archive_path, bundled=bcfg.news.bundled), bcfg.news,
-                                  bcfg.universe.resolve(), names=lambda s: company_names(s, cache))
-            pit = pit if pit.symbols else None
-        bt = Backtester(bcfg, make_price_provider(bcfg.data.price_source, cache, bcfg.data.csv_dir), news=pit)
         names = list(dict.fromkeys([custom.strip() or saved.get(strat, strat),
                                     *[saved.get(c, c) for c in compare if c != strat]]))
-        results = []
-        bar = st.progress(0.0, text=L("Downloading prices and simulating…", "下载价格并模拟中…"))
-        try:
+        reading = L("reading the news", "读取新闻")
+        steps = L("downloading prices and simulating", "下载价格并模拟")
+
+        def work(ctx, bcfg=bcfg, names=names, start=start, end=end, cash=cash, news=news):
+            cache = DiskCache(bcfg.data.cache_path)
+            pit = None
+            if news:
+                from riskaware.news.history import NewsArchive, PointInTimeNews
+                from riskaware.news.relevance import company_names
+
+                ctx.report(0.0, reading)
+                pit = PointInTimeNews(NewsArchive(bcfg.news.archive_path, bundled=bcfg.news.bundled), bcfg.news,
+                                      bcfg.universe.resolve(), names=lambda s: company_names(s, cache))
+                pit = pit if pit.symbols else None
+            bt = Backtester(bcfg, make_price_provider(bcfg.data.price_source, cache, bcfg.data.csv_dir), news=pit)
+            results = []
             for k, name in enumerate(names):
+                ctx.report(k / len(names), f"{name} · {steps}")
                 results.append(bt.run(load_strategy(name), start, end, initial_cash=cash,
-                                      progress=lambda i, n, _k=k: bar.progress(min(1.0, (_k + i / n) / len(names)))))
-        except Exception as exc:
-            bar.empty()
-            st.error(str(exc))
-            return
-        bar.empty()
-        st.session_state.bt_results = results  # survives reruns (e.g. the log-scale toggle)
-        st.session_state.bt_pit = pit  # the news this run replayed, for the panel below
-        for key in ("bt_news_trade", "bt_news_sym", "bt_news_day"):
-            st.session_state.pop(key, None)
-    results = st.session_state.get("bt_results")
-    if not results:
-        st.caption(L("Option strategies (aggressive_calls, wheel) are priced with Black-Scholes on modelled "
-                     "volatility. The wheel needs about $1M on the megacap list.",
-                     "期权策略（aggressive_calls、wheel）用 Black-Scholes 和模型估算的波动率定价。wheel 在 megacap "
-                     "股票池上大约需要 100 万美元。"))
+                                      progress=lambda i, n, _k=k: ctx.report((_k + i / n) / len(names))))
+            return {"results": results, "pit": pit}
+
+        if start_job("backtest", work, L(f"Backtest · {names[0]} · {preset}", f"回测 · {names[0]} · {preset}")):
+            for key in ("bt_news_trade", "bt_news_sym", "bt_news_day"):
+                st.session_state.pop(key, None)
+    job, _ = job_status("backtest", stoppable=True)
+    if job is None or not job.ok:
+        if job is None:
+            st.caption(L("Option strategies (aggressive_calls, wheel) are priced with Black-Scholes on modelled "
+                         "volatility. The wheel needs about $1M on the megacap list.",
+                         "期权策略（aggressive_calls、wheel）用 Black-Scholes 和模型估算的波动率定价。wheel 在 megacap "
+                         "股票池上大约需要 100 万美元。"))
         return
+    results, pit = job.result["results"], job.result["pit"]
+    st.caption(job.label)
     from riskaware.backtest.metrics import drawdown_series
 
     bm = results[0].benchmark_metrics
@@ -803,7 +899,7 @@ def page_backtest() -> None:
         st.dataframe(results[0].trades.iloc[::-1], hide_index=True, width="stretch")
     for n in results[0].notes:
         st.caption("• " + n)
-    news_seen_panel(results[0], st.session_state.get("bt_pit"))
+    news_seen_panel(results[0], pit)
 
 
 def news_kpis(rep) -> None:
@@ -912,20 +1008,26 @@ def page_news() -> None:
                                     "只有公司自己的 8-K 公告，或证实了先前报道的公司通稿，才能触发强制卖出")))
     c1, c2 = st.columns([3, 1], vertical_alignment="bottom")
     sym = c1.text_input(L("Symbol", "股票代码"), "AAPL").strip().upper()
-    if not (c2.button(L("Fetch news", "获取新闻"), type="primary", width="stretch", icon=":material/newspaper:")
-            and sym):
-        return
-    from riskaware.news.relevance import company_names
-    from riskaware.news.sources import NewsCollector
-    from riskaware.news.verify import analyze_news
-    from riskaware.utils import DiskCache
+    if c2.button(L("Fetch news", "获取新闻"), type="primary", width="stretch", icon=":material/newspaper:") and sym:
+        def work(ctx, sym=sym, cfg=cfg):
+            from riskaware.news.relevance import company_names
+            from riskaware.news.sources import NewsCollector
+            from riskaware.news.verify import analyze_news
+            from riskaware.utils import DiskCache
 
-    with st.spinner("Finviz + RSS + SEC…"):
-        cache = DiskCache(cfg.data.cache_path)
-        col = NewsCollector((["finviz"] if cfg.news.finviz else []) + cfg.news.feeds, cache,
-                            cfg.data.contact_email, cfg.news.request_interval)
-        rep = analyze_news(sym, col.collect(sym, cfg.news.lookback_hours), cfg.news, sources=col.last_status,
-                           names=company_names(sym, cache))
+            ctx.report(message="Finviz + RSS + SEC")
+            cache = DiskCache(cfg.data.cache_path)
+            col = NewsCollector((["finviz"] if cfg.news.finviz else []) + cfg.news.feeds, cache,
+                                cfg.data.contact_email, cfg.news.request_interval)
+            return analyze_news(sym, col.collect(sym, cfg.news.lookback_hours), cfg.news, sources=col.last_status,
+                                names=company_names(sym, cache))
+
+        start_job("news", work, L(f"News · {sym}", f"新闻 · {sym}"))
+    job, _ = job_status("news")
+    if job is None or not job.ok:
+        return
+    rep = job.result
+    st.caption(job.label)
     news_kpis(rep)
     story_legend()
     st.dataframe(pd.DataFrame([{
@@ -1010,6 +1112,7 @@ pages = [
     st.Page(page_account, title=L("Account", "账户"), icon=":material/account_balance_wallet:", url_path="account"),
 ]
 nav = st.navigation(pages, position="top")
+PAGE_BY_PATH = {p.url_path: p for p in pages}
 
 top_l, top_r = st.columns([5, 1.3], vertical_alignment="center")
 H(where=top_l, markup=ui.brand(T("app.name"), L("Macro-aware, risk-first trading agents for US stocks · paper trading first",
@@ -1021,6 +1124,7 @@ with top_r:
         st.session_state.lang = "zh" if choice == "中文" else "en"
         st.rerun()
 
+jobs_banner(nav.url_path)
 nav.run()
 H(f'<div class="ra-note" style="margin-top:40px;text-align:center">{ui.esc(T("disclaimer"))} · '
         f'<a href="https://github.com/jackson-cmd/risk-aware-trading-agents" target="_blank">GitHub</a></div>')
