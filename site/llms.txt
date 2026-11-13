@@ -1,0 +1,31 @@
+# Risk-Aware Trading Agents
+
+> Open-source AI trading agents for US stocks (Python, MIT license). They check the macro calendar (FOMC, CPI, jobs report), the VIX term structure and cross-verified news before they buy. The project includes news backtests that cannot see the future, a frozen point-in-time copy of the 2026 market for research, paper-trading agents ranked against SPY, an MCP server for Claude and other LLM clients, and paper or live trading through 9 broker adapters. Nothing in it is investment advice.
+
+- Install: `pip install risk-aware-trading-agents` (Python 3.10+), or run the dashboard with `docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard`.
+- MCP server: `uvx risk-aware-trading-agents mcp` (stdio, 21 tools). The tools are read-only or work on local paper accounts; none can send an order to a broker.
+- Research kit: daily prices from 2024-01-02 to 2026-11-11 for 64 large-cap stocks and 25 ETFs, the VIX term structure (VIX9D, VIX, VIX3M, VVIX) and 16,945 headlines and SEC 8-K filings with publication times, with SHA-256 hashes. Every experiment runs a look-ahead check.
+- Brokers: Alpaca (tested on a paper account), Public, Tradier, Interactive Brokers, Charles Schwab, tastytrade, Futu/moomoo, Tiger and Longbridge, plus a built-in paper account.
+
+## Guides
+
+- [Backtest trading strategies with news, without look-ahead bias](https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html): point-in-time replay, a 16:00 cutoff, orders at the next open, and a check that the backtest never saw the future
+- [Free point-in-time US stock market data for 2026](https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html): prices, VIX and news with publication times for reproducible backtests
+- [Test LLM trading agents on a frozen market](https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html): trade 2026 one close at a time with Claude, GPT, Gemini or local models, with a blind mode against memorization
+
+## Documentation
+
+- [README](https://github.com/jackson-cmd/risk-aware-trading-agents#readme): quick start, features, configuration, FAQ
+- [Research kit](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/research.md): the frozen 2026 market, experiments, the look-ahead check, LLM trading sessions
+- [Agents and the MCP server](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/agents.md): paper-trading agents and how to connect Claude, Codex, Gemini or Cursor
+- [News history](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/news-history.md): point-in-time news for backtests, bundled for 2026 and built on your machine for other years
+- [Custom strategies](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/custom-strategies.md): write a strategy class and backtest it
+- [Strategy lab](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/strategy-lab.md): let an AI write a strategy from a description and test it safely
+- [Brokers](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/brokers.md): keys, gateways and paper accounts for each broker
+- [Changelog](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/CHANGELOG.md)
+
+## Optional
+
+- [PyPI package](https://pypi.org/project/risk-aware-trading-agents/)
+- [Docker image](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents)
+- [README in Chinese](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md)
