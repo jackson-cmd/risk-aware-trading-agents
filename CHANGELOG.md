@@ -1,6 +1,6 @@
 # Changelog
 
-[中文](CHANGELOG_zh.md)
+[中文](docs/zh/CHANGELOG.md)
 
 ## 0.7.0 (2026-11-12)
 
