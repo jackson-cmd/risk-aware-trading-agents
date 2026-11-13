@@ -44,6 +44,25 @@ def T(key: str, **kw) -> str:
     return i18n.t(key, LANG, **kw)
 
 
+def Q(key: str) -> str:
+    """A ? button that opens the explanation of ``key`` (see dashboard/glossary.py)."""
+    from riskaware.dashboard import glossary as gl
+
+    return ui.tip(gl.entry(key, LANG), gl.HEADINGS[LANG])
+
+
+def HQ(key: str) -> str:
+    """The same explanation as Markdown, for Streamlit's help= tooltips."""
+    from riskaware.dashboard import glossary as gl
+
+    return gl.help_md(key, LANG)
+
+
+def legend(*pairs: tuple[str, str]) -> None:
+    """A row of column names, each with a ? that explains it, shown above a table."""
+    H('<div class="ra-legend">' + "".join(f"<span>{ui.esc(label)}{Q(key)}</span>" for label, key in pairs) + "</div>")
+
+
 def H(markup: str, where=None) -> None:
     """Render a component. st.html would strip the SVG/img charts, so this goes through markdown;
     blank-line-free and with $ escaped so markdown and LaTeX leave it alone."""
@@ -74,9 +93,7 @@ def llm_choice_inputs(key: str, current: str | None = None) -> str | None:
     kind0 = kind0 if kind0 in LLM_KINDS else "off"
     c1, c2 = st.columns([1, 1.4])
     kind = c1.selectbox(L("LLM review", "LLM 复核"), LLM_KINDS, index=LLM_KINDS.index(kind0), format_func=llm_kind_name,
-                        key=f"{key}_kind", help=L("A bull analyst, a bear analyst and a judge read the evidence for "
-                                                  "each buy and can move conviction by at most ±0.15 or veto it.",
-                                                  "多方、空方和裁判阅读每个买入候选的证据，最多把信心分调整 ±0.15，或者否决。"))
+                        key=f"{key}_kind", help=HQ("llm_review"))
     model = c2.text_input(L("Model", "模型"), value=model0, key=f"{key}_model",
                           placeholder="gpt-5.6-luna · qwen2.5:3b · default")
     if kind == "off":
@@ -178,13 +195,13 @@ def page_market() -> None:
     cnn = f"{market.cnn_fear_greed:.0f}" if market.cnn_fear_greed is not None else "–"
     H(f"""<div class="ra-hero">
       <div class="ra-card ra-regime" style="--c:{c}">
-        <div class="eyebrow">{L('Market regime', '市场状态')} · {market.day:%Y-%m-%d}</div>
+        <div class="eyebrow">{L('Market regime', '市场状态')} · {market.day:%Y-%m-%d}{Q("regime")}</div>
         <div class="big"><span class="ra-dot" style="--c:{c};width:14px;height:14px"></span>{ui.esc(regime_label(r))}</div>
         <div class="what">{ui.esc(regime_label(r, short=False))}</div>
         <div class="ra-chips">{reasons}</div>
       </div>
       <div class="ra-card ra-gauge">
-        <div class="eyebrow" style="color:var(--muted);font-size:.76rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase">{L('Fear & greed', '恐慌贪婪指数')}</div>
+        <div class="eyebrow" style="color:var(--muted);font-size:.76rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase">{L('Fear & greed', '恐慌贪婪指数')}{Q("fear_greed")}</div>
         {ui.gauge(market.fear_greed, P, fg_label)}
         <div class="cap">CNN Fear &amp; Greed <b class="mono" style="color:var(--text)">{cnn}</b> · {L('computed from free data', '用免费数据自算')}</div>
       </div></div>""")
@@ -200,19 +217,23 @@ def page_market() -> None:
                  else L("contango: normal", "正常结构"))
     cards = [
         ui.kpi("VIX", ui.num(market.vix), vix_note, ui.sparkline(vix_tail, P, color=P["warn"], height=30, stretch=True),
-               help_text=T("market.vix")),
-        ui.kpi("VIX / VIX3M", ui.num(term, 2), term_note, "", "down" if term and term > 1 else "muted"),
-        ui.kpi(T("market.fg_short"), ui.num(market.fear_greed, 0), fg_label, ui.sparkline(fg_tail, P, color=P["accent"], height=30, stretch=True)),
-        ui.kpi(T("market.breadth_short"), ui.pct(market.breadth, 0), L("sectors above EMA200", "板块站上 EMA200")),
-        ui.kpi(T("market.risk_short"), ui.num(market.risk_score, 0), L("0 calm · 100 stress", "0 平静 · 100 紧张")),
+               info=Q("vix")),
+        ui.kpi("VIX / VIX3M", ui.num(term, 2), term_note, "", "down" if term and term > 1 else "muted",
+               info=Q("vix_term")),
+        ui.kpi(T("market.fg_short"), ui.num(market.fear_greed, 0), fg_label,
+               ui.sparkline(fg_tail, P, color=P["accent"], height=30, stretch=True), info=Q("fear_greed")),
+        ui.kpi(T("market.breadth_short"), ui.pct(market.breadth, 0), L("sectors above EMA200", "板块站上 EMA200"),
+               info=Q("breadth")),
+        ui.kpi(T("market.risk_short"), ui.num(market.risk_score, 0), L("0 calm · 100 stress", "0 平静 · 100 紧张"),
+               info=Q("risk_score")),
         ui.kpi("SPY", ui.num(spy["close"].iloc[-1], 2) if len(spy) else "–",
                f'{ui.pct(above, 1, True)} {L("vs EMA200", "相对 EMA200")}', ui.sparkline(spy_tail, P, height=30, stretch=True),
-               ui.tone(above)),
+               ui.tone(above), info=Q("spy_trend")),
     ]
     H(f'<div class="ra-grid ra-g6" style="margin-top:12px">{"".join(cards)}</div>')
 
     H(ui.section(T("events.title"), L("the agents get careful before FOMC, CPI and the jobs report",
-                                              "FOMC、CPI、非农前智能体会更谨慎")))
+                                              "FOMC、CPI、非农前智能体会更谨慎"), Q("events")))
     if events:
         chips = []
         for e in events[:14]:
@@ -294,16 +315,17 @@ def _create_agent_form(a) -> None:
                                                                               "小写字母、数字、- 或 _"))
         saved = saved_ai_strategies()
         strat = c2.selectbox(L("Strategy", "策略"), [*strategies, *saved], format_func=lambda s: s,
-                             help=L("built-in strategies and the ones an AI saved for you; or give your own file "
-                                    "below", "内置策略和 AI 帮你保存的策略；也可以在下面填你自己的策略文件"))
+                             help=HQ("strategy"))
         custom = st.text_input(L("…or your own strategy file", "…或你自己的策略文件"),
                                placeholder="/path/to/my_strategy.py:MyStrategy")
         c3, c4, c5 = st.columns(3)
         profile = c3.selectbox(L("Risk profile", "风险档位"), list(PROFILE_PRESETS),
-                               index=list(PROFILE_PRESETS).index("balanced"), format_func=profile_name)
+                               index=list(PROFILE_PRESETS).index("balanced"), format_func=profile_name,
+                               help=HQ("profile"))
         universe = c4.selectbox(L("Stock list", "股票池"), ["", *UNIVERSES],
-                                format_func=lambda u: u or L("from your config", "用配置里的"))
-        cash = c5.number_input(L("Starting cash ($)", "初始资金（美元）"), 1_000, 10_000_000, 100_000, 10_000)
+                                format_func=lambda u: u or L("from your config", "用配置里的"), help=HQ("universe"))
+        cash = c5.number_input(L("Starting cash ($)", "初始资金（美元）"), 1_000, 10_000_000, 100_000, 10_000,
+                               help=HQ("cash"))
         symbols = st.text_input(L("Extra symbols (optional)", "额外股票（可选）"), placeholder="PLTR, SHOP")
         llm = llm_choice_inputs("new_agent_llm")
         note = st.text_input(L("Note (optional)", "备注（可选）"))
@@ -490,9 +512,12 @@ def _decisions_tab(a, name: str) -> None:
         L("Action", "操作"): ("🟢 " if r["action"] == "BUY" else "🔴 ") + i18n.t("action." + r["action"], LANG),
         L("Conviction", "信心"): float(r["strength"]), L("Passed risk check", "通过风控"): bool(r["accepted"]),
         "LLM": verdict(r.get("llm"))} for r in rows])
+    legend((L("Conviction", "信心"), "conviction"), (L("Passed risk check", "通过风控"), "passed_risk"),
+           ("LLM", "llm_review"))
     st.dataframe(table, hide_index=True, width="stretch", height=260, column_config={
-        L("Conviction", "信心"): st.column_config.ProgressColumn(min_value=0.0, max_value=1.0, format="%.2f"),
-        L("Passed risk check", "通过风控"): st.column_config.CheckboxColumn()})
+        L("Conviction", "信心"): st.column_config.ProgressColumn(min_value=0.0, max_value=1.0, format="%.2f",
+                                                               help=HQ("conviction")),
+        L("Passed risk check", "通过风控"): st.column_config.CheckboxColumn(help=HQ("passed_risk"))})
     i = st.selectbox(L("How was this decision made?", "这个决定是怎么做出来的？"), range(len(rows)),
                      format_func=lambda k: f"{str(rows[k]['ts'])[:16].replace('T', ' ')} · {rows[k]['symbol']} · "
                                            f"{rows[k]['action']} · {rows[k]['strength']:.2f}",
@@ -516,17 +541,17 @@ def _decision_view(r: dict) -> None:
         <div style="font-size:1.3rem;font-weight:800">{ui.esc(r['symbol'])} · {ui.esc(i18n.t('action.' + r['action'], LANG))}</div></div>
         <div>{check} {ui.pill(L('conviction ', '信心 ') + conv, P['accent'], dot=False)}</div>
       </div>
-      <div class="ra-note" style="margin-top:12px">{L('1 · What the technical, earnings and news agents found', '1 · 技术面、财报和新闻智能体的发现')}</div>
+      <div class="ra-note" style="margin-top:12px">{L('1 · What the technical, earnings and news agents found', '1 · 技术面、财报和新闻智能体的发现')}{Q("setups")}</div>
       <div class="ra-chips" style="margin-top:6px">{setups}</div>
       <ul style="margin:8px 0 0 18px;padding:0">{reasons}</ul>
-      <div class="ra-note" style="margin-top:12px">{L('2 · Risk manager', '2 · 风控')}</div>
+      <div class="ra-note" style="margin-top:12px">{L('2 · Risk manager', '2 · 风控')}{Q("passed_risk")}</div>
       <div>{ui.esc(r['reject_reason']) if not ok else L('within the cash floor, position, sector and regime limits', '没有超出现金底线、单票、板块和市场状态的限制')}</div>
     </div>""")
     if not rv:
         st.caption(L("3 · No LLM review: the LLM only looks at buy candidates, and only for agents that have one.",
                      "3 · 没有 LLM 复核：LLM 只看买入候选，而且要智能体开了 LLM。"))
         return
-    H(f'<div class="ra-note" style="margin:14px 0 6px">{L("3 · LLM review board", "3 · LLM 复核")} · '
+    H(f'<div class="ra-note" style="margin:14px 0 6px">{L("3 · LLM review board", "3 · LLM 复核")}{Q("llm_review")} · '
       f'{ui.esc(rv["model"])} · {rv["latency_ms"]} ms</div>')
     if rv.get("adjustment") is None:
         st.warning(f"{rv['model']}: {rv.get('error') or L('no usable answer', '没有可用的回答')}")
@@ -550,7 +575,7 @@ def page_agents() -> None:
     head_l, head_r = st.columns([3, 2], vertical_alignment="bottom")
     H(where=head_l, markup=ui.section(L("Paper-trading agents", "模拟盘智能体"),
                            L("each agent is a strategy with its own simulated account",
-                             "每个智能体是一个策略，配一个独立的模拟账户")))
+                             "每个智能体是一个策略，配一个独立的模拟账户"), Q("agents")))
     with head_r:
         b1, b2 = st.columns(2)
         with b1.popover(L("New agent", "新建智能体"), icon=":material/add:", width="stretch"):
@@ -581,23 +606,26 @@ def page_agents() -> None:
     best = rows[0]
     avg = sum(r["return"] for r in rows) / len(rows)
     traded = sum(1 for r in rows if r["ran_today"])
-    bench_ret = next((r["benchmark_return"] for r in rows if r["benchmark_return"] is not None), None)
+    first = min((r for r in rows if r["benchmark_return"] is not None), key=lambda r: str(r["created"]),
+                default=None)  # the label says "since the first agent started": the oldest agent, not the leader
+    bench_ret = first["benchmark_return"] if first else None
     H('<div class="ra-grid ra-g4">' + "".join([
         ui.kpi(L("Agents", "智能体"), str(len(rows)), L(f"{traded} traded today", f"今天已交易 {traded} 个")),
         ui.kpi(L("Leader", "领先"), ui.esc(best["name"]), f'<span class="{ui.tone(best["return"])}">'
                f'{ui.pct(best["return"], 2, True)}</span>'),
-        ui.kpi(L("Average return", "平均收益"), ui.pct(avg, 2, True), L("all agents", "全部智能体"), "", ui.tone(avg)),
+        ui.kpi(L("Average return", "平均收益"), ui.pct(avg, 2, True), L("all agents", "全部智能体"), "", ui.tone(avg),
+               info=Q("avg_return")),
         ui.kpi("SPY", ui.pct(bench_ret, 2, True), L("since the first agent started", "自第一个智能体开始"), "",
-               ui.tone(bench_ret)),
+               ui.tone(bench_ret), info=Q("spy_since")),
     ]) + "</div>")
-    H(ui.section(L("Leaderboard", "排行榜"), L("ranked by return since start", "按开始以来的收益排名")))
+    H(ui.section(L("Leaderboard", "排行榜"), L("ranked by return since start", "按开始以来的收益排名"), Q("agent_card")))
     H(_agent_cards(rows))
     H(ui.section(L("Agent details", "智能体详情")))
     name = st.segmented_control(L("Agent", "智能体"), [r["name"] for r in rows], default=rows[0]["name"],
                                 label_visibility="collapsed")
     if name:
         _agent_detail(a, name, bench)
-    H(ui.section(L("Schedule", "定时运行")))
+    H(ui.section(L("Schedule", "定时运行"), "", Q("schedule")))
     _schedule_panel(a)
 
 
@@ -605,14 +633,17 @@ def page_signals() -> None:
     from riskaware.strategy import list_strategies
 
     H(ui.section(L("Today's signals", "今天的信号"),
-                       L("what each strategy would buy or sell at today's prices", "每个策略按今天的价格会买什么、卖什么")))
+                       L("what each strategy would buy or sell at today's prices", "每个策略按今天的价格会买什么、卖什么"),
+                       Q("signals")))
     with st.container(border=True):
         c1, c2, c3 = st.columns([1.2, 1, 2])
-        strat = c1.selectbox(L("Strategy", "策略"), list(list_strategies()))
+        strat = c1.selectbox(L("Strategy", "策略"), list(list_strategies()), help=HQ("strategy"))
         profile = c2.selectbox(L("Risk profile", "风险档位"), list(PROFILE_PRESETS),
-                               index=list(PROFILE_PRESETS).index("balanced"), format_func=profile_name)
+                               index=list(PROFILE_PRESETS).index("balanced"), format_func=profile_name,
+                               help=HQ("profile"))
         extra = c3.text_input(L("Symbols (optional, comma separated)", "股票代码（可选，逗号分隔）"),
-                              placeholder="NVDA, AAPL, COST")
+                              placeholder="NVDA, AAPL, COST",
+                              help=L("Leave empty to scan the stock list in your config.", "留空就扫描配置里的股票池。"))
         go_ = st.button(L("Run scan", "开始扫描"), type="primary", icon=":material/radar:")
     if go_:
         from riskaware.engine import TradingEngine
@@ -627,14 +658,24 @@ def page_signals() -> None:
             H(ui.empty("🧘", T("scan.none"), L("The agents only act on setups that pass every check.",
                                                        "只有通过全部检查的机会，智能体才会行动。")))
             return
+        parts = {"technical": (L("Technical (TA)", "技术面（TA）"), "technical"),
+                 "fundamental": (L("Earnings", "财报"), "earnings"), "news": (L("News", "新闻"), "news_part"),
+                 "macro": (L("Macro", "宏观"), "macro_part")}
+        shown = [k for k in parts if any(k in (s.details or {}).get("components", {}) for s in signals)]
         df = pd.DataFrame([{
             L("Symbol", "代码"): s.symbol,
             L("Action", "操作"): ("🟢 " if s.action.value == "BUY" else "🔴 ") + i18n.t("action." + s.action.value, LANG),
             L("Conviction", "信心"): float(s.strength),
+            **{parts[k][0]: (s.details or {}).get("components", {}).get(k) for k in shown},
             L("Setups", "形态"): ", ".join(i18n.setup(x, LANG) for x in s.setups[:3]),
             L("Why", "理由"): s.reason} for s in sorted(signals, key=lambda x: -x.strength)])
+        bar = st.column_config.ProgressColumn
+        legend((L("Conviction", "信心"), "conviction"), *[(parts[k][0], parts[k][1]) for k in shown],
+               (L("Setups", "形态"), "setups"))
         st.dataframe(df, hide_index=True, width="stretch", column_config={
-            L("Conviction", "信心"): st.column_config.ProgressColumn(min_value=0.0, max_value=1.0, format="%.2f"),
+            L("Conviction", "信心"): bar(min_value=0.0, max_value=1.0, format="%.2f", help=HQ("conviction")),
+            **{parts[k][0]: bar(min_value=0.0, max_value=1.0, format="%.2f", help=HQ(parts[k][1])) for k in shown},
+            L("Setups", "形态"): st.column_config.TextColumn(help=HQ("setups")),
             L("Why", "理由"): st.column_config.TextColumn(width="large")})
 
 
@@ -655,20 +696,22 @@ def page_backtest() -> None:
                                                "收盘出信号、次日成交、5 个基点滑点")))
     with st.form("bt"):
         c1, c2, c3 = st.columns(3)
-        strat = c1.selectbox(L("Strategy", "策略"), choices)
-        compare = c2.multiselect(L("Compare with", "对比策略"), choices, default=["buy_and_hold"])
-        preset = c3.selectbox(L("Stock list", "股票池"), UNIVERSES)
+        strat = c1.selectbox(L("Strategy", "策略"), choices, help=HQ("strategy"))
+        compare = c2.multiselect(L("Compare with", "对比策略"), choices, default=["buy_and_hold"], help=HQ("compare"))
+        preset = c3.selectbox(L("Stock list", "股票池"), UNIVERSES, help=HQ("universe"))
         d1, d2, d3, d4 = st.columns(4)
-        start = d1.date_input(L("Start", "开始"), date(2018, 1, 1))
-        end = d2.date_input(L("End", "结束"), date.today())
-        cash = d3.number_input(L("Initial cash", "初始资金"), value=100_000, step=10_000)
+        start = d1.date_input(L("Start", "开始"), date(2018, 1, 1), help=HQ("dates"))
+        end = d2.date_input(L("End", "结束"), date.today(), help=HQ("dates"))
+        cash = d3.number_input(L("Initial cash", "初始资金"), value=100_000, step=10_000, help=HQ("cash"))
         profile = d4.selectbox(L("Risk profile", "风险档位"), list(PROFILE_PRESETS),
-                               index=list(PROFILE_PRESETS).index("balanced"), format_func=profile_name)
+                               index=list(PROFILE_PRESETS).index("balanced"), format_func=profile_name,
+                               help=HQ("profile"))
         custom = st.text_input(L("…or your own strategy file", "…或你自己的策略文件"),
-                               placeholder="/path/to/my_strategy.py:MyStrategy")
+                               placeholder="/path/to/my_strategy.py:MyStrategy", help=HQ("own_file"))
         news = st.toggle(L("Replay news: each day sees only what was published before its close "
                            "(2026 headlines ship with the package)",
-                           "回放新闻：每天只看到收盘前已发布的新闻（安装包自带 2026 年标题）"), value=False)
+                           "回放新闻：每天只看到收盘前已发布的新闻（安装包自带 2026 年标题）"), value=False,
+                         help=HQ("replay_news"))
         run = st.form_submit_button(L("Run backtest", "开始回测"), type="primary")
     if run:
         from riskaware.backtest.engine import Backtester
@@ -716,16 +759,17 @@ def page_backtest() -> None:
 
     bm = results[0].benchmark_metrics
     cards = []
-    for r in [*results, None]:
+    for i, r in enumerate([*results, None]):
         m = r.metrics if r else bm
         title = r.strategy if r else L("SPY buy & hold", "SPY 买入持有")
+        q = (lambda k: Q(k)) if i == 0 else (lambda k: "")  # the ? buttons once, on the first card
         cards.append(f"""<div class="ra-card ra-kpi"><div class="label">{ui.esc(title)}</div>
           <div class="value {ui.tone(m.get('cagr'))}">{ui.pct(m.get('cagr'), 1)}</div>
-          <div class="sub">{L('a year', '年化')}</div>
+          <div class="sub">{L('a year', '年化')}{q("cagr")}</div>
           <div class="stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;border-top:1px solid var(--line);padding-top:8px">
-            <div><span class="ra-note">Sharpe</span><div class="mono">{ui.num(m.get('sharpe'), 2)}</div></div>
-            <div><span class="ra-note">{L('Max DD', '最大回撤')}</span><div class="mono down">{ui.pct(m.get('max_drawdown'), 1)}</div></div>
-            <div><span class="ra-note">{L('Worst yr', '最差年')}</span><div class="mono">{ui.pct(m.get('worst_year'), 1)}</div></div>
+            <div><span class="ra-note">Sharpe{q("sharpe")}</span><div class="mono">{ui.num(m.get('sharpe'), 2)}</div></div>
+            <div><span class="ra-note">{L('Max DD', '最大回撤')}{q("max_dd")}</span><div class="mono down">{ui.pct(m.get('max_drawdown'), 1)}</div></div>
+            <div><span class="ra-note">{L('Worst yr', '最差年')}{q("worst_year")}</span><div class="mono">{ui.pct(m.get('worst_year'), 1)}</div></div>
           </div></div>""")
     H(f'<div class="ra-grid ra-g4">{"".join(cards)}</div>')
     log_y = st.toggle(L("Log scale", "对数坐标"), value=False)
@@ -747,12 +791,14 @@ def page_backtest() -> None:
     fig.update_layout(**ui.plotly_layout(P, 240, T("bt.drawdown") + " %"))
     st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False})
     from riskaware.backtest.metrics import METRIC_LABELS, fmt_metric
+    from riskaware.dashboard.glossary import metric_help
 
     rows = [{L("Metric", "指标"): label, **{r.strategy: fmt_metric(k, r.metrics.get(k)) for r in results},
-             "SPY": fmt_metric(k, bm.get(k))} for k, (label, _) in METRIC_LABELS.items()
-            if any(k in r.metrics for r in results)]
+             "SPY": fmt_metric(k, bm.get(k)), L("What it means", "含义"): metric_help(k, LANG)}
+            for k, (label, _) in METRIC_LABELS.items() if any(k in r.metrics for r in results)]
     with st.expander(L("All metrics", "全部指标")):
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
+                     column_config={L("What it means", "含义"): st.column_config.TextColumn(width="large")})
     with st.expander(T("bt.trades") + f" · {results[0].strategy}"):
         st.dataframe(results[0].trades.iloc[::-1], hide_index=True, width="stretch")
     for n in results[0].notes:
@@ -764,17 +810,30 @@ def news_kpis(rep) -> None:
     """Score, confirmed and single-source stories and red flags of one news report."""
     H('<div class="ra-grid ra-g4">' + "".join([
         ui.kpi(T("news.score"), f"{rep.score:+.2f}", L("-1 bearish · +1 bullish", "-1 利空 · +1 利好"), "",
-               ui.tone(rep.score)),
-        ui.kpi(T("news.status.confirmed"), str(rep.confirmed), L("stories", "条")),
-        ui.kpi(T("news.status.unconfirmed"), str(rep.unconfirmed), L("not counted", "不计入")),
+               ui.tone(rep.score), info=Q("news_score")),
+        ui.kpi(T("news.status.confirmed"), str(rep.confirmed), L("stories", "条"), info=Q("confirmed")),
+        ui.kpi(T("news.status.unconfirmed"), str(rep.unconfirmed), L("count 0.2 each", "每条只算 0.2"),
+               info=Q("single_source")),
         ui.kpi(T("news.flags"), str(len(rep.red_flags_confirmed)),
                ", ".join(rep.red_flags_confirmed) or L("none confirmed", "无已确认"), "",
-               "down" if rep.red_flags_confirmed else "muted"),
+               "down" if rep.red_flags_confirmed else "muted", info=Q("red_flags")),
     ]) + "</div>")
     if rep.red_flags_unconfirmed:
         st.warning(f"{T('news.flags')} ({T('news.status.unconfirmed')}): {', '.join(rep.red_flags_unconfirmed)}")
     if rep.red_flags_denied:
         st.info(f"{T('news.flags')} ({T('news.denied')}): {', '.join(rep.red_flags_denied)}")
+
+
+def story_legend() -> None:
+    legend((L("Status", "状态"), "news_status"), (L("Sentiment", "情绪"), "sentiment"), (L("Flags", "风险"), "red_flags"))
+
+
+def story_columns() -> dict:
+    """Column settings for a table of news stories, with ? help on the columns that need it."""
+    col = st.column_config.TextColumn
+    return {L("Headline", "标题"): col(width="large"), L("Status", "状态"): col(help=HQ("news_status")),
+            L("Sentiment", "情绪"): st.column_config.NumberColumn(help=HQ("sentiment")),
+            L("Flags", "风险"): col(help=HQ("red_flags"))}
 
 
 def news_seen_panel(r, pit) -> None:
@@ -784,7 +843,7 @@ def news_seen_panel(r, pit) -> None:
 
     H(ui.section(L("News the backtest saw", "回测看到的新闻"),
                  L("each day sees only what was published before its close; orders fill the next day",
-                   "每天只看收盘前已发布的新闻；订单第二天成交")))
+                   "每天只看收盘前已发布的新闻；订单第二天成交"), Q("news_seen")))
     if pit is None or not pit.symbols:
         st.caption(L("This run did not replay news. Turn on Replay news above and run it again.",
                      "这次回测没有回放新闻。在上面打开「回放新闻」再跑一次。"))
@@ -836,8 +895,9 @@ def news_seen_panel(r, pit) -> None:
         st.info(L("Nothing about this stock was published in that window.", "这段时间里没有关于这只股票的新闻。"))
         return
     news_kpis(rep)
-    st.dataframe(pd.DataFrame(nv.story_rows(rep, LANG)), hide_index=True, width="stretch", column_config={
-        L("Headline", "标题"): st.column_config.TextColumn(width="large")})
+    story_legend()
+    st.dataframe(pd.DataFrame(nv.story_rows(rep, LANG)), hide_index=True, width="stretch",
+                 column_config=story_columns())
     if rep.off_topic:
         st.caption(L(f"{rep.off_topic} headlines about other companies or the market were ignored.",
                      f"已忽略 {rep.off_topic} 条讲其他公司或大盘的新闻。"))
@@ -867,6 +927,7 @@ def page_news() -> None:
         rep = analyze_news(sym, col.collect(sym, cfg.news.lookback_hours), cfg.news, sources=col.last_status,
                            names=company_names(sym, cache))
     news_kpis(rep)
+    story_legend()
     st.dataframe(pd.DataFrame([{
         L("Status", "状态"): ("✅ " if c.status.value != "UNCONFIRMED" else "· ") + T("news.status." + c.status.value.lower())
         + (" · " + T("news.denial") if c.denial else ""),
@@ -874,8 +935,7 @@ def page_news() -> None:
         L("Publishers", "来源"): ", ".join(c.publishers[:5]),
         L("Flags", "风险"): ", ".join(c.live_flags)
         + (f" ({T('news.denied')}: {', '.join(c.cleared_flags)})" if c.cleared_flags else "")}
-        for c in rep.top(60)]), hide_index=True, width="stretch", column_config={
-        L("Headline", "标题"): st.column_config.TextColumn(width="large")})
+        for c in rep.top(60)]), hide_index=True, width="stretch", column_config=story_columns())
     st.caption(T("news.sources") + ": " + ", ".join(f"{k} {v}" for k, v in rep.sources.items())
                + (L(f" · {rep.off_topic} headlines about other companies or the market were ignored",
                     f" · 已忽略 {rep.off_topic} 条讲其他公司或大盘的新闻") if rep.off_topic else ""))
@@ -902,11 +962,12 @@ def page_account() -> None:
             floor = cfg.risk_profile().cash_floor
             cash_ratio = (acct.cash + cv) / eq
             H('<div class="ra-grid ra-g4">' + "".join([
-                ui.kpi(T("account.equity"), ui.money(acct.equity), acct.account_id),
+                ui.kpi(T("account.equity"), ui.money(acct.equity), acct.account_id, info=Q("equity")),
                 ui.kpi(T("account.cash_total"), ui.pct(cash_ratio, 1), f"{T('account.floor')} {ui.pct(floor, 0)}", "",
-                       "up" if cash_ratio >= floor else "down"),
-                ui.kpi(T("account.stocks"), ui.pct(stocks / eq, 1), f"{len(pos)} {L('positions', '个持仓')}"),
-                ui.kpi(T("account.treasury"), ui.pct(tr / eq, 1), cfg.universe.treasury_symbol),
+                       "up" if cash_ratio >= floor else "down", info=Q("cash_floor")),
+                ui.kpi(T("account.stocks"), ui.pct(stocks / eq, 1), f"{len(pos)} {L('positions', '个持仓')}",
+                       info=Q("stocks")),
+                ui.kpi(T("account.treasury"), ui.pct(tr / eq, 1), cfg.universe.treasury_symbol, info=Q("treasury")),
             ]) + "</div>")
             c1, c2 = st.columns([1, 2])
             with c1:

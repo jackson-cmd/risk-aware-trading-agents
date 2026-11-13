@@ -2,6 +2,14 @@
 
 [中文](CHANGELOG_zh.md)
 
+## 0.6.2 (2026-11-12)
+
+- Every number on the dashboard explains itself: a ? next to each card, section, table column and form field opens a popup (the browser's popover: click to open, click outside or Esc to close) with what it is, how it is calculated and how to use it, in English and Chinese. The texts follow the code and the balanced profile's defaults: the regime rules, the fear & greed and risk-score parts, the macro calendar's weights and windows, the technical (TA) score and setups, conviction and its parts, the earnings check, the risk manager's rules, the risk profiles, the news score, statuses, sentiment and red flags, and the backtest metrics. They live in `riskaware/dashboard/glossary.py`.
+- The Signals page shows conviction's parts as columns: technical (TA), earnings, news and macro.
+- The All metrics table has a column that explains each metric.
+- Fix: the Agents page's SPY card said "since the first agent started" but used the leading agent's start date; it now uses the oldest agent's.
+- The breadth card is labeled Breadth so it fits on one line.
+
 ## 0.6.1 (2026-11-12)
 
 - The dashboard's Backtest page has a **News the backtest saw** panel. After a run with Replay news on, pick a trade (each one shows how many news items the backtest had seen when it decided), or any stock and day, to see the close at which it was decided, the order the strategy placed the next day, the news score with its confirmed and single-source stories and red flags, and every story with its New York time, status, sentiment and sources. It opens at the latest trade that had news.
