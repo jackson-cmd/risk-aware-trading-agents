@@ -573,7 +573,9 @@ docker/             Dockerfile 和 docker-compose.yml
 
 ## 📝 引用
 
-如果在研究里用到了本项目或冻结的 2026 年市场数据，请引用。GitHub 页面上的 **Cite this repository** 按钮可以给出其他格式（[CITATION.cff](CITATION.cff)）；引用数据时，再加上 `src/riskaware/research/data/manifest.json` 里的版本和 SHA-256。
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24202496.svg)](https://doi.org/10.5281/zenodo.24202496)
+
+如果在研究里用到了本项目或冻结的 2026 年市场数据，请引用。每个版本都存档在 Zenodo；[10.5281/zenodo.24202496](https://doi.org/10.5281/zenodo.24202496) 总是指向最新版本，每个版本在那里也有自己的 DOI。GitHub 页面上的 **Cite this repository** 按钮可以给出其他格式（[CITATION.cff](CITATION.cff)）；引用数据时，再加上 `src/riskaware/research/data/manifest.json` 里的版本和 SHA-256。
 
 ```bibtex
 @software{risk_aware_trading_agents,
@@ -581,6 +583,7 @@ docker/             Dockerfile 和 docker-compose.yml
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
   version = {0.7.2},
+  doi     = {10.5281/zenodo.24202496},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```
