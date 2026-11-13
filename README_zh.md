@@ -8,7 +8,7 @@
 
 [🌐 项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [English → README.md](README.md) · [🚀 快速开始](#-快速开始) · [🆕 新功能](#-新功能) · [🔬 研究工具箱](#-研究工具箱) · [🔗 MCP](#-mcp-服务器) · [📸 截图](#-截图一览) · [更新记录](docs/zh/CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.1](https://img.shields.io/badge/pypi-0.7.1-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.7.2-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
 
 <img src="site/assets/demo_zh.gif" alt="16 秒导览：市场状态、今天的信号、一个决定是怎么做出来的、模拟盘智能体和 SPY 对比、回测、回测看到的新闻、交叉验证新闻，以及一次带防偷看检查的研究实验" width="100%">
 
@@ -74,14 +74,15 @@ docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp            
 
 ## 🆕 新功能
 
+- **0.7.2** · 🔗 **一步接入 Claude 和其他 MCP 客户端**：服务器上了官方 MCP Registry，`uvx risk-aware-trading-agents mcp` 不用先安装就能启动，每个版本还附带 Claude Desktop 扩展（`.mcpb`），打开就能装。[怎么用 →](#-mcp-服务器)
 - **0.7.1** · 📦 **上架 PyPI 和 Docker**：`pip install risk-aware-trading-agents` 就能装；不想装 Python，也可以直接用 `ghcr.io/jackson-cmd/risk-aware-trading-agents` 跑网页看板或 MCP 服务器；在 GitHub Codespaces 里打开整个仓库，依赖都已装好。[怎么用 →](#-快速开始)
 - **0.7.0** · 🔬 **冻结的 2026 年市场，供研究用**：全年按时间点记录的价格、VIX 和新闻随安装包提供。可以查任意一天收盘时已知的信息，可以让 Claude 把你描述的策略写成代码并测试，也可以让 LLM 一步一步把这一年交易一遍。每次运行都做防偷看检查，并留下可以用于论文的记录；趋势跟随赚了 **+21.1%**，同期 SPY 是 +12.1%。[怎么用 →](#-研究工具箱)
 - **0.6.3** · ⏳ **长任务在后台接着跑**：扫描、回测、运行智能体和获取新闻，切到别的页面或刷新都不会中断，跑完点提示条就回到结果。
-- **0.6.2** · ❓ **每个数字都能点开看说明**：每张卡片、每一列、每个输入框旁边都有 ?，说明它是什么、怎么算、怎么用，中英文都有。[看截图 →](#-截图一览)
 
 <details>
 <summary>更早的版本</summary>
 
+- **0.6.2** · ❓ **每个数字都能点开看说明**：每张卡片、每一列、每个输入框旁边都有 ?，说明它是什么、怎么算、怎么用，中英文都有。[看截图 →](#-截图一览)
 - **0.6.1** · 🔎 **每笔回测交易背后的新闻**：选一笔交易，就能看到回测在那天收盘时看到的标题，以及第二天下的单。[怎么用 →](docs/zh/news-history.md#查看回测看到的新闻)
 - **0.6.0** · 🗞️ **自带 2026 年新闻**：内置 64 只股票的 16,945 条标题和 SEC 公告，`riskaware backtest --news` 什么都不用下载就能用。带新闻的智能体赚了 **+15.9%**，同期 SPY +12.1%；最大回撤 **-5.3%**，SPY 是 -8.9%。[看结果 →](#2026-年至今带新闻)
 - **0.6.0** · 🧪 **说出策略，AI 写代码并回测**：通过 MCP，Claude、Codex 或 Gemini 把策略写成代码；代码先检查有没有偷看未来和副作用，再放到单独的进程里跑。[怎么用 →](#-策略实验室)
@@ -211,9 +212,11 @@ riskaware agents schedule --install                      # 以后每个交易日
 `riskaware mcp` 通过 Model Context Protocol 提供这些智能体的能力，Claude、Codex、Gemini、Cursor 或任何 MCP 客户端都能直接用，走你的订阅，不需要 API key。`riskaware mcp-setup` 会打印（加 `--apply` 则直接执行）接入那一步：
 
 ```bash
-pip install "risk-aware-trading-agents[mcp]"
+pip install risk-aware-trading-agents        # 从 0.7.2 起，MCP 服务器包含在基础安装里
 riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex（用你的 ChatGPT 登录）、gemini、antigravity
 ```
+
+其他接入方式：在 Claude Desktop 里，从[最新版本](https://github.com/jackson-cmd/risk-aware-trading-agents/releases/latest)下载 `risk-aware-trading-agents-<版本号>.mcpb` 并打开。按命令启动服务器的客户端可以用 `uvx risk-aware-trading-agents mcp`（不用先安装）或 `docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp`。服务器已收录在官方 MCP Registry，名称是 `io.github.jackson-cmd/risk-aware-trading-agents`。
 
 一共二十一个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`strategy_guide`、`backtest_code`、`agents_leaderboard`、`agent_detail`、`agent_decisions`、`agents_create` 和 `agents_run`，以及研究用的 `research_guide`、`market_day`、`run_experiment`、`list_experiments`、`experiment_report`、`trading_session_start`、`trading_session_step` 和 `trading_session_status`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。ChatGPT 本身只能连远程服务器，所以 OpenAI 这边用 Codex，它走你的 ChatGPT 登录。详见 [docs/zh/agents.md](docs/zh/agents.md#在-claudechatgpt-或-gemini-里使用mcp)。
 
@@ -511,7 +514,8 @@ src/riskaware/      Python 包本体
 tests/              离线测试（pytest）
 docs/               使用指南和设计说明；docs/zh/ 是中文指南和中文更新记录
 examples/           示例配置、示例策略、.env.example
-scripts/            重建自带的行情和新闻数据、生成发版说明、隐私检查和它的提交钩子
+scripts/            重建自带的行情和新闻数据、生成发版说明和 Claude Desktop 扩展、隐私检查和它的提交钩子
+server.json         每次发版发布到 MCP Registry 的条目
 site/               中英双语项目网站和指南（GitHub Pages）
 docker/             Dockerfile 和 docker-compose.yml
 .devcontainer/      GitHub Codespaces 和 VS Code 开发容器配置
@@ -576,7 +580,7 @@ docker/             Dockerfile 和 docker-compose.yml
   title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
-  version = {0.7.1},
+  version = {0.7.2},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```

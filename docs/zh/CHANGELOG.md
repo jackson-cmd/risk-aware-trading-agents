@@ -2,6 +2,13 @@
 
 [English](../../CHANGELOG.md)
 
+## 0.7.2（2026-11-13）
+
+- **上了官方 MCP Registry**，名称是 `io.github.jackson-cmd/risk-aware-trading-agents`：每次发版上传 PyPI 之后，会把 `server.json` 发布到那里，读取这个注册表的 MCP 客户端和目录就能找到并安装这个服务器。
+- **每个版本都附带 Claude Desktop 扩展**：在 Claude Desktop 里打开 `risk-aware-trading-agents-<版本号>.mcpb`，它会用 uv 从 PyPI 安装对应版本（由 `scripts/build_mcpb.py` 生成）。
+- `uvx risk-aware-trading-agents mcp` 不用先安装就能启动 MCP 服务器：MCP SDK 现在是基础依赖（`mcp` 扩展仍然可以写，只是不再多装东西），命令也能用包名 `risk-aware-trading-agents` 调用。
+- Docker 镜像带上了 MCP Registry 要检查的 `io.modelcontextprotocol.server.name` 标签。
+
 ## 0.7.1（2026-11-12）
 
 - **每个版本都有 Docker 镜像**，x86-64 和 ARM（Apple 芯片）都能用：`docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard` 会在 http://localhost:8501 打开网页看板，`docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp` 通过 stdio 提供 MCP 工具（镜像里现在装了 `mcp` 扩展）。标签有版本号、小版本号和 `latest`。

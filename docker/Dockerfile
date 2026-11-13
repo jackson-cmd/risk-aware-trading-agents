@@ -9,6 +9,8 @@ COPY src ./src
 RUN pip install --no-cache-dir ".[dashboard,llm,mcp]"
 VOLUME ["/data"]
 EXPOSE 8501
+# the MCP Registry checks this label to confirm the image belongs to the server it lists
+LABEL io.modelcontextprotocol.server.name="io.github.jackson-cmd/risk-aware-trading-agents"
 # default: run the daily scheduler; override with any riskaware command
 ENTRYPOINT ["riskaware"]
 CMD ["schedule"]
