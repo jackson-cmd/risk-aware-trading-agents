@@ -412,8 +412,33 @@ def _trades(trades: Any) -> dict[str, Any]:
                        for row in recent.to_dict("records")]}
 
 
+def run_research_job(job: dict[str, Any]) -> dict[str, Any]:
+    """Run the code as a research experiment on the frozen market (called in the child process)."""
+    from .research.data import bundled_market
+    from .research.experiment import Experiment, run_experiment
+
+    settings = dict(job["research"])
+    exp = Experiment(**settings)
+    market = bundled_market()  # read the data before any strategy code runs
+    install_guard()
+    try:
+        cls = load_code(job["code"])
+        params = dict(settings.get("params") or {})
+        res = run_experiment(exp, factory=lambda: guard_strategy(cls(**params)), market=market, save=True,
+                             code=job["code"])
+    except Exception as exc:  # noqa: BLE001 - every error in the strategy goes back to the author
+        return _user_error(exc)
+    out: dict[str, Any] = {"ok": True, **res.summary(), "look_ahead": LOOK_AHEAD_NOTE}
+    printed = _PRINTED.getvalue()
+    if printed:
+        out["printed"] = printed[-4000:]
+    return out
+
+
 def run_job(job: dict[str, Any]) -> dict[str, Any]:
     """Check and backtest one strategy (called in the child process)."""
+    if job.get("research"):
+        return run_research_job(job)
     from .backtest.engine import Backtester
     from .config import load_config
     from .data.prices import SyntheticPrices, make_price_provider
@@ -605,6 +630,8 @@ def guide() -> dict[str, Any]:
             "A model trained on text from the test period knows how it ended; take the rules from the request, "
             "not from what you remember about the period.",
             "save_as='name' keeps a strategy that works; agents_create can then paper trade it every day.",
+            "For an experiment others can repeat (a frozen 2026 market, a look-ahead check, a saved record with "
+            "data hashes), read research_guide and pass the same code to run_experiment.",
         ],
     }
 
@@ -645,8 +672,12 @@ def backtest_code(code: str, symbols: list[str] | None = None, universe: str | N
                   start: str = "2026-01-02", end: str | None = None, news: bool = True, profile: str = "balanced",
                   cash: float = 100_000.0, params: dict[str, Any] | None = None, compare: list[str] | None = None,
                   save_as: str | None = None, timeout: float = 600.0, synthetic: bool = False,
-                  config_path: str | None = None) -> dict[str, Any]:
-    """Check the code, backtest it in a separate process and return the result (see the module docstring)."""
+                  config_path: str | None = None, research: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Check the code, backtest it in a separate process and return the result (see the module docstring).
+
+    ``research`` runs it as a research experiment instead (riskaware.research): the settings of an ``Experiment``
+    (start, end, universe or symbols, news, execution, max_positions, split, leak_check, ...); the result is the
+    experiment's summary and the folder of its record."""
     from .config import load_config
 
     cfg = load_config(config_path, {"profile": profile})
@@ -671,7 +702,7 @@ def backtest_code(code: str, symbols: list[str] | None = None, universe: str | N
     job = {"code": code, "symbols": symbols, "universe": universe, "start": start, "end": end, "news": news,
            "profile": profile, "cash": cash, "params": params or {}, "compare": list(compare or ["buy_and_hold"]),
            "synthetic": synthetic, "timeout": timeout,
-           "config_path": config_path or getattr(cfg, "source_path", None)}
+           "config_path": config_path or getattr(cfg, "source_path", None), "research": research}
     with tempfile.TemporaryDirectory(prefix="riskaware-lab-") as tmp:
         try:
             proc = subprocess.run([sys.executable, "-m", "riskaware.lab", "--child"], input=json.dumps(job),

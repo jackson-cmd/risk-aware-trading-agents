@@ -2,6 +2,16 @@
 
 [English](CHANGELOG.md)
 
+## 0.7.0（2026-11-12）
+
+- **研究工具箱**（`riskaware.research`、`riskaware research`、[docs/zh/research.md](docs/zh/research.md)）：安装包里带了一份冻结的 2026 年市场，实验在任何机器上都得出同样的数字。内容是 64 只股票池股票、25 个 ETF、VIX 期限结构（VIX9D、VIX、VIX3M、VVIX）和 4 个跨资产 ETF 从 2024-01-02 到 2026-11-11 的日线（`research/data/market_2026.csv.gz`，1.4 MB，附带记录 SHA-256 的清单；`scripts/build_market_bundle.py` 可以重建），再加上已有的 2026 年新闻。
+- `riskaware research day 日期`（MCP `market_day`）：某天收盘时已知的全部信息：市场状态、VIX 期限结构、恐慌贪婪、广度、信用压力和事先公布的宏观日程；每只股票的价格、技术指标、技术形态、收盘前发布的已核实新闻，以及最近一次财报公告。
+- `riskaware research run`（MCP `run_experiment`）：在冻结的市场上回测内置策略、策略文件或 AI 写的代码（先检查，再在单独的进程里运行），收盘出信号，次日开盘成交。纯执行规则完全照策略说的做（等额仓位，最多 N 个，只做多）；`--execution risk_aware` 加上风控。报告给出 SPY 和等权组合、beta、alpha、t 统计量、移动块 bootstrap 区间以及样本内外的拆分，并保存记录：清单（数据哈希、版本、commit、设置、策略源码）、指标、净值、成交、每一个决定、report.md 和图。
+- 每次实验都做防偷看检查：把三个切点之后的每个价格和每条标题换成随机的再跑一遍，每个切点之前的决定必须一模一样。结论有三种：通过、失败（写出第一个变化的日期和决定）、不可重复。
+- LLM 智能体：`riskaware research trade --llm ...` 和 `run_policy` 让模型一步一步交易这段时间，MCP 的 `trading_session_start` / `trading_session_step` 让 Claude 来做。盲测模式隐藏股票代码、公司名和日期。`extra_news` 可以给一次实验加标题，做反事实测试。
+- 五种常见的波段策略，可开关新闻：`swing_trend`、`swing_rsi2`、`swing_breakout`、`swing_pullback` 和 `swing_news`，在 `riskaware backtest` 里也能用。`riskaware research baselines` 会开和不开新闻各跑一遍：2026 年趋势跟随赚了 +21.1%（Sharpe 1.44），同期 SPY 是 +12.1%（0.77）；加新闻过滤让每个策略都略差一点。
+- 回测引擎可以换用别的下单规则，并在同一份数据上多次运行时复用技术指标。
+
 ## 0.6.3（2026-11-12）
 
 - 看板上的长任务改在后台跑：信号页的扫描、回测、智能体的「立即运行」和「全部立即运行」、获取新闻，开始以后切到别的页面或刷新浏览器都不会中断，结果留在原来的页面上。任务在跑的时候，它所在的页面显示进度和已用时间，回测还有「停止」按钮。其他页面顶部有一条提示，列出还在跑或已经跑完的任务，点它就回到结果。同一种任务一次只跑一个。任务由看板进程保管，所以每个打开的标签页看到的都是同一批任务。

@@ -104,14 +104,19 @@ class BacktestResult:
 class Backtester:
     def __init__(self, cfg: AppConfig, prices: PriceProvider, calendar: EventCalendar | None = None,
                  profile: RiskProfile | None = None, quality_fn: Callable[[str, date], Any] | None = None,
-                 news: PointInTimeNews | None = None):
+                 news: PointInTimeNews | None = None, planner: Any = None):
         self.cfg = cfg
         self.prices = prices
         self.calendar = calendar if calendar is not None else EventCalendar(cfg.macro.events)
         self.profile = profile or cfg.risk_profile()
         self.quality_fn = quality_fn
         self.news = news
+        # turns signals into orders: the risk manager by default, or anything with the same plan() method
+        # (riskaware.research.execution.PlainPlanner sizes orders without the risk rules)
+        self.planner = planner
         self._data_cache: dict[tuple, dict[str, pd.DataFrame]] = {}
+        self._frames_key: tuple | None = None
+        self._derived: dict[tuple, Any] = {}  # indicators and macro series per loaded data, reused by later runs
 
     # ------------------------------------------------------------------ data
     def load(self, symbols: list[str], start: date, end: date) -> dict[str, pd.DataFrame]:
@@ -124,7 +129,14 @@ class Backtester:
         key = (tuple(wanted), data_start, end)
         if key not in self._data_cache:
             self._data_cache[key] = self.prices.history(wanted, data_start, end)
+        self._frames_key = key
         return self._data_cache[key]
+
+    def _cached(self, *key: Any, make: Callable[[], Any]) -> Any:
+        k = (self._frames_key, *key)
+        if k not in self._derived:
+            self._derived[k] = make()
+        return self._derived[k]
 
     def universe_for(self, universe: list[str] | None = None) -> list[str]:
         """The symbols a run trades: the given list or the configured universe, without the cash vehicles."""
@@ -175,8 +187,9 @@ class Backtester:
             tsym = None
         sym_data: dict[str, SymbolData] = {}
         for s in trade_syms_with_t:
-            sym_data[s] = SymbolData(ind.compute(frames[s], spy_close))
-        macro = MacroAgent(cfg.macro, self.calendar).compute_series(frames, full_index)
+            sym_data[s] = self._cached("ind", s, make=lambda _s=s: SymbolData(ind.compute(frames[_s], spy_close)))
+        macro = self._cached("macro", make=lambda: MacroAgent(cfg.macro, self.calendar).compute_series(frames,
+                                                                                                        full_index))
         bil = frames.get(bt.cash_yield_symbol) if bt.cash_yield_symbol else None
         cash_ret = bil["close"].pct_change().reindex(full_index).fillna(0.0).clip(-0.01, 0.01) if bil is not None \
             else pd.Series(0.0, index=full_index)
@@ -184,7 +197,8 @@ class Backtester:
             notes.append(f"No data for {bt.cash_yield_symbol}: cash earns nothing.")
 
         x = ExecutionConfig(order_type="LIMIT", limit_offset=bt.max_chase, allow_fractional=False)
-        risk = RiskManager(prof, cfg.universe, x, manage_cash=True, options=cfg.options)
+        risk = self.planner if self.planner is not None else RiskManager(prof, cfg.universe, x, manage_cash=True,
+                                                                            options=cfg.options)
         rate = (cash_ret.rolling(63, min_periods=10).mean() * 252).clip(0.0, 0.08).fillna(0.02)
         vix_s = macro["vix"]
         oc = cfg.options

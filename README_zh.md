@@ -6,7 +6,7 @@
 
 *别人恐慌时买入 · 始终留 30% 现金 · 从不恐慌割肉*
 
-**FOMC · CPI · 非农 · VIX 决定市场状态 · 回踩 EMA 50 / 100 / 200 时买入 · 财报过关才抄底 · Finviz + RSS + SEC 新闻交叉验证 · 每天自动跑的模拟盘智能体 · 给 Claude 用的 MCP 服务器 · 11 个策略（含期权）· 回测你自己的策略 · 10 家券商的模拟盘和实盘 · 中文和 English**
+**FOMC · CPI · 非农 · VIX 决定市场状态 · 回踩 EMA 50 / 100 / 200 时买入 · 财报过关才抄底 · Finviz + RSS + SEC 新闻交叉验证 · 每天自动跑的模拟盘智能体 · 给 Claude 用的 MCP 服务器 · 16 个策略（含期权）· 冻结的 2026 年市场，供研究用 · 回测你自己的策略 · 10 家券商的模拟盘和实盘 · 中文和 English**
 
 📊 **2026 年带新闻回测：收益 +15.9%，SPY +12.1% · 最大回撤 -5.3%，SPY -8.9% · 夏普 1.70，SPY 0.77** · [详情](#2026-年至今带新闻)
 
@@ -16,9 +16,9 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![默认模拟盘](https://img.shields.io/badge/%E9%BB%98%E8%AE%A4-%E6%A8%A1%E6%8B%9F%E7%9B%98-orange.svg)](#-安全机制)
-[![版本 0.6.3](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.6.3-e5534b.svg)](CHANGELOG_zh.md)
+[![版本 0.7.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.7.0-e5534b.svg)](CHANGELOG_zh.md)
 [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器)
-[![11 个策略](https://img.shields.io/badge/%E7%AD%96%E7%95%A5-11%20%E4%B8%AA-8957e5.svg)](#-策略库)
+[![16 个策略](https://img.shields.io/badge/%E7%AD%96%E7%95%A5-16%20%E4%B8%AA-8957e5.svg)](#-策略库)
 [![10 家券商](https://img.shields.io/badge/%E5%88%B8%E5%95%86-10%20%E5%AE%B6-0969da.svg)](#-支持的券商)
 [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
 
@@ -31,7 +31,7 @@
 ## 目录
 
 - [🆕 新功能](#-新功能) · [📸 截图一览](#-截图一览) · [💡 设计思路](#-设计思路) · [✨ 主要功能](#-主要功能) · [🚀 快速开始](#-快速开始)
-- [🤖 模拟盘智能体](#-模拟盘智能体) · [🔗 MCP 服务器](#-mcp-服务器) · [🧪 策略实验室](#-策略实验室)
+- [🤖 模拟盘智能体](#-模拟盘智能体) · [🔗 MCP 服务器](#-mcp-服务器) · [🧪 策略实验室](#-策略实验室) · [🔬 研究工具箱](#-研究工具箱)
 - [🧠 工作原理](#-工作原理)：[市场状态](#不同市场状态下的做法) · [风险档位](#风险档位)
 - [📊 回测](#-回测)：[用新闻回测](#用新闻回测) · [📚 策略库](#-策略库)：[期权](#期权目前只支持回测) · [🧩 写你自己的策略](#-写你自己的策略)
 - [🔌 支持的券商](#-支持的券商) · [🔒 安全机制](#-安全机制) · [🔧 配置](#-配置) · [💻 命令一览](#-命令一览) · [📁 目录结构](#-目录结构)
@@ -39,10 +39,11 @@
 
 ## 🆕 新功能
 
-<sub>最新版本 **0.6.3**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>最新版本 **0.7.0**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
 
-| | 0.6 和 0.5 新加入 |
+| | 0.7、0.6 和 0.5 新加入 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔬 冻结的 2026 年市场，供研究用**：智能体在 2026 年看到的一切都随安装包提供，全部按时间点记录：2024 年以来的日线、VIX 期限结构、16,945 条标题和 SEC 公告、每个技术指标和市场状态读数。可以查任意一天收盘时已知的信息，可以让 Claude 把你描述的策略写成代码并测试，也可以让 LLM 一步一步把这一年交易一遍，还能盲测。每次运行都做防偷看检查，并留下带数据哈希的记录，可以直接用于论文。五种常见波段策略开和不开新闻各测了一遍：趋势跟随赚了 **+21.1%**，同期 SPY 是 +12.1%。[怎么用 →](#-研究工具箱) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **⏳ 长任务在后台接着跑**：在看板上开始扫描、回测、运行智能体或获取新闻以后，切到别的页面或刷新都不会中断；每个页面顶部的提示条显示它跑到哪了，跑完点一下就回到结果。长回测还能中途停止。 |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **❓ 每个数字都能点开看说明**：看板上每张卡片、每一列、每个输入框旁边都有 ?，点开弹窗说明它是什么、怎么算（直接照代码写：市场状态的判定规则、风险分的六项构成、技术面（TA）分、信心、新闻分、夏普等等）、怎么用，中英文都有。信号页还新增了信心的四个分项：技术面（TA）、财报、新闻、宏观。[看截图 →](#-截图一览) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔎 每笔回测交易背后的新闻**：看板回测页新增 **回测看到的新闻** 面板。选一笔交易，就能看到回测在那天收盘时看到的标题、哪些已确认、新闻分，以及策略第二天下的单。[怎么用 →](docs/zh/news-history.md#查看回测看到的新闻) |
@@ -86,6 +87,7 @@
 - **什么都能回测，包括你自己的策略。** 只要写一个 Python 方法，同一个策略对象就能在回测、模拟盘和实盘里运行，并且走同一套风控。多个策略可以并排对比，生成 HTML 报告；还能按发布时间回放新闻：2026 年的标题和 SEC 公告随安装包自带，其他年份来自本地新闻库（SEC 8-K 公告、你自己的 Benzinga key 或 CSV）。
 - **每天自动跑的模拟盘智能体。** 几个策略可以同时跑，每个都有自己的模拟账户，用免费价格交易。后台任务每个交易日让它们交易一次，排行榜拿它们和 SPY 对比。
 - **能在 Claude 里用（MCP）。** `riskaware mcp` 让 Claude、Cursor 或任何 MCP 客户端都能查市场状态、信号、新闻、回测，以及管理模拟盘智能体。用大白话说出策略，AI 把它写成代码并回测，代码会先检查有没有偷看未来。
+- **冻结的 2026 年市场，供研究用。** 按时间点记录的价格、VIX、新闻和技术指标随安装包提供。每次实验都做防偷看检查，并连同数据哈希一起保存；LLM 可以通过 MCP 做实验，或把这一年交易一遍。
 - **可选的 LLM 复核，每个智能体单独设置。** 多头分析师、空头分析师和风控裁判（GPT、Claude、任何 OpenAI 兼容模型比如 DeepSeek 或通义千问，或者用 Ollama 跑的免费本地模型）可以把信心分最多调高或调低 0.15，或者否决一笔买入。它们不能自己发起交易，也不能改任何限额。新闻只作为加了引号的不可信文本交给它们；每次的 prompt 和回复都存在本地日志里，每个决定是怎么做出来的都能看到。
 - **中英双语。** 命令行、网页看板、回测报告和文档都支持中文和英文。
 
@@ -142,7 +144,7 @@ pip install -e ".[mcp]"
 riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex（用你的 ChatGPT 登录）、gemini、antigravity
 ```
 
-一共十三个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`strategy_guide`、`backtest_code`、`agents_leaderboard`、`agent_detail`、`agent_decisions`、`agents_create` 和 `agents_run`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。ChatGPT 本身只能连远程服务器，所以 OpenAI 这边用 Codex，它走你的 ChatGPT 登录。详见 [docs/zh/agents.md](docs/zh/agents.md#在-claudechatgpt-或-gemini-里使用mcp)。
+一共二十一个工具：`market_regime`、`scan`、`analyze_stock`、`stock_news`、`list_strategies`、`backtest`、`strategy_guide`、`backtest_code`、`agents_leaderboard`、`agent_detail`、`agent_decisions`、`agents_create` 和 `agents_run`，以及研究用的 `research_guide`、`market_day`、`run_experiment`、`list_experiments`、`experiment_report`、`trading_session_start`、`trading_session_step` 和 `trading_session_status`。它们要么只读，要么只操作本地模拟账户，没有任何工具能向券商下单。之后直接问就行，比如「现在市场是什么状态，这周有什么重要数据？」或者「用 100 万美元在 megacap 上回测 2018 年以来的 wheel」。ChatGPT 本身只能连远程服务器，所以 OpenAI 这边用 Codex，它走你的 ChatGPT 登录。详见 [docs/zh/agents.md](docs/zh/agents.md#在-claudechatgpt-或-gemini-里使用mcp)。
 
 ## 🧪 策略实验室
 
@@ -151,6 +153,36 @@ riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex�
 > 写一个策略：上升趋势里连跌两天、最近新闻偏正面时买入，持有 10 天或涨 8% 卖出。用 2026 年的 tech 股票池带新闻回测。
 
 `save_as` 把好用的策略保存下来，之后看板里能看到，也能当模拟盘智能体每天跑。从别处拿到的代码，用 `riskaware lab my_strategy.py --preset tech` 做同样的检查和回测。详见 [docs/zh/strategy-lab.md](docs/zh/strategy-lab.md)。
+
+## 🔬 研究工具箱
+
+整个 2026 年随安装包一起提供，冻结不变，做的实验任何人都能重跑：64 只股票和 25 个 ETF 自 2024 年起的日线、VIX 期限结构、16,945 条标题和 SEC 公告，以及智能体用到的每个技术指标和市场状态读数，每个值都是当天收盘时已知的样子。
+
+```bash
+riskaware research day 2026-04-08 --symbols NVDA,TSLA           # 那天收盘时已知的全部信息
+riskaware research run --strategy swing_trend --split 2026-07-01
+riskaware research trade --llm ollama:qwen2.5:3b --universe core --blind
+```
+
+- **按时间点。** 收盘出信号，次日开盘成交：基于日线的波段交易。标题发布之后才算数，技术指标只往回看。
+- **每次运行都做防偷看检查。** 把三个切点之后的每个价格和每条标题都换成随机的，再跑一遍，每个切点之前的决定必须一模一样。
+- **留下可用于论文的记录。** 每次运行都保存数据哈希、代码、设置、指标、bootstrap 区间、成交和每一个决定。
+- **为 LLM 设计。** 通过 MCP，你描述一个策略，Claude 就写代码并测试（`run_experiment`），可以查任意一天（`market_day`），也可以一步一步把这一年交易一遍（`trading_session_start`），还能盲测：看不到股票代码、公司名和日期。
+
+五种常见波段策略，2026-01-02 到 2026-11-11，megacap 的 56 只股票，最多 10 个等额仓位：
+
+| 策略 | 不开新闻 | 开新闻 | Sharpe | 最大回撤 |
+|---|---:|---:|---:|---:|
+| 趋势跟随（EMA20 上穿 EMA50） | **+21.1%** | +19.6% | **1.44** | **-4.7%** |
+| 新闻后的惯性（不开新闻时：同样的交易，改由价格异动触发） | +15.7% | +4.4% | 1.01 | -9.8% |
+| Connors RSI(2) | +12.7% | +10.8% | 0.85 | -7.9% |
+| 上升趋势中买回调 | +2.3% | +1.7% | -0.13 | -4.4% |
+| 20 日突破 | -0.3% | -3.5% | -0.15 | -15.6% |
+| SPY 买入持有 | +12.1% | | 0.77 | -8.9% |
+
+<img src="site/assets/research_baselines.png" width="820" alt="五种波段策略 2026 年的表现，开和不开新闻">
+
+Sharpe 和回撤都是不开新闻时的数字。趋势跟随跑赢了 SPY，回撤只有 SPY 的一半。加新闻过滤让每个策略都略差一点；按正面标题买入，也不如按同样幅度的价格异动买入。所有区间都彼此重叠，每次运行都通过了防偷看检查。策略定义、带 95% 区间的完整表格和写论文的建议见 [docs/zh/research.md](docs/zh/research.md)。
 
 ## 🧠 工作原理
 
@@ -278,6 +310,7 @@ riskaware backtest --strategy examples/strategies/news_earnings_drift.py --prese
 | `bollinger_reversion` | 股票 | 上升趋势中收盘跌破布林带下轨买入，回到中轨卖出 |
 | `fear_greed_dca` | 股票 / ETF | 市场恐慌时分批买入，极度贪婪时减仓 |
 | `ema_bounce`、`rsi2`、`golden_cross`、`buy_and_hold` | 股票 | 简单的参考策略和基准 |
+| `swing_trend`、`swing_rsi2`、`swing_breakout`、`swing_pullback`、`swing_news` | 股票 | 五种教科书式的波段策略，可开关新闻，是[研究工具箱](#-研究工具箱)的基准 |
 | `aggressive_calls` | 期权 | 强势上升趋势回调时，买入 45–60 天到期、delta 约 0.6 的看涨期权；赚 100% 止盈，亏 50% 止损 |
 | `wheel` | 期权 | 在支撑位附近卖出 delta 约 0.25 的现金担保看跌期权；被行权拿到股票后，在成本价以上卖备兑看涨期权 |
 
@@ -405,6 +438,7 @@ llm:
 | `riskaware backtest [--news]` | 回测和策略对比（`--news` 回放新闻；安装包自带 2026 年） |
 | `riskaware lab 文件 [--check-only] [--save 名字]` | 检查策略有没有偷看未来、有没有副作用，再在单独的进程里回测 |
 | `riskaware news-history build / import / status / show` | 回测用的本地历史新闻库 |
+| `riskaware research day / run / baselines / trade / runs / data` | 冻结的 2026 年市场：任意一天的数据、带防偷看检查的实验、LLM 交易 |
 | `riskaware strategies` / `new-strategy` | 列出内置策略 / 生成策略模板 |
 | `riskaware brokers` | 支持的券商及所需配置 |
 | `riskaware halt` / `resume` | 一键停止 / 恢复交易 |
@@ -420,11 +454,12 @@ src/riskaware/
   agents/      宏观状态、技术形态、财报质量、新闻
   data/        价格（Yahoo、CSV、模拟数据）、FOMC/BLS/BEA 日历、基本面、CNN 恐慌贪婪指数
   news/        Finviz + RSS + SEC 新闻源、聚类和交叉验证
-  strategy/    策略接口、内置策略、示例、加载器
+  strategy/    策略接口、内置策略、示例、波段基准策略、加载器
   risk.py      风控（现金底线、各类上限、分批、状态规则）
   brokers/     模拟盘 + 9 家券商接口
   engine.py    模拟盘 / 实盘交易循环、安全开关、日志、持仓状态
   backtest/    回测引擎、指标、HTML 报告
+  research/    冻结的 2026 年市场、按日期查询、实验、防偷看检查、LLM 交易会话
   llm/         可选的多空辩论复核
   dashboard/   Streamlit 网页看板（页面、主题、图表）
   arena.py     模拟盘智能体：账户、每日运行、排行榜

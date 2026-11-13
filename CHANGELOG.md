@@ -2,6 +2,16 @@
 
 [中文](CHANGELOG_zh.md)
 
+## 0.7.0 (2026-11-12)
+
+- **Research kit** (`riskaware.research`, `riskaware research`, [docs/research.md](docs/research.md)): a frozen copy of the 2026 market ships with the package, so experiments give the same numbers on any machine: daily bars from 2024-01-02 to 2026-11-11 for the 64 watchlist stocks, 25 ETFs, the VIX term structure (VIX9D, VIX, VIX3M, VVIX) and four cross-asset ETFs (`research/data/market_2026.csv.gz`, 1.4 MB, with a manifest of SHA-256 hashes; `scripts/build_market_bundle.py` rebuilds it), next to the bundled 2026 news.
+- `riskaware research day DATE` (MCP `market_day`): everything known at a day's close: the regime, the VIX term structure, fear & greed, breadth, credit stress and scheduled macro events; per stock its prices, indicators, technical setups, the verified news published before the close and the last earnings release.
+- `riskaware research run` (MCP `run_experiment`): backtests a built-in strategy, a file, or code an AI wrote (checked and run in a separate process) on the frozen market, with signals at the close and orders at the next open. Plain execution trades exactly what the strategy says (equal positions, at most N, long only); `--execution risk_aware` adds the risk manager. It reports SPY and the equal-weight universe, beta, alpha, a t-statistic, moving-block bootstrap intervals and an in-sample and out-of-sample split, and saves a record: manifest (data hashes, version, commit, settings, strategy source), metrics, equity, trades, every decision, report.md and a chart.
+- A look-ahead check on every experiment: the run is repeated with every price and headline after three cut days replaced by random ones, and the decisions before each cut must be identical. Verdicts: pass, fail (with the first day and decision that changed) or not repeatable.
+- LLM agents: `riskaware research trade --llm ...` and `run_policy` let a model trade the period step by step, and MCP `trading_session_start` / `trading_session_step` let Claude do it. Blind mode hides tickers, company names and dates. `extra_news` adds headlines to one experiment for counterfactual tests.
+- Five common swing strategies with a news switch: `swing_trend`, `swing_rsi2`, `swing_breakout`, `swing_pullback` and `swing_news`, also usable in `riskaware backtest`. `riskaware research baselines` runs them with and without news: in 2026 trend following made +21.1% (Sharpe 1.44) against SPY's +12.1% (0.77), and the news filter made every strategy slightly worse.
+- The backtester takes another order planner and reuses indicators across runs on the same data.
+
 ## 0.6.3 (2026-11-12)
 
 - Long dashboard tasks run in the background: a scan on the Signals page, a backtest, an agents run (Run now, Run all now) and a news fetch keep running when you open another page or reload the browser, and the result waits on its page. While a task runs, its page shows the progress and the time so far, and a backtest has a Stop button. Every other page shows a bar with the tasks that are still running or have finished, and clicking it takes you to the result. One task of each kind runs at a time. The dashboard process keeps the tasks, so every open tab sees the same ones.
