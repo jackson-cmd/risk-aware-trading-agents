@@ -1,10 +1,10 @@
 # 更新记录
 
-[English](CHANGELOG.md)
+[English](../../CHANGELOG.md)
 
 ## 0.7.0（2026-11-12）
 
-- **研究工具箱**（`riskaware.research`、`riskaware research`、[docs/zh/research.md](docs/zh/research.md)）：安装包里带了一份冻结的 2026 年市场，实验在任何机器上都得出同样的数字。内容是 64 只股票池股票、25 个 ETF、VIX 期限结构（VIX9D、VIX、VIX3M、VVIX）和 4 个跨资产 ETF 从 2024-01-02 到 2026-11-11 的日线（`research/data/market_2026.csv.gz`，1.4 MB，附带记录 SHA-256 的清单；`scripts/build_market_bundle.py` 可以重建），再加上已有的 2026 年新闻。
+- **研究工具箱**（`riskaware.research`、`riskaware research`、[docs/zh/research.md](research.md)）：安装包里带了一份冻结的 2026 年市场，实验在任何机器上都得出同样的数字。内容是 64 只股票池股票、25 个 ETF、VIX 期限结构（VIX9D、VIX、VIX3M、VVIX）和 4 个跨资产 ETF 从 2024-01-02 到 2026-11-11 的日线（`research/data/market_2026.csv.gz`，1.4 MB，附带记录 SHA-256 的清单；`scripts/build_market_bundle.py` 可以重建），再加上已有的 2026 年新闻。
 - `riskaware research day 日期`（MCP `market_day`）：某天收盘时已知的全部信息：市场状态、VIX 期限结构、恐慌贪婪、广度、信用压力和事先公布的宏观日程；每只股票的价格、技术指标、技术形态、收盘前发布的已核实新闻，以及最近一次财报公告。
 - `riskaware research run`（MCP `run_experiment`）：在冻结的市场上回测内置策略、策略文件或 AI 写的代码（先检查，再在单独的进程里运行），收盘出信号，次日开盘成交。纯执行规则完全照策略说的做（等额仓位，最多 N 个，只做多）；`--execution risk_aware` 加上风控。报告给出 SPY 和等权组合、beta、alpha、t 统计量、移动块 bootstrap 区间以及样本内外的拆分，并保存记录：清单（数据哈希、版本、commit、设置、策略源码）、指标、净值、成交、每一个决定、report.md 和图。
 - 每次实验都做防偷看检查：把三个切点之后的每个价格和每条标题换成随机的再跑一遍，每个切点之前的决定必须一模一样。结论有三种：通过、失败（写出第一个变化的日期和决定）、不可重复。

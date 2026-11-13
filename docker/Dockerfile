@@ -1,3 +1,4 @@
+# Build from the repository root: docker build -f docker/Dockerfile -t riskaware .
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 RISKAWARE_HOME=/data

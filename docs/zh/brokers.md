@@ -2,7 +2,7 @@
 
 [English](../brokers.md)
 
-所有券商都用同一套接口（`account`、`positions`、`quotes`、`place_order`、`cancel_order`、`open_orders`）。在 `riskaware.yaml` 里用 `broker.name` 选券商，用 `broker.options` 传参数，key 放在 `.env` 里（参考 [.env.example](../../.env.example)）。先用 `riskaware doctor` 检查连接，第一次 `riskaware run` 之前先用 `riskaware plan` 预演。
+所有券商都用同一套接口（`account`、`positions`、`quotes`、`place_order`、`cancel_order`、`open_orders`）。在 `riskaware.yaml` 里用 `broker.name` 选券商，用 `broker.options` 传参数，key 放在 `.env` 里（参考 [examples/.env.example](../../examples/.env.example)）。先用 `riskaware doctor` 检查连接，第一次 `riskaware run` 之前先用 `riskaware plan` 预演。
 
 模拟盘、沙盒账户按模拟盘处理。其他账户都是实盘，需要 `execution.mode: live`、命令加 `--live`，并手动确认。
 

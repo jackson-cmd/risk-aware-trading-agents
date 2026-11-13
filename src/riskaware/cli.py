@@ -131,7 +131,7 @@ def init(
                            contact=contact or "null", llm_enabled=str(llm).lower(), llm_provider=provider,
                            llm_model=model)
     target.write_text(text, encoding="utf-8")
-    env_example = Path(__file__).resolve().parents[2] / ".env.example"
+    env_example = Path(__file__).resolve().parents[2] / "examples" / ".env.example"
     console.print(Panel.fit(
         (f"已写入 {target}\n\n下一步：\n  riskaware doctor     检查环境\n  riskaware regime     看市场状态\n"
          f"  riskaware scan       看今天的信号\n  riskaware backtest   回测\n  riskaware run        模拟盘下单")
@@ -140,8 +140,8 @@ def init(
          f"  riskaware scan       today's signals\n  riskaware backtest   backtest\n  riskaware run        paper trade"),
         title=T("app.name")))
     if broker != "paper":
-        console.print(("把券商 key 写进 .env（参考 .env.example）。" if zh else
-                       "Put your broker keys in a .env file (see .env.example).")
+        console.print(("把券商 key 写进 .env（参考 examples/.env.example）。" if zh else
+                       "Put your broker keys in a .env file (see examples/.env.example).")
                       + (f" {env_example}" if env_example.exists() else ""))
 
 

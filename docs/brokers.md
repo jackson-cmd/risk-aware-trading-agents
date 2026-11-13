@@ -2,7 +2,7 @@
 
 [中文](zh/brokers.md)
 
-Every broker sits behind the same interface (`account`, `positions`, `quotes`, `place_order`, `cancel_order`, `open_orders`). Pick one with `broker.name` in `riskaware.yaml`, pass adapter options in `broker.options`, and keep keys in `.env` (see [.env.example](../.env.example)). Check the connection with `riskaware doctor`, then preview with `riskaware plan` before the first `riskaware run`.
+Every broker sits behind the same interface (`account`, `positions`, `quotes`, `place_order`, `cancel_order`, `open_orders`). Pick one with `broker.name` in `riskaware.yaml`, pass adapter options in `broker.options`, and keep keys in `.env` (see [examples/.env.example](../examples/.env.example)). Check the connection with `riskaware doctor`, then preview with `riskaware plan` before the first `riskaware run`.
 
 Paper or sandbox accounts are treated as paper. Any other account is LIVE and needs `execution.mode: live`, the `--live` flag and a confirmation.
 

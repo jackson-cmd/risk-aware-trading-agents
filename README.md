@@ -6,8 +6,6 @@
 
 *Buy when others are afraid · keep 30% in cash · never panic-sell*
 
-**Market regimes from FOMC · CPI · jobs reports · VIX · dip buying at EMA 50 / 100 / 200 · earnings-checked dips · Finviz + RSS + SEC news, cross-verified · daily paper-trading agents · an MCP server for Claude · 16 strategies including options · a frozen 2026 market for research · backtest your own · paper and live trading on 10 brokers · English and 中文**
-
 📊 **2026 backtest with news: +15.9% vs SPY +12.1% · max drawdown -5.3% vs -8.9% · Sharpe 1.70 vs 0.77** · [details](#2026-so-far-with-news)
 
 🔬 **News backtesting without look-ahead bias**: a point-in-time 2026 dataset (prices, VIX, 16,945 headlines and SEC filings) ships with the package, every run gets a look-ahead check, and LLM trading agents can be tested step by step over MCP · [research kit](#-research-kit)
@@ -17,16 +15,18 @@
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
-[![Paper trading first](https://img.shields.io/badge/default-paper%20trading-orange.svg)](#-safety)
 [![Version 0.7.0](https://img.shields.io/badge/version-0.7.0-e5534b.svg)](CHANGELOG.md)
 [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server)
-[![16 strategies](https://img.shields.io/badge/strategies-16-8957e5.svg)](#-strategy-library)
-[![10 brokers](https://img.shields.io/badge/brokers-10-0969da.svg)](#-brokers)
 [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
 <img src="site/assets/dashboard_en.jpg" width="820" alt="Dashboard: market regime card, fear and greed gauge, VIX, sector breadth and the macro calendar">
 
 </div>
+
+```bash
+pip install "risk-aware-trading-agents[dashboard,mcp] @ git+https://github.com/jackson-cmd/risk-aware-trading-agents"
+riskaware dashboard          # the web UI on http://localhost:8501, English and 中文
+```
 
 ---
 
@@ -37,26 +37,28 @@
 - [🧠 How it works](#-how-it-works): [Market regimes](#what-the-agent-does-in-each-regime) · [Risk profiles](#risk-profiles)
 - [📊 Backtest](#-backtest): [News in backtests](#news-in-backtests) · [📚 Strategy library](#-strategy-library): [Options](#options-backtest-only) · [🧩 Write your own strategy](#-write-your-own-strategy)
 - [🔌 Brokers](#-brokers) · [🔒 Safety](#-safety) · [🔧 Configuration](#-configuration) · [💻 CLI](#-cli) · [📁 Project layout](#-project-layout)
-- [❓ FAQ](#-faq) · [🧭 Roadmap](#-roadmap) · [🤝 Contributing](#-contributing) · [❗ Disclaimer](#-disclaimer) · [📜 License](#-license)
+- [❓ FAQ](#-faq) · [🧭 Roadmap](#-roadmap) · [🤝 Contributing](#-contributing) · [❗ Disclaimer](#-disclaimer) · [📝 Citation](#-citation) · [📜 License](#-license)
 
 ## 🆕 What's new
 
-<sub>Latest release **0.7.0** (2026-11-12). The full history is in the [changelog](CHANGELOG.md).</sub>
+- **0.7.0** · 🔬 **A frozen 2026 market for research**: point-in-time prices, VIX and news for the whole year ship with the package. Ask what was known at any close, let Claude turn a strategy you describe into code and test it, or let an LLM trade the year step by step. Every run gets a look-ahead check and a record for papers; trend following made **+21.1%** against SPY's +12.1%. [How →](#-research-kit)
+- **0.6.3** · ⏳ **Long runs keep going in the background**: scans, backtests, agent runs and news fetches go on when you switch pages or reload, and a bar takes you back to the result.
+- **0.6.2** · ❓ **Every number explains itself**: a ? next to every card, column and field says what it is, how it is calculated and how to use it, in English and 中文. [See it →](#-screenshots)
+- **0.6.1** · 🔎 **The news behind every backtest trade**: pick a trade and see the headlines the backtest had at that close and the order it placed. [How →](docs/news-history.md#see-what-a-backtest-saw)
 
-| | New in 0.7, 0.6 and 0.5 |
-|---|---|
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔬 A frozen 2026 market for research**: everything the agents saw in 2026 ships with the package, point in time: daily prices since 2024, the VIX term structure, 16,945 headlines and SEC filings, every indicator and regime reading. Ask what was known at any close, have Claude turn a strategy you describe into code and test it, or let an LLM trade the year step by step, blind if you like. Every run gets a look-ahead check and a record with data hashes, ready for a paper. Five common swing strategies tested with and without news: trend following made **+21.1%** against SPY's +12.1%. [How →](#-research-kit) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **⏳ Long runs keep going in the background**: start a scan, a backtest, an agents run or a news fetch on the dashboard, then open another page or reload: it keeps running, a bar at the top of every page shows how far it is, and one click takes you back to the result. A long backtest can be stopped halfway. |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **❓ Every number explains itself**: click the ? next to any card, column or field on the dashboard and a popup says what it is, how it is calculated (straight from the code: the regime rules, the six parts of the risk score, the technical (TA) score, conviction, the news score, Sharpe and the rest) and how to use it, in English and 中文. The Signals page now also shows conviction's four parts: technical (TA), earnings, news and macro. [See it →](#-screenshots) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔎 The news behind every backtest trade**: the dashboard's Backtest page now has a **News the backtest saw** panel. Pick a trade and it shows the headlines the backtest had seen at that close, which of them were confirmed, the news score, and the order the strategy placed the next day. [How →](docs/news-history.md#see-what-a-backtest-saw) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 2026 news in the box**: 16,945 news items for the 64 stocks of the built-in lists ship with the package (Benzinga headlines, titles only, and SEC 8-K filings, January to November 2026), so `riskaware backtest --news`, or the new **Replay news** switch on the dashboard's Backtest page, works with nothing to download. In 2026 so far the built-in agent with news returned **+15.9%** against SPY's +12.1%, with a max drawdown of **-5.3%** against -8.9%. [Results →](#2026-so-far-with-news) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🧪 Describe a strategy, the AI writes and tests it**: over MCP, Claude, Codex or Gemini read `strategy_guide`, write the strategy as code and run it with `backtest_code`. The code is checked for look-ahead and side effects and runs in a separate process; the good ones are saved for the dashboard and the paper agents. `riskaware lab FILE` does the same for code from anywhere. [How →](#-strategy-lab) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔭 No peeking at the future**: each backtest day sees only news published before its close (13:00 on early-close days), a timestamp that could be read two ways is read the later way, and a strategy can no longer reach later prices through the price data it is given. [Details →](docs/news-history.md#how-the-backtest-avoids-look-ahead) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔑 No API key needed**: an agent's review can run on your Claude, ChatGPT or Gemini plan through the tool you are already logged in to: `--llm claude-cli`, `--llm codex-cli` or `--llm gemini-cli` (Gemini CLI or Antigravity). [How →](docs/agents.md#no-api-key-use-your-plan) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔌 MCP in one command**: `riskaware mcp-setup claude-desktop` (or `claude-code`, `codex`, `gemini`, `antigravity`) connects the agents to that app, so you can ask it about the market and run agents in plain words. [Set it up →](#-mcp-server) |
-| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗄️ Your own news archive**: for other years, `riskaware news-history` keeps a point-in-time archive on your own machine (SEC 8-K filings for free, your Benzinga key, or any CSV) that backtests replay the same way. [How →](docs/news-history.md) |
+<details>
+<summary>Earlier releases</summary>
 
-<sub>0.4.0 gave each agent its own LLM review (GPT, Claude or a free local model) with every decision on record, and made the news harder to fake; 0.3.0 added daily paper-trading agents, the MCP server and the new dashboard; 0.2.0 added options to the backtester and four stock strategies. See the [changelog](CHANGELOG.md).</sub>
+- **0.6.0** · 🗞️ **2026 news in the box**: 16,945 headlines and SEC filings for the 64 built-in stocks, so `riskaware backtest --news` works with nothing to download. The agent with news made **+15.9%** against SPY's +12.1%, with a **-5.3%** drawdown against -8.9%. [Results →](#2026-so-far-with-news)
+- **0.6.0** · 🧪 **Describe a strategy, the AI writes and tests it**: over MCP, Claude, Codex or Gemini write the strategy as code; it is checked for look-ahead and side effects and runs in a separate process. [How →](#-strategy-lab)
+- **0.6.0** · 🔭 **No peeking at the future**: each backtest day sees only news published before its close, and a strategy cannot reach later prices. [Details →](docs/news-history.md#how-the-backtest-avoids-look-ahead)
+- **0.5.0** · 🔑 **No API key needed**: agent reviews run on your Claude, ChatGPT or Gemini plan with `--llm claude-cli`, `codex-cli` or `gemini-cli`. [How →](docs/agents.md#no-api-key-use-your-plan)
+- **0.5.0** · 🔌 **MCP in one command**: `riskaware mcp-setup claude-desktop` (or `claude-code`, `codex`, `gemini`, `antigravity`). [Set it up →](#-mcp-server)
+- **0.5.0** · 🗄️ **Your own news archive** for other years: SEC 8-K filings for free, your Benzinga key, or any CSV, replayed the same way. [How →](docs/news-history.md)
+- **0.4.0** gave each agent its own LLM review with every decision on record, **0.3.0** added daily paper-trading agents, the MCP server and the new dashboard, and **0.2.0** added options backtests and four stock strategies.
+
+The full history is in the [changelog](CHANGELOG.md).
+</details>
 
 ## 📸 Screenshots
 
@@ -116,6 +118,8 @@ riskaware dashboard                   # web UI (English / 中文)
 ```
 
 No account or API key is needed for any of the commands above. Add `--lang zh` to any command for Chinese output.
+
+Prefer Docker? Put `riskaware.yaml` (from `riskaware init`) and, if you use broker keys, `.env` in the repository root, then `docker compose -f docker/docker-compose.yml up -d` (or `make docker`) runs the daily paper-trading scheduler and the dashboard on http://localhost:8501.
 
 ## 🤖 Paper-trading agents
 
@@ -391,7 +395,7 @@ Setup for each broker (keys, gateways, paper accounts) is in [docs/brokers.md](d
 - Guards: limit price within a band of the quote, a per-order value cap, a maximum number of orders per run, no trading on market holidays, and deterministic client order ids so a rerun on the same day cannot duplicate an order.
 - `riskaware halt` blocks all order submission until `riskaware resume`.
 - Every run, decision and order is written to a local SQLite journal (`~/.riskaware/journal.db`), visible in the dashboard.
-- API keys stay in `.env` (see [.env.example](.env.example)); they are never written to the config or the journal.
+- API keys stay in `.env` (see [examples/.env.example](examples/.env.example)); they are never written to the config or the journal.
 
 ## 🔧 Configuration
 
@@ -513,11 +517,25 @@ A built-in paper account, Alpaca, Interactive Brokers, Public.com, Charles Schwa
 
 ## 🤝 Contributing
 
-Issues and pull requests are welcome: new brokers, data sources, strategies, translations. Run `pip install -e ".[dev]" && pytest` before you open a PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Issues and pull requests are welcome: new brokers, data sources, strategies, translations. Run `pip install -e ".[dev]" && pytest` before you open a PR. See [CONTRIBUTING.md](.github/CONTRIBUTING.md).
 
 ## ❗ Disclaimer
 
 This software is for research and education. It is not investment advice, and nothing in it is a recommendation to buy or sell any security. Trading involves risk of loss. You are responsible for every order your account sends; test with paper trading first.
+
+## 📝 Citation
+
+If you use the package or its frozen 2026 market in your research, please cite it. GitHub's **Cite this repository** button gives other formats ([CITATION.cff](CITATION.cff)); for the data, add the version and SHA-256 from `src/riskaware/research/data/manifest.json`.
+
+```bibtex
+@software{risk_aware_trading_agents,
+  title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
+  author  = {{Risk-Aware Trading Agents contributors}},
+  year    = {2026},
+  version = {0.7.0},
+  url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
+}
+```
 
 ## 📜 License
 
