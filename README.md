@@ -453,23 +453,30 @@ llm:
 ## 📁 Project layout
 
 ```
-src/riskaware/
-  agents/      macro regime, technical setups, earnings quality, news
-  data/        prices (Yahoo, CSV, synthetic), FOMC/BLS/BEA calendar, fundamentals, CNN Fear & Greed
-  news/        Finviz + RSS + SEC sources, clustering and cross-source verification
-  strategy/    Strategy interface, the risk-aware strategy, examples, swing baselines, loader
-  risk.py      the risk manager (cash floor, caps, tranches, regime rules)
-  brokers/     paper + 9 broker adapters
-  engine.py    paper / live cycle, guards, journal, state
-  backtest/    backtester, metrics, HTML report
-  research/    the frozen 2026 market, point-in-time days, experiments, look-ahead check, LLM trading sessions
-  llm/         optional bull / bear / judge review
-  dashboard/   Streamlit app (pages, theme, charts)
-  arena.py     paper-trading agents: accounts, daily runs, leaderboard
-  scheduler.py the daily background job (launchd, cron, Task Scheduler)
-  mcp_server.py  tools for Claude and other MCP clients
-site/          bilingual project website (GitHub Pages)
-docs/          design notes and guides (English and Chinese)
+src/riskaware/      the package
+  agents/           macro regime, technical setups, earnings quality, news
+  strategy/         Strategy interface, the risk-aware strategy, examples, swing baselines, loader
+  risk.py           the risk manager (cash floor, caps, tranches, regime rules)
+  engine.py         paper / live cycle, guards, journal, state
+  backtest/         backtester, metrics, HTML report
+  research/         the frozen 2026 market, point-in-time days, experiments, look-ahead check, LLM trading sessions
+  news/             Finviz + RSS + SEC sources, relevance filter, cross-source verification, the 2026 news file
+  data/             prices (Yahoo, CSV, synthetic), FOMC/BLS/BEA calendar, fundamentals, CNN Fear & Greed
+  brokers/          paper + 9 broker adapters
+  options/          option pricing and contract selection for backtests
+  llm/              optional bull / bear / judge review
+  dashboard/        Streamlit app (pages, theme, charts)
+  arena.py          paper-trading agents: accounts, daily runs, leaderboard
+  scheduler.py      the daily background job (launchd, cron, Task Scheduler)
+  mcp_server.py     tools for Claude and other MCP clients
+  cli.py            the riskaware command
+tests/              offline test suite (pytest)
+docs/               guides and design notes; docs/zh/ holds the Chinese guides and changelog
+examples/           example configs, example strategies, .env.example
+scripts/            rebuild the bundled market and news data
+site/               bilingual project website and guides (GitHub Pages)
+docker/             Dockerfile and docker-compose.yml
+.github/            CI and website workflows, issue and PR templates, contributing and security notes
 ```
 
 ## ❓ FAQ
