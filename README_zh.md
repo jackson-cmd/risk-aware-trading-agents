@@ -15,8 +15,9 @@
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
-[![版本 0.7.0](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.7.0-e5534b.svg)](docs/zh/CHANGELOG.md)
+[![版本 0.7.1](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.7.1-e5534b.svg)](docs/zh/CHANGELOG.md)
 [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器)
+[![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents)
 [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
 
 <img src="site/assets/dashboard_zh.jpg" width="820" alt="网页看板：市场状态卡片、恐慌贪婪仪表盘、VIX、板块广度和宏观日历">
@@ -41,14 +42,15 @@ riskaware --lang zh dashboard   # 网页看板 http://localhost:8501，可切换
 
 ## 🆕 新功能
 
+- **0.7.1** · 🐳 **Docker 镜像和 Codespaces**：不用装 Python，直接用 `ghcr.io/jackson-cmd/risk-aware-trading-agents` 跑网页看板或 MCP 服务器；也可以在 GitHub Codespaces 里打开整个仓库，依赖都已装好。[怎么用 →](#-快速开始)
 - **0.7.0** · 🔬 **冻结的 2026 年市场，供研究用**：全年按时间点记录的价格、VIX 和新闻随安装包提供。可以查任意一天收盘时已知的信息，可以让 Claude 把你描述的策略写成代码并测试，也可以让 LLM 一步一步把这一年交易一遍。每次运行都做防偷看检查，并留下可以用于论文的记录；趋势跟随赚了 **+21.1%**，同期 SPY 是 +12.1%。[怎么用 →](#-研究工具箱)
 - **0.6.3** · ⏳ **长任务在后台接着跑**：扫描、回测、运行智能体和获取新闻，切到别的页面或刷新都不会中断，跑完点提示条就回到结果。
 - **0.6.2** · ❓ **每个数字都能点开看说明**：每张卡片、每一列、每个输入框旁边都有 ?，说明它是什么、怎么算、怎么用，中英文都有。[看截图 →](#-截图一览)
-- **0.6.1** · 🔎 **每笔回测交易背后的新闻**：选一笔交易，就能看到回测在那天收盘时看到的标题，以及第二天下的单。[怎么用 →](docs/zh/news-history.md#查看回测看到的新闻)
 
 <details>
 <summary>更早的版本</summary>
 
+- **0.6.1** · 🔎 **每笔回测交易背后的新闻**：选一笔交易，就能看到回测在那天收盘时看到的标题，以及第二天下的单。[怎么用 →](docs/zh/news-history.md#查看回测看到的新闻)
 - **0.6.0** · 🗞️ **自带 2026 年新闻**：内置 64 只股票的 16,945 条标题和 SEC 公告，`riskaware backtest --news` 什么都不用下载就能用。带新闻的智能体赚了 **+15.9%**，同期 SPY +12.1%；最大回撤 **-5.3%**，SPY 是 -8.9%。[看结果 →](#2026-年至今带新闻)
 - **0.6.0** · 🧪 **说出策略，AI 写代码并回测**：通过 MCP，Claude、Codex 或 Gemini 把策略写成代码；代码先检查有没有偷看未来和副作用，再放到单独的进程里跑。[怎么用 →](#-策略实验室)
 - **0.6.0** · 🔭 **回测不偷看未来**：回测每天只能看到当天收盘前发布的新闻，策略也拿不到之后的价格。[细节 →](docs/zh/news-history.md#回测怎么防止偷看未来)
@@ -119,7 +121,16 @@ riskaware --lang zh dashboard         # 网页看板，右上角可切换中英�
 
 上面这些命令都不需要券商账户或 API key。在配置文件里写 `language: zh`，以后就不用每次加 `--lang zh`。
 
-想用 Docker？先把 `riskaware.yaml`（`riskaware init` 生成）和要用券商 key 时的 `.env` 放在仓库根目录，然后运行 `docker compose -f docker/docker-compose.yml up -d`（或 `make docker`），就会启动每日模拟盘任务和网页看板 http://localhost:8501。
+想用 Docker？每个版本都会发布镜像，x86-64 和 ARM 都能用：
+
+```bash
+docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard   # 网页看板 http://localhost:8501
+docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp                   # 通过 stdio 提供 MCP 服务
+```
+
+还想跑每日模拟盘任务的话，先把 `riskaware.yaml`（`riskaware init` 生成）和要用券商 key 时的 `.env` 放在仓库根目录，然后运行 `docker compose -f docker/docker-compose.yml up -d`（或 `make docker`），就会启动每日模拟盘任务和网页看板 http://localhost:8501。
+
+什么都不想装，也可以直接在浏览器里打开：[![在 GitHub Codespaces 中打开](https://github.com/codespaces/badge.svg)](https://codespaces.new/jackson-cmd/risk-aware-trading-agents)，依赖都会装好；运行 `riskaware --lang zh dashboard`，看板会在 8501 端口打开。
 
 ## 🤖 模拟盘智能体
 
@@ -479,7 +490,8 @@ examples/           示例配置、示例策略、.env.example
 scripts/            重建自带的行情和新闻数据
 site/               中英双语项目网站和指南（GitHub Pages）
 docker/             Dockerfile 和 docker-compose.yml
-.github/            CI 和网站部署流程、Issue 和 PR 模板、参与贡献和安全说明
+.devcontainer/      GitHub Codespaces 和 VS Code 开发容器配置
+.github/            CI、发布和网站部署流程，Issue 和 PR 模板，参与贡献、安全和行为准则说明
 ```
 
 ## ❓ 常见问题
@@ -542,7 +554,7 @@ docker/             Dockerfile 和 docker-compose.yml
   title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
-  version = {0.7.0},
+  version = {0.7.1},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```

@@ -45,9 +45,19 @@ def absolute_links(text: str, tag: str, repo: str = REPO) -> str:
     return re.sub(r"(\[[^\]]*\])\(([^)\s]+)\)", fix, text)
 
 
+def previous_version(version: str, root: Path = ROOT) -> str | None:
+    """The version of the changelog section right below this one."""
+    heads = re.findall(r"^## (\d+\.\d+\.\d+)\b", (root / "CHANGELOG.md").read_text(encoding="utf-8"), re.M)
+    i = heads.index(version) if version in heads else -1
+    return heads[i + 1] if 0 <= i < len(heads) - 1 else None
+
+
 def notes(version: str, root: Path = ROOT, repo: str = REPO) -> str:
     tag = f"v{version}"
     body = absolute_links(changelog_section(version, root), tag, repo)
+    prev = previous_version(version, root)
+    if prev:
+        body += f"\n\n**Full changelog**: https://github.com/{repo}/compare/v{prev}...{tag}"
     return (f"{body}\n\n"
             f"Install this version: `pip install \"risk-aware-trading-agents @ "
             f"git+https://github.com/{repo}@{tag}\"`\n\n"
