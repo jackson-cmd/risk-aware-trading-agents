@@ -1,10 +1,10 @@
 name: Release
 
 # When CI passes on main and pyproject.toml carries a version that has no tag yet, this drafts a GitHub release whose
-# notes are the version's section of CHANGELOG.md, attaches the wheel and the source archive, pushes the Docker image to
-# ghcr.io, and only then publishes the release, which tags the commit vX.Y.Z. Once the repository variable PYPI_PUBLISH
-# is "true", the files also go to PyPI. A version bump in a merged PR is all it takes; pushes that keep the version do
-# nothing. If a job fails, the release stays a draft: re-run the failed jobs. Run the workflow by hand with the tag of a
+# notes are the version's section of CHANGELOG.md, attaches the wheel, the source archive and the Claude Desktop extension
+# (.mcpb), pushes the Docker image to ghcr.io, and only then publishes the release, which tags the commit vX.Y.Z. Once the
+# repository variable PYPI_PUBLISH is "true", the files also go to PyPI, and server.json then goes to the official MCP
+# Registry. A version bump in a merged PR is all it takes; pushes that keep the version do nothing. If a job fails, the release stays a draft: re-run the failed jobs. Run the workflow by hand with the tag of a
 # published release (v0.7.1 or later) to build its files again and upload them to PyPI, for example after setting
 # PyPI up, and with rebuild_image to push its Docker image again; the release itself is not changed.
 
@@ -107,9 +107,11 @@ jobs:
           python -m pip install --upgrade build twine
           python -m build
           python -m twine check --strict dist/*
+      - name: Build the Claude Desktop extension
+        run: python scripts/build_mcpb.py --out dist-mcpb   # kept out of dist/, which goes to PyPI as it is
       - name: Attach them to the draft
         if: needs.release.outputs.draft == 'true'
-        run: gh release upload "$TAG" dist/* --clobber
+        run: gh release upload "$TAG" dist/* dist-mcpb/* --clobber
       - uses: actions/upload-artifact@v7
         with:
           name: dist
@@ -191,3 +193,70 @@ jobs:
           name: dist
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+
+  mcp-registry:
+    # The registry lists the server under io.github.<owner>/<repo> and checks that the PyPI package's README carries
+    # "mcp-name: <that name>" and that the image carries the io.modelcontextprotocol.server.name label, so it runs
+    # after both are out. A version can be published once; a re-run with a tag skips what the registry already has.
+    needs: [release, docker, pypi]
+    if: ${{ !cancelled() && needs.pypi.result == 'success' && needs.docker.result != 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write   # GitHub OIDC: the registry checks this workflow's identity, no token is stored
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TAG: ${{ needs.release.outputs.tag }}
+      MCP_PUBLISHER_VERSION: v1.8.9
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.release.outputs.sha }}
+      - name: Skip a version the registry already has
+        id: check
+        run: |
+          name=$(jq -r .name server.json); version=$(jq -r .version server.json)
+          [ "v$version" = "$TAG" ] || { echo "server.json says $version but the release is $TAG"; exit 1; }
+          code=$(curl -s -o /dev/null -w '%{http_code}' \
+            "https://registry.modelcontextprotocol.io/v0.1/servers/${name/\//%2F}/versions/$version")
+          if [ "$code" = 200 ]; then
+            echo "$name $version is already in the MCP Registry" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: List the Claude Desktop extension too, with its hash
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          file="risk-aware-trading-agents-${TAG#v}.mcpb"
+          if ! gh release download "$TAG" --pattern "$file" --dir "$RUNNER_TEMP"; then
+            echo "$file is not on the release; listing the PyPI package and the image only"; exit 0
+          fi
+          sha=$(sha256sum "$RUNNER_TEMP/$file" | cut -d' ' -f1)
+          url="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/$file"
+          jq --arg url "$url" --arg sha "$sha" \
+            '.packages += [{"registryType": "mcpb", "identifier": $url, "fileSha256": $sha, "transport": {"type": "stdio"}}]' \
+            server.json > "$RUNNER_TEMP/server.json" && mv "$RUNNER_TEMP/server.json" server.json
+      - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        if: steps.check.outputs.skip != 'true'
+      - name: Download mcp-publisher and verify its signature
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          archive="mcp-publisher_linux_amd64.tar.gz"
+          base="https://github.com/modelcontextprotocol/registry/releases/download/$MCP_PUBLISHER_VERSION"
+          curl --fail --location --silent --show-error --output "$archive" "$base/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base/$archive.sigstore.json"
+          cosign verify-blob --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/$MCP_PUBLISHER_VERSION" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" "$archive"
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive" "$archive.sigstore.json"
+      - name: Publish to the MCP Registry
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          ./mcp-publisher login github-oidc
+          for attempt in 1 2 3; do
+            ./mcp-publisher publish && exit 0
+            echo "attempt $attempt failed; PyPI or ghcr.io may not show the new version yet"; sleep 60
+          done
+          exit 1

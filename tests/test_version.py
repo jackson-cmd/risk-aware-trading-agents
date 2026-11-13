@@ -63,3 +63,29 @@ def test_the_pypi_readme_has_only_absolute_links():
     assert not re.findall(r"\]\((?!https?:|mailto:)[^)\s]+\)", text)
     assert not re.findall(r'(?:src|href)="(?!https?:|mailto:)[^"]*"', text)
     assert "https://raw.githubusercontent.com/jackson-cmd/risk-aware-trading-agents/main/site/assets/" in text
+
+
+def test_the_mcp_registry_entry_agrees():
+    """The release publishes server.json to the MCP Registry, which accepts it only if the PyPI README names the server
+    and the image carries its label; `uvx risk-aware-trading-agents mcp` needs a command under the package name and the
+    MCP SDK in the base install."""
+    import json
+
+    tomllib = pytest.importorskip("tomllib")
+    version = _release_notes().project_version(ROOT)
+    server = json.loads((ROOT / "server.json").read_text(encoding="utf-8"))
+    assert server["version"] == version
+    assert len(server["description"]) <= 100, "the registry rejects longer descriptions"
+    pypi = next(p for p in server["packages"] if p["registryType"] == "pypi")
+    oci = next(p for p in server["packages"] if p["registryType"] == "oci")
+    assert (pypi["identifier"], pypi["version"]) == ("risk-aware-trading-agents", version)
+    assert oci["identifier"] == f"ghcr.io/jackson-cmd/risk-aware-trading-agents:{version}"
+    assert all(p["packageArguments"] == [{"type": "positional", "value": "mcp"}] for p in (pypi, oci))
+    name = server["name"]
+    assert name == "io.github.jackson-cmd/risk-aware-trading-agents"
+    assert f"<!-- mcp-name: {name} -->" in (ROOT / "README.md").read_text(encoding="utf-8")
+    assert f'LABEL io.modelcontextprotocol.server.name="{name}"' in (ROOT / "docker" / "Dockerfile").read_text(
+        encoding="utf-8")
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    assert project["scripts"]["risk-aware-trading-agents"] == project["scripts"]["riskaware"]
+    assert any(re.match(r"mcp\b", dep) for dep in project["dependencies"])

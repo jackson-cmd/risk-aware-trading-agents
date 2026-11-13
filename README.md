@@ -1,3 +1,5 @@
+<!-- mcp-name: io.github.jackson-cmd/risk-aware-trading-agents -->
+
 <div align="center">
 
 <img src="site/assets/banner.svg" alt="Risk-Aware Trading Agents · 风险感知交易智能体: AI trading agents for US stocks, with news backtests that cannot see the future" width="100%">
@@ -8,7 +10,7 @@ Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnin
 
 [🌐 Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [中文说明 → README_zh.md](README_zh.md) · [🚀 Quick start](#-quick-start) · [🆕 What's new](#-whats-new) · [🔬 Research kit](#-research-kit) · [🔗 MCP](#-mcp-server) · [📸 Screenshots](#-screenshots) · [Changelog](CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.1](https://img.shields.io/badge/pypi-0.7.1-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.7.2-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
 <img src="site/assets/demo_en.gif" alt="A 16-second tour: the market regime, today's signals, how a decision was made, paper-trading agents ranked against SPY, a backtest, the news a backtest saw, cross-verified news, and a research run with its look-ahead check" width="100%">
 
@@ -74,14 +76,15 @@ For the daily paper-trading scheduler as well, put `riskaware.yaml` (from `riska
 
 ## 🆕 What's new
 
+- **0.7.2** · 🔗 **One step into Claude and other MCP clients**: the server is on the official MCP Registry, `uvx risk-aware-trading-agents mcp` starts it with nothing installed first, and every release carries a Claude Desktop extension (`.mcpb`) that installs when you open it. [How →](#-mcp-server)
 - **0.7.1** · 📦 **On PyPI and Docker**: `pip install risk-aware-trading-agents`, or run the dashboard or the MCP server from `ghcr.io/jackson-cmd/risk-aware-trading-agents` without installing Python; GitHub Codespaces opens the repository with everything installed. [How →](#-quick-start)
 - **0.7.0** · 🔬 **A frozen 2026 market for research**: point-in-time prices, VIX and news for the whole year ship with the package. Ask what was known at any close, let Claude turn a strategy you describe into code and test it, or let an LLM trade the year step by step. Every run gets a look-ahead check and a record for papers; trend following made **+21.1%** against SPY's +12.1%. [How →](#-research-kit)
 - **0.6.3** · ⏳ **Long runs keep going in the background**: scans, backtests, agent runs and news fetches go on when you switch pages or reload, and a bar takes you back to the result.
-- **0.6.2** · ❓ **Every number explains itself**: a ? next to every card, column and field says what it is, how it is calculated and how to use it, in English and 中文. [See it →](#-screenshots)
 
 <details>
 <summary>Earlier releases</summary>
 
+- **0.6.2** · ❓ **Every number explains itself**: a ? next to every card, column and field says what it is, how it is calculated and how to use it, in English and 中文. [See it →](#-screenshots)
 - **0.6.1** · 🔎 **The news behind every backtest trade**: pick a trade and see the headlines the backtest had at that close and the order it placed. [How →](docs/news-history.md#see-what-a-backtest-saw)
 - **0.6.0** · 🗞️ **2026 news in the box**: 16,945 headlines and SEC filings for the 64 built-in stocks, so `riskaware backtest --news` works with nothing to download. The agent with news made **+15.9%** against SPY's +12.1%, with a **-5.3%** drawdown against -8.9%. [Results →](#2026-so-far-with-news)
 - **0.6.0** · 🧪 **Describe a strategy, the AI writes and tests it**: over MCP, Claude, Codex or Gemini write the strategy as code; it is checked for look-ahead and side effects and runs in a separate process. [How →](#-strategy-lab)
@@ -211,9 +214,11 @@ The daily job (a LaunchAgent on macOS, a crontab line on Linux, a scheduled task
 `riskaware mcp` serves the agents over the Model Context Protocol, so Claude, Codex, Gemini, Cursor or any MCP client can use them, on your plan and without an API key. `riskaware mcp-setup` prints (or, with `--apply`, runs) the one step that connects it:
 
 ```bash
-pip install "risk-aware-trading-agents[mcp]"
+pip install risk-aware-trading-agents        # the MCP server is part of the base install since 0.7.2
 riskaware mcp-setup claude-desktop --apply   # or: claude-code, codex (your ChatGPT login), gemini, antigravity
 ```
+
+Other ways in: in Claude Desktop, download `risk-aware-trading-agents-<version>.mcpb` from the [latest release](https://github.com/jackson-cmd/risk-aware-trading-agents/releases/latest) and open it. A client that starts servers by command can use `uvx risk-aware-trading-agents mcp` (nothing to install first) or `docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp`. The server is listed on the official MCP Registry as `io.github.jackson-cmd/risk-aware-trading-agents`.
 
 Twenty-one tools: `market_regime`, `scan`, `analyze_stock`, `stock_news`, `list_strategies`, `backtest`, `strategy_guide`, `backtest_code`, `agents_leaderboard`, `agent_detail`, `agent_decisions`, `agents_create` and `agents_run`, and for research `research_guide`, `market_day`, `run_experiment`, `list_experiments`, `experiment_report`, `trading_session_start`, `trading_session_step` and `trading_session_status`. They are read-only or act on local paper accounts; no tool can send an order to a broker. Then just ask, for example "What regime is the market in, and what is coming up this week?" or "Backtest the wheel on megacap with $1M since 2018." ChatGPT itself only connects to remote servers, so on the OpenAI side use Codex, which runs on your ChatGPT login. More in [docs/agents.md](docs/agents.md#use-it-from-claude-chatgpt-or-gemini-mcp).
 
@@ -508,7 +513,8 @@ src/riskaware/      the package
 tests/              offline test suite (pytest)
 docs/               guides and design notes; docs/zh/ holds the Chinese guides and changelog
 examples/           example configs, example strategies, .env.example
-scripts/            rebuild the bundled market and news data, release notes, the privacy check and its git hook
+scripts/            rebuild the bundled market and news data, release notes, the Claude Desktop extension, the privacy check and its git hook
+server.json         the MCP Registry entry that each release publishes
 site/               bilingual project website and guides (GitHub Pages)
 docker/             Dockerfile and docker-compose.yml
 .devcontainer/      GitHub Codespaces and VS Code dev container
@@ -573,7 +579,7 @@ If you use the package or its frozen 2026 market in your research, please cite i
   title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
-  version = {0.7.1},
+  version = {0.7.2},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```
