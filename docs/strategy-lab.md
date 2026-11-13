@@ -5,7 +5,7 @@ Tell Claude, Codex or Gemini what you want in plain words. Through MCP it reads 
 ## Set up
 
 ```bash
-pip install -e ".[mcp]"
+pip install "risk-aware-trading-agents[mcp]"
 riskaware mcp-setup claude-desktop --apply   # or: claude-code, codex (your ChatGPT login), gemini, antigravity
 ```
 

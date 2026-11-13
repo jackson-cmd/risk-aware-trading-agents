@@ -5,8 +5,8 @@ name: Release
 # ghcr.io, and only then publishes the release, which tags the commit vX.Y.Z. Once the repository variable PYPI_PUBLISH
 # is "true", the files also go to PyPI. A version bump in a merged PR is all it takes; pushes that keep the version do
 # nothing. If a job fails, the release stays a draft: re-run the failed jobs. Run the workflow by hand with the tag of a
-# published release (v0.7.1 or later) to build its files and image again and upload them to PyPI, for example after
-# setting PyPI up; the release itself is not changed.
+# published release (v0.7.1 or later) to build its files again and upload them to PyPI, for example after setting
+# PyPI up, and with rebuild_image to push its Docker image again; the release itself is not changed.
 
 on:
   workflow_run:
@@ -19,6 +19,10 @@ on:
         description: "Tag of a published release to publish again, e.g. v0.7.1 (leave empty to release the version in pyproject.toml; only from main)"
         required: false
         default: ""
+      rebuild_image:
+        description: "With a tag: build and push its Docker image again"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -113,7 +117,7 @@ jobs:
 
   docker:
     needs: release
-    if: needs.release.outputs.tag != ''
+    if: needs.release.outputs.tag != '' && (needs.release.outputs.draft == 'true' || inputs.rebuild_image)
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:

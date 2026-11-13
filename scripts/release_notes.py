@@ -59,8 +59,8 @@ def notes(version: str, root: Path = ROOT, repo: str = REPO) -> str:
     if prev:
         body += f"\n\n**Full changelog**: https://github.com/{repo}/compare/v{prev}...{tag}"
     return (f"{body}\n\n"
-            f"Install this version: `pip install \"risk-aware-trading-agents @ "
-            f"git+https://github.com/{repo}@{tag}\"`\n\n"
+            f"Install this version: `pip install risk-aware-trading-agents=={version}` · Docker: "
+            f"`docker pull ghcr.io/{repo}:{version}`\n\n"
             f"中文更新记录：[docs/zh/CHANGELOG.md](https://github.com/{repo}/blob/{tag}/docs/zh/CHANGELOG.md)\n")
 
 

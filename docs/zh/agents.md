@@ -53,7 +53,7 @@ riskaware llm-check ollama:qwen2.5:3b                     # 发一次示例复�
 |---|---|---|
 | `openai:模型` | OpenAI，比如 `gpt-5.6-luna`（关掉推理，一次复核几秒钟） | `.env` 里的 `OPENAI_API_KEY` |
 | `ollama:模型` | 你电脑上的免费本地模型，比如 `qwen2.5:3b` | [Ollama](https://ollama.com)：`ollama pull qwen2.5:3b`，再 `ollama serve` |
-| `anthropic:模型` | 用官方 SDK 调 Claude | `pip install -e ".[llm]"` 和 `ANTHROPIC_API_KEY` |
+| `anthropic:模型` | 用官方 SDK 调 Claude | `pip install "risk-aware-trading-agents[llm]"` 和 `ANTHROPIC_API_KEY` |
 | `compat:模型` | 任何 OpenAI 兼容服务（DeepSeek、Groq、OpenRouter、vLLM、LM Studio） | `--llm-base-url` 和 `--llm-key-env` |
 
 回复用严格的 JSON schema 模式请求，模型必须按规定的格式回答；仍然不合格式的回复会被忽略，这笔交易照规则正常进行。用同一天的买入候选简单比了一下：`gpt-5.6-luna` 每次约 2.5 秒，调整在 -0.04 到 +0.05 之间；3B 的本地模型每次约 7.5 秒，几乎都回答 +0.00。小的本地模型免费、隐私好，但给出的判断不多。
@@ -111,7 +111,7 @@ riskaware agents schedule --uninstall  # 关闭
 MCP 服务器让 AI 应用可以直接向这些智能体提问、让它们运行，走你自己的订阅，不需要 API key。需要先装 `mcp` 扩展，然后一条命令接上一个应用（默认打印这一步，加 `--apply` 直接执行）：
 
 ```bash
-pip install -e ".[mcp]"
+pip install "risk-aware-trading-agents[mcp]"
 riskaware mcp-setup claude-desktop --apply    # Claude Desktop：改它的配置文件（会留备份），然后重启应用
 riskaware mcp-setup claude-code --apply       # Claude Code：claude mcp add -s user riskaware -- ...
 riskaware mcp-setup codex --apply             # OpenAI Codex，用你的 ChatGPT 登录

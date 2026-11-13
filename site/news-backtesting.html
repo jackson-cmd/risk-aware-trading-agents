@@ -61,9 +61,7 @@
 </ul>
 
 <h2>Try it</h2>
-<pre>git clone https://github.com/jackson-cmd/risk-aware-trading-agents
-cd risk-aware-trading-agents
-pip install -e ".[dashboard,mcp]"        # Python 3.10+
+<pre>pip install "risk-aware-trading-agents[dashboard,mcp]"        # Python 3.10+
 
 riskaware backtest --strategy risk_aware --preset megacap --start 2026-01-02 --news
 riskaware research run --strategy swing_trend --split 2026-07-01   # look-ahead check and a saved record

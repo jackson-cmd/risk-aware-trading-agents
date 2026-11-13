@@ -8,7 +8,7 @@
 
 [🌐 项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [English → README.md](README.md) · [🚀 快速开始](#-快速开始) · [🆕 新功能](#-新功能) · [🔬 研究工具箱](#-研究工具箱) · [🔗 MCP](#-mcp-服务器) · [📸 截图](#-截图一览) · [更新记录](docs/zh/CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![版本 0.7.1](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.7.1-e5534b.svg)](docs/zh/CHANGELOG.md) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.1](https://img.shields.io/badge/pypi-0.7.1-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
 
 <img src="site/assets/demo_zh.gif" alt="16 秒导览：市场状态、今天的信号、一个决定是怎么做出来的、模拟盘智能体和 SPY 对比、回测、回测看到的新闻、交叉验证新闻，以及一次带防偷看检查的研究实验" width="100%">
 
@@ -19,7 +19,7 @@
 ## 🚀 快速开始
 
 ```bash
-pip install "risk-aware-trading-agents[dashboard,mcp] @ git+https://github.com/jackson-cmd/risk-aware-trading-agents"   # 需要 Python 3.10+
+pip install "risk-aware-trading-agents[dashboard,mcp]"   # 需要 Python 3.10+
 riskaware --lang zh dashboard   # 网页看板 http://localhost:8501，可切换中英文
 ```
 
@@ -39,7 +39,7 @@ riskaware agents schedule --install   # 以后每个交易日自动交易
 riskaware --lang zh research run -s swing_trend   # 在冻结的 2026 年市场上跑一个策略，带防偷看检查
 ```
 
-上面这些命令都不需要券商账户或 API key。在配置文件里写 `language: zh`，以后就不用每次加 `--lang zh`。想改代码的话，先克隆仓库，再用 `pip install -e ".[dashboard,mcp]"` 安装。
+上面这些命令都不需要券商账户或 API key。在配置文件里写 `language: zh`，以后就不用每次加 `--lang zh`。想用 GitHub 上还没发版的最新代码，就改用 `pip install "risk-aware-trading-agents[dashboard,mcp] @ git+https://github.com/jackson-cmd/risk-aware-trading-agents"`；想改代码的话，先克隆仓库，再用 `pip install -e ".[dashboard,mcp]"` 安装。
 
 **Docker**，x86-64 和 ARM 都能用：
 
@@ -74,7 +74,7 @@ docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp            
 
 ## 🆕 新功能
 
-- **0.7.1** · 🐳 **Docker 镜像和 Codespaces**：不用装 Python，直接用 `ghcr.io/jackson-cmd/risk-aware-trading-agents` 跑网页看板或 MCP 服务器；也可以在 GitHub Codespaces 里打开整个仓库，依赖都已装好。[怎么用 →](#-快速开始)
+- **0.7.1** · 📦 **上架 PyPI 和 Docker**：`pip install risk-aware-trading-agents` 就能装；不想装 Python，也可以直接用 `ghcr.io/jackson-cmd/risk-aware-trading-agents` 跑网页看板或 MCP 服务器；在 GitHub Codespaces 里打开整个仓库，依赖都已装好。[怎么用 →](#-快速开始)
 - **0.7.0** · 🔬 **冻结的 2026 年市场，供研究用**：全年按时间点记录的价格、VIX 和新闻随安装包提供。可以查任意一天收盘时已知的信息，可以让 Claude 把你描述的策略写成代码并测试，也可以让 LLM 一步一步把这一年交易一遍。每次运行都做防偷看检查，并留下可以用于论文的记录；趋势跟随赚了 **+21.1%**，同期 SPY 是 +12.1%。[怎么用 →](#-研究工具箱)
 - **0.6.3** · ⏳ **长任务在后台接着跑**：扫描、回测、运行智能体和获取新闻，切到别的页面或刷新都不会中断，跑完点提示条就回到结果。
 - **0.6.2** · ❓ **每个数字都能点开看说明**：每张卡片、每一列、每个输入框旁边都有 ?，说明它是什么、怎么算、怎么用，中英文都有。[看截图 →](#-截图一览)
@@ -211,7 +211,7 @@ riskaware agents schedule --install                      # 以后每个交易日
 `riskaware mcp` 通过 Model Context Protocol 提供这些智能体的能力，Claude、Codex、Gemini、Cursor 或任何 MCP 客户端都能直接用，走你的订阅，不需要 API key。`riskaware mcp-setup` 会打印（加 `--apply` 则直接执行）接入那一步：
 
 ```bash
-pip install -e ".[mcp]"
+pip install "risk-aware-trading-agents[mcp]"
 riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex（用你的 ChatGPT 登录）、gemini、antigravity
 ```
 

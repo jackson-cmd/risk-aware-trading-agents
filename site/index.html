@@ -217,9 +217,7 @@ riskaware mcp                          # use them from Claude / 在 Claude 里�
 <section id="start"><div class="wrap">
   <h2><span lang="en">Quick start</span><span lang="zh">快速开始</span></h2>
   <p class="sub"><span lang="en">Python 3.10+. No account or API key needed for the first four commands.</span><span lang="zh">需要 Python 3.10+。前四条命令不需要券商账户或 API key。</span></p>
-<pre><code>git clone https://github.com/jackson-cmd/risk-aware-trading-agents
-cd risk-aware-trading-agents
-pip install -e ".[dashboard,mcp]"
+<pre><code>pip install "risk-aware-trading-agents[dashboard,mcp]"
 
 riskaware init                 # 2-minute wizard / 两分钟配置向导
 riskaware regime               # market regime, VIX, fear &amp; greed, FOMC countdown

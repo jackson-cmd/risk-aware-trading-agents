@@ -61,7 +61,7 @@ broker:
 
 ## Interactive Brokers (`ibkr`)
 
-`pip install -e ".[ibkr]"`, start TWS or IB Gateway, enable "ActiveX and Socket Clients" in the API settings.
+`pip install "risk-aware-trading-agents[ibkr]"`, start TWS or IB Gateway, enable "ActiveX and Socket Clients" in the API settings.
 
 ```yaml
 broker:
@@ -71,7 +71,7 @@ broker:
 
 ## Charles Schwab (`schwab`)
 
-`pip install -e ".[schwab]"`. Create an app at developer.schwab.com with the callback URL `https://127.0.0.1:8182`.
+`pip install "risk-aware-trading-agents[schwab]"`. Create an app at developer.schwab.com with the callback URL `https://127.0.0.1:8182`.
 
 ```bash
 SCHWAB_API_KEY=...
@@ -82,7 +82,7 @@ The first connection opens a browser for the Schwab login and saves a token to `
 
 ## tastytrade (`tastytrade`)
 
-`pip install -e ".[tastytrade]"`. Create an OAuth application in tastytrade's API settings.
+`pip install "risk-aware-trading-agents[tastytrade]"`. Create an OAuth application in tastytrade's API settings.
 
 ```bash
 TASTYTRADE_CLIENT_SECRET=...
@@ -97,7 +97,7 @@ broker:
 
 ## Futu / moomoo (`futu`)
 
-`pip install -e ".[futu]"`. Download and log in to OpenD (Futu or moomoo).
+`pip install "risk-aware-trading-agents[futu]"`. Download and log in to OpenD (Futu or moomoo).
 
 ```yaml
 broker:
@@ -109,7 +109,7 @@ Real trading (`simulate: false`) needs `FUTU_TRADE_PASSWORD` in `.env`.
 
 ## Tiger Brokers (`tiger`)
 
-`pip install -e ".[tiger]"`. Download `tiger_openapi_config.properties` from the Tiger developer page into `~/.riskaware/tiger/`.
+`pip install "risk-aware-trading-agents[tiger]"`. Download `tiger_openapi_config.properties` from the Tiger developer page into `~/.riskaware/tiger/`.
 
 ```yaml
 broker:
@@ -119,7 +119,7 @@ broker:
 
 ## Longbridge (`longbridge`)
 
-`pip install -e ".[longbridge]"`. Create an app on the Longbridge developer site; a paper account has its own access token.
+`pip install "risk-aware-trading-agents[longbridge]"`. Create an app on the Longbridge developer site; a paper account has its own access token.
 
 ```bash
 LONGPORT_APP_KEY=...
