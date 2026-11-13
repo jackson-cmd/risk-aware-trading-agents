@@ -572,7 +572,9 @@ Issues and pull requests are welcome: new brokers, data sources, strategies, tra
 
 ## 📝 Citation
 
-If you use the package or its frozen 2026 market in your research, please cite it. GitHub's **Cite this repository** button gives other formats ([CITATION.cff](CITATION.cff)); for the data, add the version and SHA-256 from `src/riskaware/research/data/manifest.json`.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24202496.svg)](https://doi.org/10.5281/zenodo.24202496)
+
+If you use the package or its frozen 2026 market in your research, please cite it. Every release is archived on Zenodo; [10.5281/zenodo.24202496](https://doi.org/10.5281/zenodo.24202496) always resolves to the latest version, and each release page there has its own DOI. GitHub's **Cite this repository** button gives other formats ([CITATION.cff](CITATION.cff)); for the data, add the version and SHA-256 from `src/riskaware/research/data/manifest.json`.
 
 ```bibtex
 @software{risk_aware_trading_agents,
@@ -580,6 +582,7 @@ If you use the package or its frozen 2026 market in your research, please cite i
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
   version = {0.7.2},
+  doi     = {10.5281/zenodo.24202496},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```
