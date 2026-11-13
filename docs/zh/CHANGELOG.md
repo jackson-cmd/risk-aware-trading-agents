@@ -2,6 +2,13 @@
 
 [English](../../CHANGELOG.md)
 
+## 0.7.1（2026-11-12）
+
+- **每个版本都有 Docker 镜像**，x86-64 和 ARM（Apple 芯片）都能用：`docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard` 会在 http://localhost:8501 打开网页看板，`docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp` 通过 stdio 提供 MCP 工具（镜像里现在装了 `mcp` 扩展）。标签有版本号、小版本号和 `latest`。
+- 发布全自动：新版本合并到 main 且 CI 通过后，会自动打标签，GitHub Release 附上这份更新记录、wheel 和源码包，再推送镜像。
+- **GitHub Codespaces**：开发容器里装好了 Python 3.12，以及看板、MCP、LLM 和测试用的扩展。运行 `riskaware dashboard` 后，8501 端口会在浏览器里打开。
+- 仓库根目录更整洁：Docker 文件移到 `docker/`（`docker compose -f docker/docker-compose.yml up -d` 或 `make docker`），`.env.example` 移到 `examples/`，参与贡献、安全和行为准则说明移到 `.github/`。
+
 ## 0.7.0（2026-11-12）
 
 - **研究工具箱**（`riskaware.research`、`riskaware research`、[docs/zh/research.md](research.md)）：安装包里带了一份冻结的 2026 年市场，实验在任何机器上都得出同样的数字。内容是 64 只股票池股票、25 个 ETF、VIX 期限结构（VIX9D、VIX、VIX3M、VVIX）和 4 个跨资产 ETF 从 2024-01-02 到 2026-11-11 的日线（`research/data/market_2026.csv.gz`，1.4 MB，附带记录 SHA-256 的清单；`scripts/build_market_bundle.py` 可以重建），再加上已有的 2026 年新闻。

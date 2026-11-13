@@ -15,8 +15,9 @@
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
-[![Version 0.7.0](https://img.shields.io/badge/version-0.7.0-e5534b.svg)](CHANGELOG.md)
+[![Version 0.7.1](https://img.shields.io/badge/version-0.7.1-e5534b.svg)](CHANGELOG.md)
 [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server)
+[![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents)
 [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
 <img src="site/assets/dashboard_en.jpg" width="820" alt="Dashboard: market regime card, fear and greed gauge, VIX, sector breadth and the macro calendar">
@@ -41,14 +42,15 @@ riskaware dashboard          # the web UI on http://localhost:8501, English and 
 
 ## 🆕 What's new
 
+- **0.7.1** · 🐳 **Docker image and Codespaces**: run the dashboard or the MCP server from `ghcr.io/jackson-cmd/risk-aware-trading-agents` without installing Python, or open the repository in GitHub Codespaces with everything installed. [How →](#-quick-start)
 - **0.7.0** · 🔬 **A frozen 2026 market for research**: point-in-time prices, VIX and news for the whole year ship with the package. Ask what was known at any close, let Claude turn a strategy you describe into code and test it, or let an LLM trade the year step by step. Every run gets a look-ahead check and a record for papers; trend following made **+21.1%** against SPY's +12.1%. [How →](#-research-kit)
 - **0.6.3** · ⏳ **Long runs keep going in the background**: scans, backtests, agent runs and news fetches go on when you switch pages or reload, and a bar takes you back to the result.
 - **0.6.2** · ❓ **Every number explains itself**: a ? next to every card, column and field says what it is, how it is calculated and how to use it, in English and 中文. [See it →](#-screenshots)
-- **0.6.1** · 🔎 **The news behind every backtest trade**: pick a trade and see the headlines the backtest had at that close and the order it placed. [How →](docs/news-history.md#see-what-a-backtest-saw)
 
 <details>
 <summary>Earlier releases</summary>
 
+- **0.6.1** · 🔎 **The news behind every backtest trade**: pick a trade and see the headlines the backtest had at that close and the order it placed. [How →](docs/news-history.md#see-what-a-backtest-saw)
 - **0.6.0** · 🗞️ **2026 news in the box**: 16,945 headlines and SEC filings for the 64 built-in stocks, so `riskaware backtest --news` works with nothing to download. The agent with news made **+15.9%** against SPY's +12.1%, with a **-5.3%** drawdown against -8.9%. [Results →](#2026-so-far-with-news)
 - **0.6.0** · 🧪 **Describe a strategy, the AI writes and tests it**: over MCP, Claude, Codex or Gemini write the strategy as code; it is checked for look-ahead and side effects and runs in a separate process. [How →](#-strategy-lab)
 - **0.6.0** · 🔭 **No peeking at the future**: each backtest day sees only news published before its close, and a strategy cannot reach later prices. [Details →](docs/news-history.md#how-the-backtest-avoids-look-ahead)
@@ -119,7 +121,16 @@ riskaware dashboard                   # web UI (English / 中文)
 
 No account or API key is needed for any of the commands above. Add `--lang zh` to any command for Chinese output.
 
-Prefer Docker? Put `riskaware.yaml` (from `riskaware init`) and, if you use broker keys, `.env` in the repository root, then `docker compose -f docker/docker-compose.yml up -d` (or `make docker`) runs the daily paper-trading scheduler and the dashboard on http://localhost:8501.
+Prefer Docker? Every release is published as an image for x86-64 and ARM:
+
+```bash
+docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard   # http://localhost:8501
+docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp                   # MCP server over stdio
+```
+
+To run the daily paper-trading scheduler as well, put `riskaware.yaml` (from `riskaware init`) and, if you use broker keys, `.env` in the repository root, then `docker compose -f docker/docker-compose.yml up -d` (or `make docker`): it starts the scheduler and the dashboard on http://localhost:8501.
+
+Or open it in the browser with nothing to install: [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/jackson-cmd/risk-aware-trading-agents) sets up the repository with every extra installed; run `riskaware dashboard` and the dashboard opens on port 8501.
 
 ## 🤖 Paper-trading agents
 
@@ -476,7 +487,8 @@ examples/           example configs, example strategies, .env.example
 scripts/            rebuild the bundled market and news data
 site/               bilingual project website and guides (GitHub Pages)
 docker/             Dockerfile and docker-compose.yml
-.github/            CI and website workflows, issue and PR templates, contributing and security notes
+.devcontainer/      GitHub Codespaces and VS Code dev container
+.github/            CI, release and website workflows, issue and PR templates, contributing, security and conduct notes
 ```
 
 ## ❓ FAQ
@@ -539,7 +551,7 @@ If you use the package or its frozen 2026 market in your research, please cite i
   title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
-  version = {0.7.0},
+  version = {0.7.1},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```

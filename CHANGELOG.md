@@ -2,6 +2,13 @@
 
 [中文](docs/zh/CHANGELOG.md)
 
+## 0.7.1 (2026-11-12)
+
+- **A Docker image for every release**, for x86-64 and ARM (Apple silicon): `docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard` opens the dashboard on http://localhost:8501, and `docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp` serves the MCP tools over stdio (the image now includes the `mcp` extra). Tags: the version, the minor version and `latest`.
+- Releases are automatic: when a new version reaches main and CI passes, the commit is tagged, and the GitHub release gets this changelog's notes, the wheel and the source archive; then the image is pushed.
+- **GitHub Codespaces**: a dev container with Python 3.12 and the dashboard, MCP, LLM and test extras installed. Port 8501 opens in the browser when you run `riskaware dashboard`.
+- A tidier repository root: the Docker files moved to `docker/` (`docker compose -f docker/docker-compose.yml up -d`, or `make docker`), `.env.example` to `examples/`, and the contributing, security and conduct notes to `.github/`.
+
 ## 0.7.0 (2026-11-12)
 
 - **Research kit** (`riskaware.research`, `riskaware research`, [docs/research.md](docs/research.md)): a frozen copy of the 2026 market ships with the package, so experiments give the same numbers on any machine: daily bars from 2024-01-02 to 2026-11-11 for the 64 watchlist stocks, 25 ETFs, the VIX term structure (VIX9D, VIX, VIX3M, VVIX) and four cross-asset ETFs (`research/data/market_2026.csv.gz`, 1.4 MB, with a manifest of SHA-256 hashes; `scripts/build_market_bundle.py` rebuilds it), next to the bundled 2026 news.

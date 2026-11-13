@@ -59,7 +59,7 @@ def test_parse_choice_and_llm_config():
     with pytest.raises(ValueError):
         llm_config("compat:deepseek-chat")  # needs a base_url
     d = llm_config("compat:deepseek-chat", base_url="https://api.deepseek.com/v1", key_env="DEEPSEEK_API_KEY")
-    assert d.base_url.startswith("https://api.deepseek") and d.api_key_env == "DEEPSEEK_API_KEY"
+    assert d.base_url == "https://api.deepseek.com/v1" and d.api_key_env == "DEEPSEEK_API_KEY"
 
 
 def test_request_body_for_reasoning_and_chat_models():
