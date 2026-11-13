@@ -7,6 +7,7 @@
 - **每个版本都有 Docker 镜像**，x86-64 和 ARM（Apple 芯片）都能用：`docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard` 会在 http://localhost:8501 打开网页看板，`docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp` 通过 stdio 提供 MCP 工具（镜像里现在装了 `mcp` 扩展）。标签有版本号、小版本号和 `latest`。
 - 发布全自动：新版本合并到 main 且 CI 通过后，会自动打标签，GitHub Release 附上这份更新记录、wheel 和源码包，再推送镜像。
 - **GitHub Codespaces**：开发容器里装好了 Python 3.12，以及看板、MCP、LLM 和测试用的扩展。运行 `riskaware dashboard` 后，8501 端口会在浏览器里打开。
+- 修复：智能体的每日任务记下的是它检查的那个交易日，而不是电脑当前的日期，所以 `scheduled_run(now=...)` 不管时钟走到哪里，都是每个智能体每天只跑一次、连续失败三次就停（之前过了纽约午夜测试会失败）。
 - 仓库根目录更整洁：Docker 文件移到 `docker/`（`docker compose -f docker/docker-compose.yml up -d` 或 `make docker`），`.env.example` 移到 `examples/`，参与贡献、安全和行为准则说明移到 `.github/`。
 
 ## 0.7.0（2026-11-12）
