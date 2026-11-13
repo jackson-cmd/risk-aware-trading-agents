@@ -2,6 +2,10 @@
 
 [中文](CHANGELOG_zh.md)
 
+## 0.6.3 (2026-11-12)
+
+- Long dashboard tasks run in the background: a scan on the Signals page, a backtest, an agents run (Run now, Run all now) and a news fetch keep running when you open another page or reload the browser, and the result waits on its page. While a task runs, its page shows the progress and the time so far, and a backtest has a Stop button. Every other page shows a bar with the tasks that are still running or have finished, and clicking it takes you to the result. One task of each kind runs at a time. The dashboard process keeps the tasks, so every open tab sees the same ones.
+
 ## 0.6.2 (2026-11-12)
 
 - Every number on the dashboard explains itself: a ? next to each card, section, table column and form field opens a popup (the browser's popover: click to open, click outside or Esc to close) with what it is, how it is calculated and how to use it, in English and Chinese. The texts follow the code and the balanced profile's defaults: the regime rules, the fear & greed and risk-score parts, the macro calendar's weights and windows, the technical (TA) score and setups, conviction and its parts, the earnings check, the risk manager's rules, the risk profiles, the news score, statuses, sentiment and red flags, and the backtest metrics. They live in `riskaware/dashboard/glossary.py`.

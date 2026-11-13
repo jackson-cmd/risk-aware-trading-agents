@@ -16,7 +16,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 [![默认模拟盘](https://img.shields.io/badge/%E9%BB%98%E8%AE%A4-%E6%A8%A1%E6%8B%9F%E7%9B%98-orange.svg)](#-安全机制)
-[![版本 0.6.2](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.6.2-e5534b.svg)](CHANGELOG_zh.md)
+[![版本 0.6.3](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.6.3-e5534b.svg)](CHANGELOG_zh.md)
 [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器)
 [![11 个策略](https://img.shields.io/badge/%E7%AD%96%E7%95%A5-11%20%E4%B8%AA-8957e5.svg)](#-策略库)
 [![10 家券商](https://img.shields.io/badge/%E5%88%B8%E5%95%86-10%20%E5%AE%B6-0969da.svg)](#-支持的券商)
@@ -39,10 +39,11 @@
 
 ## 🆕 新功能
 
-<sub>最新版本 **0.6.2**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
+<sub>最新版本 **0.6.3**（2026-11-12）。完整的更新历史见[更新记录](CHANGELOG_zh.md)。</sub>
 
 | | 0.6 和 0.5 新加入 |
 |---|---|
+| <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **⏳ 长任务在后台接着跑**：在看板上开始扫描、回测、运行智能体或获取新闻以后，切到别的页面或刷新都不会中断；每个页面顶部的提示条显示它跑到哪了，跑完点一下就回到结果。长回测还能中途停止。 |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **❓ 每个数字都能点开看说明**：看板上每张卡片、每一列、每个输入框旁边都有 ?，点开弹窗说明它是什么、怎么算（直接照代码写：市场状态的判定规则、风险分的六项构成、技术面（TA）分、信心、新闻分、夏普等等）、怎么用，中英文都有。信号页还新增了信心的四个分项：技术面（TA）、财报、新闻、宏观。[看截图 →](#-截图一览) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🔎 每笔回测交易背后的新闻**：看板回测页新增 **回测看到的新闻** 面板。选一笔交易，就能看到回测在那天收盘时看到的标题、哪些已确认、新闻分，以及策略第二天下的单。[怎么用 →](docs/zh/news-history.md#查看回测看到的新闻) |
 | <img src="https://img.shields.io/badge/NEW!-e5534b" alt="NEW!"> | **🗞️ 自带 2026 年新闻**：安装包里带了内置股票池 64 只股票的 16,945 条新闻（Benzinga 标题，只有标题，加上 SEC 8-K 公告，2026 年 1 月到 11 月），`riskaware backtest --news` 或看板回测页新加的 **回放新闻** 开关，什么都不用下载就能用。2026 年至今，内置智能体带新闻回测收益 **+15.9%**，同期 SPY +12.1%；最大回撤 **-5.3%**，SPY 是 -8.9%。[看结果 →](#2026-年至今带新闻) |

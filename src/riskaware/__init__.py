@@ -5,7 +5,7 @@ volatility and news before it buys, keeps a cash floor, and runs the same
 strategy in backtests, paper trading and live trading.
 """
 
-__version__ = "0.6.2"
+__version__ = "0.6.3"
 
 from .types import (  # noqa: E402
     Action,
