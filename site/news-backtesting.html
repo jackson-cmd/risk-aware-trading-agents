@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backtest trading strategies with news, without look-ahead bias · Risk-Aware Trading Agents</title>
+<meta name="description" content="How to backtest a stock trading strategy with news headlines and SEC filings without look-ahead bias: point-in-time replay, a 16:00 cutoff, orders at the next open, and a check that proves the backtest never saw the future. Free and open source.">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-backtesting.html">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html">
+<meta property="og:title" content="Backtest trading strategies with news, without look-ahead bias">
+<meta property="og:description" content="Point-in-time news replay for stock backtests, with a check that re-runs every experiment against a random future. 2026 headlines and SEC filings included.">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/research_baselines.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Backtest trading strategies with news, without look-ahead bias","description":"How to backtest a stock trading strategy with news headlines and SEC filings without look-ahead bias, with point-in-time replay and a look-ahead check.","inLanguage":"en","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html","image":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/research_baselines.png","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["news backtesting","look-ahead bias","point-in-time data","algorithmic trading"],"isPartOf":{"@type":"WebSite","name":"Risk-Aware Trading Agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I backtest a trading strategy with news without look-ahead bias?","acceptedAnswer":{"@type":"Answer","text":"Replay every news item at its publication time and decide only after the close: a headline published before 16:00 New York time counts that day, one published later counts the next trading day, and orders fill at the next open. Risk-Aware Trading Agents does this with riskaware backtest --news and checks each research experiment by re-running it with a random future."}},{"@type":"Question","name":"Where can I get historical news for backtesting?","acceptedAnswer":{"@type":"Answer","text":"The open-source package ships 2026 news for 64 large-cap US stocks: Benzinga headlines (titles only) and SEC 8-K filings, each with its publication time. Earlier SEC 8-K filings can be downloaded for free with riskaware news-history build, and any CSV with a time, a ticker and a headline can be imported."}},{"@type":"Question","name":"Does news improve swing trading strategies?","acceptedAnswer":{"@type":"Answer","text":"Not in a 2026 test with headline sentiment from one feed: a news filter made five common swing strategies slightly worse, and buying on positive headlines did worse than buying the same price move without them."}}]}</script>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="./">Risk-Aware Trading Agents</a>
+  <nav>
+    <a href="./#backtest">Backtests</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+    <a href="zh/news-backtesting.html" hreflang="zh-Hans" lang="zh-Hans">中文</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+<p class="crumbs"><a href="./">Home</a> › Guides</p>
+<h1>Backtest trading strategies with news, without look-ahead bias</h1>
+<p class="lead">News strategies are easy to fool yourself with. If a backtest lets a strategy read a headline before it was published, or a story that came out after the close it trades on, the result looks better than anything you could trade. Risk-Aware Trading Agents is an open-source Python package that replays news at the time it was published and checks every experiment for look-ahead.</p>
+<div class="cta">
+  <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents">Get it on GitHub</a>
+  <a class="btn" href="point-in-time-market-data.html">The 2026 dataset</a>
+  <a class="btn" href="llm-trading-agents.html">Testing LLM agents</a>
+</div>
+
+<h2>Where news backtests see the future</h2>
+<p>Most news backtests leak in one of a few ordinary ways:</p>
+<ul>
+  <li><b>Dates instead of times.</b> Many datasets keep only the day, or the time an item was collected. An earnings release at 16:05 then looks like news the strategy had at the 16:00 close.</li>
+  <li><b>Time zones.</b> A UTC timestamp read as New York time moves every story four or five hours earlier.</li>
+  <li><b>Trading at the price that reacted to the news.</b> Deciding on a headline and filling at that day's close assumes you traded before everyone else read it.</li>
+  <li><b>Later edits and wrong dates.</b> Articles updated after the fact, or items stamped with a future date.</li>
+  <li><b>Hindsight in the setup.</b> Picking the stocks, dates or rules you already know worked, which an LLM can also do from memory.</li>
+</ul>
+
+<h2>How the package replays news</h2>
+<pre>day t, 16:00 New York        after the close                      day t+1, 09:30
+    stocks close    ->   the strategy sees day t and earlier   ->   orders fill at the open
+                         news published before 16:00               (+5 bps slippage)</pre>
+<ul>
+  <li>The strategy decides once a day, after the close, and its orders fill at the next trading day's open. Positions are held for days or weeks: swing trading on daily bars.</li>
+  <li>A headline counts from the first close after its timestamp: before 16:00 New York time (13:00 on early-close days) it counts that day, otherwise the next trading day.</li>
+  <li>An item with only a date counts at the end of that day. A timestamp without a time zone is read as New York time. Items dated in the future are dropped.</li>
+  <li>Stories go through the same checks as live trading: a headline counts only for the company it names, and a story is confirmed when two independent outlets, the company's own release or its SEC filing carry it.</li>
+</ul>
+
+<h2>Try it</h2>
+<pre>git clone https://github.com/jackson-cmd/risk-aware-trading-agents
+cd risk-aware-trading-agents
+pip install -e ".[dashboard,mcp]"        # Python 3.10+
+
+riskaware backtest --strategy risk_aware --preset megacap --start 2026-01-02 --news
+riskaware research run --strategy swing_trend --split 2026-07-01   # look-ahead check and a saved record
+riskaware research day 2026-04-08 --symbols NVDA,TSLA              # what was known at that close</pre>
+<p>The 2026 news ships with the package, so nothing has to be downloaded. To test your own idea, write it as a small Python class, or describe it to Claude and let it write the code (see <a href="llm-trading-agents.html">LLM agents and MCP</a>).</p>
+
+<h2>Prove it: the look-ahead check</h2>
+<p>Rules about timestamps can still leak through a bug. So each research experiment runs again three times, on copies of the market where every price and every headline after a cut day is replaced by random ones, invented good and bad news and bankruptcy filings included. A strategy that only uses what it may know makes exactly the same decisions up to each cut. If a decision before a cut changes, the check fails and names the first day and decision that changed. The package's tests plant such a bug, an indicator that reads the next day's close, to show that the check catches it.</p>
+
+<h2>What we found in 2026</h2>
+<p>Five common swing strategies on 56 large caps, January 2 to November 11, 2026, with at most 10 equal positions and orders at the next open:</p>
+<div class="table-wrap"><table>
+  <tr><th>Strategy</th><th class="num">Without news</th><th class="num">With news</th><th class="num">Sharpe</th><th class="num">Max drawdown</th></tr>
+  <tr><td>Trend following (EMA20 / EMA50 cross)</td><td class="num">+21.1%</td><td class="num">+19.6%</td><td class="num">1.44</td><td class="num">-4.7%</td></tr>
+  <tr><td>Post-news drift (without news: the same trade on a price jump)</td><td class="num">+15.7%</td><td class="num">+4.4%</td><td class="num">1.01</td><td class="num">-9.8%</td></tr>
+  <tr><td>Connors RSI(2) mean reversion</td><td class="num">+12.7%</td><td class="num">+10.8%</td><td class="num">0.85</td><td class="num">-7.9%</td></tr>
+  <tr><td>Pullback in an uptrend</td><td class="num">+2.3%</td><td class="num">+1.7%</td><td class="num">-0.13</td><td class="num">-4.4%</td></tr>
+  <tr><td>20-day breakout</td><td class="num">-0.3%</td><td class="num">-3.5%</td><td class="num">-0.15</td><td class="num">-15.6%</td></tr>
+  <tr><td>SPY buy and hold</td><td class="num">+12.1%</td><td class="num"></td><td class="num">0.77</td><td class="num">-8.9%</td></tr>
+</table></div>
+<p class="note">Sharpe and drawdown without news. Reproduce with <code>riskaware research baselines</code>.</p>
+<img class="chart" src="assets/research_baselines.png" alt="Five swing strategies in 2026, with and without news, against SPY" loading="lazy">
+<p>The news filter made every strategy slightly worse, and buying on positive headlines did worse than buying the same price move without them. With one headline feed most stories have a single source, so the filter mostly reacts to noise. The package's own risk-aware agent did better with news (+15.9%, against +15.4% without and +12.1% for SPY), but ten months cannot separate these numbers with confidence: the 95% intervals overlap. Every run passed the look-ahead check.</p>
+
+<h2>News for other years</h2>
+<p><code>riskaware news-history</code> builds a point-in-time archive on your own machine: SEC 8-K filings since 2018 for free (with the time SEC accepted each one), Benzinga headlines with your own API key, or any CSV with a timestamp, a ticker and a headline. <code>riskaware news-history show NVDA --date 2024-05-22</code> prints exactly what a backtest saw at that close. See <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/news-history.md">docs/news-history.md</a>.</p>
+
+<h2>Questions</h2>
+<h3>Is this intraday?</h3>
+<p>No. Decisions happen after each close and orders fill at the next open, so the package tests swing and position trading on daily bars, not day trading.</p>
+<h3>Can I use my own news?</h3>
+<p>Yes: import a CSV with a publication time, a ticker and a headline, or add headlines to a single experiment to see how a strategy reacts to a story that never ran.</p>
+<h3>Can an AI write the strategy for me?</h3>
+<p>Yes. Over MCP, Claude, Codex or Gemini writes the strategy as code; the code is checked for dates, tickers and side effects before it runs in a separate process.</p>
+
+<h2>More guides</h2>
+<div class="more">
+  <a href="point-in-time-market-data.html">Point-in-time market data for 2026<span>Prices, VIX and news with SHA-256 hashes</span></a>
+  <a href="llm-trading-agents.html">Test LLM trading agents<span>Step by step, blind, over MCP</span></a>
+  <a href="./">Risk-Aware Trading Agents<span>The agents, brokers and dashboard</span></a>
+</div>
+</main>
+
+<footer><div class="wrap">MIT License · Not financial advice · Paper trade first · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="zh/news-backtesting.html" hreflang="zh-Hans">中文</a></div></footer>
+</body>
+</html>

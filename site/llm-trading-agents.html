@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test LLM trading agents on a frozen market, without look-ahead · Risk-Aware Trading Agents</title>
+<meta name="description" content="Evaluate LLM trading agents fairly: trade the 2026 US stock market one close at a time with point-in-time prices and news, a blind mode against memorization, and saved records. Works with Claude, GPT, Gemini and local models, from Python or over MCP.">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-agents.html">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html">
+<meta property="og:title" content="Test LLM trading agents on a frozen market, without look-ahead">
+<meta property="og:description" content="Let any LLM trade the 2026 US market step by step on point-in-time data, blind if you like, and keep a record of every order. Claude can drive it over MCP.">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/decisions_en.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Test LLM trading agents on a frozen market, without look-ahead","description":"How to evaluate LLM trading agents on point-in-time 2026 US stock market data, step by step, with a blind mode and saved records, from Python or over MCP.","inLanguage":"en","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html","image":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/decisions_en.jpg","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["LLM trading agents","AI agent evaluation","look-ahead bias","Model Context Protocol"],"isPartOf":{"@type":"WebSite","name":"Risk-Aware Trading Agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="./">Risk-Aware Trading Agents</a>
+  <nav>
+    <a href="news-backtesting.html">News backtesting</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+    <a href="zh/llm-trading-agents.html" hreflang="zh-Hans" lang="zh-Hans">中文</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+<p class="crumbs"><a href="./">Home</a> › Guides</p>
+<h1>Test LLM trading agents on a frozen market</h1>
+<p class="lead">Asking an LLM what it would have bought last spring is a poor test: it may know what happened, and a careless setup hands it tomorrow's prices or headlines. Risk-Aware Trading Agents lets any model trade the 2026 US stock market one close at a time, on data that holds only what was known that day, and saves every order with the result.</p>
+<div class="cta">
+  <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents">Get it on GitHub</a>
+  <a class="btn" href="point-in-time-market-data.html">The 2026 dataset</a>
+  <a class="btn" href="news-backtesting.html">News backtesting</a>
+</div>
+
+<h2>Why LLM trading results are hard to trust</h2>
+<ul>
+  <li><b>Memory.</b> A model trained on text from the test period may recall how a stock or the market did.</li>
+  <li><b>Look-ahead in the prompt.</b> Prices, indicators or headlines from after the decision slip into the context.</li>
+  <li><b>Fills that could not happen.</b> Trading at the same close the model just read.</li>
+  <li><b>No record.</b> Without the exact data, prompts and orders, nobody can check or repeat the run.</li>
+  <li><b>Untrusted text.</b> Headlines are written by others; the model should treat them as quotes, never as instructions.</li>
+</ul>
+
+<h2>How a session works</h2>
+<p>On each decision day the model gets an observation: the market regime and VIX, fear and greed, sector breadth and the macro events close by; its own portfolio; and for every stock the main indicators and up to three headlines published before the close, each with its verified status. It answers with orders, which fill at the next open:</p>
+<pre>{"orders": [
+  {"symbol": "AAPL", "action": "buy",    "weight": 0.10, "reason": "pullback to EMA50 in an uptrend"},
+  {"symbol": "TSLA", "action": "sell",   "fraction": 1.0, "reason": "red flag in the news"},
+  {"symbol": "MSFT", "action": "target", "weight": 0.05, "reason": "trim"}
+], "note": "hold the rest"}</pre>
+<p>Positions are long only, at most a set number at a time. The model can decide every day or, to save tokens, once a week. The run is saved like any experiment: data hashes, settings, every step's orders, the equity curve against SPY and the equal-weight universe, and statistics with confidence intervals.</p>
+
+<h2>Blind mode</h2>
+<p>With blind mode on, tickers become S01, S02 and so on, dates become day numbers, prices are rebased to 100 on the first day, and company names and tickers in headlines become the same aliases, so a headline reads "S01 Stock Moves Lower As Investors Assess Its AI Edge Against S03". It lowers the chance that the model recalls what happened; it cannot rule it out, since an unusual headline, a sector and a price path together may still give a stock away.</p>
+
+<h2>Run any model</h2>
+<pre>riskaware research trade --llm ollama:qwen2.5:3b --universe core --decide-every 5 --blind
+riskaware research trade --llm openai:gpt-5.6-luna --universe megacap --decide-every 1
+riskaware research trade --llm claude-cli --universe core --decide-every 5</pre>
+<p>Local models run through Ollama; OpenAI-compatible servers, Anthropic, and the Claude Code, Codex and Gemini command-line tools work too. From Python, any function from an observation to orders is a policy:</p>
+<pre>from riskaware.research import Experiment
+from riskaware.research.agent import llm_policy, run_policy
+
+result = run_policy(llm_policy("ollama:qwen2.5:3b"),
+                    Experiment(universe="core", max_positions=5), decide_every=5, blind=True)
+print(result.summary()["metrics"], result.folder)</pre>
+
+<h2>Let Claude trade it, or test your strategy, over MCP</h2>
+<p>Connect the package's MCP server once (<code>riskaware mcp-setup claude-desktop --apply</code>, or <code>claude mcp add riskaware -- riskaware mcp</code>). Claude can then trade the year itself with <code>trading_session_start</code> and <code>trading_session_step</code>, look at any day with <code>market_day</code>, or turn a strategy you describe into code and test it with <code>run_experiment</code>:</p>
+<div class="box"><p>"Using the riskaware research tools: buy large caps after three down days when the news is not negative, sell after five days or at +5%. Tune it on January to June, then test July to November once, with and without news, and compare with SPY."</p></div>
+<p>The code Claude writes is checked for dates, tickers and side effects, runs in a separate process, and comes back with the metrics, confidence intervals and a look-ahead verdict: every experiment is re-run with a random future after three cut days, and the decisions before each cut must not change.</p>
+
+<h2>Tips for papers</h2>
+<ul>
+  <li>Say which model, how often it decided, whether it ran blind, and give the run folder.</li>
+  <li>Fix the period and the settings before looking at results; tune on the first half and test once on the second (<code>split="2026-07-01"</code>).</li>
+  <li>Report the intervals: ten months is a short sample.</li>
+  <li>Compare with the five swing baselines and the equal-weight universe, not only with SPY.</li>
+</ul>
+
+<h2>More guides</h2>
+<div class="more">
+  <a href="news-backtesting.html">Backtest with news, without look-ahead<span>Point-in-time replay and the look-ahead check</span></a>
+  <a href="point-in-time-market-data.html">Point-in-time market data for 2026<span>Prices, VIX and news with SHA-256 hashes</span></a>
+  <a href="./">Risk-Aware Trading Agents<span>The agents, brokers and dashboard</span></a>
+</div>
+</main>
+
+<footer><div class="wrap">MIT License · Not financial advice · Paper trade first · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="zh/llm-trading-agents.html" hreflang="zh-Hans">中文</a></div></footer>
+</body>
+</html>

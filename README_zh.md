@@ -10,6 +10,8 @@
 
 📊 **2026 年带新闻回测：收益 +15.9%，SPY +12.1% · 最大回撤 -5.3%，SPY -8.9% · 夏普 1.70，SPY 0.77** · [详情](#2026-年至今带新闻)
 
+🔬 **新闻回测，不用未来函数**：安装包自带按时间点记录的 2026 年数据（价格、VIX、16,945 条标题和 SEC 公告），每次运行都做防偷看检查，还能通过 MCP 一步一步测试 LLM 交易智能体 · [研究工具箱](#-研究工具箱)
+
 [English → README.md](README.md) · [项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [新功能](#-新功能) · [截图](#-截图一览) · [快速开始](#-快速开始) · [模拟盘智能体](#-模拟盘智能体) · [MCP](#-mcp-服务器) · [策略实验室](#-策略实验室) · [策略库](#-策略库) · [支持的券商](#-支持的券商) · [更新记录](CHANGELOG_zh.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
@@ -35,7 +37,7 @@
 - [🧠 工作原理](#-工作原理)：[市场状态](#不同市场状态下的做法) · [风险档位](#风险档位)
 - [📊 回测](#-回测)：[用新闻回测](#用新闻回测) · [📚 策略库](#-策略库)：[期权](#期权目前只支持回测) · [🧩 写你自己的策略](#-写你自己的策略)
 - [🔌 支持的券商](#-支持的券商) · [🔒 安全机制](#-安全机制) · [🔧 配置](#-配置) · [💻 命令一览](#-命令一览) · [📁 目录结构](#-目录结构)
-- [🧭 后续计划](#-后续计划) · [🤝 参与贡献](#-参与贡献) · [❗ 免责声明](#-免责声明) · [📜 开源协议](#-开源协议)
+- [❓ 常见问题](#-常见问题) · [🧭 后续计划](#-后续计划) · [🤝 参与贡献](#-参与贡献) · [❗ 免责声明](#-免责声明) · [📜 开源协议](#-开源协议)
 
 ## 🆕 新功能
 
@@ -468,6 +470,42 @@ src/riskaware/
 site/          中英双语项目主页（GitHub Pages）
 docs/          设计说明和使用指南（中英文）
 ```
+
+## ❓ 常见问题
+
+网站上有更完整的回答：[用新闻回测，不用未来函数](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-backtesting.html) · [按时间点记录的 2026 年美股数据](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html) · [测试 LLM 交易智能体](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-agents.html)。
+
+### 怎么用新闻回测交易策略，又不用到未来函数（look-ahead）？
+
+用 `riskaware backtest --news`；想要一份可以引用的记录，就用 `riskaware research run`。新闻按时间点回放：每一天，策略只能看到当天纽约时间 16:00 收盘之前发布的标题和 SEC 公告，订单在下一个交易日开盘成交。研究工具箱的每次实验还会把三个切点之后的数据换成随机的再跑一遍，每个切点之前的决定都不能变。详见[用新闻回测](docs/zh/news-history.md)和[研究工具箱](docs/zh/research.md)。
+
+### 回测用的历史新闻数据从哪里来？
+
+2026 年的数据随安装包提供：64 只美国大盘股的 16,945 条新闻，包括 Benzinga 标题（只有标题）和 SEC 8-K 公告，每条都带发布时间。其他年份可以用 `riskaware news-history build` 免费下载 SEC 8-K 公告，也可以用你自己的 API key 下载 Benzinga 标题；任何包含时间、代码和标题的 CSV 也能导入。详见 [docs/zh/news-history.md](docs/zh/news-history.md)。
+
+### 有没有免费的、按时间点记录的美股价格、VIX 和新闻数据？
+
+有。研究工具箱里冻结的市场数据包括 64 只股票和 25 个 ETF 从 2024 年 1 月到 2026 年 11 月的日线、VIX 期限结构（VIX9D、VIX、VIX3M、VVIX）以及 2026 年的新闻，并附带 SHA-256 哈希，论文可以准确引用用到的数据。`riskaware research day 2026-04-08` 可以看到那天收盘时已知的全部信息。详见[自带哪些数据](docs/zh/research.md#自带哪些数据)。
+
+### 怎么公平地评测一个 LLM 交易智能体？
+
+让它在冻结的 2026 年市场上一步一步做决定：用 `riskaware research trade --llm ...`，或者通过 MCP 调 `trading_session_start`。每份观察只包含那天收盘时已知的信息，订单在次日开盘成交，整次运行连同每一笔订单和相对 SPY 的指标一起保存。盲测模式会替换股票代码、公司名和日期，模型没法凭记忆知道某只股票后来怎么样。详见 [LLM 智能体](docs/zh/research.md#让-llm-把这一年交易一遍)。
+
+### Claude、ChatGPT（Codex）或 Gemini 能帮我回测策略吗？
+
+能，通过 MCP。运行 `riskaware mcp-setup claude-desktop --apply`（或 `claude-code`、`codex`、`gemini`），然后用一句话描述策略。助手会把它写成代码；代码先检查有没有写日期、股票代码和副作用，再在单独的进程里运行，最后给出指标、置信区间和防偷看检查的结论。详见 [MCP 服务器](#-mcp-服务器)和[策略实验室](docs/zh/strategy-lab.md)。
+
+### 新闻情绪能让波段交易策略更好吗？
+
+在我们 2026 年、只用一个标题来源的测试里不能。给五种常见波段策略（趋势跟随、RSI(2) 均值回归、突破、回调买入、新闻后的惯性）加上新闻过滤，每一个都略差了一点；按正面标题买入，也不如按同样幅度的价格异动买入。趋势跟随赚了 +21.1%，同期 SPY 是 +12.1%。详见[结果](#-研究工具箱)。
+
+### 不想拿真钱冒险，怎么先模拟交易？
+
+默认就是模拟盘。`riskaware run` 用内置的模拟账户交易，`riskaware agents` 每个交易日用模拟资金跑多个策略，Alpaca 这类券商的模拟账户也能用。实盘交易要打开三个开关才行。详见[安全机制](#-安全机制)。
+
+### 支持哪些券商？
+
+内置模拟盘、Alpaca、盈透（Interactive Brokers）、Public.com、嘉信（Charles Schwab）、tastytrade、Tradier、富途/moomoo、老虎证券和长桥。详见[支持的券商](#-支持的券商)。
 
 ## 🧭 后续计划
 

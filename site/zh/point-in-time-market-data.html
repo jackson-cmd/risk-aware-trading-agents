@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>免费的 2026 年美股按时间点数据：价格、VIX 和新闻 · 风险感知交易智能体</title>
+<meta name="description" content="免费、按时间点记录的 2026 年美股数据，用于可复现的回测：64 只大盘股和 25 个 ETF 自 2024 年起的日线、VIX 期限结构、16,945 条带发布时间的新闻标题和 SEC 8-K 公告，附 SHA-256 哈希。">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html">
+<meta property="og:title" content="免费的 2026 年美股按时间点数据：价格、VIX 和新闻">
+<meta property="og:description" content="2024 年起的日线、VIX 期限结构，以及 2026 年的 16,945 条标题和 SEC 公告，冻结保存并附 SHA-256 哈希，回测可以复现。">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/dashboard_zh.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"免费的 2026 年美股按时间点数据：价格、VIX 和新闻","description":"按时间点记录的 2026 年美股数据：日线、VIX 期限结构、新闻标题和 SEC 公告，附 SHA-256 哈希，用于可复现的回测。","inLanguage":"zh-CN","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["美股数据","新闻回测","按时间点的数据","未来函数"],"isPartOf":{"@type":"WebSite","name":"风险感知交易智能体","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="../?lang=zh">风险感知交易智能体</a>
+  <nav>
+    <a href="news-backtesting.html">新闻回测</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md">GitHub</a>
+    <a href="../point-in-time-market-data.html" hreflang="en" lang="en">English</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+<p class="crumbs"><a href="../?lang=zh">首页</a> › 指南</p>
+<h1>2026 年美股按时间点数据：价格、VIX 和新闻</h1>
+<p class="lead">开源项目「风险感知交易智能体」的安装包里带了一份冻结的 2026 年美股市场：日线价格、VIX 期限结构和这一年的新闻，每个值都是当天收盘时已知的样子。在它上面跑的每个回测、每个 LLM 交易智能体，在任何机器上都得出同样的数字；文件附带 SHA-256 哈希，论文可以准确引用。</p>
+<div class="cta">
+  <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents/tree/main/src/riskaware/research/data">数据文件</a>
+  <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/research.md">研究工具箱文档</a>
+  <a class="btn" href="news-backtesting.html">新闻回测</a>
+</div>
+
+<h2>里面有什么</h2>
+<div class="table-wrap"><table>
+  <tr><th>部分</th><th>内容</th></tr>
+  <tr><td>股票</td><td>64 只美国大盘股 2024-01-02 到 2026-11-11 的日线（719 个交易日），即 megacap、tech 和 defensive 三个股票池</td></tr>
+  <tr><td>ETF</td><td>25 个指数、行业和债券 ETF：SPY、QQQ、IWM、DIA、VTI、RSP、11 个行业 SPDR、BIL、SGOV、SHV、SHY、IEF、TLT、HYG、LQD</td></tr>
+  <tr><td>波动率</td><td>VIX9D、VIX 和 VIX3M（VIX 期限结构）以及 VVIX</td></tr>
+  <tr><td>跨资产</td><td>GLD（黄金）、USO（原油）、UUP（美元）、IBIT（比特币）：和股市同时收盘的 ETF</td></tr>
+  <tr><td>新闻</td><td>这 64 只股票 2026 年的 16,945 条新闻：Benzinga 标题（只有标题，没有正文）和带 SEC 受理时间的 8-K 公告</td></tr>
+  <tr><td>日程</td><td>FOMC 议息、CPI、PPI 和非农，都是事先公布的日期</td></tr>
+</table></div>
+<p>2026 年是测试年。2024 和 2025 两年是为了让 200 日 EMA、52 周高点这类慢指标在 2026 年第一个交易日就完全预热好。</p>
+
+<h2>文件和字段</h2>
+<p><code>src/riskaware/research/data/market_2026.csv.gz</code>（1.4 MB，69,738 行）：</p>
+<pre>date,symbol,open,high,low,close,volume,adj,dividend,split
+2026-04-08,NVDA,...</pre>
+<ul>
+  <li><code>open</code> 到 <code>close</code>：实际成交价，只按拆股调整；</li>
+  <li><code>adj</code>：换算成全收益价格的系数（复权收盘价除以收盘价）；</li>
+  <li><code>dividend</code>、<code>split</code>：当天的现金分红和拆股比例。</li>
+</ul>
+<p><code>src/riskaware/news/data/news_2026.jsonl.gz</code>：每行一个 JSON 对象，包含 <code>ts</code>（发布时间，UTC）、<code>symbol</code>、<code>headline</code>、<code>source</code> 和 <code>feed</code>；SEC 公告还带表格条目（比如财报公告是 <code>items:2.02,9.01</code>）和 sec.gov 链接。<code>manifest.json</code> 列出时间范围、股票代码和两个文件的 SHA-256。</p>
+
+<h2>读取数据</h2>
+<pre>from riskaware.research.data import bundled_market
+
+market = bundled_market()
+aapl = market.frame("AAPL")        # 全收益 OHLCV，2024-01-02 到 2026-11-11
+traded = market.raw("AAPL")        # 实际成交价、分红、拆股、复权系数
+vix = market.raw("^VIX")["close"]
+
+import pandas as pd                # 也可以直接读文件
+df = pd.read_csv("src/riskaware/research/data/market_2026.csv.gz", parse_dates=["date"])</pre>
+
+<h2>按天查看</h2>
+<p>这份数据的价值在于每一天当时知道什么。<code>riskaware research day 2026-04-08</code>（MCP 里是 <code>market_day</code>）会列出那天收盘时已知的全部信息：市场状态、VIX 和期限结构、恐慌贪婪、板块广度、未来两周的宏观日程，以及每只股票的涨跌、技术指标、技术形态和纽约时间 16:00 之前发布的新闻。</p>
+
+<h2>「按时间点」在这里指什么</h2>
+<ul>
+  <li>技术指标只用更早的 K 线计算；测试会把某天之后的数据全部改掉，检查那天的值不变。</li>
+  <li>新闻从它发布之后的第一个收盘起才算数（提前收盘日是 13:00）。</li>
+  <li>VIX 指数 16:15 收盘，比股票晚一刻钟；决策发生在收盘之后、次日开盘之前，这时它已经知道了。</li>
+  <li>期货、美元指数和比特币本身在股市收盘后才结算，所以没有放进来。</li>
+</ul>
+
+<h2>引用</h2>
+<p>引用数据版本（<code>2026-11-11</code>）和 <code>manifest.json</code> 里两个文件的 SHA-256。仓库里的 <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/CITATION.cff">CITATION.cff</a> 给出软件的引用格式，每次实验自己的清单还会记下项目版本和 commit。</p>
+
+<h2>来源和局限</h2>
+<ul>
+  <li>价格来自 Yahoo Finance 的日线，<code>scripts/build_market_bundle.py</code> 可以重建；复权以数据最后一天为准。</li>
+  <li>股票池是今天的大盘股，是事后挑的（幸存者偏差）：策略之间互相比、和等权组合比，不要只和 SPY 比。</li>
+  <li>新闻只有一个标题来源加 SEC 公告，所以多数报道只有单一出处。</li>
+</ul>
+
+<h2>更多指南</h2>
+<div class="more">
+  <a href="news-backtesting.html">用新闻回测，不用未来函数<span>按时间点回放新闻和防偷看检查</span></a>
+  <a href="llm-trading-agents.html">测试 LLM 交易智能体<span>一步一步、可盲测、通过 MCP</span></a>
+  <a href="../?lang=zh">风险感知交易智能体<span>智能体、券商和看板</span></a>
+</div>
+</main>
+
+<footer><div class="wrap">MIT 开源协议 · 不构成投资建议 · 请先用模拟盘 · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="../point-in-time-market-data.html" hreflang="en">English</a></div></footer>
+</body>
+</html>

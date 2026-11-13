@@ -10,6 +10,8 @@
 
 📊 **2026 backtest with news: +15.9% vs SPY +12.1% · max drawdown -5.3% vs -8.9% · Sharpe 1.70 vs 0.77** · [details](#2026-so-far-with-news)
 
+🔬 **News backtesting without look-ahead bias**: a point-in-time 2026 dataset (prices, VIX, 16,945 headlines and SEC filings) ships with the package, every run gets a look-ahead check, and LLM trading agents can be tested step by step over MCP · [research kit](#-research-kit)
+
 [中文说明 → README_zh.md](README_zh.md) · [Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [What's new](#-whats-new) · [Screenshots](#-screenshots) · [Quick start](#-quick-start) · [Paper agents](#-paper-trading-agents) · [MCP](#-mcp-server) · [Strategy lab](#-strategy-lab) · [Strategy library](#-strategy-library) · [Brokers](#-brokers) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml)
@@ -35,7 +37,7 @@
 - [🧠 How it works](#-how-it-works): [Market regimes](#what-the-agent-does-in-each-regime) · [Risk profiles](#risk-profiles)
 - [📊 Backtest](#-backtest): [News in backtests](#news-in-backtests) · [📚 Strategy library](#-strategy-library): [Options](#options-backtest-only) · [🧩 Write your own strategy](#-write-your-own-strategy)
 - [🔌 Brokers](#-brokers) · [🔒 Safety](#-safety) · [🔧 Configuration](#-configuration) · [💻 CLI](#-cli) · [📁 Project layout](#-project-layout)
-- [🧭 Roadmap](#-roadmap) · [🤝 Contributing](#-contributing) · [❗ Disclaimer](#-disclaimer) · [📜 License](#-license)
+- [❓ FAQ](#-faq) · [🧭 Roadmap](#-roadmap) · [🤝 Contributing](#-contributing) · [❗ Disclaimer](#-disclaimer) · [📜 License](#-license)
 
 ## 🆕 What's new
 
@@ -465,6 +467,42 @@ src/riskaware/
 site/          bilingual project website (GitHub Pages)
 docs/          design notes and guides (English and Chinese)
 ```
+
+## ❓ FAQ
+
+Longer answers on the website: [backtesting with news without look-ahead bias](https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html) · [point-in-time market data for 2026](https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html) · [testing LLM trading agents](https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html).
+
+### How do I backtest a trading strategy with news, without look-ahead bias?
+
+Run `riskaware backtest --news`, or `riskaware research run` for a record you can cite. News is replayed point in time: each day the strategy sees only the headlines and SEC filings published before that day's 16:00 New York close, and its orders fill at the next open. Every research experiment is also run again with a random future after three cut days, and the decisions before each cut must not change. See [news in backtests](docs/news-history.md) and the [research kit](docs/research.md).
+
+### Where can I get historical news data for backtesting?
+
+2026 ships with the package: 16,945 news items for 64 large-cap US stocks, Benzinga headlines (titles only) and SEC 8-K filings, each with its publication time. For other years, `riskaware news-history build` downloads SEC 8-K filings for free, and Benzinga headlines with your own API key; a CSV with a time, a ticker and a headline works too. See [docs/news-history.md](docs/news-history.md).
+
+### Is there a free point-in-time dataset of US stock prices, VIX and news?
+
+Yes. The research kit's frozen market holds daily bars from January 2024 to November 2026 for 64 stocks and 25 ETFs, the VIX term structure (VIX9D, VIX, VIX3M, VVIX) and the 2026 news, with SHA-256 hashes so that a paper can cite the exact data. `riskaware research day 2026-04-08` shows everything that was known at that close. See [what ships](docs/research.md#what-ships).
+
+### How do I evaluate an LLM trading agent fairly?
+
+Let it trade the frozen 2026 market one decision at a time with `riskaware research trade --llm ...`, or with `trading_session_start` over MCP. Each observation holds only what was known at that close, orders fill at the next open, and the run is saved with every order and its metrics against SPY. Blind mode replaces tickers, company names and dates, so the model cannot recall how a stock did. See [LLM agents](docs/research.md#let-an-llm-trade-the-year).
+
+### Can Claude, ChatGPT (Codex) or Gemini backtest my strategy?
+
+Yes, over MCP. Run `riskaware mcp-setup claude-desktop --apply` (or `claude-code`, `codex`, `gemini`), then describe the strategy in words. The assistant writes it as code; the code is checked for dates, tickers and side effects, runs in a separate process, and comes back with metrics, confidence intervals and a look-ahead verdict. See the [MCP server](#-mcp-server) and the [strategy lab](docs/strategy-lab.md).
+
+### Does news sentiment improve swing trading strategies?
+
+Not in our 2026 test with headline sentiment from one feed. A news filter made each of five common swing strategies (trend following, RSI(2) mean reversion, breakouts, pullbacks, post-news drift) slightly worse, and buying on positive headlines did worse than buying the same price move without them. Trend following made +21.1% against SPY's +12.1%. See the [results](#-research-kit).
+
+### How do I paper trade before risking real money?
+
+Paper trading is the default. `riskaware run` trades the built-in paper account, `riskaware agents` runs several strategies on simulated money every trading day, and broker paper accounts such as Alpaca's work too. Live trading needs three explicit switches. See [safety](#-safety).
+
+### Which brokers are supported?
+
+A built-in paper account, Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers and Longbridge. See [brokers](#-brokers).
 
 ## 🧭 Roadmap
 

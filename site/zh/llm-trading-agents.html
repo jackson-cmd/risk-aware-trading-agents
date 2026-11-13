@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>在冻结的市场上测试 LLM 交易智能体，不偷看未来 · 风险感知交易智能体</title>
+<meta name="description" content="公平地评测 LLM 交易智能体：用按时间点记录的价格和新闻，一个收盘一个收盘地交易 2026 年美股，盲测模式防止模型凭记忆作答，每一步都有记录。支持 Claude、GPT、Gemini 和本地模型，可以用 Python，也可以通过 MCP。">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-agents.html">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-agents.html">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-agents.html">
+<meta property="og:title" content="在冻结的市场上测试 LLM 交易智能体">
+<meta property="og:description" content="让任何 LLM 在按时间点记录的数据上一步一步交易 2026 年美股，可以盲测，每一笔订单都有记录。Claude 可以通过 MCP 直接操作。">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/decisions_zh.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"在冻结的市场上测试 LLM 交易智能体，不偷看未来","description":"怎样在按时间点记录的 2026 年美股数据上评测 LLM 交易智能体：一步一步交易、盲测模式、完整记录，支持 Python 和 MCP。","inLanguage":"zh-CN","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-agents.html","image":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/decisions_zh.jpg","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["LLM 交易智能体","智能体评测","未来函数","MCP"],"isPartOf":{"@type":"WebSite","name":"风险感知交易智能体","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="../?lang=zh">风险感知交易智能体</a>
+  <nav>
+    <a href="news-backtesting.html">新闻回测</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md">GitHub</a>
+    <a href="../llm-trading-agents.html" hreflang="en" lang="en">English</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+<p class="crumbs"><a href="../?lang=zh">首页</a> › 指南</p>
+<h1>在冻结的市场上测试 LLM 交易智能体</h1>
+<p class="lead">问一个 LLM「去年春天你会买什么」，这样的测试意义不大：它可能记得后来发生了什么，粗心的设置还会把第二天的价格或新闻交给它。风险感知交易智能体让任何模型一个收盘一个收盘地交易 2026 年美股，用的数据只包含当天已知的信息，每一笔订单都和结果一起保存下来。</p>
+<div class="cta">
+  <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents">在 GitHub 上获取</a>
+  <a class="btn" href="point-in-time-market-data.html">2026 年数据集</a>
+  <a class="btn" href="news-backtesting.html">新闻回测</a>
+</div>
+
+<h2>为什么 LLM 交易的结果很难让人信服</h2>
+<ul>
+  <li><b>记忆。</b>用测试期间的文本训练过的模型，可能记得某只股票或大盘后来怎么走。</li>
+  <li><b>提示词里的未来函数。</b>决策之后的价格、指标或新闻混进了上下文。</li>
+  <li><b>不可能的成交。</b>按模型刚刚读到的那个收盘价成交。</li>
+  <li><b>没有记录。</b>没有确切的数据、提示词和订单，别人无法检查，也无法重跑。</li>
+  <li><b>不可信的文本。</b>新闻标题是别人写的，模型应当把它当成引用的资料，而不是指令。</li>
+</ul>
+
+<h2>一次会话是怎么进行的</h2>
+<p>每个决策日，模型会拿到一份观察：市场状态和 VIX、恐慌贪婪、板块广度和临近的宏观事件；它自己的持仓；以及每只股票的主要指标和最多三条收盘前发布的标题，每条都标明核实状态。它用订单回答，订单在下一个交易日开盘成交：</p>
+<pre>{"orders": [
+  {"symbol": "AAPL", "action": "buy",    "weight": 0.10, "reason": "上升趋势中回踩 EMA50"},
+  {"symbol": "TSLA", "action": "sell",   "fraction": 1.0, "reason": "新闻里有风险信号"},
+  {"symbol": "MSFT", "action": "target", "weight": 0.05, "reason": "减仓"}
+], "note": "其余持有"}</pre>
+<p>只做多，同时持股数有上限。模型可以每天决策，也可以每周决策一次来节省 token。整次运行和别的实验一样保存下来：数据哈希、设置、每一步的订单、相对 SPY 和等权组合的净值曲线，以及带置信区间的统计量。</p>
+
+<h2>盲测模式</h2>
+<p>打开盲测模式后，股票代码变成 S01、S02……，日期变成「第几天」，价格从第一天起换算成 100，标题里的公司名和代码也换成同样的化名，比如「S01 Stock Moves Lower As Investors Assess Its AI Edge Against S03」。它能降低模型回忆起结果的可能，但排除不了：一条不寻常的标题、所属行业和价格走势放在一起，仍然可能暴露是哪只股票。</p>
+
+<h2>用任意模型来跑</h2>
+<pre>riskaware research trade --llm ollama:qwen2.5:3b --universe core --decide-every 5 --blind
+riskaware research trade --llm openai:gpt-5.6-luna --universe megacap --decide-every 1
+riskaware research trade --llm claude-cli --universe core --decide-every 5</pre>
+<p>本地模型通过 Ollama 运行；OpenAI 兼容的服务、Anthropic，以及 Claude Code、Codex 和 Gemini 的命令行工具也都可以用。在 Python 里，任何「观察 → 订单」的函数都可以当作一个策略：</p>
+<pre>from riskaware.research import Experiment
+from riskaware.research.agent import llm_policy, run_policy
+
+result = run_policy(llm_policy("ollama:qwen2.5:3b"),
+                    Experiment(universe="core", max_positions=5), decide_every=5, blind=True)
+print(result.summary()["metrics"], result.folder)</pre>
+
+<h2>让 Claude 通过 MCP 来交易，或者测试你的策略</h2>
+<p>先连一次项目的 MCP 服务器（<code>riskaware mcp-setup claude-desktop --apply</code>，或者 <code>claude mcp add riskaware -- riskaware mcp</code>）。之后 Claude 可以用 <code>trading_session_start</code> 和 <code>trading_session_step</code> 自己把这一年交易一遍，用 <code>market_day</code> 查任意一天，也可以把你描述的策略写成代码，用 <code>run_experiment</code> 测试：</p>
+<div class="box"><p>「用 riskaware 的研究工具：连跌三天、新闻不负面时买入大盘股，五天后或涨 5% 卖出。用 1 到 6 月调参，再在 7 到 11 月只测一次，开和不开新闻各跑一遍，和 SPY 比。」</p></div>
+<p>Claude 写的代码会先检查有没有写日期、股票代码和副作用，再在单独的进程里运行，最后返回指标、置信区间和防偷看检查的结论：每次实验都会把三个切点之后的数据换成随机的再跑一遍，切点之前的决定都不能变。</p>
+
+<h2>写论文时</h2>
+<ul>
+  <li>写清楚用的哪个模型、多久决策一次、是否盲测，并给出运行记录的文件夹。</li>
+  <li>先定好时间段和设置再看结果；用前半段调参，在后半段只测一次（<code>split="2026-07-01"</code>）。</li>
+  <li>报告置信区间：十个月的样本很短。</li>
+  <li>和五个波段基准策略以及等权组合比，不要只和 SPY 比。</li>
+</ul>
+
+<h2>更多指南</h2>
+<div class="more">
+  <a href="news-backtesting.html">用新闻回测，不用未来函数<span>按时间点回放新闻和防偷看检查</span></a>
+  <a href="point-in-time-market-data.html">按时间点记录的 2026 年数据<span>价格、VIX 和新闻，附 SHA-256 哈希</span></a>
+  <a href="../?lang=zh">风险感知交易智能体<span>智能体、券商和看板</span></a>
+</div>
+</main>
+
+<footer><div class="wrap">MIT 开源协议 · 不构成投资建议 · 请先用模拟盘 · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="../llm-trading-agents.html" hreflang="en">English</a></div></footer>
+</body>
+</html>

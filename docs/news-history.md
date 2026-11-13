@@ -1,4 +1,4 @@
-# News in backtests
+# Backtesting with news, without look-ahead bias
 
 Live trading reads news as it is published. A backtest has to replay what was known on each past day, and that needs the publication time of every item. Without it, a strategy can "see" a headline before it existed, which makes any news strategy look better than it is.
 
