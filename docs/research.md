@@ -24,6 +24,8 @@ A copy of the 2026 US stock market ships with the package, so that a strategy, a
 | Indicators | Computed on the fly from the prices: EMA 20/50/100/200, RSI 2 and 14, MACD, ATR, ADX, Bollinger bands, Donchian channels, 52-week high and drawdown, momentum, relative strength and beta against SPY, realized volatility, relative volume, and the technical agent's setups. |
 | Market readings | The regime (risk-on, neutral, uncertain, risk-off) and what it rests on: SPY's trend, VIX and its term structure, fear & greed computed from market data, sector breadth, credit stress, macro events. |
 
+The same files are on [Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026) (Parquet with a data viewer, plus the original files byte for byte), for use without installing the package.
+
 `riskaware research data` prints the contents and checks every file against the SHA-256 in `src/riskaware/research/data/manifest.json`. The prices come from Yahoo Finance (`scripts/build_market_bundle.py` rebuilds them). Each row keeps the price as traded (split-adjusted), the dividend and split of that day, and the factor that turns it into a total-return price; backtests and indicators use total-return prices.
 
 Two things are left out on purpose. Futures, the dollar index and bitcoin itself settle after 16:00 New York time, so their "close" would arrive after a decision taken at the stock close. Fundamentals and analyst data are not point-in-time from any free source, so they are not in the data.

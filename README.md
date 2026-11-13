@@ -10,7 +10,7 @@ Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnin
 
 [🌐 Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [中文说明 → README_zh.md](README_zh.md) · [🚀 Quick start](#-quick-start) · [🆕 What's new](#-whats-new) · [🔬 Research kit](#-research-kit) · [🔗 MCP](#-mcp-server) · [📸 Screenshots](#-screenshots) · [Changelog](CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.7.2-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.7.2-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
 <img src="site/assets/demo_en.gif" alt="A 16-second tour: the market regime, today's signals, how a decision was made, paper-trading agents ranked against SPY, a backtest, the news a backtest saw, cross-verified news, and a research run with its look-ahead check" width="100%">
 
@@ -232,7 +232,7 @@ Describe a strategy in plain words and let the AI build it. Over MCP, Claude, Co
 
 ### 🔬 Research kit
 
-The whole of 2026 ships with the package, frozen, for experiments that anyone can repeat: daily prices since 2024 for the 64 stocks and 25 ETFs, the VIX term structure, 16,945 headlines and SEC filings, and every indicator and regime reading the agents use, each as it was known at that day's close.
+The whole of 2026 ships with the package, frozen, for experiments that anyone can repeat: daily prices since 2024 for the 64 stocks and 25 ETFs, the VIX term structure, 16,945 headlines and SEC filings, and every indicator and regime reading the agents use, each as it was known at that day's close. The same data is also on [Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026), as Parquet with a data viewer and the original files.
 
 ```bash
 riskaware research day 2026-04-08 --symbols NVDA,TSLA           # everything known at that close
