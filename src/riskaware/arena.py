@@ -389,7 +389,8 @@ class Arena:
     def run(self, names: Iterable[str] | None = None, mode: str = "paper",
             quote_fn: Callable[[list[str]], dict[str, Quote]] | None = None,
             data_factory: Callable[[AppConfig], Any] | None = None,
-            progress: Callable[[str], None] | None = None, _locked: bool = False) -> list[AgentRun]:
+            progress: Callable[[str], None] | None = None, _locked: bool = False,
+            _day: str | None = None) -> list[AgentRun]:
         """Run one cycle for each agent (all enabled agents when ``names`` is empty).
 
         Raises RuntimeError when another run (for example the daily job) is still trading.
@@ -411,7 +412,7 @@ class Arena:
                     progress(spec.name)
                 out.append(self._run_one(spec, mode, quotes, data_factory))
             if mode == "paper":  # a day is traded once: the scheduled run skips agents that already traded today
-                today = mc.now_ny().date().isoformat()
+                today = _day or mc.now_ny().date().isoformat()  # the scheduled run passes the day it checked
                 last = self._last_run()
                 if last.get("date") != today:
                     last = {"date": today, "done": [], "attempts": {}}
@@ -589,7 +590,8 @@ class Arena:
         if not self._acquire():
             return "another run is in progress", []
         try:
-            runs = self.run(pending, mode="paper", quote_fn=quote_fn, data_factory=data_factory, _locked=True)
+            runs = self.run(pending, mode="paper", quote_fn=quote_fn, data_factory=data_factory, _locked=True,
+                            _day=today)
         finally:
             self._release()
         last = {**self._last_run(), "attempts": last["attempts"]}
