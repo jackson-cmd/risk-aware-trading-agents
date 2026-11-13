@@ -456,23 +456,30 @@ llm:
 ## 📁 目录结构
 
 ```
-src/riskaware/
-  agents/      宏观状态、技术形态、财报质量、新闻
-  data/        价格（Yahoo、CSV、模拟数据）、FOMC/BLS/BEA 日历、基本面、CNN 恐慌贪婪指数
-  news/        Finviz + RSS + SEC 新闻源、聚类和交叉验证
-  strategy/    策略接口、内置策略、示例、波段基准策略、加载器
-  risk.py      风控（现金底线、各类上限、分批、状态规则）
-  brokers/     模拟盘 + 9 家券商接口
-  engine.py    模拟盘 / 实盘交易循环、安全开关、日志、持仓状态
-  backtest/    回测引擎、指标、HTML 报告
-  research/    冻结的 2026 年市场、按日期查询、实验、防偷看检查、LLM 交易会话
-  llm/         可选的多空辩论复核
-  dashboard/   Streamlit 网页看板（页面、主题、图表）
-  arena.py     模拟盘智能体：账户、每日运行、排行榜
-  scheduler.py 每日后台任务（launchd、cron、计划任务）
-  mcp_server.py  给 Claude 和其他 MCP 客户端用的工具
-site/          中英双语项目主页（GitHub Pages）
-docs/          设计说明和使用指南（中英文）
+src/riskaware/      Python 包本体
+  agents/           宏观状态、技术形态、财报质量、新闻
+  strategy/         策略接口、内置策略、示例、波段基准策略、加载器
+  risk.py           风控（现金底线、各类上限、分批、状态规则）
+  engine.py         模拟盘 / 实盘交易循环、安全开关、日志、持仓状态
+  backtest/         回测引擎、指标、HTML 报告
+  research/         冻结的 2026 年市场、按日期查询、实验、防偷看检查、LLM 交易会话
+  news/             Finviz + RSS + SEC 新闻源、相关性过滤、交叉验证、2026 年新闻文件
+  data/             价格（Yahoo、CSV、模拟数据）、FOMC/BLS/BEA 日历、基本面、CNN 恐慌贪婪指数
+  brokers/          模拟盘 + 9 家券商接口
+  options/          回测用的期权定价和合约选择
+  llm/              可选的多空辩论复核
+  dashboard/        Streamlit 网页看板（页面、主题、图表）
+  arena.py          模拟盘智能体：账户、每日运行、排行榜
+  scheduler.py      每日后台任务（launchd、cron、计划任务）
+  mcp_server.py     给 Claude 和其他 MCP 客户端用的工具
+  cli.py            riskaware 命令
+tests/              离线测试（pytest）
+docs/               使用指南和设计说明；docs/zh/ 是中文指南和中文更新记录
+examples/           示例配置、示例策略、.env.example
+scripts/            重建自带的行情和新闻数据
+site/               中英双语项目网站和指南（GitHub Pages）
+docker/             Dockerfile 和 docker-compose.yml
+.github/            CI 和网站部署流程、Issue 和 PR 模板、参与贡献和安全说明
 ```
 
 ## ❓ 常见问题
