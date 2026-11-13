@@ -49,6 +49,16 @@
   <li><b>Hindsight in the setup.</b> Picking the stocks, dates or rules you already know worked, which an LLM can also do from memory.</li>
 </ul>
 
+<h3>How big the leak is: one headline rule, two joins</h3>
+<p>Take one simple rule on the 2026 Benzinga headlines. A headline scores +1 when it says a company beat estimates or raised its outlook and -1 when it missed or cut, and the trade holds for one day in that direction. Joined by calendar date, a headline from 16:05 lands on the row of the 16:00 close and trades from that close. Joined by its publication time, it counts from the next close and trades at the open after that.</p>
+<div class="table-wrap"><table>
+  <tr><th>How news is joined to prices</th><th class="num">Trades</th><th class="num">Mean per trade</th><th class="num">Hit rate</th></tr>
+  <tr><td>Calendar date (close to next close)</td><td class="num">444</td><td class="num">+32.0 bp</td><td class="num">48%</td></tr>
+  <tr><td>Publication time (next open to the open after)</td><td class="num">458</td><td class="num">-6.7 bp</td><td class="num">48%</td></tr>
+</table></div>
+<p>All of the apparent edge comes from the 178 headlines published after the close: joined by calendar date they make +103 bp per trade, because the trade buys at a price set before the news came out. Respecting the timestamp moves 18% of the Benzinga headlines and 63% of the SEC 8-K filings to a later trading day, since companies tend to report after the close.</p>
+<p class="note">Reproduce with <code>python examples/news_timing.py</code> from the repository; it reads only the data that ships with the package. A demonstration of timing, not a strategy.</p>
+
 <h2>How the package replays news</h2>
 <pre>day t, 16:00 New York        after the close                      day t+1, 09:30
     stocks close    ->   the strategy sees day t and earlier   ->   orders fill at the open
