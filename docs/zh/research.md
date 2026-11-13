@@ -24,6 +24,8 @@
 | 技术指标 | 由价格现算：EMA 20/50/100/200、RSI 2 和 14、MACD、ATR、ADX、布林带、唐奇安通道、52 周高点和回撤、动量、相对 SPY 的强弱和 beta、已实现波动率、相对成交量，以及技术面智能体识别出的形态。 |
 | 市场读数 | 市场状态（偏多、中性、不确定、避险）和它的依据：SPY 趋势、VIX 和期限结构、用市场数据算的恐慌贪婪、板块广度、信用压力、宏观事件。 |
 
+不装这个包也能用：同样的文件放在 [Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026)（Parquet，可在线浏览，另附一字节不差的原始文件）。
+
 `riskaware research data` 会列出内容，并用 `src/riskaware/research/data/manifest.json` 里的 SHA-256 校验每个文件。价格来自 Yahoo Finance，`scripts/build_market_bundle.py` 可以重建。每一行都保留成交时的价格（按拆股调整）、当天的分红和拆股，以及把它换算成全收益价格的系数；回测和指标用的是全收益价格。
 
 有两类数据是故意没放进来的。期货、美元指数和比特币本身在纽约时间 16:00 之后才结算，它们的「收盘价」会晚于股市收盘时的决策。基本面和分析师数据找不到免费的、按时间点记录的来源，所以不在数据里。

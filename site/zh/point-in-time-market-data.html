@@ -16,7 +16,7 @@
 <meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/dashboard_zh.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../assets/guide.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"免费的 2026 年美股按时间点数据：价格、VIX 和新闻","description":"按时间点记录的 2026 年美股数据：日线、VIX 期限结构、新闻标题和 SEC 公告，附 SHA-256 哈希，用于可复现的回测。","inLanguage":"zh-CN","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["美股数据","新闻回测","按时间点的数据","未来函数"],"isPartOf":{"@type":"WebSite","name":"风险感知交易智能体","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"免费的 2026 年美股按时间点数据：价格、VIX 和新闻","description":"按时间点记录的 2026 年美股数据：日线、VIX 期限结构、新闻标题和 SEC 公告，附 SHA-256 哈希，用于可复现的回测。","inLanguage":"zh-CN","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["美股数据","新闻回测","按时间点的数据","未来函数"],"isPartOf":{"@type":"WebSite","name":"风险感知交易智能体","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"},"sameAs":["https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026"],"distribution":[{"@type":"DataDownload","encodingFormat":"application/vnd.apache.parquet","contentUrl":"https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/prices.parquet"},{"@type":"DataDownload","encodingFormat":"application/vnd.apache.parquet","contentUrl":"https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/news.parquet"}]}</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -71,6 +71,11 @@ vix = market.raw("^VIX")["close"]
 
 import pandas as pd                # 也可以直接读文件
 df = pd.read_csv("src/riskaware/research/data/market_2026.csv.gz", parse_dates=["date"])</pre>
+<p>不安装也能用：同样的数据在 <a href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">Hugging Face</a> 上是 Parquet 格式，可在线浏览，另有原始文件。</p>
+<pre>import pandas as pd             # 读 Parquet 需要 pyarrow
+base = "https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/"
+prices = pd.read_parquet(base + "prices.parquet")   # 69,738 行
+news = pd.read_parquet(base + "news.parquet")       # 16,945 行</pre>
 
 <h2>按天查看</h2>
 <p>这份数据的价值在于每一天当时知道什么。<code>riskaware research day 2026-04-08</code>（MCP 里是 <code>market_day</code>）会列出那天收盘时已知的全部信息：市场状态、VIX 和期限结构、恐慌贪婪、板块广度、未来两周的宏观日程，以及每只股票的涨跌、技术指标、技术形态和纽约时间 16:00 之前发布的新闻。</p>
