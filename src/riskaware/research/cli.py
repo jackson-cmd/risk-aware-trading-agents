@@ -318,6 +318,36 @@ def report_cmd(run_id: str) -> None:
         raise typer.Exit(2) from exc
 
 
+@app.command("analyze")
+def analyze_cmd(
+    run: str = typer.Argument(..., help="Run id, record folder, trading session id, or a folder of runs (baselines)"),
+    as_json: bool = typer.Option(False, "--json", help="Print the full JSON"),
+    chart: bool = typer.Option(True, "--chart/--no-chart", help="Draw analysis.png"),
+) -> None:
+    """What a run made its money on: decisions, factors, P&L. / 一次实验靠什么赚钱：决策、因子、盈亏拆解"""
+    from .analysis import analyze_many, analyze_run, is_record, print_analysis, resolve
+
+    try:
+        folder = resolve(run)
+        if is_record(folder):
+            with console.status(L("Analyzing ...", "分析中 ...")):
+                res = analyze_run(folder, chart=chart)
+        else:
+            with console.status("...") as st:
+                _, out = analyze_many(folder, chart=chart, progress=lambda name: st.update(name))
+            console.print((out / "analysis.md").read_text(encoding="utf-8"))
+            return
+    except (FileNotFoundError, ValueError, KeyError) as exc:
+        console.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
+    if as_json:
+        from .analysis import jsonable
+
+        console.print_json(json.dumps(jsonable(res)))
+        return
+    print_analysis(res, console, L)
+
+
 @app.command("trade")
 def trade_cmd(
     llm: str = typer.Option(..., help="provider:model, e.g. ollama:qwen2.5:3b, openai:gpt-5.6-luna, claude-cli"),

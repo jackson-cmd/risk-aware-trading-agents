@@ -48,6 +48,9 @@ def guide() -> dict[str, Any]:
             "trading_session_start / trading_session_step": "trade the period yourself, step by step: you get an "
                                                             "observation, send orders, get the next one",
             "list_experiments / experiment_report": "the saved records",
+            "experiment_analysis(run_id)": "what a record made its money on: excess return after each decision, rank "
+                                           "IC, factor exposures and alpha, P&L by holding period, sector, regime, "
+                                           "news trigger and stock",
         },
         "write_a_strategy": {
             "how": ("One Strategy subclass with on_bar(self, ctx) returning Signals, as in strategy_guide: the same "
