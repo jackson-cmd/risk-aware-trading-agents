@@ -8,7 +8,9 @@
   with SPY and the equal-weight universe, and save a record (manifest, metrics, equity, trades, decisions, report);
 * ``strategies``: five common swing strategies with a news switch;
 * ``agent``: let an LLM trade the period day by day, from Python or over MCP, optionally blind (no tickers, no
-  dates) so that it cannot recall what happened.
+  dates) so that it cannot recall what happened;
+* ``memory``: measure whether a model remembers what happened next (the same points asked named and blind, and
+  direct recall), so a leaderboard can say whose results on a period are clean.
 
 Docs: docs/research.md. CLI: ``riskaware research --help``. MCP: ``research_guide`` first.
 """
@@ -33,6 +35,10 @@ def __getattr__(name: str) -> Any:  # imported on first use: the strategy loader
         from .day import MarketView
 
         return MarketView
+    if name in ("memory_probe", "plan_probe"):
+        from . import memory
+
+        return getattr(memory, name)
     if name == "RESEARCH_STRATEGIES":
         from .strategies import RESEARCH_STRATEGIES
 

@@ -531,3 +531,111 @@ def _print_factors(study: Any) -> None:
         t.add_row(label, f"[{color.get(v, 'white')}]{shown}[/]", nf._ic(p.get("h1")), nf._ic(p.get("h5")),
                   nf._ic(al.get("calendar_close")), nf._ic(al.get("leak")))
     console.print(t)
+
+
+@app.command("memory")
+def memory_cmd(
+    llm: str = typer.Option(..., help="provider:model, e.g. ollama:llama3.2:3b, openai:gpt-5.6-luna, claude-cli"),
+    period: str = typer.Option("2026", help=PERIOD_HELP + "; several with commas: 2022,2026"),
+    pairs: int = typer.Option(100, help="(stock, day) points per period, each asked named and blind"),
+    recall: int = typer.Option(50, help="Points per period also asked from memory with no data (0 = off)"),
+    cutoff: Optional[str] = typer.Option(None, help="The model's training cutoff (2025-06): score before and after it"),
+    control: bool = typer.Option(True, "--control/--no-control",
+                                 help="With --cutoff, add a period after it as the control when none is given"),
+    batch: int = typer.Option(5, help="Records per call"),
+    horizon: int = typer.Option(20, help="Trading days the outcome is measured over"),
+    history: int = typer.Option(60, help="Closes shown per record"),
+    headlines: int = typer.Option(3, help="Headlines per record"),
+    news: bool = typer.Option(True, "--news/--no-news"),
+    seed: int = typer.Option(0),
+    base_url: Optional[str] = typer.Option(None, help="For compat:model, the server's URL"),
+    workers: int = typer.Option(1, help="Calls at once (API models)"),
+    price_in: Optional[float] = typer.Option(None, help="USD per million input tokens (for the estimate)"),
+    price_out: Optional[float] = typer.Option(None, help="USD per million output tokens"),
+    max_cost: float = typer.Option(5.0, help="Stop before the first call if the estimate is above this (USD)"),
+    estimate: bool = typer.Option(False, "--estimate", help="Only print the calls, tokens and cost it would take"),
+    yes: bool = typer.Option(False, "--yes", help="Run a paid model even when no price is known"),
+    out: Optional[Path] = typer.Option(None, help="Record folder (default ~/.riskaware/research/memory/runs/<id>)"),
+    export_requests: Optional[Path] = typer.Option(
+        None, help="Write the calls as single-turn requests (JSONL) for a batch runner instead of calling the model"),
+    import_results: Optional[list[str]] = typer.Option(
+        None, help="Read a batch runner's results (JSONL, globs allowed) and score them without calling anything"),
+    model_id: Optional[str] = typer.Option(None, help="The name answers are cached under (default: --llm)"),
+    max_tokens: int = typer.Option(400, help="With --export-requests: the reply cap of each request"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    """Does the model remember what happened next? Score it named against blind. / 检测模型是否记得后来的行情
+
+    With --export-requests and --import-results the calls go through a batch runner (a request queue or a batch
+    API): export, run them there, import the results, and the report is computed from the cache."""
+    from rich.markdown import Markdown
+
+    from . import memory as mem
+    from .memory import CostLimitError, memory_probe, plan_probe
+
+    opts = dict(control=control, horizon=horizon, history=history, headlines=headlines, news=news, batch=batch,
+                seed=seed, base_url=base_url, price_in=price_in, price_out=price_out, model_id=model_id)
+    usage = None
+    if import_results:
+        try:
+            usage = mem.import_results(import_results, model=model_id or mem.model_name(llm, base_url))
+        except FileNotFoundError as exc:
+            console.print(f"[red]{escape(str(exc))}[/]")
+            raise typer.Exit(2) from exc
+        console.print(L(f"Read {usage['lines']} results: {usage['answers']} answers, {usage['records_unanswered']} "
+                        f"records without a usable answer, {usage['tokens_in']:,} tokens in, {usage['tokens_out']:,} out",
+                        f"读入 {usage['lines']} 条结果：{usage['answers']} 个回答，{usage['records_unanswered']} 条记录"
+                        f"没有可用回答，输入 {usage['tokens_in']:,} token，输出 {usage['tokens_out']:,} token"))
+    try:
+        with console.status(L("Drawing the points and writing the prompts ...", "抽样并生成 prompt ...")):
+            plan = plan_probe(llm, period, pairs, recall, cutoff, **opts)
+    except ValueError as exc:
+        console.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
+    if export_requests is not None:
+        n = mem.export_requests(plan, export_requests, max_tokens=max_tokens)
+        console.print(L(f"Wrote {n} requests ({plan.tokens_in:,} tokens in, about {plan.tokens_out:,} out) to "
+                        f"{export_requests}. Run them, then score with the same options and --import-results.",
+                        f"写了 {n} 条请求（输入 {plan.tokens_in:,} token，输出约 {plan.tokens_out:,}）到 "
+                        f"{export_requests}。跑完后用同样的参数加 --import-results 打分。"), soft_wrap=True)
+        return
+    d = plan.describe()
+    cost = d["cost_usd"]
+    if plan.settings.get("control_period"):
+        ctrl = plan.settings["control_period"]
+        console.print(L(f"Control: {ctrl}, the points after the cutoff {cutoff}",
+                        f"对照：{ctrl} 年截止日 {cutoff} 之后的样本"))
+    money = (L("free (local model or subscription)", "免费（本地模型或订阅）") if plan.free else
+             L("unknown: give --price-in and --price-out", "未知：请给 --price-in 和 --price-out") if cost is None
+             else f"${cost:.2f}")
+    console.print(L(f"{d['calls']} calls for {d['answers_needed']} answers ({d['answers_cached']} cached), about "
+                    f"{d['tokens_in']:,} tokens in and {d['tokens_out']:,} out; cost {money}",
+                    f"{d['calls']} 次调用，{d['answers_needed']} 个回答（{d['answers_cached']} 个已缓存），约 "
+                    f"{d['tokens_in']:,} 输入 token、{d['tokens_out']:,} 输出 token；花费 {money}"))
+    if estimate:
+        if as_json:
+            console.print_json(json.dumps(d))
+        return
+    offline = bool(import_results)
+    if plan.calls and not offline and cost is not None and cost > max_cost:
+        console.print(f"[red]{L(f'The estimate is above --max-cost ${max_cost:.2f}; nothing was sent.', f'估价超过 --max-cost ${max_cost:.2f}，没有发出任何调用。')}[/]")
+        raise typer.Exit(2)
+    if plan.calls and not offline and cost is None and not yes:
+        console.print(f"[red]{L('No price is known for this model; give --price-in/--price-out, or --yes to run anyway.', '不知道这个模型的价格；请给 --price-in/--price-out，或加 --yes 直接跑。')}[/]")
+        raise typer.Exit(2)
+    with console.status("...") as st:
+        def progress(done: int, total: int) -> None:
+            st.update(L(f"call {done} of {total}", f"第 {done}/{total} 次调用"))
+
+        try:
+            res = memory_probe(llm, period, pairs, recall, cutoff, workers=workers, out_dir=out, progress=progress,
+                               offline=offline, usage=usage, **opts)
+        except (ValueError, CostLimitError) as exc:
+            console.print(f"[red]{escape(str(exc))}[/]")
+            raise typer.Exit(2) from exc
+    if as_json:
+        console.print_json(json.dumps(res.summary, default=str))
+        return
+    console.print(Markdown(res.report(lang())))
+    if res.folder:
+        console.print(f"{L('Record', '记录')}: {res.folder}", soft_wrap=True)
