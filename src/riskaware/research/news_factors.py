@@ -989,6 +989,7 @@ class HeadlineScorer:
 
     def _load(self) -> dict[str, float]:
         out: dict[str, float] = {}
+        self.served_by: dict[str, int] = {}  # the model ids that answered, as the API reported them
         if self.path.is_file():
             with self.path.open(encoding="utf-8") as fh:
                 for line in fh:
@@ -998,6 +999,24 @@ class HeadlineScorer:
                         continue
                     if rec.get("v") == PROMPT_VERSION and isinstance(rec.get("score"), (int, float)):
                         out[rec["key"]] = float(rec["score"])
+                        who = str(rec.get("served_by") or rec.get("model") or "")
+                        self.served_by[who] = self.served_by.get(who, 0) + 1
+        return out
+
+    def manifest(self, pairs: Iterable[tuple[str, str]] | None = None) -> dict[str, Any]:
+        """What a study that uses these scores should record: the model, who served it, the prompt and its hash."""
+        out: dict[str, Any] = {
+            "model": self.choice, "served_by": dict(sorted(self.served_by.items())), "prompt_version": PROMPT_VERSION,
+            "system_prompt": LLM_SYSTEM,
+            "user_prompt": "<n> headlines; return exactly <n> numbers.\n1. [<stock>] <headline>\n...",
+            "prompt_sha256": hashlib.sha256(LLM_SYSTEM.encode()).hexdigest(), "temperature": 0.0,
+            "reply": "a JSON object {\"scores\": [...]}, one number per headline; scores clipped to [-1, 1]",
+            "cache": str(self.path),
+        }
+        if pairs is not None:
+            pairs = list(pairs)
+            have = sum(1 for s, h in pairs if headline_key(s, h) in self.scores)
+            out.update({"headlines": len(pairs), "scored": have, "coverage": have / len(pairs) if pairs else 0.0})
         return out
 
     def provider(self) -> Any:
@@ -1044,8 +1063,9 @@ class HeadlineScorer:
                         continue
                     k = headline_key(sym, head)
                     self.scores[k] = s
+                    self.served_by[self.model] = self.served_by.get(self.model, 0) + 1
                     fh.write(json.dumps({"key": k, "symbol": sym, "headline": head, "score": s, "v": PROMPT_VERSION,
-                                         "model": self.choice}, ensure_ascii=False) + "\n")
+                                         "model": self.choice, "served_by": self.model}, ensure_ascii=False) + "\n")
                 fh.flush()
                 done += len(chunk)
                 if progress:
@@ -1102,8 +1122,14 @@ class HeadlineScorer:
                         continue
                     self.scores[k] = score
                     sym, head = lookup.get(k, (None, None))
+                    asked, answered = row.get("model"), row.get("model_returned")
+                    who = str(answered or asked or self.model)
+                    if asked and answered and str(asked) != str(answered):
+                        who = f"{answered} via {asked}"  # the route, e.g. a gateway's id for the same model
+                    self.served_by[who] = self.served_by.get(who, 0) + 1
                     fh.write(json.dumps({"key": k, "symbol": sym, "headline": head, "score": score,
-                                         "v": PROMPT_VERSION, "model": self.choice}, ensure_ascii=False) + "\n")
+                                         "v": PROMPT_VERSION, "model": self.choice, "served_by": who},
+                                        ensure_ascii=False) + "\n")
                     counts["scored"] += 1
         return counts
 
@@ -1199,7 +1225,8 @@ def _bp(v: Any, t: Any = None) -> str:
 
 
 def headline_numbers(study: FactorStudy) -> dict[str, Any]:
-    """The few numbers a summary quotes: the verdict counts and the sentiment join comparison."""
+    """The few numbers a summary quotes: the verdict counts and the join comparison of lexicon sentiment (or, when
+    it is missing, of the tone factor the calendar join inflates most)."""
     counts = {k: sorted(n for n, v in study.verdicts.items() if v["verdict"] == k) for k in VERDICT_ORDER}
     best = None
     for name, al in study.pooled_alignment.items():
@@ -1207,6 +1234,8 @@ def headline_numbers(study: FactorStudy) -> dict[str, Any]:
         if ALL_FACTORS[name].expected > 0 and h.get("leak", {}).get("t") is not None:
             if best is None or h["leak"]["t"] > study.pooled_alignment[best]["h1"]["leak"]["t"]:
                 best = name
+    if "sentiment" in study.pooled_alignment and (study.pooled_alignment["sentiment"].get("h1") or {}).get("leak"):
+        best = "sentiment"
     out: dict[str, Any] = {"verdicts": counts}
     if best:
         h = study.pooled_alignment[best]["h1"]
@@ -1345,8 +1374,11 @@ def markdown_report(study: FactorStudy, lang: str = "en") -> str:
                      f"{c['items']} items; prices sha256 {str(ds.get('prices', ''))[:12]}…, news sha256 "
                      f"{str(ds.get('news', ''))[:12]}…")
     if study.llm:
-        lines.append(f"- LLM: {study.llm.get('model')}, {study.llm.get('scored')} headlines scored "
-                     f"({study.llm.get('coverage', 0):.0%} of those in the periods).")
+        served = ", ".join(f"{k} ({v:,})" for k, v in (study.llm.get("served_by") or {}).items()) or "?"
+        lines.append(f"- LLM: {study.llm.get('model')} (served by {served}), {study.llm.get('scored')} headlines "
+                     f"scored ({study.llm.get('coverage', 0):.0%} of those in the periods), prompt version "
+                     f"{study.llm.get('prompt_version')}, system prompt sha256 "
+                     f"{str(study.llm.get('prompt_sha256', ''))[:12]}…, temperature {study.llm.get('temperature')}.")
     return "\n".join(lines) + "\n"
 
 
@@ -1451,7 +1483,8 @@ def _chart_alignment(study: FactorStudy, path: Path, lang: str) -> None:
     """Mean 1-day IC of the tone factors under the honest join and the shortcut, pooled and by period."""
     T, plt = TEXT[lang], _plt(lang)
     names = _tone_factors(study)
-    fig, axes = plt.subplots(1, len(names), figsize=(4.3 * len(names) + 0.6, 3.9), squeeze=False, sharey=True)
+    width = 4.3 if len(names) <= 2 else 3.4  # three panels stay about as wide as the cumulative chart
+    fig, axes = plt.subplots(1, len(names), figsize=(width * len(names) + 0.6, 3.9), squeeze=False, sharey=True)
     for ax, n in zip(axes[0], names, strict=True):
         cols = [("pooled", study.pooled_alignment[n]["h1"])]
         cols += [(p, (study.alignment.get(p, {}).get(n) or {}).get("h1")) for p in study.periods]

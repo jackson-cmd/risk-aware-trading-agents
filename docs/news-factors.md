@@ -2,11 +2,12 @@
 
 [中文](zh/news-factors.md)
 
-`riskaware research factors` turns the headlines that ship with the package into ten daily news factors for 64 large US stocks, using only what was published before each day's close, and tests them against returns from the next open in three very different markets: 2020 (the COVID crash), 2022 (the rate-hike bear market) and 2026 (a rising market). It then computes the same factors the way many news backtests do, joined to prices by calendar date, and measures how much that shortcut inflates them.
+`riskaware research factors` turns the headlines that ship with the package into ten daily news factors for 64 large US stocks, plus an eleventh from a language model's reading of each headline, using only what was published before each day's close, and tests them against returns from the next open in three very different markets: 2020 (the COVID crash), 2022 (the rate-hike bear market) and 2026 (a rising market). It then computes the same factors the way many news backtests do, joined to prices by calendar date, and measures how much that shortcut inflates them.
 
 **What we found**
 
 - **No news factor survives.** Eight of the ten are noise (pooled |t| below 2 at one and five days). Two, the number of headlines and how many other companies they name, have a small negative one-day IC (-0.013, t = -2.25 and -0.020, t = -2.04) that momentum, reversal and low volatility absorb.
+- **A language model reads headlines better, not well enough.** Sentiment scored by gpt-5.6-luna is the strongest news factor: a one-day IC of 0.021 (t = 2.5), positive in all three years, four times the lexicon's. The price factors absorb it too (slope t = 1.1), and it changes as fast as the lexicon: 82% of its top quintile is new every day, so its 8.9 bp daily spread breaks even at 2.7 bp of cost per side.
 - **A calendar-date join makes one up.** Joined by calendar date and tested close to close, lexicon sentiment has a rank IC of 0.032 (t = 3.4) and a long-short spread of 36.9 bp a day. Joined by publication time and traded from the next open, it has 0.005 (t = 0.6) and 7.4 bp (t = 1.0). Two-thirds of the gap (+0.018 of IC, t = 4.8) is news published after the close that the calendar join reads early, and it shows up in each of the three periods.
 - **Price factors as a yardstick.** 12-1 momentum, the strongest of the four price factors here, has a pooled one-day IC of 0.027 (t = 2.3).
 
@@ -87,6 +88,7 @@ The 2020 and 2022 headlines come from one feed and have no SEC filings, so no st
 
 | Factor | Verdict | 1 day | 5 days | 20 days | Slope after price controls, 1 day |
 |---|---|---:|---:|---:|---:|
+| LLM sentiment (gpt-5.6-luna) | weak | +0.0210 (+2.49) | +0.0226 (+2.06) | +0.0178 (+1.48) | +1.79 bp (+1.09) |
 | Headline count | weak | -0.0134 (-2.25) | -0.0104 (-1.00) | -0.0090 (-0.51) | -0.97 bp (-1.01) |
 | Co-mentions | weak | -0.0198 (-2.04) | -0.0183 (-1.40) | -0.0335 (-1.61) | -2.13 bp (-1.28) |
 | Attention anomaly | noise | -0.0062 (-1.23) | +0.0036 (+0.58) | +0.0142 (+1.99) | -0.26 bp (-0.31) |
@@ -106,6 +108,7 @@ By period, one day:
 | Lexicon sentiment | +0.0031 (+0.19) | +0.0255 (+1.86) | -0.0144 (-0.97) |
 | Verified news score | -0.0082 (-0.64) | +0.0184 (+1.59) | -0.0131 (-1.01) |
 | Novelty | -0.0238 (-1.33) | +0.0175 (+1.13) | +0.0072 (+0.52) |
+| LLM sentiment | +0.0184 (+1.13) | +0.0313 (+2.38) | +0.0130 (+0.89) |
 | Co-mentions | -0.0094 (-0.57) | -0.0263 (-1.44) | -0.0223 (-1.45) |
 | Momentum 12-1 | +0.0188 (+1.07) | +0.0251 (+1.30) | +0.0368 (+1.51) |
 | Reversal, 1 week | +0.0106 (+0.60) | +0.0027 (+0.14) | +0.0297 (+1.57) |
@@ -117,7 +120,8 @@ What the tables say:
 - **More news, slightly lower next-day returns, explained by price.** Stocks with many headlines, or with headlines that also name other companies, did a little worse the next day. Stocks with many headlines are the day's big movers (the daily rank correlation of headline count with the size of that day's move is about 0.15 in each period); with 1-day and 1-week reversal and the other price factors in the regression, both slopes lose significance (t = -1.0 and -1.3).
 - **Too fast to trade.** Lexicon sentiment replaces 85% of its top group every day (the verified score, which looks back 72 hours, 51%). Its 7.3 bp daily spread breaks even at 2.2 bp per side, below the package's default 5 bp slippage.
 - **Regimes add nothing reliable.** Of about 36 regime readings of the news factors, three have |t| just above 2 (co-mentions on uncertain days, and lexicon sentiment and the verified score on the 24 neutral days), close to what chance gives.
-- **One lead, not a finding.** After the price controls, lexicon sentiment has a five-day residual IC of 0.018 (t = 2.2), but its Fama-MacBeth slope (t = 1.1) and its raw IC (t = 0.8) do not confirm it. Ten factors, three horizons and several tests make one |t| above 2 likely by chance.
+- **The model's sentiment is steadier than the lexicon's, and still weak.** Its IC is positive in every year (largest in the 2022 bear market: 0.031, t = 2.4), its top quintile beats its bottom one by 8.9 bp a day (t = 1.5), and after the price controls its five-day residual IC is 0.027 (t = 3.4). Its Fama-MacBeth slope with the controls stops short of the rule's bar (t = 1.1 at one day, 1.9 at five), so it counts as weak: a lead worth more data, not a factor to trade.
+- **One more lead, not a finding.** After the price controls, lexicon sentiment has a five-day residual IC of 0.018 (t = 2.2), but its Fama-MacBeth slope (t = 1.1) and its raw IC (t = 0.8) do not confirm it. Eleven factors, three horizons and several tests make an occasional |t| above 2 likely by chance.
 
 ## Calendar date against publication time
 
@@ -130,7 +134,7 @@ The same factor, computed two ways, tested against two return windows:
 | Calendar date, close to close (the shortcut) | **0.032 (3.4)** | 36.9 bp (t = 4.8) |
 | Calendar date, from the next open | 0.004 (0.4) | 5.6 bp |
 
-The calendar join puts a headline published at 16:05 on the row of that day's 16:00 close, and a close-to-close return then starts before the headline existed. That is the only cell that reads the future. Holding the return window fixed (close to close), the calendar join adds **+0.018 to the IC (t = 4.8)**: two-thirds of the +0.027 gap to the honest replay. The leak appears in every period (+0.0157, t = 1.8 in 2026; +0.0209, t = 3.7 in 2022; +0.0165, t = 3.1 in 2020), and the verified news score shows the same pattern (0.017, t = 2.2 joined by date against -0.001, t = -0.1).
+The calendar join puts a headline published at 16:05 on the row of that day's 16:00 close, and a close-to-close return then starts before the headline existed. That is the only cell that reads the future. Holding the return window fixed (close to close), the calendar join adds **+0.018 to the IC (t = 4.8)**: two-thirds of the +0.027 gap to the honest replay. The leak appears in every period (+0.0157, t = 1.8 in 2026; +0.0209, t = 3.7 in 2022; +0.0165, t = 3.1 in 2020), and the verified news score shows the same pattern (0.017, t = 2.2 joined by date against -0.001, t = -0.1). So does the language model's sentiment, more strongly: 0.050 (t = 5.6) joined by date and tested close to close, against 0.021 (t = 2.45) joined by publication time; the join alone adds +0.024 (t = 5.7).
 
 The calendar join with next-open returns does not leak (the evening's news is out before the next open) and it is no better than the honest replay, which is the point: the shortcut's IC is the overnight move that follows after-close news, collected by a trade that starts before it.
 
@@ -146,7 +150,7 @@ A calendar-date join moves 13% of the 2026 Benzinga headlines and 62.5% of the 2
 - The prompt asks the model to judge the headline alone and to ignore what happened afterwards, but a model trained after 2020 or 2022 may still know. llama3.2's training data ends in 2023, so its 2026 scores cannot know the outcome; compare periods with that in mind.
 - With Ollama, the scorer uses Ollama's own chat endpoint and can ask for a context size (`HeadlineScorer(..., num_ctx=16384)`), so it shares a model another program has loaded with that size instead of making both reload it.
 
-The results above are the ten factors that need no model.
+**The run on this page.** gpt-5.6-luna at temperature 0, with JSON replies and reasoning off, through a job queue: 1,569 requests of 40 headlines, then the 145 batches (9%) that came back with 41 scores for 40 headlines again in batches of 20, which all came back right. 62,722 headlines in all, about 2.2 million input and 0.26 million output tokens. `factors.json` records the model, the route it was served through, the prompt and its SHA-256. luna was trained after 2020 and 2022, and perhaps during part of 2026, so it may know how some stories ended; its IC is not higher in the older years (2020 is its lowest, 0.013), which is some comfort but no proof.
 
 ## Limits
 

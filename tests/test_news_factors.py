@@ -316,7 +316,8 @@ def test_batch_requests_and_their_results_fill_the_cache(tmp_path):
     assert [len(r["meta"]["keys"]) for r in reqs] == [4, 2] and len({r["key"] for r in reqs}) == 2
     assert "JSON" in reqs[0]["system"] and reqs[0]["prompt"].startswith("4 headlines; return exactly 4 numbers.")
     assert reqs[1]["meta"]["v"] == nf.PROMPT_VERSION and reqs[1]["max_tokens"] >= 2 * 16
-    rows = [{"key": reqs[0]["key"], "text": json.dumps({"scores": [0.5, -0.2, 2, "x"]}), "meta": reqs[0]["meta"]},
+    rows = [{"key": reqs[0]["key"], "text": json.dumps({"scores": [0.5, -0.2, 2, "x"]}), "meta": reqs[0]["meta"],
+             "model_returned": "gpt-5.6-luna"},
             {"key": reqs[1]["key"], "text": '```json\n{"scores": [1]}\n```', "meta": reqs[1]["meta"]},
             {"key": "old", "text": '{"scores": [1]}', "meta": {"keys": ["k"], "v": nf.PROMPT_VERSION - 1}}]
     assert sc.import_results(rows, pairs) == {"rows": 3, "scored": 3, "skipped": 2}
@@ -326,6 +327,9 @@ def test_batch_requests_and_their_results_fill_the_cache(tmp_path):
     assert again.scores == sc.scores and [len(r["meta"]["keys"]) for r in again.requests(pairs, batch=4)] == [3]
     cached = [json.loads(line) for line in again.path.read_text(encoding="utf-8").splitlines()]
     assert {r["symbol"] for r in cached} == {"AAPL"} and all(r["v"] == nf.PROMPT_VERSION for r in cached)
+    m = again.manifest(pairs)
+    assert m["served_by"] == {"gpt-5.6-luna": 3} and m["scored"] == 3 and m["coverage"] == pytest.approx(0.5)
+    assert m["model"] == "openai:gpt-5.6-luna" and m["system_prompt"] == nf.LLM_SYSTEM and len(m["prompt_sha256"]) == 64
 
 
 def test_the_cli_exports_requests_and_imports_results(monkeypatch, tmp_path):

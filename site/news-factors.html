@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Do news headlines predict stock returns? Ten news factors tested point in time · Risk-Aware Trading Agents</title>
-<meta name="description" content="Ten headline factors for 64 large US stocks (sentiment, attention, novelty, red flags, earnings 8-Ks and more) tested in 2020, 2022 and 2026 with news replayed at its publication time. None survives, and a calendar-date join makes headline sentiment look like a factor with t = 3.4. Free and open source.">
+<meta name="description" content="Ten headline factors for 64 large US stocks (sentiment, attention, novelty, red flags, earnings 8-Ks and more) tested in 2020, 2022 and 2026 with news replayed at its publication time. None survives, not even a language model's sentiment, and a calendar-date join makes headline sentiment look like a factor with t = 3.4. Free and open source.">
 <link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/news-factors.html">
 <link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/news-factors.html">
 <link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-factors.html">
@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/guide.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Do news headlines predict stock returns? Ten news factors tested point in time","description":"Ten headline factors for 64 large US stocks tested in 2020, 2022 and 2026 with point-in-time news, rank IC, quintiles, decay and price-factor controls, and a comparison of calendar-date and publication-time news joins.","inLanguage":"en","datePublished":"2026-11-13","dateModified":"2026-11-13","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/news-factors.html","image":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/news_factors_cumulative_en.png","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["news sentiment factor","information coefficient","look-ahead bias","point-in-time data","factor investing","news backtesting"],"isPartOf":{"@type":"WebSite","name":"Risk-Aware Trading Agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does news sentiment predict stock returns?","acceptedAnswer":{"@type":"Answer","text":"Not in this test. For 64 large US stocks in 2020, 2022 and 2026, the lexicon sentiment of headlines published before the close has a one-day rank IC of 0.005 (t = 0.6) against returns from the next open, and none of ten news factors survives once momentum, reversal and low volatility are controlled for."}},{"@type":"Question","name":"How much does a calendar-date join inflate a news factor?","acceptedAnswer":{"@type":"Answer","text":"Joined by calendar date and tested close to close, the same sentiment factor has a rank IC of 0.032 (t = 3.4) and a long-short spread of 36.9 bp a day, against 0.005 and 7.4 bp when news is replayed at its publication time. Two-thirds of the gap, +0.018 of IC (t = 4.8), comes from headlines published after the close that the calendar join reads early."}},{"@type":"Question","name":"Can I run the news factor test myself?","acceptedAnswer":{"@type":"Answer","text":"Yes. Install the open-source package with pip install risk-aware-trading-agents and run riskaware research factors. The prices and headlines ship with the package, so nothing has to be downloaded, and the run writes every number, the report and the charts to a folder."}},{"@type":"Question","name":"Can a language model score the headlines?","acceptedAnswer":{"@type":"Answer","text":"Yes: riskaware research factors --llm scores each headline from -1 to 1 with a local model through Ollama for free, or with a paid API after showing the token estimate, caches every score, and adds an LLM sentiment factor to the same tests."}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does news sentiment predict stock returns?","acceptedAnswer":{"@type":"Answer","text":"Not in this test. For 64 large US stocks in 2020, 2022 and 2026, the lexicon sentiment of headlines published before the close has a one-day rank IC of 0.005 (t = 0.6) against returns from the next open, and none of ten news factors survives once momentum, reversal and low volatility are controlled for."}},{"@type":"Question","name":"How much does a calendar-date join inflate a news factor?","acceptedAnswer":{"@type":"Answer","text":"Joined by calendar date and tested close to close, the same sentiment factor has a rank IC of 0.032 (t = 3.4) and a long-short spread of 36.9 bp a day, against 0.005 and 7.4 bp when news is replayed at its publication time. Two-thirds of the gap, +0.018 of IC (t = 4.8), comes from headlines published after the close that the calendar join reads early."}},{"@type":"Question","name":"Can I run the news factor test myself?","acceptedAnswer":{"@type":"Answer","text":"Yes. Install the open-source package with pip install risk-aware-trading-agents and run riskaware research factors. The prices and headlines ship with the package, so nothing has to be downloaded, and the run writes every number, the report and the charts to a folder."}},{"@type":"Question","name":"Can a language model score the headlines?","acceptedAnswer":{"@type":"Answer","text":"Yes: riskaware research factors --llm scores each headline from -1 to 1 with a local or paid model, or through any batch API, caches every score, and adds an LLM sentiment factor to the same tests. Scored by gpt-5.6-luna it is the strongest news factor here, a one-day rank IC of 0.021 (t = 2.5) that is positive in all three years, but momentum, reversal and low volatility absorb it."}}]}</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -32,7 +32,7 @@
 <main class="wrap">
 <p class="crumbs"><a href="./">Home</a> › Guides</p>
 <h1>Do news headlines predict stock returns? Ten news factors, tested point in time</h1>
-<p class="lead">We turned the headlines that ship with Risk-Aware Trading Agents into ten daily news factors for 64 large US stocks, using only what was published before each close, and tested them against returns from the next open in 2020, 2022 and 2026. None of them survives. Joined to prices by calendar date instead, the way many news backtests do it, headline sentiment looks like a real factor.</p>
+<p class="lead">We turned the headlines that ship with Risk-Aware Trading Agents into ten daily news factors for 64 large US stocks, using only what was published before each close, and tested them against returns from the next open in 2020, 2022 and 2026. None of them survives, not even sentiment scored by a language model. Joined to prices by calendar date instead, the way many news backtests do it, headline sentiment looks like a real factor.</p>
 <div class="cta">
   <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents">Get it on GitHub</a>
   <a class="btn" href="news-backtesting.html">Backtesting with news</a>
@@ -41,6 +41,7 @@
 
 <div class="box">
   <p><b>No news factor survives.</b> Eight of ten are noise. Two (the number of headlines, and how many other companies they name) have a small negative one-day IC that momentum, reversal and low volatility absorb.</p>
+  <p><b>A language model reads headlines better, not well enough.</b> Sentiment scored by gpt-5.6-luna has a one-day IC of 0.021 (t = 2.5), positive in all three years, but the price factors absorb it and it changes too fast to trade.</p>
   <p><b>A calendar-date join makes one up.</b> Lexicon sentiment joined by calendar date and tested close to close: rank IC 0.032 (t = 3.4), long-short 36.9 bp a day. Joined by publication time and traded from the next open: 0.005 (t = 0.6) and 7.4 bp.</p>
   <p><b>Most of the gap is read early.</b> Two-thirds of it, +0.018 of IC (t = 4.8), is news published after the close, and it shows up in each of the three years.</p>
 </div>
@@ -56,15 +57,16 @@
 </table></div>
 <p>Only the shortcut reads the future. Holding the return window fixed (close to close), the calendar join adds <b>+0.018 to the IC (t = 4.8)</b>, two-thirds of the gap to the honest replay. The calendar join with next-open returns does not leak, because the evening's news is out before the next open, and it is no better than the honest replay: the shortcut's edge is the overnight move after news that came out after the close.</p>
 <img class="chart" src="assets/news_factors_cumulative_en.png" alt="Cumulative daily rank IC of headline sentiment in 2026, 2022 and 2020: the calendar-date join climbs while the publication-time join stays near zero in 2026 and falls in 2020" loading="lazy">
-<p>The gap is not one lucky year. The leak is +0.0157 (t = 1.8) in 2026, +0.0209 (t = 3.7) in 2022 and +0.0165 (t = 3.1) in 2020, and the package's verified news score shows the same pattern: 0.017 (t = 2.2) joined by date, -0.001 (t = -0.1) joined by time.</p>
-<img class="chart" src="assets/news_factors_alignment_en.png" alt="Mean one-day rank IC of lexicon sentiment and the verified news score under both joins, pooled and by year" loading="lazy">
+<p>The gap is not one lucky year. The leak is +0.0157 (t = 1.8) in 2026, +0.0209 (t = 3.7) in 2022 and +0.0165 (t = 3.1) in 2020, and the package's verified news score shows the same pattern: 0.017 (t = 2.2) joined by date, -0.001 (t = -0.1) joined by time. So does the language model's sentiment, more strongly: 0.050 (t = 5.6) joined by date, 0.021 (t = 2.45) joined by time.</p>
+<img class="chart" src="assets/news_factors_alignment_en.png" alt="Mean one-day rank IC of lexicon sentiment, the verified news score and LLM sentiment under both joins, pooled and by year" loading="lazy">
 <p>How much moves: a calendar-date join puts 13% of the 2026 headlines and 62.5% of the 2026 SEC 8-K filings (companies report after the close) on an earlier trading day than their publication time allows, and 10% to 11% of the headlines in 2020 and 2022.</p>
 
 <h2>Ten news factors in three markets</h2>
 <p>Each factor is ranked across the 64 stocks every day and compared with the return from the next open to the open 1, 5 and 20 trading days later, on total-return prices. The t-statistics are Newey-West, and the price controls are 12-1 momentum, 1-week and 1-day reversal and 60-day low volatility.</p>
-<img class="chart" src="assets/news_factors_ic_en.png" alt="Mean one-day rank IC of ten news factors and four price factors, pooled with 95% intervals and by year" loading="lazy">
+<img class="chart" src="assets/news_factors_ic_en.png" alt="Mean one-day rank IC of eleven news factors and four price factors, pooled with 95% intervals and by year" loading="lazy">
 <div class="table-wrap"><table>
   <tr><th>Factor</th><th>Verdict</th><th class="num">IC, 1 day (t)</th><th class="num">IC, 5 days (t)</th><th class="num">After price controls (t)</th></tr>
+  <tr><td>LLM sentiment (gpt-5.6-luna)</td><td>weak</td><td class="num">+0.021 (+2.49)</td><td class="num">+0.023 (+2.06)</td><td class="num">+1.09</td></tr>
   <tr><td>Headline count</td><td>weak</td><td class="num">-0.013 (-2.25)</td><td class="num">-0.010 (-1.00)</td><td class="num">-1.01</td></tr>
   <tr><td>Co-mentions</td><td>weak</td><td class="num">-0.020 (-2.04)</td><td class="num">-0.018 (-1.40)</td><td class="num">-1.28</td></tr>
   <tr><td>Attention anomaly</td><td>noise</td><td class="num">-0.006 (-1.23)</td><td class="num">+0.004 (+0.58)</td><td class="num">-0.31</td></tr>
@@ -79,18 +81,19 @@
 </table></div>
 <p class="note">Useful = pooled |t| at least 2 at one or five days, the same sign in every year, and still |t| at least 2 after the price controls (the Fama-MacBeth slope's t is shown). Confirmed stories and earnings 8-Ks exist in 2026 only: the 2020 and 2022 headlines come from one feed without SEC filings, so no story can be confirmed there.</p>
 <ul>
-  <li><b>Tone does not carry over to the next open.</b> Headline sentiment comes closest in the 2022 bear market (0.026, t = 1.9) and turns negative in 2020.</li>
+  <li><b>A language model's sentiment is the strongest news factor, and still weak.</b> Its IC is positive in every year (0.031, t = 2.4 in 2022), and after the price controls its five-day residual IC is 0.027 (t = 3.4); but its Fama-MacBeth slope with the controls has a t of 1.1 at one day and 1.9 at five. A lead worth more data, not a factor to trade.</li>
+  <li><b>Lexicon tone does not carry over to the next open.</b> Lexicon sentiment comes closest in the 2022 bear market (0.026, t = 1.9) and turns negative in 2020.</li>
   <li><b>More news, slightly lower next-day returns, explained by price.</b> Stocks with many headlines are the day's big movers; with reversal and the other price factors in the regression the effect is no longer significant.</li>
   <li><b>Market regimes add nothing reliable.</b> Three of about 36 regime readings have |t| just above 2, close to what chance gives.</li>
 </ul>
 
 <h2>Quintiles, decay and turnover</h2>
 <img class="chart" src="assets/news_factors_groups_en.png" alt="Next-day return of each quintile of six factors, against the day's mean" loading="lazy">
-<p>The top quintile of headline sentiment did a little better than the bottom one, 7.3 bp a day (t = 1.0), not enough to tell from chance. The factor replaces 85% of its top quintile every day, so that spread breaks even at 2.2 bp of cost per side, less than the package's default 5 bp slippage. Momentum, for comparison, keeps 94% of its top quintile from one day to the next.</p>
+<p>The top quintile of headline sentiment did a little better than the bottom one, 7.3 bp a day (t = 1.0), not enough to tell from chance. The factor replaces 85% of its top quintile every day, so that spread breaks even at 2.2 bp of cost per side, less than the package's default 5 bp slippage. Sentiment scored by the language model does a little better, 8.9 bp a day (t = 1.5), and changes just as fast (82% of its top quintile is new each day), so it breaks even at 2.7 bp. Momentum, for comparison, keeps 94% of its top quintile from one day to the next.</p>
 <img class="chart" src="assets/news_factors_decay_en.png" alt="Rank IC of the one-day return k days after the decision, for headline sentiment, the verified news score, headline count and momentum" loading="lazy">
 <p>The decay curves of the news factors wander around zero from the first day on; momentum's stays flat and positive for a month.</p>
 
-<h2>The ten factors</h2>
+<h2>The factors</h2>
 <ul>
   <li><b>Headline count</b> since the previous close, and the <b>attention anomaly</b>: that count against the stock's own mean of the 20 trading days before.</li>
   <li><b>Lexicon sentiment</b>: the mean score of the day's headlines from the package's finance lexicon, opinion pieces left out.</li>
@@ -98,6 +101,7 @@
   <li><b>Earnings 8-K</b>: an SEC filing with Item 2.02 since the previous close (2026).</li>
   <li><b>Novelty</b>: how little the day's headlines repeat the five days before.</li>
   <li><b>Co-mentions</b>: how many other covered companies the day's headlines name.</li>
+  <li><b>LLM sentiment</b> (optional): the mean score from -1 to 1 that a language model gave the day's headlines; here gpt-5.6-luna at temperature 0, 62,722 headlines scored once and cached.</li>
 </ul>
 <p>Every value for a day uses only items published before that day's close (16:00 New York, 13:00 on early-close days). A test rewrites every headline published at or after a close, adds new ones, and checks that no feature up to that close changes.</p>
 
@@ -119,7 +123,7 @@ riskaware research factors --llm             # add a sentiment factor scored by 
 <h3>Can I run the news factor test myself?</h3>
 <p>Yes. The prices and headlines ship with the package, so <code>riskaware research factors</code> needs no download and no API key.</p>
 <h3>Can a language model score the headlines?</h3>
-<p>Yes. <code>--llm</code> scores each headline with a local model through Ollama for free, or with a paid API after showing the token estimate, and adds an LLM sentiment factor to the same tests; <code>--llm-export</code> and <code>--llm-import</code> run the scoring through any batch API instead. A model trained after 2020 or 2022 may know what happened next, so its scores for those years are not blind; llama3.2's training data ends in 2023.</p>
+<p>Yes. <code>--llm</code> scores each headline with a local model through Ollama for free, or with a paid API after showing the token estimate, and adds an LLM sentiment factor to the same tests; <code>--llm-export</code> and <code>--llm-import</code> run the scoring through any batch API instead. Scored by gpt-5.6-luna, it is the strongest news factor on this page (one-day IC 0.021, t = 2.5, positive in all three years), and the price factors still absorb it. A model trained after 2020 or 2022 may know what happened next, so its scores for those years are not blind; luna's IC is lowest in 2020, which is some comfort but no proof.</p>
 
 <h2>More guides</h2>
 <div class="more">
