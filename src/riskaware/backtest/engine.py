@@ -11,7 +11,10 @@ Timeline for each trading day t:
 4. The strategy sees data up to the close of t and returns signals; the risk
    manager turns them into orders for t+1.
 
-The strategy, agents and risk manager are the same objects used live.
+The strategy, agents and risk manager are the same objects used live. A planner
+with margin rules (the research kit's long_short and margin modes) trades signed
+positions instead: shorts are negative quantities, and step 3 also charges the
+day's borrow fee and margin interest (``riskaware.research.execution``).
 """
 
 from __future__ import annotations

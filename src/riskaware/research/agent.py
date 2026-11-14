@@ -97,42 +97,61 @@ ORDER_SCHEMA: dict[str, Any] = {
     "additionalProperties": False,
 }
 
-# Appended to the system prompt in the long_short and margin modes (docs/short-margin.md); the numbers are the
-# defaults, and the observation's portfolio gives the run's own limits and rates every step.
-RULES_LONG_SHORT = (
+# Appended to the system prompt in the long_short and margin modes (docs/short-margin.md), with the numbers of the
+# run's rules; the observation's portfolio also gives the limits and rates every step.
+_LONG_SHORT_TEMPLATE = (
     "Execution rules for this run (they replace \"long-only\" above): you may also sell short, without leverage. Two "
     "more actions: \"short\" opens or adds to a short position, with weight = the size of the short as a share of "
     "equity (0.1 = short 10%); \"cover\" buys back fraction of a short (1 = all). \"target\" also takes a negative "
     "weight (-0.1 = short 10%). In the portfolio, shorts have negative weights. Limits: long plus short positions "
-    "together at most max_gross_exposure (100%) of equity, buying_power is what is left; each short at most "
-    "max_short_weight (20%); at most max_positions stocks, long and short together. The money from a short sale stays "
-    "in the account as collateral: it earns the T-bill rate but cannot pay for purchases. Costs: a borrow fee on the "
-    "shorts (borrow_fee_annual, 0.5% a year), charged daily; you also owe the dividends of the stocks you are short. "
-    "If losses push maintenance_requirement (25% of the longs plus 30% of the shorts, as a share of equity) above 1, "
-    "a margin call cuts every position by the same share at the next open and that day's orders are ignored.")
-RULES_MARGIN = (
+    "together at most max_gross_exposure ({max_gross:.0%}) of equity, buying_power is what is left; each short at most "
+    "max_short_weight ({max_short:.0%}); at most max_positions stocks, long and short together. The money from a short "
+    "sale stays in the account as collateral: it earns the T-bill rate but cannot pay for purchases. Costs: a borrow "
+    "fee on the shorts (borrow_fee_annual, {borrow_fee:.1%} a year), charged daily; you also owe the dividends of the "
+    "stocks you are short. If losses push maintenance_requirement ({maint_long:.0%} of the longs plus {maint_short:.0%} "
+    "of the shorts, as a share of equity) above 1, a margin call cuts every position by the same share at the next "
+    "open and that day's orders are ignored.")
+_MARGIN_TEMPLATE = (
     "Execution rules for this run (they replace \"long-only\" above): a Reg T margin account. You may buy on margin and "
     "sell short. Two more actions: \"short\" opens or adds to a short position, with weight = the size of the short as "
     "a share of equity (0.1 = short 10%); \"cover\" buys back fraction of a short (1 = all). \"target\" also takes a "
     "negative weight, and buy and target weights may go above 1. In the portfolio, shorts have negative weights. "
-    "Limits: initial margin 50%, so long plus short positions together at most max_gross_exposure (200%) of equity, "
-    "buying_power is what is left; each short at most max_short_weight (40%); at most max_positions stocks. The money "
-    "from a short sale stays as collateral (it earns the T-bill rate but cannot pay for purchases); buying for more "
-    "than your own cash borrows the rest. Costs, charged daily: borrowed cash pays margin_interest_annual (the T-bill "
-    "rate plus 1.5% a year), shorts pay borrow_fee_annual (0.5% a year) and the dividends of the stocks. Maintenance "
-    "margin: 25% of the longs plus 30% of the shorts (maintenance_requirement, as a share of equity). When it goes "
-    "above 1 after a close, a margin call cuts every position by the same share at the next open, until the "
-    "requirement plus a 10% cushion fits in equity, and that day's orders are ignored. If equity reaches zero, "
-    "everything is closed and trading stops.")
+    "Limits: initial margin {initial_margin:.0%}, so long plus short positions together at most max_gross_exposure "
+    "({max_gross:.0%}) of equity, buying_power is what is left; each short at most max_short_weight ({max_short:.0%}); "
+    "at most max_positions stocks. The money from a short sale stays as collateral (it earns the T-bill rate but cannot "
+    "pay for purchases); buying for more than your own cash borrows the rest. Costs, charged daily: borrowed cash pays "
+    "margin_interest_annual (the T-bill rate plus {margin_spread:.1%} a year), shorts pay borrow_fee_annual "
+    "({borrow_fee:.1%} a year) and the dividends of the stocks. Maintenance margin: {maint_long:.0%} of the longs plus "
+    "{maint_short:.0%} of the shorts (maintenance_requirement, as a share of equity). When it goes above 1 after a "
+    "close, a margin call cuts every position by the same share at the next open, until the requirement plus a "
+    "{cushion:.0%} cushion fits in equity, and that day's orders are ignored. If equity reaches zero, everything is "
+    "closed and trading stops.")
+_MODE_TEMPLATES = {"long_only": "", "long_short": _LONG_SHORT_TEMPLATE, "margin": _MARGIN_TEMPLATE}
+
+
+def mode_rules(mode: str = "long_only", rules: Any = None) -> str:
+    """The rules of an execution mode for the system prompt, with the numbers of ``rules`` (an
+    ``execution.MarginRules``; the mode's defaults when None). Empty for long_only."""
+    if mode not in _MODE_TEMPLATES:
+        raise ValueError(f"mode must be one of {', '.join(_MODE_TEMPLATES)}")
+    if mode == "long_only":
+        return ""
+    r = rules if rules is not None else margin_rules(mode)
+    return _MODE_TEMPLATES[mode].format(max_gross=r.max_gross, max_short=r.max_short, borrow_fee=r.borrow_fee,
+                                        margin_spread=r.margin_spread, maint_long=r.maint_long,
+                                        maint_short=r.maint_short, cushion=r.cushion, initial_margin=r.initial_margin)
+
+
+RULES_LONG_SHORT = mode_rules("long_short")  # with the default numbers
+RULES_MARGIN = mode_rules("margin")
 MODE_RULES = {"long_only": "", "long_short": RULES_LONG_SHORT, "margin": RULES_MARGIN}
 
 
-def mode_prompt(system_prompt: str = SYSTEM_PROMPT, mode: str = "long_only") -> str:
+def mode_prompt(system_prompt: str = SYSTEM_PROMPT, mode: str = "long_only", rules: Any = None) -> str:
     """The system prompt for an execution mode: ``system_prompt`` itself when long only, with the mode's rules
-    appended otherwise."""
-    if mode not in MODE_RULES:
-        raise ValueError(f"mode must be one of {', '.join(MODE_RULES)}")
-    return system_prompt + (" " + MODE_RULES[mode] if MODE_RULES[mode] else "")
+    appended otherwise (the numbers of ``rules`` when given)."""
+    text = mode_rules(mode, rules)
+    return system_prompt + (" " + text if text else "")
 
 
 def order_schema(mode: str = "long_only") -> dict[str, Any]:
@@ -491,14 +510,15 @@ def run_policy(policy: Callable[[dict], Any], exp: Experiment | None = None, dec
 
 def llm_policy(choice: str, base_url: str | None = None, system_prompt: str = SYSTEM_PROMPT,
                on_reply: Callable[[dict, dict | None], None] | None = None,
-               mode: str = "long_only") -> Callable[[dict], dict]:
+               mode: str = "long_only", rules: Any = None) -> Callable[[dict], dict]:
     """A policy that asks a model (``openai:gpt-5.6-luna``, ``ollama:qwen2.5:3b``, ``claude-cli`` ...) each step.
-    ``mode`` is the experiment's execution mode: long_short and margin add their rules to the system prompt and the
-    short and cover actions to the reply schema."""
+    ``mode`` is the experiment's execution mode: long_short and margin add their rules to the system prompt (with
+    the numbers of ``rules``, the experiment's ``margin_rules(mode, mode_params)``, when they differ from the
+    defaults) and the short and cover actions to the reply schema."""
     from ..llm import llm_config, make_provider
 
     provider = make_provider(llm_config(choice, base_url=base_url))
-    prompt, schema = mode_prompt(system_prompt, mode), order_schema(mode)
+    prompt, schema = mode_prompt(system_prompt, mode, rules), order_schema(mode)
 
     def policy(obs: dict) -> dict:
         user = "Today's observation (JSON):\n" + json.dumps(obs, separators=(",", ":"), default=str)
@@ -646,7 +666,7 @@ def session_start(start: str | None = None, end: str | None = None, universe: st
     (d / "config.json").write_text(json.dumps(cfg, indent=1) + "\n", encoding="utf-8")
     (d / "orders.jsonl").write_text("", encoding="utf-8")
     out = _advance(sid)
-    out["rules"] = RULES + (" " + MODE_RULES[mode] if mode != "long_only" else "")
+    out["rules"] = RULES + (" " + mode_rules(mode, margin_rules(mode, mode_params)) if mode != "long_only" else "")
     out["settings"] = {k: cfg[k] for k in ("period", "start", "end", "stocks", "news", "blind", "decide_every",
                                            "max_positions")}
     if mode != "long_only":

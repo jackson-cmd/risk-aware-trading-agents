@@ -546,7 +546,8 @@ def _run_id(exp: Experiment, name: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", (exp.label or name).lower()).strip("-")[:40] or "run"
     news = "news" if exp.news else "nonews"
     costs = "-realistic" if exp.costs == "realistic" else ""
-    return f"{datetime.now():%Y%m%d-%H%M%S}-{slug}-{get_period(exp.period).name}-{news}{costs}"
+    mode = "" if exp.mode == "long_only" else "-" + exp.mode.replace("_", "-")
+    return f"{datetime.now():%Y%m%d-%H%M%S}-{slug}-{get_period(exp.period).name}-{news}{costs}{mode}"
 
 
 # ----------------------------------------------------------------------------------- the record

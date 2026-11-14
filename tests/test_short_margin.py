@@ -252,6 +252,9 @@ def test_schema_and_prompt_by_mode():
     assert agent.mode_prompt(mode="long_only") == agent.SYSTEM_PROMPT
     assert agent.mode_prompt(mode="long_short").endswith(agent.RULES_LONG_SHORT)
     assert agent.mode_prompt("custom", "margin") == "custom " + agent.RULES_MARGIN
+    assert "max_short_weight (20%)" in agent.RULES_LONG_SHORT and "max_gross_exposure (200%)" in agent.RULES_MARGIN
+    custom = agent.mode_rules("long_short", margin_rules("long_short", {"max_short": 0.1, "borrow_fee": 0.02}))
+    assert "max_short_weight (10%)" in custom and "borrow_fee_annual, 2.0% a year" in custom  # the run's own numbers
 
 
 def test_short_and_cover_orders(offline_cfg):
