@@ -475,6 +475,7 @@ class LabSettings:
     blind: bool = True
     news: bool = True
     api_seed: bool = False  # also send the seed as the API's sampling seed (off: the seed only sets the aliases)
+    costs: str = "fixed"  # the backtest's cost model: fixed (5 bps a fill) or realistic (docs/costs.md)
     base_url: str | None = None
     key_env: str | None = None  # the environment variable with the API key (compat: and openai: models)
     price_in: float | None = None  # USD per million input tokens, for the cost line of the report
@@ -545,7 +546,8 @@ def run_one(variant: Variant, period: str, seed: int, settings: LabSettings, lab
     policy = VariantPolicy(variant, prov, recorded=recorded, on_step=on_step)
     exp = Experiment(period=get_period(period).name, universe=None if settings.symbols else settings.universe,
                      symbols=settings.symbols, news=settings.news, max_positions=settings.max_positions,
-                     start=settings.start, end=settings.end, seed=int(seed), label=f"prompt-{variant.name}")
+                     start=settings.start, end=settings.end, seed=int(seed), label=f"prompt-{variant.name}",
+                     costs=settings.costs)
     t0 = time.time()
     res = run_policy(policy, exp, decide_every=variant.decide_every, blind=settings.blind, max_news=variant.max_news,
                      label=f"prompt:{variant.name}", check=check, out_dir=folder)
@@ -578,6 +580,8 @@ def reproduce_command(variant: Variant, period: str, seed: int, settings: LabSet
         parts.append(f"--temperature {settings.temperature:g}")
     if not settings.blind:
         parts.append("--named")
+    if settings.costs != "fixed":
+        parts.append(f"--costs {settings.costs}")
     return " ".join(parts)
 
 
@@ -640,7 +644,8 @@ def start_lab(lab: str | Path, variants: list[Variant], settings: LabSettings) -
                              "lab folder or another name")
     if old is not None:
         same = {k: old["settings"].get(k) for k in ("llm", "universe", "symbols", "max_positions", "temperature",
-                                                     "blind", "news", "max_tokens", "start", "end", "api_seed")}
+                                                     "blind", "news", "max_tokens", "start", "end", "api_seed",
+                                                     "costs")}
         mine = {k: settings.to_dict().get(k) for k in same}
         if same != mine:
             raise ValueError(f"the lab in {lab} was run with other settings ({same}); use a new folder")
@@ -682,8 +687,14 @@ def run_lab(variants: list[Variant], settings: LabSettings, lab: str | Path | No
         return out
 
     with ThreadPoolExecutor(max_workers=max(1, int(workers))) as pool:
-        for fut in as_completed([pool.submit(one, j) for j in jobs]):
-            fut.result()
+        futures = [pool.submit(one, j) for j in jobs]
+        try:
+            for fut in as_completed(futures):
+                fut.result()
+        except BaseException:  # a spent quota (LabStopped) or an interrupt: start nothing new, keep what is saved
+            for fut in futures:
+                fut.cancel()
+            raise
     return lab
 
 

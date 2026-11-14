@@ -182,6 +182,37 @@ def test_lab_with_a_fake_model_runs_records_and_reports(tmp_path):
         P.run_lab(chosen, P.LabSettings(**{**st.to_dict(), "max_positions": 4}), lab, provider_factory=factory)
 
 
+class Quota(FakeModel):
+    """Stops the lab after a number of calls, like a spent daily quota."""
+
+    left = 0
+
+    def complete_json(self, system, user, schema):
+        if Quota.left <= 0:
+            raise P.LabStopped("quota spent")
+        Quota.left -= 1
+        return super().complete_json(system, user, schema)
+
+
+def test_a_lab_stopped_by_a_quota_resumes_by_replaying_its_steps(tmp_path):
+    st = P.LabSettings(llm="fake:model", periods=["2026"], seeds=[0], universe="core", max_positions=3, **WINDOW)
+    chosen = P.select("baseline,news_6")
+    Quota.left = 5
+    with pytest.raises(P.LabStopped):
+        P.run_lab(chosen, st, tmp_path / "lab", workers=1, provider_factory=lambda v, s: Quota(s), check=False)
+    assert not R.collect(tmp_path / "lab") and len((tmp_path / "lab" / "progress.jsonl").read_text().splitlines()) == 5
+    Quota.left = 1000
+    P.run_lab(chosen, st, tmp_path / "lab", workers=1, provider_factory=lambda v, s: Quota(s), check=False)
+    rows = R.collect(tmp_path / "lab")
+    assert len(rows) == 2 and all(r["format_errors"] == 0 for r in rows)
+    calls = [json.loads(x) for x in (P.run_folder(tmp_path / "lab", "baseline", "2026", 0) / "calls.jsonl")
+             .read_text().splitlines()]
+    assert sum(1 for c in calls if c.get("replayed")) == 5
+    assert len((tmp_path / "lab" / "progress.jsonl").read_text().splitlines()) == sum(r["steps"] for r in rows)
+    # the same lab again with a model that would answer differently: nothing is asked, the records stay
+    assert 1000 - Quota.left == sum(r["steps"] for r in rows) - 5
+
+
 def test_a_policy_run_passes_the_look_ahead_check(tmp_path):
     st = P.LabSettings(llm="fake:model", periods=["2026"], seeds=[0], universe="core", max_positions=3, **WINDOW)
     out = P.run_one(P.VARIANTS["news_6"], "2026", 0, st, tmp_path, provider=FakeModel(0), check=True)

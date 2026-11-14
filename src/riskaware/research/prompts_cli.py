@@ -74,6 +74,7 @@ def run_cmd(
                                       "the baseline, ten pairs are the fewest that can pass the Holm correction, and "
                                       "3 periods x 4 seeds give twelve"),
     api_seed: bool = typer.Option(False, "--api-seed", help="Also send the seed as the API's sampling seed"),
+    costs: str = typer.Option("fixed", help="Cost model: fixed (5 bps a fill) or realistic (docs/costs.md)"),
     key_env: Optional[str] = typer.Option(None, help="Environment variable with the API key (e.g. for compat:)"),
     seed_list: Optional[str] = typer.Option(None, help="Exact seeds instead, e.g. 0,1,2"),
     universe: str = typer.Option("core"),
@@ -108,7 +109,7 @@ def run_cmd(
                            symbols=[x.strip().upper() for x in symbols.split(",")] if symbols else None,
                            max_positions=max_positions, temperature=temperature, max_tokens=max_tokens,
                            blind=not named, base_url=base_url, price_in=price_in, price_out=price_out, start=start,
-                           end=end, api_seed=api_seed, key_env=key_env)
+                           end=end, api_seed=api_seed, key_env=key_env, costs=costs)
         est = P.estimate(chosen, st, pilot)
     except (ValueError, FileNotFoundError) as exc:
         con.print(f"[red]{escape(str(exc))}[/]")
