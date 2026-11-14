@@ -13,6 +13,10 @@ before that day's close. It answers with orders, which fill at the next open. Th
 Orders: ``{"symbol": "AAPL", "action": "buy", "weight": 0.1}`` opens or tops up a position to 10% of equity;
 ``{"action": "sell", "fraction": 0.5}`` sells half; ``{"action": "target", "weight": 0.05}`` moves the position to 5%.
 They go through plain execution (see ``execution.PlainPlanner``): long only, at most ``max_positions`` stocks.
+With ``Experiment(mode="long_short")`` or ``mode="margin"`` the policy may also ``{"action": "short", "weight": 0.1}``
+(short 10% of equity) and ``{"action": "cover", "fraction": 1}``, ``target`` takes negative weights, the system
+prompt gets the mode's rules (``RULES_LONG_SHORT``, ``RULES_MARGIN``) and the observation the account's exposures,
+buying power and margin (docs/short-margin.md).
 
 Blind mode hides what a model could recognise: tickers become S01, S02, ..., dates become day numbers, prices are
 rebased to 100 on the first day, and company names and tickers in headlines become the same aliases. It lowers the
@@ -49,6 +53,7 @@ from ..strategy.base import Strategy
 from ..types import Action, Signal
 from ..universe import sector_of
 from .data import FrozenMarket, bundled_market
+from .execution import margin_rules
 from .experiment import (
     RUNS_DIR,
     Experiment,
@@ -91,6 +96,52 @@ ORDER_SCHEMA: dict[str, Any] = {
     "required": ["orders", "note"],
     "additionalProperties": False,
 }
+
+# Appended to the system prompt in the long_short and margin modes (docs/short-margin.md); the numbers are the
+# defaults, and the observation's portfolio gives the run's own limits and rates every step.
+RULES_LONG_SHORT = (
+    "Execution rules for this run (they replace \"long-only\" above): you may also sell short, without leverage. Two "
+    "more actions: \"short\" opens or adds to a short position, with weight = the size of the short as a share of "
+    "equity (0.1 = short 10%); \"cover\" buys back fraction of a short (1 = all). \"target\" also takes a negative "
+    "weight (-0.1 = short 10%). In the portfolio, shorts have negative weights. Limits: long plus short positions "
+    "together at most max_gross_exposure (100%) of equity, buying_power is what is left; each short at most "
+    "max_short_weight (20%); at most max_positions stocks, long and short together. The money from a short sale stays "
+    "in the account as collateral: it earns the T-bill rate but cannot pay for purchases. Costs: a borrow fee on the "
+    "shorts (borrow_fee_annual, 0.5% a year), charged daily; you also owe the dividends of the stocks you are short. "
+    "If losses push maintenance_requirement (25% of the longs plus 30% of the shorts, as a share of equity) above 1, "
+    "a margin call cuts every position by the same share at the next open and that day's orders are ignored.")
+RULES_MARGIN = (
+    "Execution rules for this run (they replace \"long-only\" above): a Reg T margin account. You may buy on margin and "
+    "sell short. Two more actions: \"short\" opens or adds to a short position, with weight = the size of the short as "
+    "a share of equity (0.1 = short 10%); \"cover\" buys back fraction of a short (1 = all). \"target\" also takes a "
+    "negative weight, and buy and target weights may go above 1. In the portfolio, shorts have negative weights. "
+    "Limits: initial margin 50%, so long plus short positions together at most max_gross_exposure (200%) of equity, "
+    "buying_power is what is left; each short at most max_short_weight (40%); at most max_positions stocks. The money "
+    "from a short sale stays as collateral (it earns the T-bill rate but cannot pay for purchases); buying for more "
+    "than your own cash borrows the rest. Costs, charged daily: borrowed cash pays margin_interest_annual (the T-bill "
+    "rate plus 1.5% a year), shorts pay borrow_fee_annual (0.5% a year) and the dividends of the stocks. Maintenance "
+    "margin: 25% of the longs plus 30% of the shorts (maintenance_requirement, as a share of equity). When it goes "
+    "above 1 after a close, a margin call cuts every position by the same share at the next open, until the "
+    "requirement plus a 10% cushion fits in equity, and that day's orders are ignored. If equity reaches zero, "
+    "everything is closed and trading stops.")
+MODE_RULES = {"long_only": "", "long_short": RULES_LONG_SHORT, "margin": RULES_MARGIN}
+
+
+def mode_prompt(system_prompt: str = SYSTEM_PROMPT, mode: str = "long_only") -> str:
+    """The system prompt for an execution mode: ``system_prompt`` itself when long only, with the mode's rules
+    appended otherwise."""
+    if mode not in MODE_RULES:
+        raise ValueError(f"mode must be one of {', '.join(MODE_RULES)}")
+    return system_prompt + (" " + MODE_RULES[mode] if MODE_RULES[mode] else "")
+
+
+def order_schema(mode: str = "long_only") -> dict[str, Any]:
+    """The reply schema: ``ORDER_SCHEMA`` when long only; with the short and cover actions in the other modes."""
+    if mode == "long_only":
+        return ORDER_SCHEMA
+    schema = json.loads(json.dumps(ORDER_SCHEMA))
+    schema["properties"]["orders"]["items"]["properties"]["action"]["enum"] += ["short", "cover"]
+    return schema
 
 
 # ----------------------------------------------------------------------------------- blind mode
@@ -138,8 +189,10 @@ def _f(v: Any, nd: int = 4) -> float | None:
 
 # ----------------------------------------------------------------------------------- observations and orders
 def observe(ctx: Any, *, step: int, trading_day: int, start_equity: float, blind: Blind | None, news: bool,
-            max_news: int, max_positions: int, size: float, problems: list[str] | None = None) -> dict[str, Any]:
-    """The observation a policy gets on one decision day (see the module docstring)."""
+            max_news: int, max_positions: int, size: float, problems: list[str] | None = None,
+            margin: Any = None) -> dict[str, Any]:
+    """The observation a policy gets on one decision day (see the module docstring). With ``margin`` (the rules of a
+    long_short or margin account) the portfolio also shows signed weights, exposures, buying power and margin."""
 
     def name(s: str) -> str:
         return blind.aliases[s] if blind else s
@@ -192,13 +245,24 @@ def observe(ctx: Any, *, step: int, trading_day: int, start_equity: float, blind
                       "positions": positions, "max_positions": max_positions, "default_weight": _f(size)},
         "stocks": stocks,
     }
+    if margin is not None:  # long_short and margin: shorts have negative weights and gain on a falling price
+        port = obs["portfolio"]
+        port["positions"] = [{"symbol": name(s), "side": "short" if p.qty < 0 else "long", "weight": _f(p.weight),
+                              "gain": _f(-p.gain if p.qty < 0 else p.gain), "days_held": p.days_held}
+                             for s, p in sorted(pf.positions.items(), key=lambda kv: name(kv[0]))]
+        short_v = -sum(p.qty * p.price for p in pf.positions.values() if p.qty < 0)
+        port["cash_share"] = _f((pf.cash - short_v) / pf.equity if pf.equity > 0 else 0.0)  # proceeds not counted
+        port.update({k: v if isinstance(v, str) else _f(v)
+                     for k, v in margin.account(pf, None if blind else getattr(m, "risk_free", None)).items()})
     if problems:
         obs["problems_with_last_orders"] = problems
     return obs
 
 
-def to_signals(reply: Any, ctx: Any, blind: Blind | None, size: float) -> tuple[list[Signal], list[str], list[dict]]:
-    """Orders from a policy (a list, or {"orders": [...]}) as signals; unusable ones are listed as problems."""
+def to_signals(reply: Any, ctx: Any, blind: Blind | None, size: float,
+               margin: Any = None) -> tuple[list[Signal], list[str], list[dict]]:
+    """Orders from a policy (a list, or {"orders": [...]}) as signals; unusable ones are listed as problems. With
+    ``margin`` (long_short or margin account) the short and cover actions and negative targets are allowed."""
     orders = reply.get("orders", []) if isinstance(reply, dict) else (reply or [])
     signals, problems, kept = [], [], []
     if not isinstance(orders, list):
@@ -221,25 +285,39 @@ def to_signals(reply: Any, ctx: Any, blind: Blind | None, size: float) -> tuple[
             problems.append(f"{raw}: weight and fraction must be numbers")
             continue
         pos = ctx.position(sym)
+        top = margin.max_gross if margin is not None else 1.0  # largest weight one long may have
         if act == "buy":
-            target = min(w if w > 0 else size, 1.0)
+            target = min(w if w > 0 else size, top)
             signals.append(Signal(sym, Action.BUY, 0.5, why or "policy buy", target_weight=target))
         elif act == "sell":
             if pos is None:
                 problems.append(f"{raw}: nothing to sell")
                 continue
+            if pos.qty < 0:
+                problems.append(f"{raw}: is a short position; use cover")
+                continue
             signals.append(Signal(sym, Action.SELL, 0.5, why or "policy sell", fraction=frac if 0 < frac <= 1 else 1.0))
         elif act == "target":
             cur = pos.weight if pos is not None else 0.0
-            w = min(max(w, 0.0), 1.0)
+            w = min(max(w, 0.0 if margin is None else -margin.max_short), top)
             if w > cur:
                 signals.append(Signal(sym, Action.BUY, 0.5, why or "policy target", target_weight=w))
-            elif pos is not None and w < cur:
+            elif (pos is not None or margin is not None) and w < cur:
                 signals.append(Signal(sym, Action.SELL, 0.5, why or "policy target", target_weight=w))
+        elif act == "short" and margin is not None:
+            target = -min(abs(w) if w else size, margin.max_short)
+            signals.append(Signal(sym, Action.SELL, 0.5, why or "policy short", target_weight=target))
+        elif act == "cover" and margin is not None:
+            if pos is None or pos.qty >= 0:
+                problems.append(f"{raw}: no short position to cover")
+                continue
+            f = frac if 0 < frac <= 1 else 1.0
+            signals.append(Signal(sym, Action.BUY, 0.5, why or "policy cover", target_weight=pos.weight * (1.0 - f)))
         elif act in ("hold", ""):
             continue
         else:
-            problems.append(f"{raw}: action must be buy, sell or target")
+            problems.append(f"{raw}: action must be buy, sell or target"
+                            + (", or short or cover" if margin is not None else ""))
             continue
         kept.append({"symbol": sym, "action": act, "weight": w, "fraction": frac, "reason": why})
     return signals, problems, kept
@@ -252,13 +330,17 @@ class PolicyStrategy(Strategy):
     description = "Decisions from a policy function: an LLM or anything that maps an observation to orders."
 
     def __init__(self, policy: Callable[[dict], Any], decide_every: int = 1, blind: bool = False, news: bool = True,
-                 max_news: int = 3, max_positions: int = 10, size: float = 0.1, seed: int = 0, label: str = "policy"):
+                 max_news: int = 3, max_positions: int = 10, size: float = 0.1, seed: int = 0, label: str = "policy",
+                 margin: Any = None):
         self.policy = policy
         self.decide_every = max(1, int(decide_every))
         self.use_blind, self.news, self.max_news = blind, news, max_news
         self.max_positions, self.size, self.seed = max_positions, size, seed
+        self.margin = margin  # the rules of a long_short or margin account (execution.MarginRules), None when long only
         self.name = label
         self.params = {"decide_every": self.decide_every, "blind": blind, "news": news, "max_news": max_news}
+        if margin is not None:
+            self.params["mode"] = margin.mode
         self.transcript: list[dict[str, Any]] = []
         self.replies: list[Any] = []
         self.observed: list[tuple[str, str]] = []  # (day, SHA-256 of the observation) for every step that built one
@@ -281,17 +363,21 @@ class PolicyStrategy(Strategy):
         if (self.trading_day - 1) % self.decide_every:
             return []
         self.step += 1
+        if self.margin is not None and ctx.portfolio.equity <= 0:  # wiped out: trading has stopped
+            self.transcript.append({"step": self.step, "day": ctx.day.isoformat(), "orders": [], "problems": [],
+                                    "note": "equity at or below zero: trading stopped, the policy is not asked"})
+            return []
         replay = getattr(self.policy, "replay", None)
         if replay is not None and not self.policy.needs_observation(self.step):
             reply = replay(self.step)
         else:
             obs = observe(ctx, step=self.step, trading_day=self.trading_day, start_equity=self.start_equity,
                           blind=self.blind, news=self.news, max_news=self.max_news, max_positions=self.max_positions,
-                          size=self.size, problems=self._problems)
+                          size=self.size, problems=self._problems, margin=self.margin)
             self.observed.append((ctx.day.isoformat(), _digest(obs)))
             reply = self.policy(obs)
         self.replies.append(reply)
-        signals, problems, kept = to_signals(reply, ctx, self.blind, self.size)
+        signals, problems, kept = to_signals(reply, ctx, self.blind, self.size, self.margin)
         self._problems = problems
         note = reply.get("note") if isinstance(reply, dict) else None
         self.transcript.append({"step": self.step, "day": ctx.day.isoformat(), "orders": kept, "problems": problems,
@@ -334,7 +420,7 @@ def observation_check(exp: Experiment, replies: list[Any], decide_every: int, bl
 
         def factory() -> PolicyStrategy:
             s = PolicyStrategy(_Replay(replies), decide_every, blind, exp.news, max_news, exp.max_positions, size,
-                               exp.seed, "replay")
+                               exp.seed, "replay", margin=margin_rules(exp.mode, exp.mode_params))
             made.append(s)
             return s
 
@@ -385,7 +471,8 @@ def run_policy(policy: Callable[[dict], Any], exp: Experiment | None = None, dec
     made: list[PolicyStrategy] = []
 
     def factory() -> PolicyStrategy:
-        s = PolicyStrategy(policy, decide_every, blind, exp.news, max_news, exp.max_positions, size, exp.seed, label)
+        s = PolicyStrategy(policy, decide_every, blind, exp.news, max_news, exp.max_positions, size, exp.seed, label,
+                           margin=margin_rules(exp.mode, exp.mode_params))
         made.append(s)
         return s
 
@@ -403,15 +490,19 @@ def run_policy(policy: Callable[[dict], Any], exp: Experiment | None = None, dec
 
 
 def llm_policy(choice: str, base_url: str | None = None, system_prompt: str = SYSTEM_PROMPT,
-               on_reply: Callable[[dict, dict | None], None] | None = None) -> Callable[[dict], dict]:
-    """A policy that asks a model (``openai:gpt-5.6-luna``, ``ollama:qwen2.5:3b``, ``claude-cli`` ...) each step."""
+               on_reply: Callable[[dict, dict | None], None] | None = None,
+               mode: str = "long_only") -> Callable[[dict], dict]:
+    """A policy that asks a model (``openai:gpt-5.6-luna``, ``ollama:qwen2.5:3b``, ``claude-cli`` ...) each step.
+    ``mode`` is the experiment's execution mode: long_short and margin add their rules to the system prompt and the
+    short and cover actions to the reply schema."""
     from ..llm import llm_config, make_provider
 
     provider = make_provider(llm_config(choice, base_url=base_url))
+    prompt, schema = mode_prompt(system_prompt, mode), order_schema(mode)
 
     def policy(obs: dict) -> dict:
         user = "Today's observation (JSON):\n" + json.dumps(obs, separators=(",", ":"), default=str)
-        reply = provider.complete_json(system_prompt, user, ORDER_SCHEMA)
+        reply = provider.complete_json(prompt, user, schema)
         if on_reply is not None:
             on_reply(obs, reply)
         return reply or {"orders": [], "note": f"no usable reply: {getattr(provider, 'last_error', '')}"}
@@ -475,7 +566,8 @@ def _experiment(cfg: dict) -> Experiment:
                       end=cfg["end"], universe=cfg.get("universe"),
                       symbols=cfg.get("symbols"), news=cfg["news"], max_positions=cfg["max_positions"],
                       position_size=cfg.get("position_size"), cash=cfg["cash"], leak_check=False,
-                      label=cfg.get("label") or "llm-session", seed=cfg.get("seed", 0))
+                      label=cfg.get("label") or "llm-session", seed=cfg.get("seed", 0),
+                      mode=cfg.get("mode", "long_only"), mode_params=cfg.get("mode_params"))
 
 
 def _advance(session_id: str) -> dict[str, Any]:
@@ -490,7 +582,8 @@ def _advance(session_id: str) -> dict[str, Any]:
 
     def factory(pause: bool = True) -> PolicyStrategy:
         s = PolicyStrategy(_Scripted(logged, pause), cfg["decide_every"], cfg["blind"], exp.news, cfg["max_news"],
-                           exp.max_positions, size, exp.seed, "llm_session")
+                           exp.max_positions, size, exp.seed, "llm_session",
+                           margin=margin_rules(exp.mode, exp.mode_params))
         made.append(s)
         return s
 
@@ -530,10 +623,13 @@ def session_start(start: str | None = None, end: str | None = None, universe: st
                   symbols: list[str] | None = None, news: bool = True, blind: bool = False, decide_every: int = 5,
                   max_positions: int = 5, position_size: float | None = None, cash: float = 100_000.0,
                   max_news: int = 3, seed: int = 0, label: str | None = None,
-                  period: str | None = None) -> dict[str, Any]:
+                  period: str | None = None, mode: str = "long_only",
+                  mode_params: dict[str, float] | None = None) -> dict[str, Any]:
     per = get_period(period).name
+    margin_rules(mode, mode_params)  # checks the mode and its parameters before anything is written
     exp = Experiment(period=per, start=start, end=end, universe=universe, symbols=symbols, news=news,
-                     max_positions=max_positions, position_size=position_size, cash=cash)
+                     max_positions=max_positions, position_size=position_size, cash=cash, mode=mode,
+                     mode_params=mode_params)
     market = bundled_market(per)
     syms = _symbols(exp, market)
     s0, s1 = _dates(exp, market)
@@ -545,12 +641,16 @@ def session_start(start: str | None = None, end: str | None = None, universe: st
            "decide_every": max(1, int(decide_every)), "max_positions": int(max_positions),
            "position_size": position_size, "cash": float(cash), "max_news": int(max_news), "seed": int(seed),
            "label": label, "stocks": len(syms), "created": datetime.now().isoformat(timespec="seconds")}
+    if mode != "long_only":
+        cfg.update(mode=mode, mode_params=mode_params)
     (d / "config.json").write_text(json.dumps(cfg, indent=1) + "\n", encoding="utf-8")
     (d / "orders.jsonl").write_text("", encoding="utf-8")
     out = _advance(sid)
-    out["rules"] = RULES
+    out["rules"] = RULES + (" " + MODE_RULES[mode] if mode != "long_only" else "")
     out["settings"] = {k: cfg[k] for k in ("period", "start", "end", "stocks", "news", "blind", "decide_every",
                                            "max_positions")}
+    if mode != "long_only":
+        out["settings"]["mode"] = mode
     return out
 
 

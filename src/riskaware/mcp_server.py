@@ -357,12 +357,17 @@ def run_experiment(strategy: str | None = None, code: str | None = None, params:
                    max_positions: int = 10, position_size: float | None = None, split: str | None = None,
                    leak_check: bool = True, label: str | None = None,
                    extra_news: list[dict[str, Any]] | None = None, period: str = "2026",
-                   costs: str = "fixed") -> dict[str, Any]:
+                   costs: str = "fixed", mode: str = "long_only",
+                   mode_params: dict[str, float] | None = None) -> dict[str, Any]:
     """Run an experiment on a frozen period and save a record (see research_guide). period is 2026 (default, a
     rising year), 2022 (the rate-hike bear market) or 2020 (the COVID crash and rebound); start and end default to
     the period's test window. costs='fixed' (default) pays 5 bps on every fill at the open; costs='realistic' adds
     10% of the overnight gap and square-root market impact and fills each order for at most 1% of its 20-day
-    average volume.
+    average volume. mode (plain execution) is long_only (default), long_short (short positions with a signed
+    target_weight, e.g. Signal(sym, Action.SELL, target_weight=-0.1), long plus short at most 100% of equity, each
+    short at most 20%, 0.5% a year borrow fee) or margin (Reg T: up to 200% gross, maintenance margin calls, borrowed
+    cash pays BIL + 1.5%); mode_params overrides those rules. The rule-based long-short anchors are momentum_ls and
+    trend_ls.
 
     Give either strategy (a built-in name such as swing_rsi2, swing_trend, swing_breakout, swing_pullback,
     swing_news, risk_aware, rsi2, momentum_rotation; or the path of a saved strategy) or code (one Strategy class,
@@ -388,7 +393,7 @@ def run_experiment(strategy: str | None = None, code: str | None = None, params:
                 "symbols": [s.upper() for s in symbols] if symbols else None, "news": news, "execution": execution,
                 "max_positions": max_positions, "position_size": position_size, "split": split,
                 "leak_check": leak_check, "label": label, "extra_news": extra_news, "params": params or {},
-                "costs": costs}
+                "costs": costs, "mode": mode, "mode_params": mode_params}
     if code is None and strategy and strategy.endswith(".py") and Path(strategy).expanduser().is_file():
         code = Path(strategy).expanduser().read_text(encoding="utf-8")
     if code is not None:
@@ -449,19 +454,20 @@ def experiment_analysis(run_id: str) -> dict[str, Any]:
 def trading_session_start(start: str | None = None, end: str | None = None, universe: str | None = "core",
                           symbols: list[str] | None = None, news: bool = True, blind: bool = False,
                           decide_every: int = 5, max_positions: int = 5, cash: float = 100_000.0,
-                          max_news: int = 3, period: str = "2026") -> dict[str, Any]:
+                          max_news: int = 3, period: str = "2026", mode: str = "long_only") -> dict[str, Any]:
     """Trade the frozen market yourself, one decision at a time (an LLM-agent experiment). Returns the rules and
     the first observation: the market, your portfolio, and per stock the main indicators and the news published
     before that close. Answer with trading_session_step. decide_every=5 decides once a week (about 44 steps for
     2026); 1 decides every day. blind=True hides tickers, company names and dates so that you cannot recall what
     happened. Orders fill at the next open; long only; at most max_positions stocks. period is 2026 (default), 2022
-    or 2020."""
+    or 2020. mode='long_short' also allows short positions (no leverage) and mode='margin' a Reg T margin account
+    (up to 2x gross, margin calls); the returned rules say what each allows and costs."""
     from .research.agent import session_start
 
     try:
         return _plain(session_start(start=start, end=end, universe=None if symbols else universe, symbols=symbols,
                                     news=news, blind=blind, decide_every=decide_every, max_positions=max_positions,
-                                    cash=cash, max_news=max_news, period=period))
+                                    cash=cash, max_news=max_news, period=period, mode=mode))
     except (ValueError, KeyError) as exc:
         return {"ok": False, "error": str(exc)}
 
@@ -470,7 +476,9 @@ def trading_session_step(session_id: str, orders: list[dict[str, Any]] | None = 
                          note: str | None = None) -> dict[str, Any]:
     """Send the orders for the current step and get the next observation (or, after the last step, the result
     with its saved record). Each order: {"symbol", "action": "buy" | "sell" | "target", "weight" (share of equity
-    for buy and target), "fraction" (share of the position for sell, 1 = all), "reason"}. An empty list holds."""
+    for buy and target), "fraction" (share of the position for sell, 1 = all), "reason"}. An empty list holds. In a
+    long_short or margin session also "short" (weight = size of the short) and "cover" (fraction of a short), and
+    target takes a negative weight."""
     from .research.agent import session_step
 
     try:
