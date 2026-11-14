@@ -1,12 +1,16 @@
 <div align="center">
 
-<img src="site/assets/banner.svg" alt="风险感知交易智能体 · Risk-Aware Trading Agents：美股 AI 交易智能体，新闻回测不偷看未来" width="100%">
+<img src="site/assets/banner.svg" alt="风险感知交易智能体 · Risk-Aware Trading Agents：新闻按发布的那一分钟回放的 LLM 交易智能体基准和榜单，以及美股 AI 交易智能体" width="100%">
 
-**先看宏观日历、恐慌指数和经过交叉验证的新闻，再决定买不买的美股 AI 交易智能体。**
+## LLM 交易智能体基准：新闻按发布的那一分钟回放
 
-用 VIX 和 FOMC / CPI 日历判断市场状态 · 财报过关才抄底 · 始终留 30% 现金 · 新闻交叉验证 · 和 SPY 比的模拟盘智能体 · 不偷看未来的新闻回测 · 供研究用的冻结 2020、2022、2026 三段市场 · 通过 MCP 接入 LLM 智能体 · 10 家券商的模拟盘和实盘。
+大多数新闻回测按日历日期把标题和价格对上，于是收盘后才发布的标题，也会按当天的收盘价成交。这里每条标题都在发布的那一分钟才出现，订单在下一个开盘成交，覆盖三段冻结的市场：2020 年暴跌、2022 年熊市和 2026 年。Llama、GPT、Claude 和 Gemini 分别在盲测和实名下交易这三段市场，每个模型跑三个种子，训练截止日之前和之后的成绩分开计分。
 
-[🌐 项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [English → README.md](README.md) · [🚀 快速开始](#-快速开始) · [🆕 新功能](#-新功能) · [🔬 研究工具箱](#-研究工具箱) · [🔗 MCP](#-mcp-服务器) · [📸 截图](#-截图一览) · [更新记录](docs/zh/CHANGELOG.md)
+**它同时也是一套美股 AI 交易智能体：先看宏观日历、恐慌指数和经过交叉验证的新闻，再决定买不买。**
+
+用 VIX 和 FOMC / CPI 日历判断市场状态 · 财报过关才抄底 · 始终留 30% 现金 · 新闻交叉验证 · 和 SPY 比的模拟盘智能体 · 不偷看未来的新闻回测 · 公开的 LLM 交易智能体榜单 · 供研究用的冻结 2020、2022、2026 三段市场 · 通过 MCP 接入 LLM 智能体 · 10 家券商的模拟盘和实盘。
+
+[🌐 项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [🏆 LLM 模型榜单](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html) · [English → README.md](README.md) · [🚀 快速开始](#-快速开始) · [🆕 新功能](#-新功能) · [🔬 研究工具箱](#-研究工具箱) · [🔗 MCP](#-mcp-服务器) · [📸 截图](#-截图一览) · [更新记录](docs/zh/CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.7.2-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
 
@@ -57,19 +61,19 @@ docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp            
 
 - 你做**美股，持有几天到几周**，想要一套看得懂的规则：好公司回调时买、始终留现金、从不恐慌割肉。
 - 你想要**不会作弊的回测**：新闻按发布时间回放，次日开盘成交，研究工具箱的每次实验都做防偷看检查。
-- 你在**研究 LLM 交易智能体**，需要别人也能复现的数据和流程：三段冻结的市场（2020 年暴跌、2022 年熊市、2026 年）、盲测模式、每次运行都有完整记录。
+- 你在**研究 LLM 交易智能体**，需要别人也能复现的数据和流程：三段冻结的市场（2020 年暴跌、2022 年熊市、2026 年）、盲测模式、每次运行都有完整记录，还有可以提交成绩的[公开榜单](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html)。
 - 你用 **Claude、Codex 或 Gemini**，想让它们帮你测试用大白话描述的策略，走你自己的订阅，不需要 API key。
 - 你想**先模拟交易**：几个策略同时用模拟资金跑，每个交易日和 SPY 比一次。
 - 你看**中文或英文**：命令行、网页看板、回测报告和文档都有两种语言。
 
-<sub>如果你在找美股 AI 交易机器人、带历史新闻又不偷看未来的回测工具、按时间点记录的 2020、2022、2026 年价格、VIX 和新闻数据、LLM 交易智能体的评测基准、做交易研究用的 MCP 服务器，或者能接 Alpaca 等券商的模拟盘智能体：这里都有，而且开源。</sub>
+<sub>如果你在找美股 AI 交易机器人、带历史新闻又不偷看未来的回测工具、按时间点记录的 2020、2022、2026 年价格、VIX 和新闻数据、LLM 交易智能体的评测基准和榜单、做交易研究用的 MCP 服务器，或者能接 Alpaca 等券商的模拟盘智能体：这里都有，而且开源。</sub>
 
 ---
 
 ## 目录
 
 - [🚀 快速开始](#-快速开始) · [这个项目适合你吗？](#这个项目适合你吗) · [🆕 新功能](#-新功能) · [💡 设计思路](#-设计思路) · [四种用法](#四种用法)
-- [✨ 功能导览](#-功能导览)：[工作原理](#-工作原理) · [新闻交叉验证](#-新闻交叉验证) · [模拟盘智能体](#-模拟盘智能体) · [MCP 服务器](#-mcp-服务器) · [策略实验室](#-策略实验室) · [研究工具箱](#-研究工具箱) · [回测](#-回测) · [策略库](#-策略库) · [写你自己的策略](#-写你自己的策略)
+- [✨ 功能导览](#-功能导览)：[工作原理](#-工作原理) · [新闻交叉验证](#-新闻交叉验证) · [模拟盘智能体](#-模拟盘智能体) · [MCP 服务器](#-mcp-服务器) · [策略实验室](#-策略实验室) · [LLM 榜单](#-llm-交易智能体榜单) · [研究工具箱](#-研究工具箱) · [回测](#-回测) · [策略库](#-策略库) · [写你自己的策略](#-写你自己的策略)
 - [📸 截图一览](#-截图一览) · [🔌 支持的券商](#-支持的券商) · [🔒 安全机制](#-安全机制) · [🔧 配置](#-配置) · [🧰 内部结构](#-内部结构)：[命令一览](#-命令一览) · [目录结构](#-目录结构)
 - [❓ 常见问题](#-常见问题) · [🧭 后续计划](#-后续计划) · [🤝 参与贡献](#-参与贡献) · [📝 引用](#-引用) · [❗ 免责声明](#-免责声明) · [📜 开源协议](#-开源协议)
 
@@ -228,6 +232,10 @@ riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex�
 > 写一个策略：上升趋势里连跌两天、最近新闻偏正面时买入，持有 10 天或涨 8% 卖出。用 2026 年的 tech 股票池带新闻回测。
 
 `save_as` 把好用的策略保存下来，之后看板里能看到，也能当模拟盘智能体每天跑。从别处拿到的代码，用 `riskaware lab my_strategy.py --preset tech` 做同样的检查和回测。详见 [docs/zh/strategy-lab.md](docs/zh/strategy-lab.md)。
+
+### 🏆 LLM 交易智能体榜单
+
+[**rta-bench-1**](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html) 让各家 LLM 在同一套规则下当交易智能体比拼：56 只大盘股，每 5 个交易日收盘后决策一次，分别跑 2026 年至今、2022 年熊市和 2020 年暴跌，每段都盲测一遍、实名一遍；新闻按发布的那一分钟回放，成交按真实成本算。模型的训练截止日决定哪些成绩算数：截止日之后的时段才排名，它可能记得的时段单列。榜单上每个模型都写清楚靠什么赚钱（市场和风格暴露还是选股、行业、持仓时长、新闻触发的交易），并给出记忆分，旁边放着五个规则策略、SPY 和等权组合作对照。每条成绩是一个 JSON 文件，里面有模型的全部回复，任何人都能不调用模型就重放出同样的数字；想加一个模型，运行 `riskaware research submit` 再开一个 PR 就行。详见 [docs/zh/leaderboard.md](docs/zh/leaderboard.md)。
 
 ### 🔬 研究工具箱
 
