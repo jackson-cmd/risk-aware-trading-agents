@@ -12,7 +12,7 @@ import pytest
 from riskaware.news import history
 from riskaware.research import agent
 from riskaware.research.data import bundled_market
-from riskaware.research.execution import MarginRules, PlainPlanner, margin_rules
+from riskaware.research.execution import PlainPlanner, margin_rules
 from riskaware.research.experiment import Experiment, reproduce_command, run_experiment
 from riskaware.strategy.base import PositionView, Strategy
 from riskaware.types import Action, Regime, Signal
