@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../assets/guide.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"新闻标题能预测股价吗？按时间点检验十个新闻因子","description":"用按时间点回放的新闻，在 2020、2022、2026 年检验 64 只美国大盘股的十个标题因子：秩 IC、五分组、衰减、价格因子对照，以及按日历日期和按发布时间对齐新闻的对比。","inLanguage":"zh-CN","datePublished":"2026-11-13","dateModified":"2026-11-13","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-factors.html","image":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/news_factors_cumulative_zh.png","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["新闻情绪因子","信息系数","未来函数","按时间点的数据","因子投资","新闻回测"],"isPartOf":{"@type":"WebSite","name":"风险感知交易智能体","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"新闻情绪能预测股票收益吗？","acceptedAnswer":{"@type":"Answer","text":"在这次检验里不能。2020、2022、2026 年的 64 只美国大盘股，收盘前发布的标题的词典情绪分，对次日开盘起算收益的 1 天秩 IC 只有 0.005（t = 0.6）；控制动量、反转和低波动之后，十个新闻因子没有一个站得住。"}},{"@type":"Question","name":"按日历日期对齐会把新闻因子虚增多少？","acceptedAnswer":{"@type":"Answer","text":"按日历日期对齐、用收盘到收盘的收益检验，同一个情绪因子的秩 IC 是 0.032（t = 3.4），多空价差每天 36.9 bp；按发布时间回放只有 0.005 和 7.4 bp。差距的三分之二，即 IC +0.018（t = 4.8），来自收盘后才发布、却被日历日期对齐提前读到的标题。"}},{"@type":"Question","name":"我能自己跑这个新闻因子检验吗？","acceptedAnswer":{"@type":"Answer","text":"能。用 pip install risk-aware-trading-agents 安装开源包，再运行 riskaware research factors。价格和新闻标题都在安装包里，不用下载，运行结果的全部数字、报告和图都写进一个文件夹。"}},{"@type":"Question","name":"能用语言模型给标题打分吗？","acceptedAnswer":{"@type":"Answer","text":"能：riskaware research factors --llm 用本地或付费模型给每条标题打 -1 到 1 分，也可以交给任何批量接口，每个分数都会缓存，并把 LLM 情绪因子加进同样的检验。用 gpt-5.6-luna 打分，它是这里最强的新闻因子，1 天秩 IC 0.021（t = 2.5），三年都为正，但会被动量、反转和低波动吸收。"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"新闻情绪能预测股票收益吗？","acceptedAnswer":{"@type":"Answer","text":"在这次检验里不能。2020、2022、2026 年的 64 只美国大盘股，收盘前发布的标题的词典情绪分，对次日开盘起算收益的 1 天秩 IC 只有 0.005（t = 0.6）；控制动量、反转和低波动之后，十个新闻因子没有一个站得住。"}},{"@type":"Question","name":"按日历日期对齐会把新闻因子虚增多少？","acceptedAnswer":{"@type":"Answer","text":"按日历日期对齐、用收盘到收盘的收益检验，同一个情绪因子的秩 IC 是 0.032（t = 3.4），多空价差每天 36.9 bp；按发布时间回放只有 0.005 和 7.4 bp。差距的三分之二，即 IC +0.018（t = 4.8），来自收盘后才发布、却被日历日期对齐提前读到的标题。"}},{"@type":"Question","name":"我能自己跑这个新闻因子检验吗？","acceptedAnswer":{"@type":"Answer","text":"有新闻标题就能。用 pip install risk-aware-trading-agents 安装开源包，再运行 riskaware research factors。价格随安装包提供；这些结论背后的标题有许可限制，不随包分发，所以需要你自己的新闻文件副本（放进 ~/.riskaware/data/news），或者按同样的规则自己建的新闻文件。运行结果的全部数字、报告和图都写进一个文件夹。"}},{"@type":"Question","name":"能用语言模型给标题打分吗？","acceptedAnswer":{"@type":"Answer","text":"能：riskaware research factors --llm 用本地或付费模型给每条标题打 -1 到 1 分，也可以交给任何批量接口，每个分数都会缓存，并把 LLM 情绪因子加进同样的检验。用 gpt-5.6-luna 打分，它是这里最强的新闻因子，1 天秩 IC 0.021（t = 2.5），三年都为正，但会被动量、反转和低波动吸收。"}}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/"},{"@type":"ListItem","position":2,"name":"新闻因子","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/news-factors.html"}]}</script>
 </head>
 <body>
@@ -33,7 +33,7 @@
 <main class="wrap">
 <p class="crumbs"><a href="../?lang=zh">首页</a> › 指南</p>
 <h1>新闻标题能预测股价吗？按时间点检验十个新闻因子</h1>
-<p class="lead">我们把风险感知交易智能体自带的新闻标题做成 64 只美国大盘股的十个每日新闻因子，每天只用收盘前已经发布的新闻，再用次日开盘起算的收益在 2020、2022、2026 年分别检验。结果没有一个站得住，连语言模型打的情绪分也不例外。如果像很多新闻回测那样按日历日期把新闻对齐到价格，标题情绪看起来就像一个真因子。</p>
+<p class="lead">我们把风险感知交易智能体研究时段背后 2020、2022、2026 年的新闻标题做成 64 只美国大盘股的十个每日新闻因子，每天只用收盘前已经发布的新闻，再用次日开盘起算的收益在 2020、2022、2026 年分别检验。结果没有一个站得住，连语言模型打的情绪分也不例外。如果像很多新闻回测那样按日历日期把新闻对齐到价格，标题情绪看起来就像一个真因子。标题有许可限制，不随包分发；结论公开。</p>
 <div class="cta">
   <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents">在 GitHub 上获取</a>
   <a class="btn" href="news-backtesting.html">用新闻回测</a>
@@ -114,7 +114,7 @@ riskaware research factors --llm             # 加一个由本地 LLM 打分的�
 <p>运行会把 <code>factors.json</code>（全部数字）、<code>factors.md</code>、本页的图和每日 IC 写进一个文件夹。加 <code>--llm</code> 时，你选的模型给每条标题打 -1 到 1 分，分数会缓存，每条只打一次；命令先打印 token 估计，付费模型开跑前会先问你。详见 <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/news-factors.md">docs/zh/news-factors.md</a>。</p>
 
 <h2>局限</h2>
-<p>这是 64 只美国最大的股票，报道多、定价快；新闻对小盘股可能更重要。新闻只有标题，来自一个来源（Benzinga），2026 年另有 SEC 8-K 文件。决策每天收盘后做一次，所以对标题更快的反应超出了日线能检验的范围。每个市场只有一年，时间短：IC 0.01 需要好几年才能和 0 分开。</p>
+<p>这是 64 只美国最大的股票，报道多、定价快；新闻对小盘股可能更重要。新闻只有标题，来自一个有许可的来源，2026 年另有 SEC 8-K 文件。决策每天收盘后做一次，所以对标题更快的反应超出了日线能检验的范围。每个市场只有一年，时间短：IC 0.01 需要好几年才能和 0 分开。</p>
 
 <h2>常见问题</h2>
 <h3>新闻情绪能预测股票收益吗？</h3>
@@ -122,7 +122,7 @@ riskaware research factors --llm             # 加一个由本地 LLM 打分的�
 <h3>按日历日期对齐会把新闻因子虚增多少？</h3>
 <p>对标题情绪，IC 从 0.005 变成 0.032，多空价差从每天 7.4 bp 变成 36.9 bp。差距的三分之二，即 IC +0.018（t = 4.8），来自收盘后才发布的标题。</p>
 <h3>我能自己跑这个新闻因子检验吗？</h3>
-<p>能。价格和新闻标题都在安装包里，所以 <code>riskaware research factors</code> 不用下载，也不用 API key。</p>
+<p>有新闻标题就能。价格随安装包提供；这些结论背后的标题有许可限制，不随包分发，所以 <code>riskaware research factors</code> 需要你把新闻文件的副本放进 <code>~/.riskaware/data/news</code>，或者按同样的规则用免费的 SEC 8-K 公告、你自己的新闻 API key 或任意 CSV 建自己的新闻文件。</p>
 <h3>能用语言模型给标题打分吗？</h3>
 <p>能。<code>--llm</code> 用本地 Ollama 模型免费给每条标题打分，或者在显示 token 估计后调用付费 API，并把 LLM 情绪因子加进同样的检验；也可以用 <code>--llm-export</code> 和 <code>--llm-import</code> 交给任何批量接口去打分。用 gpt-5.6-luna 打分，它是本页最强的新闻因子（1 天 IC 0.021，t = 2.5，三年都为正），但仍然会被价格因子吸收。2020 或 2022 年之后训练的模型可能知道后来发生了什么，所以它对那两年的打分不是盲的；luna 的 IC 在 2020 年最低，这让人稍微放心，但不是证明。</p>
 

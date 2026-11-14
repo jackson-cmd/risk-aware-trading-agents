@@ -2,20 +2,20 @@
 
 实盘里新闻是发生一条读一条。回测要还原每个交易日当时已经知道什么，所以每条新闻都必须有发布时间。没有发布时间的话，策略会在新闻出现之前就"看到"它，任何新闻策略的回测结果都会虚高。
 
-2026 年的新闻已经随安装包自带，这一年用 `riskaware backtest --news` 什么都不用下载。其他年份用 `riskaware news-history` 在你自己的电脑上建一个按时间存的新闻库，回测会把两者一起回放。
+`riskaware news-history` 在你自己的电脑上建一个按时间存的新闻库：SEC 8-K 公告免费，新闻 API 的标题用你自己的 key，也可以导入任意 CSV。回测按下面的规则回放它。本仓库的研究结论用的是 2020、2022 和 2026 年的新闻文件，这些有许可限制、不随包分发（[见下文](#研究用新闻文件不随包分发)）；同样的规则也能跑在你的新闻库上。
 
 ## 快速开始
 
 ```bash
-# 2026 年不用准备：标题随安装包自带
-riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset megacap --start 2026-01-02 --news --compare buy_and_hold
-
-# 其他年份：core 股票池 2018 年以来的 SEC 8-K 公告（免费；SEC 要求注明联系邮箱）
+# core 股票池 2018 年以来的 SEC 8-K 公告（免费；SEC 要求注明联系邮箱）
 riskaware news-history build --preset core --start 2018-01-01 --contact-email you@example.com
 
-# 可选：加入你自己的新闻来源
+# 加入你自己的新闻来源
 riskaware news-history build --symbols AAPL,NVDA --source benzinga      # 需要在 .env 里填 BENZINGA_API_KEY
 riskaware news-history import my_news.csv                                # 不带时区的时间按美东时间读
+
+# 回放新闻的回测
+riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset core --start 2026-01-02 --news --compare buy_and_hold
 
 # 看看新闻库里有什么，以及回测在某一天能看到什么
 riskaware news-history status
@@ -24,16 +24,24 @@ riskaware news-history show NVDA --date 2026-05-20
 
 看板的回测页打开 **回放新闻** 开关也可以。在 `riskaware.yaml` 里写一次 `data.contact_email`，以后就不用加 `--contact-email`。设置 `backtest.news: true`，每次回测都会回放新闻。
 
-## 安装包自带的新闻
+## 研究用新闻文件（不随包分发）
 
-`riskaware/news/data/news_2026.jsonl.gz`（0.7 MB）收了内置股票池（`core`、`megacap`、`tech`、`defensive`）里 64 只股票的 16,945 条新闻，时间从 2026 年 1 月 1 日到 11 月 11 日：
+研究用的几个时段（[docs/zh/research.md](research.md)）、榜单，以及文档和网站上所有涉及新闻的数字，都是用内置股票池（`core`、`megacap`、`tech`、`defensive`）64 只股票的三个新闻文件做出来的：
 
-- Benzinga 标题 16,249 条：只有标题、发布时间和股票代码，别的都没有（没有正文、摘要、链接和情绪分）。只有 Benzinga 给这条新闻标了这只股票、并且标题本身提到这家公司或代码时，才算这只股票的新闻。机器生成的数据汇总（"当年投 1000 美元现在值多少"、股息计算、期权异动、做空比例、市盈率汇总、电视节目荐股清单）没有收：它们只是复述价格，不是新闻。
-- SEC 8-K 公告 696 份，带 SEC 受理时间和公告链接。
+| 文件 | 条数 |
+|---|---|
+| `news_2020.jsonl.gz` | 19,618 条新闻标题，2020 全年 |
+| `news_2022.jsonl.gz` | 29,300 条新闻标题，2022 全年 |
+| `news_2026.jsonl.gz` | 16,945 条，2026 年 1 月 1 日到 11 月 11 日：新闻标题 16,249 条，SEC 8-K 公告 696 份 |
 
-回测会把它和你自己的新闻库一起读；两边有同一条时以你的为准，`remove` 只删你自己的。不想用的话设置 `news.bundled: false`。`scripts/build_news_bundle.py` 可以从一个新闻库重新生成这个文件。
+- 一条标题新闻只有标题、发布时间和股票代码，别的都没有（没有正文、摘要、链接和情绪分）。只有新闻源给这条新闻标了这只股票、并且标题本身提到这家公司或代码时，才算这只股票的新闻。机器生成的数据汇总（"当年投 1000 美元现在值多少"、股息计算、期权异动、做空比例、市盈率汇总、电视节目荐股清单）没有收：它们只是复述价格，不是新闻。
+- 一条 SEC 新闻是一份 8-K 公告，带 SEC 受理时间和公告链接。
 
-**更多历史数据。** 我们手里的新闻库大得多，2011 到 2026 年约 320 万条 Benzinga 标题，放不进安装包，所以只带了内置股票池的 2026 年。如果你需要更多年份或更多股票，欢迎开 issue，我们再看怎么提供，比如做成单独下载。
+**标题数据有许可限制，所以这些文件不随包分发。** 0.7.2 及以前的版本把 2026 年的文件放在安装包里；现在安装包、代码仓库和 Hugging Face 数据集里都已经去掉，结论和数字照样公开。每个时段的 manifest 记着新闻文件的 SHA-256，有副本的人可以核对是不是同一份数据：`riskaware research data` 会显示 `OK`、`changed` 或"不随包分发"。
+
+**代码去哪里找副本**，按顺序：环境变量 `RISKAWARE_NEWS_DIR` 指定的文件夹、`~/.riskaware/data/news/`、安装包自己的 `riskaware/news/data/`（兼容老安装）。回测会把副本和你自己的新闻库一起读；两边有同一条时以你的为准，`remove` 只删你自己的。不想用的话设置 `news.bundled: false`。没有副本也不会出错：开着新闻的研究实验照样跑，只是看不到这些标题，并在 notes 和 manifest 里写明；基准测试会在调用模型之前停下。
+
+**按同样的规则自己建。** 用 `riskaware news-history build`（SEC 8-K 公告，免费）、新闻 API（你自己的 key，见[新闻来源](#新闻来源)）或 `riskaware news-history import`（任意 CSV）建好新闻库，再用 `scripts/build_news_bundle.py --archive ~/.riskaware/news --feed FEED --source-name NAME --start 2026-01-01 --end 2026-11-11 --out ~/.riskaware/data/news/news_2026.jsonl.gz`（`--feed` 填你新闻库里标题来源的名字） 切出一个时段的文件。规则相同：只要标题、相关性过滤、发布时间、交叉验证。来源不同的文件对不上 manifest 里的 SHA-256，用它算出来的数字也会和已发布的不一样。
 
 ## 回测怎么防止偷看未来
 
@@ -95,7 +103,7 @@ Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或�
 
 - 位置：`~/.riskaware/news/`（配置里的 `news.archive_dir`；跟随 `RISKAWARE_HOME`）。
 - 每只股票一个 JSON Lines 文件，按时间排序，按来源、链接和时间去重。再次运行 `build` 只会加新的新闻。
-- `riskaware news-history remove 代码 [--feed sec|benzinga|import]` 删除你自己的新闻。自带的 2026 年新闻只读；`status` 在"自带"一列里单独计数。
+- `riskaware news-history remove 代码 [--feed sec|benzinga|import]` 删除你自己的新闻。研究用新闻文件只读；`status` 在"来自新闻文件"一列里单独计数。
 
 ## 写一个用新闻的策略
 

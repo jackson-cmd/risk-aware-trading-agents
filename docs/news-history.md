@@ -2,20 +2,20 @@
 
 Live trading reads news as it is published. A backtest has to replay what was known on each past day, and that needs the publication time of every item. Without it, a strategy can "see" a headline before it existed, which makes any news strategy look better than it is.
 
-News for 2026 ships with the package, so `riskaware backtest --news` works for that year with nothing to download. For other years, `riskaware news-history` builds a point-in-time archive on your own machine, and the backtest replays both.
+`riskaware news-history` builds a point-in-time archive on your own machine: SEC 8-K filings for free, headlines from a news API with your own key, or any CSV. The backtest replays it under the rules below. The research results in this repository were made with headline files for 2020, 2022 and 2026 that are licensed and not distributed ([below](#the-research-headline-files-not-distributed)); the same rules run on your archive.
 
 ## Quick start
 
 ```bash
-# 2026 needs no setup: the headlines ship with the package
-riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset megacap --start 2026-01-02 --news --compare buy_and_hold
-
-# other years: SEC 8-K filings for the core universe since 2018 (free; SEC asks for a contact email)
+# SEC 8-K filings for the core universe since 2018 (free; SEC asks for a contact email)
 riskaware news-history build --preset core --start 2018-01-01 --contact-email you@example.com
 
-# optional: more news from your own sources
+# more news from your own sources
 riskaware news-history build --symbols AAPL,NVDA --source benzinga      # needs BENZINGA_API_KEY in .env
 riskaware news-history import my_news.csv                                # times without a zone count as New York time
+
+# a backtest that replays it
+riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset core --start 2026-01-02 --news --compare buy_and_hold
 
 # check what is there, and what a backtest would see on a given day
 riskaware news-history status
@@ -24,16 +24,24 @@ riskaware news-history show NVDA --date 2026-05-20
 
 On the dashboard, turn on **Replay news** on the Backtest page. Put `data.contact_email` in `riskaware.yaml` once and you can drop `--contact-email`. Set `backtest.news: true` to replay news in every backtest.
 
-## What ships with the package
+## The research headline files (not distributed)
 
-`riskaware/news/data/news_2026.jsonl.gz` (0.7 MB) holds 16,945 items for the 64 stocks of the built-in watchlists (`core`, `megacap`, `tech`, `defensive`), from January 1 to November 11, 2026:
+The research periods ([docs/research.md](research.md)), the leaderboard and every number in the docs and on the website that involves news were made with three headline files for the 64 stocks of the built-in watchlists (`core`, `megacap`, `tech`, `defensive`):
 
-- 16,249 Benzinga headlines: the title, the publication time and the ticker, nothing else (no article text, teaser, link or sentiment). A headline is kept for a stock only when Benzinga tagged the stock and the headline itself names the company or its ticker. Automated recaps (what an investment would be worth today, dividend calculators, options-flow, short-interest and P/E summaries, TV pick lists) are left out: they repeat prices instead of reporting news.
-- 696 SEC 8-K filings with SEC's acceptance time and the link to the filing.
+| File | Items |
+|---|---|
+| `news_2020.jsonl.gz` | 19,618 headlines, the whole of 2020 |
+| `news_2022.jsonl.gz` | 29,300 headlines, the whole of 2022 |
+| `news_2026.jsonl.gz` | 16,945 items, January 1 to November 11, 2026: 16,249 headlines and 696 SEC 8-K filings |
 
-Backtests read it together with your own archive; when both hold the same item, yours wins, and `remove` only deletes your items. Set `news.bundled: false` to leave it out. `scripts/build_news_bundle.py` rebuilds the file from an archive.
+- A headline item is the title, the publication time and the ticker, nothing else (no article text, teaser, link or sentiment). A headline is kept for a stock only when the feed tagged the stock and the headline itself names the company or its ticker. Automated recaps (what an investment would be worth today, dividend calculators, options-flow, short-interest and P/E summaries, TV pick lists) are left out: they repeat prices instead of reporting news.
+- An SEC item is an 8-K filing with SEC's acceptance time and the link to the filing.
 
-**More history.** We keep a much larger archive, about 3.2 million Benzinga headlines from 2011 to 2026. It is far too big to ship in the package, so the package carries 2026 for the built-in watchlists. If you need more years or more stocks, open an issue and we will look at how to provide them, for example as a separate download.
+**The headlines are licensed, so the files are not distributed.** Versions up to 0.7.2 shipped the 2026 file inside the package; it is gone from the package, the repository and the Hugging Face dataset now, and the conclusions and numbers stay published. Each period's manifest keeps the SHA-256 of its headline file, so whoever has a copy can check that it is the same data: `riskaware research data` says `OK`, `changed` or `not distributed`.
+
+**Where the code looks for a copy**, in this order: the folder in `RISKAWARE_NEWS_DIR`, then `~/.riskaware/data/news/`, then the package's own `riskaware/news/data/` (for an older install). Backtests read a copy together with your own archive; when both hold the same item, yours wins, and `remove` only deletes your items. Set `news.bundled: false` to leave the files out. Without a copy, nothing breaks: research experiments with news on run without these headlines and say so in their notes and manifest, and a benchmark run stops before it calls a model.
+
+**Building your own, under the same rules.** Fill an archive with `riskaware news-history build` (SEC 8-K filings, free), a news API with your own key ([Sources](#sources)) or `riskaware news-history import` (any CSV), then cut a period's file from it with `scripts/build_news_bundle.py --archive ~/.riskaware/news --feed FEED --source-name NAME --start 2026-01-01 --end 2026-11-11 --out ~/.riskaware/data/news/news_2026.jsonl.gz` (`--feed` is the headline feed of your archive). The same rules apply: titles only, the relevance filter, publication times, the cross-check. A file built from other sources will not match the manifest's SHA-256, and numbers made with it will differ from the published ones.
 
 ## How the backtest avoids look-ahead
 
@@ -95,7 +103,7 @@ Backtests apply the same relevance filter as live trading: a story counts toward
 
 - Location: `~/.riskaware/news/` (`news.archive_dir` in the config; follows `RISKAWARE_HOME`).
 - One JSON Lines file per symbol, sorted by time, de-duplicated by source, link and time. Running `build` again only adds new items.
-- `riskaware news-history remove SYMBOL [--feed sec|benzinga|import]` deletes your items. The bundled 2026 items are read-only; `status` counts them in the Bundled column.
+- `riskaware news-history remove SYMBOL [--feed sec|benzinga|import]` deletes your items. The research headline files are read-only; `status` counts their items in the From files column.
 
 ## Writing a strategy that uses news
 

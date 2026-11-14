@@ -2,7 +2,9 @@
 
 [中文](zh/news-factors.md)
 
-`riskaware research factors` turns the headlines that ship with the package into ten daily news factors for 64 large US stocks, plus an eleventh from a language model's reading of each headline, using only what was published before each day's close, and tests them against returns from the next open in three very different markets: 2020 (the COVID crash), 2022 (the rate-hike bear market) and 2026 (a rising market). It then computes the same factors the way many news backtests do, joined to prices by calendar date, and measures how much that shortcut inflates them.
+`riskaware research factors` turns the research periods' headlines into ten daily news factors for 64 large US stocks, plus an eleventh from a language model's reading of each headline, using only what was published before each day's close, and tests them against returns from the next open in three very different markets: 2020 (the COVID crash), 2022 (the rate-hike bear market) and 2026 (a rising market). It then computes the same factors the way many news backtests do, joined to prices by calendar date, and measures how much that shortcut inflates them.
+
+The findings below were made with the 2020, 2022 and 2026 headline files (headline titles; for 2026 also SEC 8-K filings). The headlines are licensed, so the files are not distributed; each period's manifest keeps their SHA-256. To run the study, put your copy in `~/.riskaware/data/news` (or the folder named by `RISKAWARE_NEWS_DIR`), or build headline files of your own under the same rules from the free SEC 8-K filings, a news API key of your own or any CSV ([how](news-history.md#the-research-headline-files-not-distributed)); without them the command stops and says so.
 
 **What we found**
 
@@ -138,13 +140,13 @@ The calendar join puts a headline published at 16:05 on the row of that day's 16
 
 The calendar join with next-open returns does not leak (the evening's news is out before the next open) and it is no better than the honest replay, which is the point: the shortcut's IC is the overnight move that follows after-close news, collected by a trade that starts before it.
 
-A calendar-date join moves 13% of the 2026 Benzinga headlines and 62.5% of the 2026 8-K filings (companies report after the close) to an earlier trading day than their publication time allows; 10% of the headlines in 2022 and 11% in 2020. For a simpler demonstration with one headline rule, see `examples/news_timing.py` and the [news backtesting guide](https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html).
+A calendar-date join moves 13% of the 2026 headlines and 62.5% of the 2026 8-K filings (companies report after the close) to an earlier trading day than their publication time allows; 10% of the headlines in 2022 and 11% in 2020. For a simpler demonstration with one headline rule, see `examples/news_timing.py` and the [news backtesting guide](https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html).
 
 ## An LLM sentiment factor
 
 `--llm` adds an eleventh factor: the mean score from -1 to 1 that a language model gives each headline. The default is `ollama:llama3.2:3b`, which runs on your own computer for free (`ollama pull llama3.2:3b`); `--llm-model` takes any model the package can call (`openai:...`, `anthropic:...`, `compat:...`).
 
-- Before scoring, the command prints how many headlines are not scored yet, the number of calls and an estimate of input and output tokens; a paid model asks before it starts (`--yes` skips the question). The bundled files hold 62,722 distinct headlines (15,541 in 2026), about 2.0 million input and 0.3 million output tokens in batches of 25.
+- Before scoring, the command prints how many headlines are not scored yet, the number of calls and an estimate of input and output tokens; a paid model asks before it starts (`--yes` skips the question). The three research headline files hold 62,722 distinct headlines (15,541 in 2026), about 2.0 million input and 0.3 million output tokens in batches of 25.
 - Scores are cached in `~/.riskaware/research/headline_scores/<model>.jsonl`, one line per headline and prompt version, so each headline is scored once; an interrupted run goes on where it stopped (`--llm-limit` scores a few at a time).
 - To score through a batch API or a job queue instead, `--llm-export requests.jsonl` writes one request per 40 headlines without a score (`key`, `system`, `prompt`, `max_tokens`, and `meta` with the headline keys) and stops: 1,569 requests for the three periods, about 1.9 million input and 0.26 million output tokens. Run them with any tool that returns each reply as `text` together with the request's `meta`; `--llm-import results.jsonl` then caches the scores and runs the study with them, calling no model.
 - The prompt asks the model to judge the headline alone and to ignore what happened afterwards, but a model trained after 2020 or 2022 may still know. llama3.2's training data ends in 2023, so its 2026 scores cannot know the outcome; compare periods with that in mind.
@@ -155,7 +157,7 @@ A calendar-date join moves 13% of the 2026 Benzinga headlines and 62.5% of the 2
 ## Limits
 
 - 64 of the largest US stocks: heavily covered and quickly priced. News factors may do better on small caps, where this data has nothing to say.
-- Headlines only, from one feed (Benzinga), plus 8-K filings in 2026. No article text, no social media, no analyst data.
+- Headlines only, from one licensed feed, plus 8-K filings in 2026. No article text, no social media, no analyst data.
 - One decision a day at the close. Faster reactions to news (minutes after a headline) are outside what daily bars can test.
 - A year per period is short: an IC of 0.01 needs several years to separate from zero.
 

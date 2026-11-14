@@ -59,7 +59,7 @@
    "decisions.csv": "68c3c5c4f61f0aba4b1645221870dc77b4745f3c5ed008580205996e71e5ea5f",
    "policy_log.json": "d15baf38840ebe0c2bd8e240f017332e5fbcd6c42066b4c56b25cd080e69e76e"
   },
-  "replies_sha256": "3fb071cc6496956d249b10553cd637ad7a35cae30809445a225bf3de9f69cc13",
+  "replies_sha256": "57109825d5b719c5d1bb7c67bcdd19af91cb418169350333916b5006e0422ad9",
   "observations_sha256": "f88c5bd44a600192b4aacd14b4ccf2aae4340bf8ea4025072c4282d1ddc7912a",
   "costs_seen_by_model": "realistic",
   "rescored_from": null
@@ -1063,74 +1063,63 @@
      "symbol": "S05",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong risk-on momentum across 1d, 5d, and 21d with price above key moving averages."
+     "fraction": 0
     },
     {
      "symbol": "S07",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive trend alignment and strong 21-day momentum; diversified technology exposure."
+     "fraction": 0
     },
     {
      "symbol": "S13",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive short-term momentum and supportive multi-source but unconfirmed news; position sized conservatively."
+     "fraction": 0
     },
     {
      "symbol": "S17",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong trend, near 52-week high, and favorable industrials momentum."
+     "fraction": 0
     },
     {
      "symbol": "S22",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Consistent positive momentum, near 52-week high, and suitable risk-on exposure."
+     "fraction": 0
     },
     {
      "symbol": "S24",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive financials trend with strong breadth and price near 52-week high."
+     "fraction": 0
     },
     {
      "symbol": "S28",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Balanced industrials momentum with price near highs and less extreme RSI than leaders."
+     "fraction": 0
     },
     {
      "symbol": "S33",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong financials momentum, improving volume, and price near 52-week high."
+     "fraction": 0
     },
     {
      "symbol": "S35",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive technology trend and momentum with price near 52-week high."
+     "fraction": 0
     },
     {
      "symbol": "S50",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive health-care momentum and trend alignment, adding sector diversification."
+     "fraction": 0
     }
-   ],
-   "note": "Initiating a diversified 10-stock, equal-weight portfolio for the risk-on regime; avoiding the most overextended names and treating headlines as non-confirmatory."
+   ]
   },
   {
    "orders": [
@@ -1138,39 +1127,33 @@
      "symbol": "S35",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Strong 4-day gain with extreme RSI and near-high price; trim ahead of NFP risk."
+     "fraction": 0.5
     },
     {
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Extended momentum and very high short-term RSI; modest profit-taking."
+     "fraction": 0.25
     },
     {
      "symbol": "S24",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Extended short-term RSI after gains; reduce event-risk exposure."
+     "fraction": 0.25
     },
     {
      "symbol": "S13",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Weak recent momentum and negative holding return; reduce lagging exposure."
+     "fraction": 0.25
     },
     {
      "symbol": "S17",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Negative recent momentum and holding return; trim ahead of macro event."
+     "fraction": 0.25
     }
-   ],
-   "note": "Maintain a diversified long book; trim the most extended winners and weakest laggards while retaining cash for NFP uncertainty."
+   ]
   },
   {
    "orders": [
@@ -1178,32 +1161,27 @@
      "symbol": "S13",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak 21-day momentum and lagging current position; rotate capital in a risk-on regime."
+     "fraction": 1
     },
     {
      "symbol": "S17",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming held position despite broad risk-on conditions; replace with stronger momentum."
+     "fraction": 1
     },
     {
      "symbol": "S56",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive confirmed earnings-related news and strong momentum; add as a replacement holding."
+     "fraction": 0
     },
     {
      "symbol": "S30",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive momentum, improving trend, and supportive analyst/news flow; add as a replacement holding."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain a diversified 10-position portfolio while rotating out of laggards; avoid chasing the most overbought names."
+   ]
   },
   {
    "orders": [
@@ -1211,60 +1189,51 @@
      "symbol": "S50",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Persistent severe downtrend and high-volume weakness despite oversold readings."
+     "fraction": 1
     },
     {
      "symbol": "S22",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Persistent negative momentum with substantial drawdown and no supporting catalyst."
+     "fraction": 1
     },
     {
      "symbol": "S05",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Negative short- and medium-term momentum; redeploy capital toward stronger trends."
+     "fraction": 1
     },
     {
      "symbol": "S56",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak recent momentum and oversold short-term action; exit to reduce portfolio drag."
+     "fraction": 1
     },
     {
      "symbol": "S34",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strongly oversold after high-volume decline, with long-term trend still above the 200-day average."
+     "fraction": 0
     },
     {
      "symbol": "S16",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive medium-term trend, above key moving averages, and relatively resilient industrial momentum."
+     "fraction": 0
     },
     {
      "symbol": "S36",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive trend across moving averages with moderate volatility and oversold short-term RSI."
+     "fraction": 0
     },
     {
      "symbol": "S12",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong long-term uptrend and positive medium-term momentum; pullback offers entry."
+     "fraction": 0
     }
-   ],
-   "note": "Risk-on breadth and SPY trend support maintaining exposure, while rotating out of persistent losers into oversold or stronger-trend candidates."
+   ]
   },
   {
    "orders": [
@@ -1272,50 +1241,42 @@
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak momentum with persistent losses and deeply oversold short-term conditions; reduce downside exposure."
+     "fraction": 1
     },
     {
      "symbol": "S34",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Persistent downtrend and negative holding return despite oversold readings; exit rather than average down."
+     "fraction": 1
     },
     {
      "symbol": "S30",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Strong recent surge with RSI2 near 100 and unusually high volume; take partial profits."
+     "fraction": 0.5
     },
     {
      "symbol": "S19",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Extremely extended rally, RSI14 above 84 and RSI2 near 99; trim concentrated reversal risk."
+     "fraction": 0.5
     },
     {
      "symbol": "S09",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive medium-term trend, above key EMAs, and relatively defensive health-care exposure."
+     "fraction": 0
     },
     {
      "symbol": "S10",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong trend and defensive staples characteristics; favorable momentum with manageable volatility."
+     "fraction": 0
     }
-   ],
-   "note": "Uncertain regime and elevated breadth weakness favor trimming extreme winners, exiting weak holdings, and modestly reallocating toward defensive leaders while retaining cash."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold current diversified portfolio; risk-on regime and strong breadth support staying invested, while several holdings are extended and unconfirmed headlines do not justify turnover."
+   "orders": []
   },
   {
    "orders": [
@@ -1323,53 +1284,45 @@
      "symbol": "S09",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak five-day momentum and extremely oversold short-term reading; rotate capital while retaining risk-on exposure elsewhere."
+     "fraction": 1
     },
     {
      "symbol": "S36",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "SEC investigation headline is a material idiosyncratic risk despite otherwise neutral technicals."
+     "fraction": 1
     },
     {
      "symbol": "S10",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Strong trend but overbought RSI and near 52-week high; trim concentration and lock in gains."
+     "fraction": 0.5
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Large gain and extended trend; recent stake-reduction headlines justify partial profit-taking."
+     "fraction": 0.5
     },
     {
      "symbol": "S24",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Near 52-week high with very overbought short-term RSI; reduce after strong run."
+     "fraction": 0.5
     },
     {
      "symbol": "S33",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Near 52-week high and highly overbought; trim gains while maintaining exposure."
+     "fraction": 0.5
     },
     {
      "symbol": "S55",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strongest momentum and positive earnings-related analyst revisions, supported by unusually high volume; size modestly due to overbought conditions."
+     "fraction": 0
     }
-   ],
-   "note": "Risk-on breadth supports staying invested, but trim crowded overbought winners and exit the investigation-flagged holding. Proceeds can fund S55 while preserving cash flexibility."
+   ]
   },
   {
    "orders": [
@@ -1377,32 +1330,27 @@
      "symbol": "S55",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim high-volatility position after sharp decline while market risk is elevated."
+     "fraction": 0.5
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Reduce volatile technology exposure after a weak five-day trend."
+     "fraction": 0.25
     },
     {
      "symbol": "S34",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Add relatively strong healthcare exposure with positive medium-term momentum."
+     "fraction": 0
     },
     {
      "symbol": "S42",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Add defensive utilities with strong trend and lower volatility."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash in an uncertain, risk-off market; rotate modestly toward defensive strength."
+   ]
   },
   {
    "orders": [
@@ -1410,46 +1358,39 @@
      "symbol": "S28",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Severe relative weakness with deeply oversold momentum and persistent downtrend in a risk-off regime."
+     "fraction": 1
     },
     {
      "symbol": "S34",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Unconfirmed but material negative clinical headline; reduce event risk ahead of FOMC."
+     "fraction": 1
     },
     {
      "symbol": "S10",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim weaker existing holding while preserving defensive exposure; risk-off conditions favor higher cash."
+     "fraction": 0.5
     },
     {
      "symbol": "S16",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Reduce volatile industrial exposure with poor medium-term momentum ahead of macro risk."
+     "fraction": 0.5
     },
     {
      "symbol": "S46",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strongest defensive rebound, positive upgrade headline, and high-volume confirmation."
+     "fraction": 0
     },
     {
      "symbol": "S42",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Utilities provide defensive exposure with positive trend alignment despite elevated market risk."
+     "fraction": 0
     }
-   ],
-   "note": "Raise cash and rotate away from weak or event-risk positions; avoid aggressive deployment before FOMC."
+   ]
   },
   {
    "orders": [
@@ -1457,53 +1398,45 @@
      "symbol": "S16",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Exit weakest holding in severe risk-off conditions; deeply below long-term trend with persistent momentum deterioration."
+     "fraction": 1
     },
     {
      "symbol": "S33",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Reduce financial-sector downside exposure; weak trend and continued broad-market stress."
+     "fraction": 1
     },
     {
      "symbol": "S35",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Exit weak technology holding; materially below moving averages and oversold momentum is not yet stabilizing."
+     "fraction": 1
     },
     {
      "symbol": "S10",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Trim weaker defensive holding to preserve cash; persistent negative trend despite defensive sector."
+     "fraction": 1
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Reduce technology concentration while volatility and downside breadth remain extreme."
+     "fraction": 1
     },
     {
      "symbol": "S24",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Exit weak financial exposure in a high-risk regime; trend remains decisively negative."
+     "fraction": 1
     },
     {
      "symbol": "S30",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Remove discretionary exposure amid severe risk-off conditions and continued negative momentum."
+     "fraction": 1
     }
-   ],
-   "note": "Raise cash materially in an extreme risk-off regime; retain the relatively stronger utility and staples positions plus recently added holdings pending stabilization."
+   ]
   },
   {
    "orders": [
@@ -1511,29 +1444,24 @@
      "symbol": "S42",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Extreme risk-off regime and persistent downtrend; exit weakest utility holding."
+     "fraction": 1
     },
     {
      "symbol": "S55",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Technology position remains in a sharp downtrend with high volatility; preserve cash ahead of FOMC."
+     "fraction": 1
     },
     {
      "symbol": "S46",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Retain a smaller defensive staples allocation while reducing exposure during extreme volatility."
+     "fraction": 0
     }
-   ],
-   "note": "Remain predominantly in cash; VIX is exceptionally elevated, breadth is zero, and FOMC risk argues against initiating new equity positions."
+   ]
   },
   {
-   "orders": [],
-   "note": "Risk-off conditions are extreme with collapsing breadth and elevated volatility; preserve the 91.7% cash position and avoid adding exposure."
+   "orders": []
   },
   {
    "orders": [
@@ -1541,23 +1469,18 @@
      "symbol": "S46",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Maintain a modest defensive staples allocation; broad risk-off conditions argue against adding."
+     "fraction": 0
     }
-   ],
-   "note": "Remain mostly in cash during extreme risk-off conditions; no new equity exposure."
+   ]
   },
   {
-   "orders": [],
-   "note": "Remain defensive in severe risk-off conditions with 91.5% cash; hold the existing diversified staples position and avoid chasing one-day rebounds."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility and weak breadth; retain cash and existing defensive S46 position rather than chase broadly overbought rebounds."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility and weak breadth; preserve cash and avoid adding exposure at the next open."
+   "orders": []
   },
   {
    "orders": [
@@ -1565,32 +1488,27 @@
      "symbol": "S46",
      "action": "target",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Reduce existing exposure modestly in a risk-off regime ahead of FOMC; retain defensive diversification."
+     "fraction": 0
     },
     {
      "symbol": "S09",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong uptrend above major moving averages with a short-term pullback and defensive health-care exposure."
+     "fraction": 0
     },
     {
      "symbol": "S11",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Defensive staples profile, strong long-term trend, and short-term oversold condition."
+     "fraction": 0
     },
     {
      "symbol": "S42",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Utilities provide defensive exposure; price remains near trend support with subdued momentum."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash because breadth is weak, volatility is elevated, SPY trend is down, and FOMC risk is near."
+   ]
   },
   {
    "orders": [
@@ -1598,39 +1516,33 @@
      "symbol": "S42",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Exit weak utility position in a risk-off regime; below short- and medium-term averages with persistent five-day weakness."
+     "fraction": 1
     },
     {
      "symbol": "S09",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim after a sharp rebound and very high short-term RSI; retain partial exposure to the strong healthcare trend."
+     "fraction": 0.5
     },
     {
      "symbol": "S11",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim an extended staples position after short-term strength while maintaining defensive exposure."
+     "fraction": 0.5
     },
     {
      "symbol": "S46",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim after short-term overbought conditions; keep the established defensive trend position."
+     "fraction": 0.5
     },
     {
      "symbol": "S34",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Add diversified healthcare exposure with strong trend, positive recent momentum, and supportive unconfirmed news flow."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash in the risk-off environment; rotate away from the weakest holding and modestly add healthcare while trimming overbought positions."
+   ]
   },
   {
    "orders": [
@@ -1638,37 +1550,30 @@
      "symbol": "S34",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim extended position after sharp rally; risk-off regime and RSI2 near 95."
+     "fraction": 0.5
     },
     {
      "symbol": "S11",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Reduce overbought defensive holding with RSI2 near 79 while preserving exposure."
+     "fraction": 0.5
     },
     {
      "symbol": "S09",
      "action": "target",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Maintain modest exposure to strong health-care momentum and favorable FDA-related catalyst."
+     "fraction": 0
     }
-   ],
-   "note": "Remain mostly in cash ahead of PPI amid elevated volatility, weak breadth, and a downtrending market."
+   ]
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with mixed breadth and elevated volatility; retain high cash and existing positions while avoiding unconfirmed headline-driven trades."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold cash: uncertain regime with elevated volatility and mixed breadth; existing positions are retained while avoiding chasing strongly overbought short-term rallies."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with elevated volatility and broadly overbought momentum; retain high cash and existing positions."
+   "orders": []
   },
   {
    "orders": [
@@ -1676,62 +1581,51 @@
      "symbol": "S09",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim after sharp one-day rebound and overbought RSI2; market risk and macro events argue for caution."
+     "fraction": 0.25
     },
     {
      "symbol": "S34",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Reduce an extended winner with RSI2 near 99 ahead of FOMC/PPI uncertainty."
+     "fraction": 0.35
     },
     {
      "symbol": "S11",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Weak 21-day trend and deeply oversold momentum; reduce lagging exposure while retaining a small position."
+     "fraction": 0.5
     },
     {
      "symbol": "S46",
      "action": "target",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Increase modestly toward a diversified defensive allocation; stable trend and low volatility."
+     "fraction": 0
     },
     {
      "symbol": "S23",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Positive medium-term trend, above key moving averages, and relatively balanced momentum for a new health-care allocation."
+     "fraction": 0
     },
     {
      "symbol": "S40",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Strong 21-day trend and positive technical structure; adds materials diversification without chasing extreme momentum."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash ahead of nearby FOMC/PPI in an uncertain, elevated-volatility regime; favor modest, diversified additions and trim overbought winners."
+   ]
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility; retain substantial cash and avoid chasing overbought leaders or acting on unconfirmed headlines."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility; retain substantial cash and avoid adding exposure without stronger confirmation."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold current positions and cash; risk-off regime, elevated volatility, and nearby NFP favor avoiding new exposure after a broad momentum run."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold current positions; uncertain regime, elevated volatility, and nearby PPI favor preserving cash while avoiding overbought entries."
+   "orders": []
   },
   {
    "orders": [
@@ -1739,46 +1633,39 @@
      "symbol": "S40",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Extended momentum with RSI14 76 and RSI2 99; trim concentration while market regime is uncertain."
+     "fraction": 0.5
     },
     {
      "symbol": "S46",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Near 52-week high with elevated RSI14; reduce an extended position."
+     "fraction": 0.35
     },
     {
      "symbol": "S11",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Strong recent run and overbought RSI readings; take partial profits."
+     "fraction": 0.35
     },
     {
      "symbol": "S12",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Short-term oversold RSI2 near 8 after a pullback, while longer-term trend remains positive."
+     "fraction": 0
     },
     {
      "symbol": "S43",
      "action": "buy",
      "weight": 0.07,
-     "fraction": 0,
-     "reason": "Deep short-term oversold RSI2 near 5 with positive longer-term trend; initiate a modest position."
+     "fraction": 0
     },
     {
      "symbol": "S31",
      "action": "buy",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Oversold short-term momentum and pullback toward EMA20, with price still above EMA200."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain a substantial cash buffer given elevated VIX and uncertain regime; rotate modestly toward oversold names and trim overextended holdings."
+   ]
   },
   {
    "orders": [
@@ -1786,50 +1673,42 @@
      "symbol": "S23",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim extended winner after sharp run; RSI14 76.6 and RSI2 90.0 near 52-week high."
+     "fraction": 0.5
     },
     {
      "symbol": "S40",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim extended position after 15.8% 21-day gain; RSI14 77.4 and RSI2 90.2."
+     "fraction": 0.5
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Reduce volatile technology exposure after 4.3% daily drop and elevated volume; retain core position."
+     "fraction": 0.25
     },
     {
      "symbol": "S43",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Reduce technology concentration after 3.0% daily decline and weak short-term momentum."
+     "fraction": 0.25
     },
     {
      "symbol": "S07",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Oversold pullback with RSI2 8.3, strong long-term trend, and supportive but unconfirmed analyst headlines."
+     "fraction": 0
     },
     {
      "symbol": "S14",
      "action": "buy",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Oversold technology pullback with RSI2 9.6 while remaining above EMA50 and EMA200."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain elevated cash in uncertain, high-VIX conditions; harvest stretched winners and add only modestly to oversold long-term uptrends."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold current positions; maintain elevated cash while the market regime is uncertain and several candidates are extended or facing event risk."
+   "orders": []
   },
   {
    "orders": [
@@ -1837,29 +1716,24 @@
      "symbol": "S46",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Very overbought with RSI14 79.6 and RSI2 99.3; trim gains ahead of NFP and elevated uncertainty."
+     "fraction": 0.5
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Strong recent run and near 52-week high; reduce concentration and event risk around unconfirmed TikTok reports."
+     "fraction": 0.35
     },
     {
      "symbol": "S31",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.3,
-     "reason": "Overbought short-term momentum with RSI2 near 90; take partial profit while retaining exposure."
+     "fraction": 0.3
     }
-   ],
-   "note": "Maintain substantial cash ahead of NFP; broad breadth and SPY trend are positive, but volatility and event risk argue against adding at extended levels."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold current positions; elevated cash and uncertain regime favor waiting for clearer signals."
+   "orders": []
   },
   {
    "orders": [
@@ -1867,60 +1741,51 @@
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim a strong technology winner after a sustained advance while market conditions remain uncertain."
+     "fraction": 0.25
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Reduce an extended, news-sensitive position after a sharp one-day rise and overbought short-term RSI."
+     "fraction": 0.25
     },
     {
      "symbol": "S31",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.3,
-     "reason": "Take partial profits at near-record highs with extremely overbought short-term momentum."
+     "fraction": 0.3
     },
     {
      "symbol": "S43",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.3,
-     "reason": "Take partial profits after a strong run and very high short-term RSI."
+     "fraction": 0.3
     },
     {
      "symbol": "S46",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim a profitable defensive holding that is near its 52-week high and short-term overbought."
+     "fraction": 0.25
     },
     {
      "symbol": "S06",
      "action": "buy",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Add modestly to a diversified industrial with deeply oversold short-term momentum and a longer-term uptrend."
+     "fraction": 0
     },
     {
      "symbol": "S10",
      "action": "buy",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Add modestly to consumer staples after oversold short-term readings, balancing concentrated growth exposure."
+     "fraction": 0
     },
     {
      "symbol": "S56",
      "action": "buy",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Add modestly to health care after an oversold pullback while maintaining a positive longer-term trend."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash given uncertain regime and elevated volatility; rotate a small amount from extended winners into oversold, diversified candidates."
+   ]
   },
   {
    "orders": [
@@ -1928,68 +1793,57 @@
      "symbol": "S11",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Extreme short-term overbought move with elevated volume; reduce concentrated event-driven exposure."
+     "fraction": 1
     },
     {
      "symbol": "S31",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Very overbought after a sharp run; lock in substantial gains and avoid momentum reversal risk."
+     "fraction": 1
     },
     {
      "symbol": "S07",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Maintain a modest core position; strong trend but elevated valuation and uncertain regime."
+     "fraction": 0
     },
     {
      "symbol": "S09",
      "action": "target",
      "weight": 0.03,
-     "fraction": 0,
-     "reason": "Weak medium-term momentum and negative holding return; trim while retaining limited defensive exposure."
+     "fraction": 0
     },
     {
      "symbol": "S34",
      "action": "target",
      "weight": 0.03,
-     "fraction": 0,
-     "reason": "Persistent weakness and below short-term averages warrant a smaller allocation."
+     "fraction": 0
     },
     {
      "symbol": "S21",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Strong uptrend near highs with relatively low volatility; add a measured defensive-growth position."
+     "fraction": 0
     },
     {
      "symbol": "S28",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Positive multi-week trend, near highs, and moderate momentum provide a cleaner entry than crowded leaders."
+     "fraction": 0
     },
     {
      "symbol": "S50",
      "action": "buy",
      "weight": 0.07,
-     "fraction": 0,
-     "reason": "Positive trend with manageable volatility and healthcare diversification."
+     "fraction": 0
     }
-   ],
-   "note": "Keep substantial cash in the uncertain, elevated-volatility regime; rotate away from exhausted winners and unconfirmed headline-driven trades."
+   ]
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility and NFP nearby; retain substantial cash and avoid adding exposure after broad market weakness."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with elevated volatility; retain substantial cash and avoid chasing overbought leaders or acting on unconfirmed headlines."
+   "orders": []
   },
   {
    "orders": [
@@ -1997,61 +1851,51 @@
      "symbol": "S21",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Exit on unconfirmed fraud and opioid-related legal allegations."
+     "fraction": 1
     },
     {
      "symbol": "S23",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Reduce concentrated downside after sharp multi-week deterioration and weak momentum."
+     "fraction": 1
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim persistent downtrend and elevated technology volatility despite oversold RSI."
+     "fraction": 0.5
     },
     {
      "symbol": "S07",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain modest core allocation; long-term trend and dividend news remain supportive."
+     "fraction": 0
     },
     {
      "symbol": "S28",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain strong trend exposure with relatively moderate volatility."
+     "fraction": 0
     },
     {
      "symbol": "S47",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Positive analyst revisions, strong long-term trend, and oversold short-term RSI."
+     "fraction": 0
     },
     {
      "symbol": "S49",
      "action": "buy",
      "weight": 0.07,
-     "fraction": 0,
-     "reason": "Positive medium-term trend, low volatility, and resilient relative performance."
+     "fraction": 0
     }
-   ],
-   "note": "Keep substantial cash ahead of OPEX in an uncertain regime; rotate away from flagged or deteriorating holdings toward stronger, lower-volatility setups."
+   ]
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with elevated volatility; retain substantial cash and existing diversified positions."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, elevated-volatility regime; retain substantial cash and current diversified positions."
+   "orders": []
   },
   {
    "orders": [
@@ -2059,39 +1903,33 @@
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim extended near 52-week high with RSI2 above 96."
+     "fraction": 0.25
     },
     {
      "symbol": "S47",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Take partial profits after sharp run; RSI14 73.7 and near 52-week high."
+     "fraction": 0.25
     },
     {
      "symbol": "S46",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Reduce overbought position at 52-week high; RSI2 98."
+     "fraction": 0.25
     },
     {
      "symbol": "S28",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.2,
-     "reason": "Trim position near 52-week high while market risk remains elevated."
+     "fraction": 0.2
     },
     {
      "symbol": "S34",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Exit weaker holding below short- and medium-term averages with negative 21-day return."
+     "fraction": 0.5
     }
-   ],
-   "note": "Maintain substantial cash in uncertain, elevated-volatility conditions; harvest gains from overextended holdings and remove the weakest position."
+   ]
   },
   {
    "orders": [
@@ -2099,46 +1937,39 @@
      "symbol": "S09",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak 5-day and 21-day momentum with position loss; reduce exposure despite oversold RSI2."
+     "fraction": 1
     },
     {
      "symbol": "S28",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Strong gain and near 52-week high with RSI2 overbought; trim concentration."
+     "fraction": 0.35
     },
     {
      "symbol": "S46",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.3,
-     "reason": "Large gain, near 52-week high, and overbought RSI14/RSI2; take partial profits."
+     "fraction": 0.3
     },
     {
      "symbol": "S50",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Positive clinical and regulatory news, improving relative sentiment, and modest valuation pullback."
+     "fraction": 0
     },
     {
      "symbol": "S31",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Strong 21-day momentum, above key moving averages, and short-term oversold RSI2."
+     "fraction": 0
     },
     {
      "symbol": "S44",
      "action": "buy",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Positive coverage, constructive trend above EMA20/50/200, and moderate RSI."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash given elevated VIX and uncertain regime; rotate from weaker or overextended holdings into selective pullback candidates."
+   ]
   },
   {
    "orders": [
@@ -2146,46 +1977,39 @@
      "symbol": "S28",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak momentum, negative news tone, and persistent breakdown below short-term averages."
+     "fraction": 1
     },
     {
      "symbol": "S50",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Position remains below key moving averages with negative 21-day trend; recent bounce is overbought."
+     "fraction": 1
     },
     {
      "symbol": "S07",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong trend and earnings-related support; maintain a modest core allocation."
+     "fraction": 0
     },
     {
      "symbol": "S12",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive trend and constructive analyst/news tone; increase from small existing position."
+     "fraction": 0
     },
     {
      "symbol": "S23",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong medium-term trend, above major averages, and relatively balanced momentum."
+     "fraction": 0
     },
     {
      "symbol": "S31",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive trend across medium-term measures with less extended momentum than leading candidates."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash in the uncertain, elevated-volatility regime; rotate away from deteriorating holdings and avoid chasing highly overbought names."
+   ]
   },
   {
    "orders": [
@@ -2193,60 +2017,51 @@
      "symbol": "S23",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Risk-off regime; position is down sharply with weak momentum and elevated volume."
+     "fraction": 1
     },
     {
      "symbol": "S31",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Risk-off regime; persistent weakness and high-volume decline warrant exiting."
+     "fraction": 1
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Reduce technology exposure amid broad risk-off conditions and continued negative momentum."
+     "fraction": 0.5
     },
     {
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim concentrated technology exposure despite relative strength, given elevated volatility."
+     "fraction": 0.5
     },
     {
      "symbol": "S34",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Take profit after sharp high-volume rebound while risk conditions remain unfavorable."
+     "fraction": 1
     },
     {
      "symbol": "S40",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Exit weaker cyclical exposure in a risk-off market."
+     "fraction": 1
     },
     {
      "symbol": "S42",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Add defensive utilities exposure; strong longer-term trend and deeply oversold short-term reading."
+     "fraction": 0
     },
     {
      "symbol": "S51",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Add defensive consumer staples exposure with relatively low volatility and positive long-term trend."
+     "fraction": 0
     }
-   ],
-   "note": "Raise cash and rotate modestly toward defensive sectors; avoid unconfirmed headlines."
+   ]
   },
   {
    "orders": [
@@ -2254,43 +2069,36 @@
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Strong run with RSI2 near 100 and near 52-week high; trim in uncertain, elevated-volatility regime."
+     "fraction": 0.5
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Extended after strong five-day advance; RSI2 near 100 warrants partial profit-taking."
+     "fraction": 0.5
     },
     {
      "symbol": "S46",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Near 52-week high with overbought RSI2; reduce concentration after substantial gain."
+     "fraction": 0.5
     },
     {
      "symbol": "S43",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim extended technology exposure after strong five-day move while retaining the position."
+     "fraction": 0.25
     },
     {
      "symbol": "S49",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Reduce a weaker financial position with negative 21-day return and limited trend confirmation."
+     "fraction": 0.25
     }
-   ],
-   "note": "Maintain substantial cash given uncertain regime and high VIX; take profits from overbought winners rather than add risk."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold current positions; market regime is uncertain and existing cash provides substantial risk control. Avoid chasing overbought momentum names or acting on unconfirmed headlines."
+   "orders": []
   },
   {
    "orders": [
@@ -2298,46 +2106,39 @@
      "symbol": "S51",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weakening trend with negative 5-day and 21-day returns; free cash for stronger setups."
+     "fraction": 1
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Below 20-day and 50-day averages with persistent short-term weakness."
+     "fraction": 1
     },
     {
      "symbol": "S47",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Strong gain and near 52-week high with very elevated RSI2; trim overbought exposure."
+     "fraction": 0.35
     },
     {
      "symbol": "S42",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain diversified defensive exposure; trend remains above 50-day and 200-day averages."
+     "fraction": 0
     },
     {
      "symbol": "S09",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive momentum and favorable catalyst, while portfolio has room for a new position."
+     "fraction": 0
     },
     {
      "symbol": "S21",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Oversold short-term reading, improving legal outlook, and trial progress provide a contrarian setup."
+     "fraction": 0
     }
-   ],
-   "note": "Keep substantial cash given uncertain regime and elevated volatility; favor diversified, liquid setups and avoid unconfirmed headline-driven trades."
+   ]
   },
   {
    "orders": [
@@ -2345,46 +2146,39 @@
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Strong gain with RSI2 overbought; trim concentration while market regime is uncertain."
+     "fraction": 0.5
     },
     {
      "symbol": "S46",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Large gain and extremely overbought RSI2 near a 52-week high; take partial profits."
+     "fraction": 0.5
     },
     {
      "symbol": "S43",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Position is sharply overbought on RSI2; reduce exposure after gains."
+     "fraction": 0.5
     },
     {
      "symbol": "S42",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak momentum, negative short- and medium-term returns, and below EMA20; exit lagging position."
+     "fraction": 1
     },
     {
      "symbol": "S35",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Oversold RSI2 after a sharp pullback, with longer-term trend still above EMA200; initiate a measured position."
+     "fraction": 0
     },
     {
      "symbol": "S06",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Strong medium-term uptrend and oversold RSI2 after a one-day decline; add cautiously."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash given uncertainty and elevated volatility; rotate from overbought or weakening holdings into measured pullback entries."
+   ]
   },
   {
    "orders": [
@@ -2392,51 +2186,42 @@
      "symbol": "S06",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Strong trend but extended near 52-week high; trim concentration in uncertain conditions."
+     "fraction": 0.35
     },
     {
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Very overbought short-term and essentially at 52-week high; realize part of large gain."
+     "fraction": 0.5
     },
     {
      "symbol": "S35",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Persistent weak momentum, below 20/50-day averages, and elevated volatility; reduce downside exposure."
+     "fraction": 0.5
     },
     {
      "symbol": "S21",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain a diversified defensive holding with positive trend and relatively low volatility."
+     "fraction": 0
     },
     {
      "symbol": "S49",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Keep moderate financial exposure; positive longer trend but recent momentum is soft."
+     "fraction": 0
     }
-   ],
-   "note": "Retain substantial cash given uncertain regime and elevated short-term overbought readings; trim extended winners and the weakest existing position."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold current positions; elevated uncertainty and nearby FOMC favor preserving the substantial cash buffer. Existing holdings are generally above long-term trend, while unconfirmed headlines do not justify reallocating at the next open."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold current positions; market regime is uncertain with elevated volatility, while existing exposure is concentrated in several extended winners and cash remains substantial."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold current positions; market breadth and trend are strong, but elevated volatility and widespread short-term overbought readings favor preserving cash and avoiding unconfirmed headline-driven trades."
+   "orders": []
   }
  ]
 }

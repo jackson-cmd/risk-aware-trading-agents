@@ -15,7 +15,9 @@ from riskaware.research import bench
 from riskaware.research.agent import ORDER_SCHEMA, run_policy
 from riskaware.research.experiment import Experiment
 
-REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
+from .conftest import needs_news, news_file
+
+REAL_NEWS = news_file("news_2026.jsonl.gz")
 ROOT = Path(__file__).resolve().parent.parent
 WINDOW = (date(2026, 2, 2), date(2026, 4, 30))
 
@@ -67,6 +69,7 @@ def test_tasks_and_training_cutoffs():
     assert bench.contamination("2026", None) == "unknown"
 
 
+@needs_news
 def test_a_run_becomes_an_entry_that_replays_to_the_same_numbers(blind_run, tmp_path):
     task, problems = bench.check_record(blind_run)
     assert problems == [] and task.name == "2026-blind"
@@ -100,6 +103,7 @@ def test_a_run_becomes_an_entry_that_replays_to_the_same_numbers(blind_run, tmp_
     assert any("contamination" in p for p in bench.check_entry(edited))
 
 
+@needs_news
 def test_each_seed_is_its_own_entry_and_replays_with_its_aliases(tmp_path):
     res = bench.run_task(momentum, "2026-blind", label="rules:momentum", seed=1)
     entry = bench.make_entry(res.folder, model="rules-momentum", cutoff="2025-06")
@@ -111,6 +115,7 @@ def test_each_seed_is_its_own_entry_and_replays_with_its_aliases(tmp_path):
     assert not bench.verify_entry(wrong)["ok"]
 
 
+@needs_news
 def test_a_run_with_other_fill_costs_is_replayed_under_the_benchmarks():
     if not bench.costs_supported():
         pytest.skip("this version has no cost models")
@@ -121,7 +126,8 @@ def test_a_run_with_other_fill_costs_is_replayed_under_the_benchmarks():
     assert task.name == "2026-named" and problems == ["costs is 'fixed', the benchmark uses 'realistic'"]
     entry = bench.make_entry(res.folder, model="rules-fixed", cutoff="2024-06")
     assert entry["record"]["rescored_from"] == res.run_id and entry["record"]["costs_seen_by_model"] == "fixed"
-    assert entry["replies"] == json.loads((Path(res.folder) / "policy_log.json").read_text())["replies"]
+    raw = json.loads((Path(res.folder) / "policy_log.json").read_text())["replies"]
+    assert entry["replies"] == bench.public_replies(raw) and raw != entry["replies"]  # the orders, not the words
     assert entry["metrics"]["total_return"] < res.metrics["total_return"]  # the same orders, dearer fills
     assert bench.verify_entry(entry)["ok"]
 
@@ -159,6 +165,7 @@ def test_the_board_puts_clean_and_may_remember_apart():
     assert p["anchors"] == anchors and b["models"] == 3 and b["entries"] == 5
 
 
+@needs_news
 def test_cli_submit_and_leaderboard(blind_run, tmp_path):
     from riskaware.research.cli import app
 
@@ -220,3 +227,21 @@ def test_shipped_entries_are_well_formed():
             assert e["_file"] == bench.entry_name(e)
     finally:
         mp.undo()
+
+
+def test_entries_publish_the_orders_only():
+    replies = [{"orders": [{"symbol": "S01", "action": "buy", "weight": 0.2, "fraction": 0, "reason": "a headline",
+                            "thought": "more words"}], "note": "free text"},
+               None, {"orders": []}]
+    clean = bench.public_replies(replies)
+    assert clean == [{"orders": [{"symbol": "S01", "action": "buy", "weight": 0.2, "fraction": 0}]}, None,
+                     {"orders": []}]
+    assert bench.public_replies(clean) == clean
+    for path in sorted((ROOT / "leaderboard" / "entries").glob("*.json")):
+        entry = json.loads(path.read_text(encoding="utf-8"))
+        assert bench.public_replies(entry["replies"]) == entry["replies"], path.name
+        assert bench._sha(entry["replies"]) == entry["record"]["replies_sha256"], path.name
+        assert not any("model's text" in p for p in bench.check_entry(entry)), path.name
+    entry = json.loads(next((ROOT / "leaderboard" / "entries").glob("*.json")).read_text(encoding="utf-8"))
+    entry["replies"][0] = {**entry["replies"][0], "note": "words"}
+    assert any("model's text" in p for p in bench.check_entry(entry))

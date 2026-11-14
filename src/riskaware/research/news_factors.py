@@ -47,6 +47,7 @@ import pandas as pd
 
 from ..config import RISKAWARE_HOME, NewsConfig
 from ..news import lexicon as lx
+from ..news.files import missing_message
 from ..news.history import NewsArchive, PointInTimeNews, decision_time
 from ..news.relevance import company_names
 from ..news.verify import analyze_news
@@ -58,7 +59,7 @@ NY = ZoneInfo("America/New_York")
 
 FACTORS_DIR = RISKAWARE_HOME / "research" / "factors"
 SCORES_DIR = RISKAWARE_HOME / "research" / "headline_scores"
-NO_LOCAL_NEWS = Path(__file__).resolve().parent / "data" / "_no_local_news"  # never exists: bundled news only
+NO_LOCAL_NEWS = Path(__file__).resolve().parent / "data" / "_no_local_news"  # never exists: headline files only
 
 HORIZONS = (1, 5, 20)
 DECAY_LAGS = tuple(range(21))
@@ -176,16 +177,21 @@ def _jaccard(a: frozenset[str], b: frozenset[str]) -> float:
 
 
 class NewsPanel:
-    """The bundled news of one period, ready to be turned into daily features.
+    """The headline file of one period (your copy), ready to be turned into daily features.
 
-    ``records`` replaces the bundled file (a list of dicts like its lines: ts, symbol, headline, source, feed,
-    summary); the tests use it to change items and check which features move.
+    ``records`` replaces the headline file (a list of dicts like its lines: ts, symbol, headline, source, feed,
+    summary); the tests use it to change items and check which features move. Without ``records`` the period's
+    headline file is needed: it is not distributed with the package (``FileNotFoundError`` when there is no copy).
     """
 
     def __init__(self, period: str | None = None, stocks: list[str] | None = None,
                  market: FrozenMarket | None = None, cfg: NewsConfig | None = None,
                  records: list[dict] | None = None, llm_scores: dict[str, float] | None = None):
         self.period = get_period(period).name
+        per = get_period(self.period)
+        if records is None and not per.has_news:
+            raise FileNotFoundError(f"the news factors read the {per.name} headlines and no copy of {per.news} was "
+                                    f"found: {missing_message(per.news)}")
         self.market = market or bundled_market(self.period)
         self.cfg = cfg or NewsConfig()
         manifest_stocks = _stock_list(self.market)
@@ -318,13 +324,14 @@ class NewsPanel:
 
     # -------------------------------------------------------------- what moves between the two joins
     def moved_share(self) -> dict[str, float]:
-        """Share of items (per feed) that a calendar-date join puts on an earlier trading day than their
-        publication time allows."""
+        """Share of items that a calendar-date join puts on an earlier trading day than their publication time
+        allows: ``sec`` for SEC filings, ``headlines`` for every other feed."""
         ts = self.items["ts"].to_numpy(np.int64)
         pub = assign_days(ts, cutoff_times(self.days, "publication"))
         cal = assign_days(ts, cutoff_times(self.days, "calendar"))
         moved = pd.Series(cal < pub, index=self.items.index)
-        return {str(k): round(float(v), 4) for k, v in moved.groupby(self.items["feed"]).mean().items()}
+        kind = self.items["feed"].where(self.items["feed"] == "sec", "headlines")
+        return {str(k): round(float(v), 4) for k, v in moved.groupby(kind).mean().items()}
 
 
 class _RecordArchive(NewsArchive):
@@ -948,12 +955,15 @@ def _slug(choice: str) -> str:
 
 
 def headlines_to_score(periods: Iterable[str]) -> list[tuple[str, str]]:
-    """The distinct (stock, headline) pairs of the periods' bundled files (SEC filings left out)."""
+    """The distinct (stock, headline) pairs of the periods' headline files (SEC filings left out)."""
     from ..news.history import load_bundle
 
     seen: dict[str, tuple[str, str]] = {}
     for p in periods:
-        for sym, recs in load_bundle(get_period(p).news_path).items():
+        per = get_period(p)
+        if not per.has_news:
+            raise FileNotFoundError(f"no copy of {per.news} was found: {missing_message(per.news)}")
+        for sym, recs in load_bundle(per.news_path).items():
             for r in recs:
                 if r.get("feed") == "sec":
                     continue

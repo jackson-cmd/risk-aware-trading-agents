@@ -1,8 +1,9 @@
 """The frozen periods that ship with the package.
 
 Each period is a test window plus the two years before it (to warm up slow indicators such as EMA200), with its own
-price file, headline file and manifest. A strategy or an LLM that only did well in one kind of market says little;
-the periods are chosen to differ:
+price file, headline file and manifest. The price files ship with the package. The headline files are licensed and do
+not: the manifests keep their SHA-256, and ``news_path`` finds your own copy (see ``riskaware.news.files``). A
+strategy or an LLM that only did well in one kind of market says little; the periods are chosen to differ:
 
 * ``2026``: January to November 2026, a rising market with a spring sell-off (SPY +12.1%). The default.
 * ``2022``: the whole of 2022, the rate-hike bear market (SPY -18.2%, the Nasdaq 100 -32.6%): eight Fed hikes,
@@ -21,7 +22,10 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-NEWS_DIR = Path(__file__).resolve().parent.parent / "news" / "data"
+from ..news.files import PACKAGE_NEWS_DIR, find_news_file, news_file
+
+#: The package's own headline folder (versions up to 0.7.2 shipped the files there); ``news_path`` looks further.
+NEWS_DIR = PACKAGE_NEWS_DIR
 
 
 @dataclass(frozen=True)
@@ -30,7 +34,7 @@ class Period:
     title: str
     title_zh: str
     manifest: str  # file name in research/data
-    news: str  # file name in news/data
+    news: str  # file name of the headline file (not distributed; see riskaware.news.files)
     start: date  # first day of the test window (the days before it warm up the indicators)
     end: date  # last day of the data
     split: date  # suggested first day of the out-of-sample part
@@ -40,7 +44,13 @@ class Period:
 
     @property
     def news_path(self) -> Path:
-        return NEWS_DIR / self.news
+        """Your copy of the period's headline file, or the place to put it when there is none."""
+        return news_file(self.news)
+
+    @property
+    def has_news(self) -> bool:
+        """Whether a copy of the period's headline file was found."""
+        return find_news_file(self.news) is not None
 
     def describe(self) -> dict[str, Any]:
         return {"period": self.name, "title": self.title, "start": self.start.isoformat(), "end": self.end.isoformat(),
@@ -55,7 +65,7 @@ PERIODS: dict[str, Period] = {
         start=date(2026, 1, 2), end=date(2026, 11, 11), split=date(2026, 7, 1),
         about="SPY +12.1% from 2 January to 11 November 2026, with a -8.9% drawdown in March.",
         about_zh="2026 年 1 月 2 日到 11 月 11 日 SPY 涨 12.1%，三月最大回撤 -8.9%。",
-        news_feeds="Benzinga headlines (titles only) and SEC 8-K filings"),
+        news_feeds="licensed headlines (titles only; not distributed) and SEC 8-K filings"),
     "2022": Period(
         name="2022", title="2022: the rate-hike bear market",
         title_zh="2022 年：加息熊市",
@@ -65,7 +75,7 @@ PERIODS: dict[str, Period] = {
               "June, and large caps such as META, NVDA, TSLA and AMZN down 50% or more.",
         about_zh="2022 年 SPY 跌 18.2%，纳斯达克 100 跌 32.6%：美联储加息八次（0.25% 到 4.5%），六月 CPI 超过 9%，"
                  "META、NVDA、TSLA、AMZN 等大盘股跌了一半以上。",
-        news_feeds="Benzinga headlines (titles only)"),
+        news_feeds="licensed headlines (titles only; not distributed)"),
     "2020": Period(
         name="2020", title="2020: the COVID crash and rebound",
         title_zh="2020 年：疫情暴跌和反弹",
@@ -76,7 +86,7 @@ PERIODS: dict[str, Period] = {
               "+48.4%).",
         about_zh="2020 年 2 月 19 日到 3 月 23 日，SPY 在 23 个交易日里跌了 34%，是有记录以来最快的熊市，VIX 收盘最高 82.7；"
                  "八月收复新高，全年涨 18.3%（纳斯达克 100 涨 48.4%）。",
-        news_feeds="Benzinga headlines (titles only)"),
+        news_feeds="licensed headlines (titles only; not distributed)"),
 }
 DEFAULT_PERIOD = "2026"
 

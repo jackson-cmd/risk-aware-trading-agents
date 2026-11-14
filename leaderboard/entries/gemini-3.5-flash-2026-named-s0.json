@@ -57,7 +57,7 @@
    "decisions.csv": "9277181a1b4ea346d31d14404d6f049035407b03ebd5ad4d6eae9b79ba0ee219",
    "policy_log.json": "af4125dec4a2442f7a2f1bc121a80410352861381f2aaaf54c15e9816ce38e79"
   },
-  "replies_sha256": "0ace33fb914be434877cc81c910c28409ff66e44fd6c19911ab685cb5b852827",
+  "replies_sha256": "1bb2428bf5e473d4029e28aa895a788687c5ad01c207cdc72edb23f4fea5f373",
   "observations_sha256": "8eee6336eb592a4b046a3193f6b41572a3c1bfc0a264e18a39c43f2743a2aabb",
   "costs_seen_by_model": "fixed",
   "rescored_from": "20261113-210704-llm-gemini-3-5-flash-2026-named-2026-news"
@@ -842,74 +842,63 @@
      "symbol": "GE",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, close to 52-week high, and solid relative volume in a RISK_ON regime."
+     "fraction": 0
     },
     {
      "symbol": "GS",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong financial sector leader with high relative volume and positive momentum indicators."
+     "fraction": 0
     },
     {
      "symbol": "RTX",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong industrial sector momentum, trading near 52-week highs with high RSI and positive EMA trends."
+     "fraction": 0
     },
     {
      "symbol": "LLY",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong healthcare leader with positive momentum and trading near its 52-week high."
+     "fraction": 0
     },
     {
      "symbol": "XOM",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Energy sector leader showing strong short-term and medium-term momentum, trading near 52-week highs."
+     "fraction": 0
     },
     {
      "symbol": "BAC",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Financial sector strength, trading very close to its 52-week high with positive EMA alignment."
+     "fraction": 0
     },
     {
      "symbol": "MRK",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Excellent healthcare sector momentum, high RSI, and trading near its 52-week high."
+     "fraction": 0
     },
     {
      "symbol": "CAT",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong industrial sector momentum with high relative volume and positive EMA trends."
+     "fraction": 0
     },
     {
      "symbol": "JPM",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Leading financial stock with solid momentum and trading near its 52-week high."
+     "fraction": 0
     },
     {
      "symbol": "WMT",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Defensive consumer staple showing steady upward momentum and trading near its 52-week high."
+     "fraction": 0
     }
-   ],
-   "note": "Initiating 10 long positions of 10% weight each in high-momentum stocks trading near their 52-week highs, aligned with the current RISK_ON market regime."
+   ]
   },
   {
    "orders": [
@@ -917,32 +906,27 @@
      "symbol": "BAC",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming financial position compared to peers, downgraded by Wolfe Research to Peer Perform."
+     "fraction": 1
     },
     {
      "symbol": "LLY",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming health care position with negative return since purchase and short-term momentum loss."
+     "fraction": 1
     },
     {
      "symbol": "GOOGL",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, positive analyst price target revisions, and escaping tough European regulations."
+     "fraction": 0
     },
     {
      "symbol": "HD",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong upward momentum, high relative volume, and positive catalyst from Trump housing plan."
+     "fraction": 0
     }
-   ],
-   "note": "Rebalancing portfolio by selling underperforming positions (BAC, LLY) and buying high-momentum stocks with strong positive catalysts (GOOGL, HD) under RISK_ON market regime."
+   ]
   },
   {
    "orders": [
@@ -950,18 +934,15 @@
      "symbol": "JPM",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming relative to other financial holdings and showing negative return since purchase"
+     "fraction": 1.0
     },
     {
      "symbol": "HON",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, upgraded to Overweight by JP Morgan, and positive news regarding Quantinuum IPO filing"
+     "fraction": 0.0
     }
-   ],
-   "note": "Replaced underperforming JPM with HON which exhibits strong momentum and positive analyst catalysts."
+   ]
   },
   {
    "orders": [
@@ -969,26 +950,21 @@
      "symbol": "GE",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with significant loss and weak short-term momentum"
+     "fraction": 1.0
     },
     {
      "symbol": "CSCO",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, high relative volume, and a major analyst upgrade to Outperform with a raised price target"
+     "fraction": 0.0
     }
-   ],
-   "note": "Replaced underperforming GE with CSCO, which shows strong momentum and positive analyst upgrades."
+   ]
   },
   {
-   "orders": [],
-   "note": "The portfolio is fully invested across 10 high-performing positions with solid gains. The market regime remains RISK_ON with a healthy risk score of 5.425. No changes are required at this step; we will hold all current positions to maximize returns."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The portfolio is currently fully invested in 10 high-performing positions with solid gains. The market regime is UNCERTAIN with a elevated risk score of 7.547, suggesting we should avoid unnecessary turnover and maintain our current strong holdings."
+   "orders": []
   },
   {
    "orders": [
@@ -996,11 +972,9 @@
      "symbol": "GOOGL",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming position with high relative weakness and negative short-term momentum (rsi2 < 1)"
+     "fraction": 1
     }
-   ],
-   "note": "Selling underperforming GOOGL to raise cash and manage risk in an uncertain market regime."
+   ]
   },
   {
    "orders": [
@@ -1008,11 +982,9 @@
      "symbol": "GS",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming financial position with negative return and weak relative momentum in an uncertain market regime."
+     "fraction": 1
     }
-   ],
-   "note": "Trimming underperforming financial exposure (GS) to raise cash and maintain defensive posture under UNCERTAIN market regime."
+   ]
   },
   {
    "orders": [
@@ -1020,29 +992,24 @@
      "symbol": "HD",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with negative return and weak relative strength compared to other holdings."
+     "fraction": 1.0
     },
     {
      "symbol": "ABBV",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, trading above key EMAs, and positive clinical news bolstering competitive positioning."
+     "fraction": 0.0
     },
     {
      "symbol": "COST",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Solid defensive consumer staple showing strong relative strength and positive price momentum."
+     "fraction": 0.0
     }
-   ],
-   "note": "Selling underperforming Home Depot (HD) and deploying cash into strong, trending defensive names (ABBV and COST) to optimize the portfolio's risk-adjusted returns in an uncertain market regime."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime remains UNCERTAIN with a mixed SPY trend and elevated VIX (24.93). Given the upcoming CPI macro event and a risk score of 46.47, we will maintain our current diversified portfolio of 9 high-quality positions and hold our remaining cash buffer (~7.8%) to preserve flexibility."
+   "orders": []
   },
   {
    "orders": [
@@ -1050,15 +1017,12 @@
      "symbol": "ABBV",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with negative momentum and relative weakness compared to other healthcare options."
+     "fraction": 1.0
     }
-   ],
-   "note": "Selling ABBV to free up cash and reduce exposure to underperforming assets under uncertain market conditions."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market remains in a RISK_OFF regime with elevated volatility (VIX at 26.95) and mixed SPY trend. Our current portfolio of defensive and high-performing stocks (such as XOM, CAT, WMT, and MRK) is performing well, with XOM hitting all-time highs. Given the risk-off environment and our solid cash buffer (~17.3%), we will maintain our current positions without making new trades today."
+   "orders": []
   },
   {
    "orders": [
@@ -1066,11 +1030,9 @@
      "symbol": "CSCO",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Sell CSCO due to negative news regarding a source code breach and weak short-term price momentum."
+     "fraction": 1
     }
-   ],
-   "note": "Selling CSCO to manage risk under RISK_OFF regime and source code breach news. Holding other positions as they show stable performance."
+   ]
   },
   {
    "orders": [
@@ -1078,25 +1040,21 @@
      "symbol": "XOM",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Energy sector weakness and sharp short-term momentum reversal following geopolitical news and price target downgrades."
+     "fraction": 1
     },
     {
      "symbol": "GOOGL",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong relative strength, positive momentum, and positive sentiment surrounding global AI product rollouts."
+     "fraction": 0
     },
     {
      "symbol": "UNH",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum recovery following positive regulatory updates and price target upgrades."
+     "fraction": 0
     }
-   ],
-   "note": "Replaced declining energy exposure (XOM) with high-momentum opportunities in technology (GOOGL) and healthcare (UNH) while maintaining a balanced portfolio structure."
+   ]
   },
   {
    "orders": [
@@ -1104,25 +1062,21 @@
      "symbol": "COST",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming position with negative return and weak short-term momentum relative to other options"
+     "fraction": 1
     },
     {
      "symbol": "NVDA",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, positive news sentiment, and solid technical indicators in a RISK_ON regime"
+     "fraction": 0
     },
     {
      "symbol": "AVGO",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, positive news regarding AI chip partnership with Meta, and high relative volume"
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming COST with high-momentum technology leaders NVDA and AVGO to maximize returns in a strong RISK_ON market environment."
+   ]
   },
   {
    "orders": [
@@ -1130,18 +1084,15 @@
      "symbol": "RTX",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "RTX has experienced a sharp decline, breaking below its key moving averages with high relative volume following its earnings release, and its RSI is extremely oversold, indicating a loss of momentum."
+     "fraction": 1.0
     },
     {
      "symbol": "AMZN",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "AMZN shows strong upward momentum, trading near its 52-week high with positive sentiment surrounding its Anthropic alliance and robust technical indicators."
+     "fraction": 0.0
     }
-   ],
-   "note": "Replaced RTX with AMZN to align the portfolio with stronger momentum and positive catalysts under RISK_ON market conditions."
+   ]
   },
   {
    "orders": [
@@ -1149,18 +1100,15 @@
      "symbol": "HON",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with negative return and weak momentum relative to moving averages"
+     "fraction": 1.0
     },
     {
      "symbol": "SBUX",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong earnings report, positive analyst revisions, and high relative volume breakout"
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming HON with SBUX following its strong earnings breakout."
+   ]
   },
   {
    "orders": [
@@ -1168,19 +1116,15 @@
      "symbol": "AMD",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum and positive earnings catalyst with a significant price breakout."
+     "fraction": 0
     }
-   ],
-   "note": "The market is in a strong RISK_ON regime with high breadth. Adding AMD to utilize the remaining cash slot, as it shows exceptional momentum and positive earnings news."
+   ]
   },
   {
-   "orders": [],
-   "note": "The portfolio is fully invested in 10 high-performing positions. Market regime remains RISK_ON with strong breadth and trend indicators. No adjustments are needed at this time; holding all current positions to maximize gains."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The portfolio is fully invested with 10 high-performing positions in a RISK_ON market regime. All current positions are showing positive gains, and there are no urgent sell signals or significant red flags to warrant rebalancing at this step."
+   "orders": []
   },
   {
    "orders": [
@@ -1188,22 +1132,18 @@
      "symbol": "SBUX",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming position with negative return and weak relative momentum, freeing up capital for stronger opportunities."
+     "fraction": 1
     },
     {
      "symbol": "LLY",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum and positive news catalyst with Eli Lilly presenting new cardiometabolic data and expanding infectious disease push."
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming SBUX with high-momentum LLY to optimize portfolio performance under RISK_ON regime."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime remains UNCERTAIN with a risk score of 11.25 and NFP macro events near. All 10 positions are currently held at target weights, and we will maintain the current portfolio allocation without making any adjustments today."
+   "orders": []
   },
   {
    "orders": [
@@ -1211,78 +1151,66 @@
      "symbol": "LLY",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance Eli Lilly to target weight of 10% to maintain portfolio balance."
+     "fraction": 0
     },
     {
      "symbol": "AMD",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance AMD to target weight of 10% following strong performance."
+     "fraction": 0
     },
     {
      "symbol": "AMZN",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance Amazon to target weight of 10%."
+     "fraction": 0
     },
     {
      "symbol": "AVGO",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance Broadcom to target weight of 10%."
+     "fraction": 0
     },
     {
      "symbol": "CAT",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance Caterpillar to target weight of 10%."
+     "fraction": 0
     },
     {
      "symbol": "GOOGL",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance Alphabet to target weight of 10%."
+     "fraction": 0
     },
     {
      "symbol": "MRK",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance Merck to target weight of 10%."
+     "fraction": 0
     },
     {
      "symbol": "NVDA",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance Nvidia to target weight of 10%."
+     "fraction": 0
     },
     {
      "symbol": "UNH",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance UnitedHealth to target weight of 10%."
+     "fraction": 0
     },
     {
      "symbol": "WMT",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance Walmart to target weight of 10%."
+     "fraction": 0
     }
-   ],
-   "note": "Rebalancing all 10 existing positions to their default 10% target weights to manage risk in an uncertain market regime."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime is RISK_ON with a healthy risk score of 10.28 and VIX at 16.4. All 10 portfolio positions are currently held at near-target weights (around 10% each). Since the portfolio is fully invested and performing well, we will hold all current positions without making any adjustments."
+   "orders": []
   },
   {
    "orders": [
@@ -1290,32 +1218,27 @@
      "symbol": "AMZN",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming relative to the market and showing persistent negative returns over the 21-day period."
+     "fraction": 1
     },
     {
      "symbol": "AVGO",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Significant short-term drop and technical breakdown below key moving averages."
+     "fraction": 1
     },
     {
      "symbol": "LLY",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, positive news catalyst, and trading near 52-week highs."
+     "fraction": 0
     },
     {
      "symbol": "MRK",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Excellent relative strength, positive FDA approvals, and strong upward trend."
+     "fraction": 0
     }
-   ],
-   "note": "Rebalancing portfolio by cutting underperforming technology positions (AMZN, AVGO) and adding to high-momentum healthcare leaders (LLY, MRK) showing strong relative strength and positive catalysts."
+   ]
   },
   {
    "orders": [
@@ -1323,25 +1246,21 @@
      "symbol": "WMT",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming relative to moving averages and showing weak momentum (RSI14 near 33.7, vs_ema50 -0.077)"
+     "fraction": 1
     },
     {
      "symbol": "AAPL",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, positive news regarding Broadcom chip deal extension, and trading near 52-week highs with solid RSI indicators"
+     "fraction": 0
     },
     {
      "symbol": "TSLA",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong upward momentum (ret_5d 10.55%) supported by positive news on robotaxi service launch in Miami"
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming WMT with high-momentum stocks AAPL and TSLA under RISK_ON market regime."
+   ]
   },
   {
    "orders": [
@@ -1349,11 +1268,9 @@
      "symbol": "TSLA",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming relative to the portfolio with negative returns and weak short-term momentum under uncertain market conditions."
+     "fraction": 1
     }
-   ],
-   "note": "Selling TSLA to raise cash and manage risk under an UNCERTAIN market regime ahead of CPI data."
+   ]
   },
   {
    "orders": [
@@ -1361,29 +1278,24 @@
      "symbol": "CAT",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "CAT has broken down significantly below its 20-day and 50-day EMAs, showing weak short-term momentum and high relative drawdown from its 52-week high."
+     "fraction": 1
     },
     {
      "symbol": "MSFT",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, trading above key EMAs, and positive news regarding its AMD partnership and AI deployment."
+     "fraction": 0
     },
     {
      "symbol": "V",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong upward trend, trading near its 52-week high with solid momentum indicators (RSI14 at 63.59 and positive EMA alignment)."
+     "fraction": 0
     }
-   ],
-   "note": "Replaced CAT due to deteriorating technicals and momentum. Added MSFT and V to leverage strong momentum and positive catalysts in a RISK_ON market regime."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime is UNCERTAIN with an upcoming FOMC meeting. Our current portfolio is well-diversified across 9 high-quality positions with a healthy cash buffer of ~9.4%. We will stand pat and maintain our current allocations to manage risk ahead of the macro event."
+   "orders": []
   },
   {
    "orders": [
@@ -1391,11 +1303,9 @@
      "symbol": "AMZN",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum and positive earnings reaction with massive AWS backlog support."
+     "fraction": 0
     }
-   ],
-   "note": "Adding AMZN to utilize cash and capture strong post-earnings momentum in a RISK_ON regime."
+   ]
   },
   {
    "orders": [
@@ -1403,22 +1313,18 @@
      "symbol": "AAPL",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Downgraded by Jefferies to Underperform with a significantly lowered price target, leading to negative short-term momentum and negative news score."
+     "fraction": 1
     },
     {
      "symbol": "RTX",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong positive momentum (ret_21d of 14.39%), high RSI, trading near 52-week highs, and positive mention as a buy on Investor Business Daily SwingTrader."
+     "fraction": 0
     }
-   ],
-   "note": "Selling AAPL due to analyst downgrade and negative momentum; replacing it with RTX which shows strong relative strength and positive momentum indicators."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime remains RISK_ON with a low VIX and strong breadth. All 10 portfolio positions are currently held at near-target weights (around 10% each), and their performance is generally solid. No immediate rebalancing or substitutions are required today."
+   "orders": []
   },
   {
    "orders": [
@@ -1426,18 +1332,15 @@
      "symbol": "AMD",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "AMD is showing persistent relative weakness, trading below its 20-day and 50-day EMAs with a negative 5-day return of -9.73%."
+     "fraction": 1
     },
     {
      "symbol": "MA",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, trading near 52-week highs with positive news regarding high-profile stock purchases."
+     "fraction": 0
     }
-   ],
-   "note": "Replaced AMD with MA to align the portfolio with stronger momentum and positive catalyst flow under RISK_ON market conditions."
+   ]
   },
   {
    "orders": [
@@ -1445,11 +1348,9 @@
      "symbol": "AMZN",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Selling AMZN due to negative news momentum regarding the FTC lawsuit over sponsored ads pricing and weak short-term price action."
+     "fraction": 1
     }
-   ],
-   "note": "Exited AMZN position to manage risk following negative regulatory news. Holding remaining positions as the broader market regime remains RISK_ON."
+   ]
   },
   {
    "orders": [
@@ -1457,22 +1358,18 @@
      "symbol": "RTX",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with -11% return and weak relative momentum"
+     "fraction": 1.0
     },
     {
      "symbol": "META",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum and positive news catalyst regarding Muse AI agent launch"
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming RTX with META to capture strong momentum and positive AI-related news catalyst."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime is UNCERTAIN with a risk score of 32.44 and an upcoming FOMC meeting. Our current portfolio of 9 high-quality positions is well-diversified and performing reasonably well. We will maintain our current holdings and preserve our cash buffer of approximately 7.3% ahead of the macro event."
+   "orders": []
   },
   {
    "orders": [
@@ -1480,18 +1377,15 @@
      "symbol": "MA",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming position with negative momentum and short holding period, freeing up space for stronger trends."
+     "fraction": 1
     },
     {
      "symbol": "AMD",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum and relative strength with a historic AI boom catalyst."
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming Mastercard (MA) with high-momentum AMD to capture strong AI-driven sector trends."
+   ]
   },
   {
    "orders": [
@@ -1499,11 +1393,9 @@
      "symbol": "AMD",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "AMD short-term momentum has stalled and its RSI2 is low, but we will exit to free up cash and manage risk under a neutral market regime."
+     "fraction": 1.0
     }
-   ],
-   "note": "Exiting AMD to maintain a high-quality portfolio with sufficient cash buffer under neutral market conditions."
+   ]
   },
   {
    "orders": [
@@ -1511,11 +1403,9 @@
      "symbol": "UNH",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Sell UNH due to negative news regarding Texas AG investigation into alleged bribes and coverage denials, which poses regulatory and reputational risks."
+     "fraction": 1
     }
-   ],
-   "note": "Selling UNH to mitigate regulatory risk from the Texas AG investigation. Keeping other positions intact as the market regime is neutral and overall portfolio performance remains stable."
+   ]
   },
   {
    "orders": [
@@ -1523,26 +1413,21 @@
      "symbol": "CRM",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, positive news score, and double upgrade from Bank of America highlighting AI potential."
+     "fraction": 0
     },
     {
      "symbol": "UNH",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Solid earnings report, raised guidance, and attractive entry point near its 20-day EMA."
+     "fraction": 0
     }
-   ],
-   "note": "Adding CRM and UNH to the portfolio to utilize cash. CRM shows strong momentum and positive analyst sentiment, while UNH presents a defensive growth opportunity following its earnings release."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime remains UNCERTAIN with a risk score of 20.33. All 9 current positions are performing well and are held within target weights. Cash share is low at 4.2%, so we will hold our current portfolio unchanged."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is UNCERTAIN with a risk score of 29.95 and an upcoming FOMC meeting. Our current portfolio is well-diversified across 9 high-quality positions with a small cash buffer. We will stand pat and maintain our current holdings without making any trades today."
+   "orders": []
   },
   {
    "orders": [
@@ -1550,11 +1435,9 @@
      "symbol": "GOOGL",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Severe short-term and medium-term relative weakness (RSI14 at 22.16, price 15.7% below EMA50) and market regime is uncertain."
+     "fraction": 1
     }
-   ],
-   "note": "Selling GOOGL due to persistent technical breakdown and underperformance relative to other portfolio holdings in an uncertain market environment."
+   ]
   },
   {
    "orders": [
@@ -1562,58 +1445,49 @@
      "symbol": "NVDA",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Severe short-term momentum breakdown and negative news flow (subpoena risk, CPI pressure)"
+     "fraction": 1.0
     },
     {
      "symbol": "CRM",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Weak relative strength and persistent negative trend below key EMAs"
+     "fraction": 1.0
     },
     {
      "symbol": "LLY",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance position back to default weight to lock in strong gains"
+     "fraction": 0
     },
     {
      "symbol": "MRK",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance position back to default weight to lock in strong gains"
+     "fraction": 0
     },
     {
      "symbol": "MSFT",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance position back to default weight to manage risk"
+     "fraction": 0
     },
     {
      "symbol": "V",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Rebalance position back to default weight to manage risk"
+     "fraction": 0
     },
     {
      "symbol": "AMZN",
      "action": "buy",
-     "weight": 0.1,
-     "reason": "Strong momentum, trading near 52-week highs with positive short-term catalysts"
+     "weight": 0.1
     },
     {
      "symbol": "JNJ",
      "action": "buy",
-     "weight": 0.1,
-     "reason": "Defensive sector strength, positive clinical trial data, and solid technical setup"
+     "weight": 0.1
     }
-   ],
-   "note": "Selling underperforming and high-risk assets (NVDA, CRM), trimming overextended positions to lock in profits, and deploying capital into high-momentum and defensive leaders (AMZN, JNJ) under an uncertain market regime."
+   ]
   }
  ]
 }

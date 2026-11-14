@@ -169,7 +169,8 @@ def backtest(strategy: str = "risk_aware", start: str = "2018-01-01", end: str |
     """Backtest a strategy on daily data (signals at the close, fills the next day) against SPY buy and hold.
 
     news=True replays the news archive: each day the strategy sees only items published before that day's close.
-    2026 headlines and SEC filings for the built-in watchlists ship with the package."""
+    The research headline files (2026 headlines and SEC filings for the built-in watchlists) are licensed and do not
+    ship with the package; news comes from your local archive and from those files if you have a copy."""
     from .backtest.engine import Backtester
     from .data.prices import make_price_provider
     from .strategy import load_strategy
@@ -306,8 +307,9 @@ def _market_view(period: str | None = None):
 
 def research_guide() -> dict[str, Any]:
     """Read this first for experiments on the frozen markets: what data ships with the package (three periods:
-    2026 to date, the 2022 bear market and the 2020 crash, each with daily bars, the VIX term structure and that
-    year's news), how a backtest decides and fills (after the close,
+    2026 to date, the 2022 bear market and the 2020 crash, each with daily bars and the VIX term structure; each
+    year's headline file is licensed and not distributed, so news needs your own copy), how a backtest decides and
+    fills (after the close,
     at the next open: swing trading), the look-ahead rules and check, how to write a strategy, the five baseline
     swing strategies, what a saved record holds, and advice for papers."""
     from .research.guide import guide
@@ -317,7 +319,7 @@ def research_guide() -> dict[str, Any]:
 
 def market_day(day: str, symbols: list[str] | None = None, news: bool = True, headlines: int = 3) -> dict[str, Any]:
     """Everything known at the close of one day of the bundled periods (2018 to 2020, 2020 to 2022, 2024 to
-    2026-11-11; news in 2020, 2022 and 2026):
+    2026-11-11; news in 2020, 2022 and 2026 when you have a copy of the headline files, which are not distributed):
     the market regime, VIX, VIX9D, VIX3M, VVIX and the term structure, fear & greed, breadth, credit stress, the
     macro events of the next two weeks; and per stock its prices and returns, indicators (EMAs, RSI, MACD, ATR, ADX,
     Bollinger, 52-week high), technical setups and the news published before the close (score, verified status,

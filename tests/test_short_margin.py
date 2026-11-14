@@ -17,9 +17,9 @@ from riskaware.research.experiment import Experiment, reproduce_command, run_exp
 from riskaware.strategy.base import PositionView, Strategy
 from riskaware.types import Action, Regime, Signal
 
-from .conftest import make_ctx
+from .conftest import make_ctx, news_file
 
-REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
+REAL_NEWS = news_file("news_2026.jsonl.gz")
 WINDOW = {"start": "2026-02-02", "end": "2026-04-30"}
 SPRING_2022 = {"period": "2022", "start": "2022-02-01", "end": "2022-05-31"}
 PRICES = {s: 100.0 for s in ("AAA", "BBB", "CCC", "DDD")}

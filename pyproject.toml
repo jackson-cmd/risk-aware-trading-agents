@@ -66,7 +66,8 @@ all = [
   "ib_async>=1.0", "schwab-py>=1.4", "tastytrade>=10.0", "futu-api>=9.0", "tigeropen>=3.0",
   "longport>=2.0", "streamlit>=1.50", "plotly>=5.20", "anthropic>=2.0", "mcp>=1.2",
 ]
-dev = ["pytest>=8.0", "ruff>=0.5"]
+# hatchling and the readme plugin let the tests build a wheel (tests/test_packaging.py)
+dev = ["pytest>=8.0", "ruff>=0.5", "hatchling>=1.24", "hatch-fancy-pypi-readme>=24.1"]
 
 [project.scripts]
 riskaware = "riskaware.cli:main"
@@ -82,6 +83,8 @@ Website = "https://jackson-cmd.github.io/risk-aware-trading-agents/"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/riskaware"]
+# The research headline files are licensed and never go into a package, even from a checkout that has a copy.
+exclude = ["news_*.jsonl.gz"]
 
 # PyPI shows README.md without the repository around it, so relative links and images there become absolute.
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
@@ -112,6 +115,7 @@ replacement = '](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/m
 
 [tool.hatch.build.targets.sdist]
 include = ["src/riskaware", "tests", "examples", "docs", "config", "README.md", "README_zh.md", "LICENSE"]
+exclude = ["news_*.jsonl.gz"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

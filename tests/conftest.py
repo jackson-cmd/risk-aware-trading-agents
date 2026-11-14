@@ -4,8 +4,13 @@ from __future__ import annotations
 
 import os
 import tempfile
+from pathlib import Path
 
-# must happen before riskaware.config is imported anywhere
+# The research headline files are licensed and are not in the repository. A machine that has its own copy
+# ($RISKAWARE_NEWS_DIR, or the data/news folder of the real RISKAWARE_HOME) runs the tests that read them; anywhere
+# else, CI included, those tests are skipped. This must happen before riskaware.config is imported anywhere.
+os.environ.setdefault("RISKAWARE_NEWS_DIR",
+                      str(Path(os.environ.get("RISKAWARE_HOME") or "~/.riskaware").expanduser() / "data" / "news"))
 os.environ["RISKAWARE_HOME"] = tempfile.mkdtemp(prefix="riskaware-test-")
 os.environ.pop("RISKAWARE_CONFIG", None)
 
@@ -18,8 +23,21 @@ import pytest  # noqa: E402
 from riskaware.agents.macro import MarketState  # noqa: E402
 from riskaware.config import AppConfig  # noqa: E402
 from riskaware.data.prices import SyntheticPrices  # noqa: E402
+from riskaware.news.files import PERIOD_FILES, find_news_file  # noqa: E402
+from riskaware.news.files import news_file as _news_file  # noqa: E402
 from riskaware.strategy.base import PortfolioView, PositionView, StrategyContext  # noqa: E402
 from riskaware.types import Quote, Regime  # noqa: E402
+
+
+def news_file(name: str = "news_2026.jsonl.gz") -> Path:
+    """This machine's copy of a research headline file (where it would be when there is none)."""
+    return _news_file(name)
+
+
+#: Whether this machine has all three research headline files (never in CI: they are not distributed).
+HAS_NEWS = all(find_news_file(name) for name in PERIOD_FILES)
+needs_news = pytest.mark.skipif(not HAS_NEWS, reason="needs the research headline files (licensed, not distributed; "
+                                                     "put a copy in ~/.riskaware/data/news to run it)")
 
 
 @pytest.fixture(autouse=True)

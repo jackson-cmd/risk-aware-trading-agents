@@ -69,6 +69,7 @@ MODE_PARAMS_HELP = "Override the mode's rules as JSON, e.g. '{\"max_short\": 0.1
 @app.command("data")
 def data_cmd(period: Optional[str] = typer.Option(None, help="Show one period (default: all)")) -> None:
     """What the bundled data holds, and a check of its SHA-256. / 自带数据的内容和校验"""
+    from ..news.files import missing_message
     from .data import available_periods, manifest, verify
     from .periods import get_period
 
@@ -85,9 +86,14 @@ def data_cmd(period: Optional[str] = typer.Option(None, help="Show one period (d
         for group, syms in m["symbols"].items():
             t.add_row(group, f"{len(syms)}: " + ", ".join(syms[:12]) + (" ..." if len(syms) > 12 else ""))
         for fname, meta in m["files"].items():
+            state = ok.get(fname)
             t.add_row(fname, f"sha256 {(meta['sha256'] or '')[:16]}... "
-                      + ("[green]OK[/]" if ok.get(fname) else "[red]changed[/]"))
+                      + ("[green]OK[/]" if state else "[red]changed[/]" if state is False else
+                         "[yellow]" + L("not distributed (licensed headlines); the SHA-256 checks your own copy",
+                                        "不随包分发（标题有许可限制）；SHA-256 用来核对你自己的副本") + "[/]"))
         t.add_row(L("News", "新闻"), per.news_feeds)
+        if ok.get(per.news) is None:
+            t.add_row("", "[dim]" + escape(L(missing_message(per.news), missing_message(per.news, zh=True))) + "[/]")
         t.add_row(L("Source", "来源"), m["source"])
         console.print(t)
 
@@ -160,6 +166,11 @@ def day_cmd(
                   _num(n.get("score")), ", ".join((n.get("red_flags_confirmed") or []) +
                                                   (n.get("red_flags_single_source") or [])))
     console.print(t)
+    if snap.get("news_note"):
+        from ..news.files import missing_message
+
+        news_file = get_period(per).news
+        console.print("[yellow]" + escape(L(missing_message(news_file), missing_message(news_file, zh=True))) + "[/]")
     if syms and headlines:
         for sym, st in snap["stocks"].items():
             for h in (st.get("news") or {}).get("top", []):
@@ -214,6 +225,10 @@ def _print_summary(s: dict[str, Any]) -> None:
         color = {"pass": "green", "fail": "red"}.get(leak["verdict"], "yellow")
         console.print(f"{L('Look-ahead check', '防偷看检查')}: [{color}]{leak['verdict'].upper()}[/]  "
                       + "  ".join(f"{c['cut']}: {'same' if c['same'] else 'DIFFERENT'}" for c in leak.get("cuts", [])))
+    if s.get("news_missing"):
+        console.print("[yellow]" + escape(L(s["news_missing"], "新闻开着，但没找到这个时段的新闻文件，这次运行没有看到任何标题。"
+                                             "新闻标题有许可限制，不随包分发；把你自己的副本放进 ~/.riskaware/data/news "
+                                             "或 RISKAWARE_NEWS_DIR 指定的文件夹（docs/zh/news-history.md）。")) + "[/]")
     if s.get("folder"):
         console.print(f"{L('Record', '实验记录')}: {s['folder']}", soft_wrap=True)
 
@@ -435,6 +450,13 @@ def factors_cmd(
     except ValueError as exc:
         console.print(f"[red]{escape(str(exc))}[/]")
         raise typer.Exit(2) from exc
+    missing = [get_period(p).news for p in periods if not get_period(p).has_news]
+    if missing:
+        from ..news.files import missing_message
+
+        for name in missing:
+            console.print(f"[red]{escape(L(missing_message(name), missing_message(name, zh=True)))}[/]")
+        raise typer.Exit(2)
     scores = None
     llm_info = None
     if llm_import:  # scores from a batch run: use them, and call no model unless --llm-limit says so
@@ -656,7 +678,7 @@ def bench_cmd(
     max_tokens: int = typer.Option(2000),
 ) -> None:
     """Run rta-bench-1 tasks with an LLM and save each record. / 用一个 LLM 跑 rta-bench-1 的任务并保存记录"""
-    from .bench import SEEDS, TASKS, bench_policy, get_task, run_task
+    from .bench import SEEDS, TASKS, bench_policy, get_task, need_news, run_task
 
     try:
         tasks = [get_task(t).name for t in (task or TASKS)]
@@ -669,6 +691,12 @@ def bench_cmd(
         text = ", ".join(f"{o.get('action')} {o.get('symbol')}" for o in orders) or L("hold", "持有")
         console.print(f"[dim]{obs['day']}[/] {escape(text)}")
 
+    try:
+        for name in tasks:
+            need_news(get_task(name).period)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
     for s, name in ((s, name) for s in (seed or SEEDS) for name in tasks):
         console.print(f"[bold]{name}[/] seed {s}")
         policy = bench_policy(llm, base_url=base_url, temperature=temperature, max_tokens=max_tokens, on_reply=show)
@@ -742,8 +770,12 @@ def leaderboard_cmd(
                         "这里没有 leaderboard 文件夹；克隆仓库，或用 --dir 指定。"))
         raise typer.Exit(2)
     if anchors:
-        with console.status("...") as st:
-            rows = anchor_rows(progress=lambda msg: st.update(msg))
+        try:
+            with console.status("...") as st:
+                rows = anchor_rows(progress=lambda msg: st.update(msg))
+        except FileNotFoundError as exc:
+            console.print(f"[red]{escape(str(exc))}[/]")
+            raise typer.Exit(2) from exc
         (root / "anchors.json").write_text(json.dumps(rows, indent=1) + "\n", encoding="utf-8")
     entries = load_entries(root / "entries")
     bad = 0

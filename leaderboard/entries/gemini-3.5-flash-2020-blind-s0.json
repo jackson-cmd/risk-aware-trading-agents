@@ -57,7 +57,7 @@
    "decisions.csv": "aa85ad04ace289daf65806c33cb1fb3c5e403d9e7a9917715f19a0d484b4887f",
    "policy_log.json": "6144201e595f448471ed6f371f0c61bf596ef187e6d46d5f145f1b615d5d1972"
   },
-  "replies_sha256": "ec69da1db6cd0d361237bf780c5bffcbf67cd3fd872531d846b79d6d4fd3076a",
+  "replies_sha256": "278bdd777ee49c220c66abc443571f3e203b46f7321ba9293453f881bfc5d5fa",
   "observations_sha256": "bed28507bc82ce5ea33d86f34e71a04a3cdc72e9e610739998e1fd16be30d68c",
   "costs_seen_by_model": "fixed",
   "rescored_from": "20261113-205602-llm-gemini-3-5-flash-2020-blind-2020-news"
@@ -805,74 +805,63 @@
      "symbol": "S30",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, high RSI, and positive option flow/analyst commentary under RISK_ON regime."
+     "fraction": 0.0
     },
     {
      "symbol": "S16",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Exceptional 21-day return, high relative volume, and positive price target increase."
+     "fraction": 0.0
     },
     {
      "symbol": "S50",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, positive news regarding China deliveries, and price target upgrades."
+     "fraction": 0.0
     },
     {
      "symbol": "S26",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Trading at 52-week high with positive AI-related healthcare news."
+     "fraction": 0.0
     },
     {
      "symbol": "S14",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong technology sector momentum, high RSI, and trading near 52-week high."
+     "fraction": 0.0
     },
     {
      "symbol": "S12",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Financial sector leader trading at 52-week high with strong momentum."
+     "fraction": 0.0
     },
     {
      "symbol": "S31",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Financial sector stock trading at 52-week high with low volatility."
+     "fraction": 0.0
     },
     {
      "symbol": "S54",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Technology sector stock with strong momentum and positive option sweep activity."
+     "fraction": 0.0
     },
     {
      "symbol": "S25",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Industrials sector stock with high relative volume and strong post-holiday momentum."
+     "fraction": 0.0
     },
     {
      "symbol": "S08",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Consumer Discretionary stock trading near 52-week high with solid momentum indicators."
+     "fraction": 0.0
     }
-   ],
-   "note": "Initiating 10 long positions of 10% weight each in high-momentum stocks showing strong relative strength and positive catalysts under a RISK_ON market regime."
+   ]
   },
   {
    "orders": [
@@ -880,18 +869,15 @@
      "symbol": "S50",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Take profit on S50 following multiple analyst downgrades (Baird and CFRA) and high relative volume indicating a potential short-term reversal."
+     "fraction": 1.0
     },
     {
      "symbol": "S36",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, upgraded to Outperform by Credit Suisse, and full acquisition of Fairlife provides positive fundamental catalyst."
+     "fraction": 0
     }
-   ],
-   "note": "Replaced S50 with S36 to lock in gains on S50 after analyst downgrades, while adding S36 which has strong positive news and analyst upgrades."
+   ]
   },
   {
    "orders": [
@@ -899,11 +885,9 @@
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming position with negative return since purchase and weak relative momentum compared to other financial sector options."
+     "fraction": 1
     }
-   ],
-   "note": "Selling S12 to free up cash and optimize the portfolio's momentum profile under RISK_ON conditions."
+   ]
   },
   {
    "orders": [
@@ -911,18 +895,15 @@
      "symbol": "S26",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong positive news regarding cloud partnership with Activision Blizzard and solid technical setup."
+     "fraction": 0
     },
     {
      "symbol": "S07",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Data breach red flag and negative news sentiment regarding driver abuse complaints."
+     "fraction": 1
     }
-   ],
-   "note": "Replaced S07 with S26 due to a data breach red flag on S07 and highly positive cloud partnership news for S26."
+   ]
   },
   {
    "orders": [
@@ -930,39 +911,33 @@
      "symbol": "S08",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "SEC probe investigation red flag and weak price action"
+     "fraction": 1
     },
     {
      "symbol": "S16",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak price action and relative underperformance"
+     "fraction": 1
     },
     {
      "symbol": "S31",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Weak price action and relative underperformance"
+     "fraction": 1
     },
     {
      "symbol": "S28",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, high RSI, and positive analyst price target revisions"
+     "fraction": 0
     },
     {
      "symbol": "S52",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong positive news score and multiple analyst price target upgrades"
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming and high-risk positions (S08, S16, S31) with high-momentum, positively-rated stocks (S28, S52) while maintaining a balanced portfolio."
+   ]
   },
   {
    "orders": [
@@ -970,18 +945,15 @@
      "symbol": "S24",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, high relative volume, and positive earnings surprise news score."
+     "fraction": 0
     },
     {
      "symbol": "S17",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong earnings-driven breakout with high relative volume and positive price momentum."
+     "fraction": 0
     }
-   ],
-   "note": "Adding S24 and S17 to utilize the remaining cash in a RISK_ON regime with strong momentum candidates."
+   ]
   },
   {
    "orders": [
@@ -989,18 +961,15 @@
      "symbol": "S17",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Underperforming short-term momentum with negative 1-day return and high relative volume on down day."
+     "fraction": 1.0
     },
     {
      "symbol": "S39",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong positive momentum with high relative volume and positive analyst revisions following earnings beat."
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming position S17 with high-momentum stock S39 which showed strong earnings-driven breakout."
+   ]
   },
   {
    "orders": [
@@ -1008,11 +977,9 @@
      "symbol": "S39",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Sell underperforming position showing high volatility and negative short-term momentum during market uncertainty."
+     "fraction": 1
     }
-   ],
-   "note": "Market regime is uncertain with elevated VIX (25.03) and fear/greed at 24.65. Trimming S39 to raise cash and manage risk."
+   ]
   },
   {
    "orders": [
@@ -1020,25 +987,21 @@
      "symbol": "S25",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with negative return and high volatility in a RISK_OFF regime"
+     "fraction": 1.0
     },
     {
      "symbol": "S52",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with negative return in a RISK_OFF regime"
+     "fraction": 1.0
     },
     {
      "symbol": "S04",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong relative strength, positive news upgrade, and trading above key EMAs in a defensive sector"
+     "fraction": 0.0
     }
-   ],
-   "note": "Trimming underperforming positions (S25, S52) to raise cash and adding a strong defensive consumer staple (S04) during a RISK_OFF regime."
+   ]
   },
   {
    "orders": [
@@ -1046,25 +1009,21 @@
      "symbol": "S28",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Risk-off regime with high VIX (54.46). Reducing exposure in underperforming technology positions to preserve capital."
+     "fraction": 1.0
     },
     {
      "symbol": "S30",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Risk-off regime with high VIX (54.46). Selling position due to negative news sentiment and circuit breaker halt."
+     "fraction": 1.0
     },
     {
      "symbol": "S26",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Risk-off regime with high VIX (54.46). Reducing exposure in underperforming communication services positions."
+     "fraction": 1.0
     }
-   ],
-   "note": "The market is in a severe RISK_OFF regime with VIX at 54.46 and fear_greed at 1.65. We are raising cash by liquidating some of our weakest positions to protect the portfolio from further systemic downside."
+   ]
   },
   {
    "orders": [
@@ -1072,59 +1031,48 @@
      "symbol": "S04",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Extreme risk-off regime (VIX at 82.69) requires raising cash and reducing exposure across all positions."
+     "fraction": 1.0
     },
     {
      "symbol": "S14",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Extreme risk-off regime (VIX at 82.69) requires raising cash and reducing exposure across all positions."
+     "fraction": 1.0
     },
     {
      "symbol": "S24",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Extreme risk-off regime (VIX at 82.69) requires raising cash and reducing exposure across all positions."
+     "fraction": 1.0
     },
     {
      "symbol": "S36",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Extreme risk-off regime (VIX at 82.69) requires raising cash and reducing exposure across all positions."
+     "fraction": 1.0
     },
     {
      "symbol": "S54",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Extreme risk-off regime (VIX at 82.69) requires raising cash and reducing exposure across all positions."
+     "fraction": 1.0
     }
-   ],
-   "note": "The market is in an extreme RISK_OFF regime with the VIX at 82.69 and breadth at 0.0. Liquidating all positions to preserve capital and maximize cash share."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market is in a severe RISK_OFF regime with a VIX of 61.59 and breadth at 0.0. Given the extreme volatility and downward trend, we will remain 100% in cash to preserve capital until market conditions stabilize."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime remains in RISK_OFF with an extremely high risk score of 88.42 and VIX elevated at 57.08. Market breadth is at 0.0 and the SPY trend is down. In such a highly defensive and volatile environment, preserving capital is the priority. We will remain 100% in cash and wait for market conditions to stabilize."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime remains RISK_OFF with a very high risk score of 80.62 and VIX at 45.24. Although there was a strong one-day market-wide rebound, breadth is 0.0 and the SPY trend is down. In accordance with a defensive strategy under high-risk conditions, we will remain 100% in cash and wait for market conditions to stabilize."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is RISK_OFF with a high risk score of 70.61 and VIX at 37.76. The SPY trend is down. In this environment, we will remain 100% in cash to preserve capital and wait for a more favorable risk regime."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is RISK_OFF with a high risk score of 76.04 and VIX elevated at 45.41. SPY trend is down. In this environment, preserving capital is the priority. We will remain 100% in cash and wait for market conditions to stabilize."
+   "orders": []
   },
   {
    "orders": [
@@ -1132,33 +1080,27 @@
      "symbol": "S42",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong Q1 earnings beat, positive CFRA upgrade to Strong Buy, and solid technical momentum with RSI2 pulling back slightly from extreme highs but remaining in a healthy uptrend."
+     "fraction": 0
     },
     {
      "symbol": "S01",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Reported better-than-expected Q1 EPS and sales, showing strong relative strength and trading near its 52-week highs despite a minor guidance cut."
+     "fraction": 0
     },
     {
      "symbol": "S39",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Completed acquisition of Mellanox, received a price target raise from Morgan Stanley, and shows strong momentum trading well above its EMA200."
+     "fraction": 0
     }
-   ],
-   "note": "Initiating positions in high-conviction names with strong earnings catalysts and positive analyst revisions (S42, S01, S39) while maintaining a high cash buffer due to the RISK_OFF regime and upcoming FOMC meeting."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime is RISK_OFF with a high VIX of 33.61 and a down SPY trend. We will hold our current positions (S01, S39, S42) and maintain a high cash buffer of approximately 70% to protect capital during this volatile period."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is RISK_OFF with a high risk score of 65.43 and VIX elevated at 33.04. Breadth is weak at 0.2727 and SPY trend is down. Given these defensive conditions and upcoming PPI macro data, we will maintain our current high cash position (approx 70%) and hold our existing positions (S01, S39, S42) without adding new exposure."
+   "orders": []
   },
   {
    "orders": [
@@ -1166,42 +1108,33 @@
      "symbol": "S42",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming position with negative return and weak relative strength compared to other holdings"
+     "fraction": 1
     },
     {
      "symbol": "S56",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, high relative volume, and positive catalyst from launching the new 'Shops' commerce feature"
+     "fraction": 0
     }
-   ],
-   "note": "Replaced underperforming consumer staples position S42 with high-momentum technology/communication stock S56 following its major commerce product announcement."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime is currently UNCERTAIN with a relatively high VIX of 27.62. Our existing positions (S01, S39, S56) are performing well and showing positive gains. Given the elevated risk score and uncertain trend, we will maintain our current holdings and preserve our cash buffer of approximately 67.8% without initiating new positions at this time."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is UNCERTAIN with a high VIX of 25.66, although fear/greed is elevated. Our current positions (S01, S39, S56) are performing well with solid gains and reasonable RSI levels. We will maintain our current holdings and preserve our cash cushion of 67% until the market regime stabilizes or clearer trends emerge."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime remains UNCERTAIN with a risk score of 36.22 and VIX elevated at 27.57. Our existing positions (S01, S39, S56) are performing well and showing positive gains. Given the upcoming macro events (FOMC, PPI) and the uncertain regime, we will maintain our current positions and hold our cash buffer without making new purchases."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is RISK_OFF with a high VIX of 33.47. Our current positions (S01, S39, S56) are performing well and showing positive gains. Given the elevated risk score and high volatility, we will maintain our current holdings and preserve our cash buffer of 66.7% rather than initiating new positions."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is RISK_OFF with a high VIX of 33.84. Our existing positions (S01, S39, S56) are showing positive gains and reasonable RSI levels. Given the risk-off environment and high volatility, we will hold our current positions and maintain a high cash buffer without adding new exposure."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is RISK_OFF with a high VIX of 28.62, and NFP is approaching. Our current positions (S01, S39, S56) are performing well and showing positive gains. Given the elevated risk score and high volatility, we will maintain our current holdings and preserve our cash cushion of 66% without initiating new positions."
+   "orders": []
   },
   {
    "orders": [
@@ -1209,32 +1142,27 @@
      "symbol": "S04",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum and volume breakout in Consumer Staples sector with positive news catalyst"
+     "fraction": 0
     },
     {
      "symbol": "S14",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong technology momentum, high RSI, and trading near 52-week highs"
+     "fraction": 0
     },
     {
      "symbol": "S30",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong technology stock with high relative strength and trading near 52-week highs"
+     "fraction": 0
     },
     {
      "symbol": "S54",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Excellent momentum, trading near highs, and positive analyst price target revisions"
+     "fraction": 0
     }
-   ],
-   "note": "Adding high-momentum stocks in Technology and Consumer Staples sectors while maintaining existing profitable positions."
+   ]
   },
   {
    "orders": [
@@ -1242,32 +1170,27 @@
      "symbol": "S14",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming technology position with negative return since purchase and weak short-term momentum"
+     "fraction": 1
     },
     {
      "symbol": "S54",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming technology position with negative return since purchase and weak short-term momentum"
+     "fraction": 1
     },
     {
      "symbol": "S32",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum in Health Care sector with multiple analyst price target upgrades and positive news score"
+     "fraction": 0
     },
     {
      "symbol": "S41",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum in Health Care sector with positive news score and raised acquisition offer"
+     "fraction": 0
     }
-   ],
-   "note": "Reallocating capital from underperforming technology positions (S14, S54) into high-momentum healthcare stocks (S32, S41) with positive news catalysts."
+   ]
   },
   {
    "orders": [
@@ -1275,40 +1198,33 @@
      "symbol": "S30",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Negative news regarding multi-state consumer protection probe and deceptive trade practices investigation."
+     "fraction": 1
     },
     {
      "symbol": "S56",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Negative news regarding continuing advertising boycotts impacting ad revenue."
+     "fraction": 1
     },
     {
      "symbol": "S21",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, positive Q2 earnings report, and multiple analyst price target upgrades."
+     "fraction": 0
     },
     {
      "symbol": "S36",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Upgraded to Overweight by Morgan Stanley following strong Q2 earnings results."
+     "fraction": 0
     }
-   ],
-   "note": "Reallocating capital away from positions with negative news catalysts (S30, S56) into high-momentum stocks with strong earnings and analyst upgrades (S21, S36)."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime is UNCERTAIN with a high VIX of 24.76. Our current positions are performing reasonably well, and we have a solid cash buffer of 25.67%. Given the heightened volatility and uncertain regime, we will hold our current positions and wait for clearer market direction before deploying more capital."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "The market regime is UNCERTAIN with a high risk score of 22.13 and VIX at 22.65, though fear/greed is in extreme greed territory. Our current portfolio positions are performing well overall, with S39 showing a substantial gain of 52.78% and S01 up 16.45%. Given the upcoming Non-Farm Payrolls (NFP) macro event and the uncertain market regime, we will maintain our current positions and hold our cash buffer of approximately 25% to protect capital and preserve flexibility."
+   "orders": []
   },
   {
    "orders": [
@@ -1316,25 +1232,21 @@
      "symbol": "S36",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with flat returns over 14 days, freeing up capital for stronger momentum opportunities."
+     "fraction": 1.0
     },
     {
      "symbol": "S23",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum with RSI14 at 81.13, trading very close to its 52-week high, and supported by positive analyst price target increases."
+     "fraction": 0.0
     },
     {
      "symbol": "S30",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "High relative volume and strong upward trend, trading near its 52-week high despite temporary noise regarding App Store disputes."
+     "fraction": 0.0
     }
-   ],
-   "note": "Replaced underperforming consumer staple S36 with high-momentum technology and consumer discretionary names (S30 and S23) to maximize returns in an uncertain but upward-trending market regime."
+   ]
   },
   {
    "orders": [
@@ -1342,32 +1254,27 @@
      "symbol": "S23",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Underperforming short-term momentum and high RSI2 pullback risk"
+     "fraction": 1
     },
     {
      "symbol": "S30",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Extremely overbought short-term (RSI2 > 97) and negative news sentiment"
+     "fraction": 1
     },
     {
      "symbol": "S06",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, positive analyst price target increase, and solid relative volume"
+     "fraction": 0
     },
     {
      "symbol": "S52",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong upward trend, high RSI14, and solid relative volume"
+     "fraction": 0
     }
-   ],
-   "note": "Rebalancing portfolio by selling underperforming and overextended positions (S23, S30) and buying strong momentum stocks (S06, S52) with positive catalysts."
+   ]
   },
   {
    "orders": [
@@ -1375,11 +1282,9 @@
      "symbol": "S34",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum and high relative volume driven by positive news regarding TikTok partnership with S54."
+     "fraction": 0
     }
-   ],
-   "note": "Adding S34 to the portfolio to capture momentum from the TikTok acquisition news, while maintaining existing positions in a highly valued but uncertain market regime."
+   ]
   },
   {
    "orders": [
@@ -1387,11 +1292,9 @@
      "symbol": "S39",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Rebalance S39 to default weight after a significant run-up and today's sharp market-wide pullback."
+     "fraction": 0.0
     }
-   ],
-   "note": "Market regime is RISK_OFF with a high VIX of 33.6. We maintain our existing long positions but trim our outsized winner S39 back to the default 10% weight to lock in profits and manage risk ahead of the NFP macro event."
+   ]
   },
   {
    "orders": [
@@ -1399,39 +1302,33 @@
      "symbol": "S32",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming health care position with negative returns and weak momentum indicators."
+     "fraction": 1.0
     },
     {
      "symbol": "S34",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming consumer staples position with negative returns since purchase."
+     "fraction": 1.0
     },
     {
      "symbol": "S52",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Financial position showing negative returns and short-term weakness."
+     "fraction": 1.0
     },
     {
      "symbol": "S41",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, positive analyst revisions, and solid relative volume."
+     "fraction": 0.0
     },
     {
      "symbol": "S08",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong upward momentum, reaching 52-week highs with positive analyst price target upgrades."
+     "fraction": 0.0
     }
-   ],
-   "note": "Rebalancing the portfolio by selling underperforming positions (S32, S34, S52) and buying high-momentum stocks (S41, S08) with strong relative volume and positive news catalysts."
+   ]
   },
   {
    "orders": [
@@ -1439,26 +1336,21 @@
      "symbol": "S21",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Underperforming health care position with negative momentum and high relative volume on down days"
+     "fraction": 1.0
     },
     {
      "symbol": "S08",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong analyst support with raised price targets and solid momentum indicators"
+     "fraction": 0
     }
-   ],
-   "note": "Rebalancing portfolio by cutting underperforming S21 and adding to S08 which has strong positive analyst revisions and bullish momentum."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime remains UNCERTAIN with a risk score of 32.14 and VIX elevated at 26.38. All current positions (S01, S04, S06, S08, S39, S41) are showing positive gains and stable technical indicators. I will maintain the current portfolio allocation and hold cash at approximately 38.5% to preserve flexibility."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Market regime is uncertain with a risk score of 21.54 and VIX elevated at 27.63. Our current portfolio of 6 positions is performing well, with S39 showing a substantial gain of 76.1%. Given the mixed trend and general uncertainty, we will maintain our current holdings and preserve our cash buffer of approximately 37.8% without initiating new positions."
+   "orders": []
   },
   {
    "orders": [
@@ -1466,60 +1358,51 @@
      "symbol": "S41",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain target weight on strong performer near 52-week highs"
+     "fraction": 0
     },
     {
      "symbol": "S39",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain target weight on high-performing technology position"
+     "fraction": 0
     },
     {
      "symbol": "S08",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain target weight on strong consumer discretionary position"
+     "fraction": 0
     },
     {
      "symbol": "S06",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain target weight on solid consumer discretionary position"
+     "fraction": 0
     },
     {
      "symbol": "S04",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain target weight on stable consumer staples position"
+     "fraction": 0
     },
     {
      "symbol": "S01",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain target weight on financials position"
+     "fraction": 0
     },
     {
      "symbol": "S51",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, high RSI, and trading very close to 52-week highs in a supportive market trend"
+     "fraction": 0
     },
     {
      "symbol": "S37",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Excellent momentum, high RSI, and trading near 52-week highs with strong relative volume"
+     "fraction": 0
     }
-   ],
-   "note": "Rebalancing existing positions to target weights and deploying excess cash into high-momentum, low-risk-flagged stocks S51 and S37 to optimize portfolio performance under uncertain regime conditions."
+   ]
   },
   {
    "orders": [
@@ -1527,29 +1410,24 @@
      "symbol": "S01",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Negative news sentiment regarding sovereign rating downgrades and debt restructuring pressure."
+     "fraction": 1.0
     },
     {
      "symbol": "S28",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, high relative volume, and positive analyst coverage with raised price targets."
+     "fraction": 0
     },
     {
      "symbol": "S38",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong upward momentum, high relative volume, and a fresh upgrade to Overweight with a high price target."
+     "fraction": 0
     }
-   ],
-   "note": "Replaced S01 due to negative macro-related news with high-momentum stocks S28 and S38 showing strong analyst support and technical strength."
+   ]
   },
   {
-   "orders": [],
-   "note": "The market regime is UNCERTAIN with a risk score of 26.37 and elevated VIX at 27.55. The portfolio is currently well-diversified across 9 positions, close to the maximum of 10, with a cash buffer of 9.4%. No immediate changes are required; we will hold our current positions and monitor market conditions."
+   "orders": []
   },
   {
    "orders": [
@@ -1557,11 +1435,9 @@
      "symbol": "S39",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Take profit on S39 with high gain in a RISK_OFF regime to raise cash and manage risk."
+     "fraction": 1
     }
-   ],
-   "note": "Reducing exposure by taking profits on S39 in a RISK_OFF regime with high VIX."
+   ]
   },
   {
    "orders": [
@@ -1569,39 +1445,33 @@
      "symbol": "S38",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with negative returns and restructuring headwinds in Northern Ireland."
+     "fraction": 1.0
     },
     {
      "symbol": "S41",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Rebalancing strong performer to default weight of 10%."
+     "fraction": 0.0
     },
     {
      "symbol": "S04",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Rebalancing strong performer to default weight of 10%."
+     "fraction": 0.0
     },
     {
      "symbol": "S15",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, trading near 52-week highs, positive analyst price target increase."
+     "fraction": 0.0
     },
     {
      "symbol": "S33",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "High momentum stock with strong relative performance and positive institutional interest."
+     "fraction": 0.0
     }
-   ],
-   "note": "Selling underperforming S38, rebalancing S41 and S04 to lock in gains, and deploying cash into high-momentum stocks S15 and S33."
+   ]
   },
   {
    "orders": [
@@ -1609,18 +1479,15 @@
      "symbol": "S15",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Take profit/reduce exposure on short-term overextended position (RSI14 > 73, high vs_ema200)"
+     "fraction": 1
     },
     {
      "symbol": "S34",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum, high relative volume, positive news sentiment, and close to 52-week high"
+     "fraction": 0
     }
-   ],
-   "note": "Rebalancing portfolio by selling overextended industrial stock S15 and buying strong consumer staple S34."
+   ]
   },
   {
    "orders": [
@@ -1628,18 +1495,15 @@
      "symbol": "S06",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with negative momentum and weak relative strength (RSI14 under 40, vs_ema200 low)."
+     "fraction": 1.0
     },
     {
      "symbol": "S24",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, high RSI, trading near 52-week highs with positive analyst coverage."
+     "fraction": 0.0
     }
-   ],
-   "note": "Replaced underperforming S06 with S24 to capture strong positive momentum in the Communication Services sector."
+   ]
   },
   {
    "orders": [
@@ -1647,15 +1511,12 @@
      "symbol": "S30",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong positive news sentiment with analyst upgrades and price target increases, showing solid momentum."
+     "fraction": 0
     }
-   ],
-   "note": "Adding S30 to the portfolio to utilize available cash, capitalizing on its positive analyst upgrades and strong relative volume."
+   ]
   },
   {
-   "orders": [],
-   "note": "The portfolio is currently fully invested with 10 positions, and all positions are performing well or stable. The market regime is UNCERTAIN with a high fear/greed score of 81.14, suggesting caution. No immediate adjustments are required, so we hold all current positions."
+   "orders": []
   },
   {
    "orders": [
@@ -1663,18 +1524,15 @@
      "symbol": "S34",
      "action": "sell",
      "weight": 0,
-     "fraction": 1.0,
-     "reason": "Underperforming position with weak short-term momentum and low RSI2"
+     "fraction": 1.0
     },
     {
      "symbol": "S16",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong upward momentum, high relative volume, and positive option trader sentiment near all-time highs"
+     "fraction": 0
     }
-   ],
-   "note": "Replacing underperforming consumer staple S34 with high-momentum technology stock S16 to optimize portfolio performance."
+   ]
   },
   {
    "orders": [
@@ -1682,32 +1540,27 @@
      "symbol": "S16",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming short-term position with negative return and high relative volatility."
+     "fraction": 1.0
     },
     {
      "symbol": "S33",
      "action": "sell",
      "weight": 0.0,
-     "fraction": 1.0,
-     "reason": "Underperforming technology position with negative return over 29 days held."
+     "fraction": 1.0
     },
     {
      "symbol": "S03",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Strong momentum, high relative volume, and positive news regarding loosened buyback restrictions."
+     "fraction": 0.0
     },
     {
      "symbol": "S30",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0.0,
-     "reason": "Maintain target weight on strong momentum and positive news regarding EV partnership plans."
+     "fraction": 0.0
     }
-   ],
-   "note": "Replaced underperforming technology positions S16 and S33 with S03, which shows strong momentum and positive regulatory catalysts."
+   ]
   },
   {
    "orders": [
@@ -1715,11 +1568,9 @@
      "symbol": "S23",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Avoid potential negative impact from unconfirmed product recall news."
+     "fraction": 1
     }
-   ],
-   "note": "Selling S23 due to a product recall red flag in the news to manage risk, while keeping other positions unchanged."
+   ]
   }
  ]
 }

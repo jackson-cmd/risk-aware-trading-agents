@@ -16,6 +16,8 @@ from riskaware.news.history import decision_time, load_bundle
 from riskaware.research import news_factors as nf
 from riskaware.research.periods import get_period
 
+from .conftest import needs_news
+
 NY = ZoneInfo("America/New_York")
 # enough stocks for a cross-section (the price controls need 15), few enough to keep the tests quick
 STOCKS = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "JPM", "XOM", "KO", "PG", "WMT", "UNH", "HD",
@@ -72,8 +74,8 @@ def _rewrite_after(records: list[dict], cutoff: datetime) -> list[dict]:
     for k, sym in enumerate(STOCKS):
         for minutes in (0, 1, 125, 60 * 24 + 7):  # right at the close, just after, the evening, the next day
             stamp = cutoff + timedelta(minutes=minutes, seconds=k)
-            out.append({"ts": stamp.strftime("%Y-%m-%dT%H:%M:%SZ"), "symbol": sym, "source": "Benzinga",
-                        "feed": "benzinga", "headline": f"{sym} and AAPL soar after a surprise buyback"})
+            out.append({"ts": stamp.strftime("%Y-%m-%dT%H:%M:%SZ"), "symbol": sym, "source": "Newswire",
+                        "feed": "headlines", "headline": f"{sym} and AAPL soar after a surprise buyback"})
         out.append({"ts": (cutoff + timedelta(minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ"), "symbol": sym,
                     "source": "SEC EDGAR", "feed": "sec", "headline": "8-K: Item 2.02 Results of operations",
                     "summary": "items:2.02,9.01", "url": f"https://example.invalid/{sym}"})
@@ -93,6 +95,7 @@ def panels():
     return honest, changed
 
 
+@needs_news
 def test_features_ignore_everything_published_at_or_after_the_close(panels):
     honest, changed = panels
     a, b = honest.features("publication"), changed.features("publication")
@@ -112,6 +115,7 @@ def test_a_calendar_date_join_reads_the_evening_news(panels):
     assert {"headlines", "sentiment", "earnings_8k"} <= set(moved)
 
 
+@needs_news
 def test_the_features_look_like_the_bundled_news(panels):
     honest, _ = panels
     f = honest.features("publication", report=False)
@@ -123,7 +127,7 @@ def test_the_features_look_like_the_bundled_news(panels):
     assert set(np.unique(f["earnings_8k"].to_numpy())) <= {0.0, 1.0} and f["earnings_8k"].to_numpy().sum() >= 40
     assert f["sentiment"].isna().any().any()  # stocks without news are not ranked on tone
     moved = honest.moved_share()
-    assert 0.08 < moved["benzinga"] < 0.25 and 0.5 < moved["sec"] < 0.75
+    assert 0.08 < moved["headlines"] < 0.25 and 0.5 < moved["sec"] < 0.75
 
 
 # --------------------------------------------------------------------------------------------- statistics
@@ -214,6 +218,7 @@ def study():
     return nf.run_study(["2026"], stocks=STOCKS, report=False)
 
 
+@needs_news
 def test_the_study_tests_each_factor_and_compares_the_joins(study, tmp_path):
     assert study.periods == ["2026"]
     assert {"headlines", "sentiment", "earnings_8k", "momentum", "low_vol"} <= set(study.pooled)
@@ -257,6 +262,7 @@ def test_the_verdict_rule():
     assert nf.verdict("sentiment", st)["verdict"] == "noise"
 
 
+@needs_news
 def test_the_cli_writes_the_report(monkeypatch, tmp_path):
     from typer.testing import CliRunner
 
@@ -332,6 +338,7 @@ def test_batch_requests_and_their_results_fill_the_cache(tmp_path):
     assert m["model"] == "openai:gpt-5.6-luna" and m["system_prompt"] == nf.LLM_SYSTEM and len(m["prompt_sha256"]) == 64
 
 
+@needs_news
 def test_the_cli_exports_requests_and_imports_results(monkeypatch, tmp_path):
     from typer.testing import CliRunner
 
@@ -363,6 +370,7 @@ def test_the_cli_exports_requests_and_imports_results(monkeypatch, tmp_path):
     assert json.loads((tmp_path / "f" / "factors.json").read_text(encoding="utf-8"))["llm"]["scored"] == 120
 
 
+@needs_news
 def test_llm_scores_become_a_factor():
     recs = [r for r in _records() if r["symbol"] in STOCKS[:12]]
     scores = {nf.headline_key(r["symbol"], r["headline"]): (1.0 if "beat" in r["headline"].lower() else -0.2)
@@ -373,6 +381,7 @@ def test_llm_scores_become_a_factor():
     assert (f.stack().dropna() > 0).any() and (f.stack().dropna() < 0).any()
 
 
+@needs_news
 def test_pairs_to_score_skip_filings_and_duplicates():
     pairs = nf.headlines_to_score(["2026"])
     assert len(pairs) == len(set(pairs)) > 15000
@@ -383,6 +392,7 @@ def test_pairs_to_score_skip_filings_and_duplicates():
 ROOT = __import__("pathlib").Path(__file__).resolve().parent.parent
 
 
+@needs_news
 def test_the_guide_numbers_still_hold():
     """The join comparison the website and docs quote comes from the frozen data of all three periods."""
     parts = [nf.alignment_series("sentiment", nf.load_period(p, report=False)) for p in ("2026", "2022", "2020")]

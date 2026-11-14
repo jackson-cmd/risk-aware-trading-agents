@@ -119,6 +119,8 @@ The levered longs lost money in all 17 positions; the shorts made a little but b
 
 The baselines on all three periods (`riskaware research baselines --period 2026`, `2022`, `2020`, then `riskaware research analyze` on each folder): the 56 megacap stocks, plain execution with at most 10 equal positions, orders at the next open with 5 bps slippage, without and with news. Returns are the same as in [the research kit](research.md#five-swing-strategies-with-and-without-news).
 
+The runs with news here read the research headline files (headline titles; for 2026 also SEC 8-K filings). They are licensed and not distributed, so the numbers are published and the headlines are not; with your own copy in `~/.riskaware/data/news`, or headline files built under the same rules ([news-history](news-history.md#the-research-headline-files-not-distributed)), the same commands run.
+
 Buys: the stocks' excess return over SPY in the five trading days from the fill. Sells: the excess they avoided. Exposures and alpha: the four-factor regression. Without it: the run's return had its best position made nothing.
 
 2026-01-02 to 2026-11-11, a rising market:

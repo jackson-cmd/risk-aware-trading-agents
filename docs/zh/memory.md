@@ -46,22 +46,22 @@ print(r.report("zh"))           # 中文报告（r.report() 是英文）
 
 - 过去 60 个交易日的收盘价，从旧到新；
 - RSI(14)、距 EMA50 和 EMA200 的距离、ATR 占价格的比例、距 52 周高点的距离、相对成交量，以及 21 日收益和同期 SPY 的对比；
-- 当天收盘前发布的最多三条标题，标明在收盘前几小时出现。
+- 当天收盘前发布的最多三条标题，标明在收盘前几小时出现（来自该时段的新闻文件：标题有许可限制，不随包分发，没有你自己的副本时记录里没有标题）。
 
-**实名**版本给出代码、公司名、行业、日期和真实成交价。**盲测**版本给化名（S01）、行业和「第 0 天」，价格以第一个收盘价为 100 换算，标题按盲测交易模式同样的规则遮蔽：公司名和代码、最有名的人（「the S01 chief」）和产品（「[product]」），以及所有日期和年份。标题里的每股美元金额按价格同样的比例换算，所以「Raises Price Target to $264」保留了目标价和股价的距离，却不再暴露是哪只股票：
+**实名**版本给出代码、公司名、行业、日期和真实成交价。**盲测**版本给化名（S01）、行业和「第 0 天」，价格以第一个收盘价为 100 换算，标题按盲测交易模式同样的规则遮蔽：公司名和代码、最有名的人（「the S01 chief」）和产品（「[product]」），以及所有日期和年份。标题里的每股美元金额按价格同样的比例换算，所以「raises its price target to $264」保留了目标价和股价的距离，却不再暴露是哪只股票（下面的例子改写了标题原文：研究用的新闻标题有许可限制，不随包分发）：
 
 ```
 [a1] LLY (Eli Lilly, Health Care), close of 2022-04-13
 closes (oldest first): 245.1 243.1 243.1 240.4 239.5 ... 308.4 311.7 309.0 308.1 302.7
 RSI14 66 | vs EMA50 +9.2% | vs EMA200 +21.3% | ATR 2.2% of the price | from the 52-week high -3.6% | ...
 headlines:
-- 33h before the close: "Goldman Sachs Maintains Neutral on Eli Lilly, Raises Price Target to $264"
+- 33h before the close: "A broker keeps its Neutral rating on Eli Lilly and raises its price target to $264"
 
 [a1] S01 (Health Care), close of day 0
 closes (oldest first, the first = 100): 100.0 99.2 99.2 98.1 97.7 ... 125.9 127.2 126.1 125.7 123.5
 RSI14 66 | vs EMA50 +9.2% | vs EMA200 +21.3% | ATR 2.2% of the price | from the 52-week high -3.6% | ...
 headlines:
-- 33h before the close: "Goldman Sachs Maintains Neutral on S01, Raises Price Target to $107.7"
+- 33h before the close: "A broker keeps its Neutral rating on S01 and raises its price target to $107.7"
 ```
 
 两遍都问同一个问题：接下来 20 个交易日，这只股票的总收益跑赢 SPY 的概率。两个回答都用实际结果打分：准确率、Brier 分数、对数损失和 AUC。两个版本只差「是谁、是哪天」，所以一个模型知道名字和日期时答得更好，就是在用它记住的东西。实名和盲测的记录从不放在同一次调用里：放在一个 prompt 里，模型可能把盲测记录和它的实名双胞胎对上。两种版本用同一个 system prompt，里面把两种形式都说明了。

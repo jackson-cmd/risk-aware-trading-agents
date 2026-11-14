@@ -15,7 +15,9 @@ from riskaware.research import agent
 from riskaware.research import prompt_report as R
 from riskaware.research import prompts as P
 
-REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
+from .conftest import news_file
+
+REAL_NEWS = news_file("news_2026.jsonl.gz")
 WINDOW = {"start": "2026-02-02", "end": "2026-04-30"}
 
 

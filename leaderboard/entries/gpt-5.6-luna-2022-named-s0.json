@@ -57,7 +57,7 @@
    "decisions.csv": "badf75c7183ca6fa6a1d58bf25015ebc5fd93898209a043b8ed8adc4008e9611",
    "policy_log.json": "32047185d8ff251588e26f228c3b057574329c3e8c3f410b972ec7546832e246"
   },
-  "replies_sha256": "8d5801c205f8b3cbbd3ca302217e008050e07f54b60964674e277a46e40c80b9",
+  "replies_sha256": "0e4365bf06378a6f1ded2947490419fba96a73f3211734c6f9e28ea9fcf63ebe",
   "observations_sha256": "5678ba2997999ab1746896c8f3cd298a87a563ae68f7ed0e643ca2cf6f9dcadf",
   "costs_seen_by_model": "fixed",
   "rescored_from": "20261113-203635-llm-gpt-5-6-luna-2022-named-2022-news"
@@ -767,72 +767,60 @@
      "symbol": "MSFT",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Risk-on regime; strong long-term trend with short-term oversold RSI2."
+     "fraction": 0
     },
     {
      "symbol": "GOOGL",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Long-term uptrend and short-term oversold conditions offer a measured entry."
+     "fraction": 0
     },
     {
      "symbol": "AMZN",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Near-term momentum improving while valuation proxy remains below prior highs."
+     "fraction": 0
     },
     {
      "symbol": "JPM",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive trend across moving averages and supportive financial-sector momentum."
+     "fraction": 0
     },
     {
      "symbol": "JNJ",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Defensive healthcare exposure with steady positive trend and moderate volatility."
+     "fraction": 0
     },
     {
      "symbol": "UNP",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Industrial uptrend with short-term pullback and controlled volatility."
+     "fraction": 0
     },
     {
      "symbol": "COST",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong persistent trend near highs; adds consumer-staples diversification."
+     "fraction": 0
     },
     {
      "symbol": "CVX",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Positive energy trend and broad risk-on participation, sized moderately."
+     "fraction": 0
     }
-   ],
-   "note": "Initiating a diversified 80% equity allocation; retain 20% cash because several leaders are short-term overbought and sentiment is elevated."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold current diversified portfolio; risk-on conditions persist, while several holdings are oversold and recent headlines are largely unconfirmed."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, mixed market with elevated volatility; retain current diversified positions and cash."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility and FOMC nearby; retain cash and existing diversified positions rather than adding exposure ahead of the event."
+   "orders": []
   },
   {
    "orders": [
@@ -840,64 +828,54 @@
      "symbol": "CVX",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Trim extended energy exposure modestly in an uncertain, overbought market."
+     "fraction": 0
     },
     {
      "symbol": "AMZN",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain diversified exposure; recent rebound is overbought but longer trend remains weak."
+     "fraction": 0
     },
     {
      "symbol": "COST",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain defensive consumer-staples exposure despite short-term overbought conditions."
+     "fraction": 0
     },
     {
      "symbol": "GOOGL",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain position after strong rebound; avoid adding with very high short-term RSI."
+     "fraction": 0
     },
     {
      "symbol": "JNJ",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Retain lower-volatility healthcare exposure."
+     "fraction": 0
     },
     {
      "symbol": "JPM",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain financial exposure while avoiding chasing the rebound."
+     "fraction": 0
     },
     {
      "symbol": "MSFT",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain quality technology exposure; mixed trend argues against increasing risk."
+     "fraction": 0
     },
     {
      "symbol": "UNP",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain industrial diversification with relatively contained volatility."
+     "fraction": 0
     }
-   ],
-   "note": "Hold current positions and cash; uncertain regime, elevated fear, and broad short-term overbought readings do not justify new purchases."
+   ]
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with mixed trend and elevated short-term momentum; maintain current diversified holdings and cash rather than chase overbought names or act on unconfirmed headlines."
+   "orders": []
   },
   {
    "orders": [
@@ -905,43 +883,36 @@
      "symbol": "JNJ",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Negative litigation-related headline risk and weak recent performance; exit to avoid concentrated event risk."
+     "fraction": 1
     },
     {
      "symbol": "MSFT",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Underperforming position with persistent weakness below short-term moving averages; reduce exposure in uncertain regime."
+     "fraction": 0.5
     },
     {
      "symbol": "JPM",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Negative recent return and weak news tone; trim financial exposure while maintaining diversification."
+     "fraction": 0.5
     },
     {
      "symbol": "ABBV",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong 21-day momentum and above major moving averages; replace part of exited defensive healthcare exposure despite short-term overbought readings."
+     "fraction": 0
     },
     {
      "symbol": "BRK-B",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Lower-volatility diversified financial exposure with positive long-term trend, suitable for uncertain conditions."
+     "fraction": 0
     }
-   ],
-   "note": "Trim event-risk and weaker holdings; maintain cash and favor diversified, higher-quality exposures."
+   ]
   },
   {
-   "orders": [],
-   "note": "Risk-off conditions remain severe; retain elevated cash and avoid adding to deeply oversold, high-volatility equities before confirmation of stabilization."
+   "orders": []
   },
   {
    "orders": [
@@ -949,50 +920,42 @@
      "symbol": "CVX",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Trim extended energy winner in risk-off conditions; RSI2 near 100 and price near 52-week high."
+     "fraction": 0.35
     },
     {
      "symbol": "COST",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim sharply overbought position ahead of earnings; RSI2 near 96."
+     "fraction": 0.25
     },
     {
      "symbol": "UNP",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.2,
-     "reason": "Reduce near-high, overbought industrial exposure while market regime remains risk-off."
+     "fraction": 0.2
     },
     {
      "symbol": "JPM",
      "action": "target",
      "weight": 0.07,
-     "fraction": 0,
-     "reason": "Increase selectively from an underweight after substantial decline; valuation and oversold conditions offer diversification."
+     "fraction": 0
     },
     {
      "symbol": "MSFT",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Restore a moderate quality-growth allocation after recent weakness and improving five-day momentum."
+     "fraction": 0
     },
     {
      "symbol": "PG",
      "action": "buy",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Add defensive consumer staples exposure with low volatility and mildly oversold trend."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain meaningful cash in a risk-off regime; rotate modestly from crowded, overbought winners toward defensive and quality exposures."
+   ]
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with CPI nearby; retain cash and current diversified holdings, avoiding reactive trades on unconfirmed headlines."
+   "orders": []
   },
   {
    "orders": [
@@ -1000,43 +963,36 @@
      "symbol": "ABBV",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Position is sharply overbought near its 52-week high; trim concentration ahead of FOMC uncertainty."
+     "fraction": 0.25
     },
     {
      "symbol": "BRK-B",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.2,
-     "reason": "Strong defensive rally and extreme short-term overbought reading; modestly reduce exposure."
+     "fraction": 0.2
     },
     {
      "symbol": "CVX",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.2,
-     "reason": "Lock in substantial gains after a strong run while energy momentum has weakened."
+     "fraction": 0.2
     },
     {
      "symbol": "JPM",
      "action": "target",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Maintain a smaller financials allocation; rebound is occurring but trend remains below longer-term averages."
+     "fraction": 0
     },
     {
      "symbol": "MSFT",
      "action": "target",
      "weight": 0.09,
-     "fraction": 0,
-     "reason": "Increase modestly toward a core weight after stabilization, with price near its 200-day average."
+     "fraction": 0
     }
-   ],
-   "note": "Keep elevated cash ahead of the FOMC; trim crowded winners and avoid chasing broadly overbought rebounds."
+   ]
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with elevated volatility; maintain current diversified holdings and cash, avoiding momentum chasing or reacting to unconfirmed headlines."
+   "orders": []
   },
   {
    "orders": [
@@ -1044,67 +1000,57 @@
      "symbol": "ABBV",
      "action": "target",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Strong trend but extremely overbought; trim concentration and lock gains."
+     "fraction": 0
     },
     {
      "symbol": "COST",
      "action": "target",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Near 52-week high with very elevated short-term RSI; reduce exposure."
+     "fraction": 0
     },
     {
      "symbol": "UNP",
      "action": "target",
      "weight": 0.07,
-     "fraction": 0,
-     "reason": "Near 52-week high and overbought after strong run; modest profit-taking."
+     "fraction": 0
     },
     {
      "symbol": "CVX",
      "action": "target",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Large gain and extended long-term trend; reduce concentration while retaining energy exposure."
+     "fraction": 0
     },
     {
      "symbol": "JPM",
      "action": "target",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Weak relative trend and negative news tone; modestly reduce risk."
+     "fraction": 0
     },
     {
      "symbol": "PG",
      "action": "target",
      "weight": 0.04,
-     "fraction": 0,
-     "reason": "Downgrade headline and limited momentum; reduce defensive allocation."
+     "fraction": 0
     },
     {
      "symbol": "AAPL",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Strong multi-week uptrend and broad risk-on backdrop; unconfirmed breach headline warrants moderate sizing."
+     "fraction": 0
     },
     {
      "symbol": "MA",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Positive trend across moving averages with improving five-day momentum."
+     "fraction": 0
     },
     {
      "symbol": "TXN",
      "action": "buy",
      "weight": 0.07,
-     "fraction": 0,
-     "reason": "Strong medium-term momentum and constructive trend despite a mild daily pullback."
+     "fraction": 0
     }
-   ],
-   "note": "Rebalance toward diversified momentum while trimming several overbought winners; retain cash for next-open uncertainty."
+   ]
   },
   {
    "orders": [
@@ -1112,58 +1058,48 @@
      "symbol": "ABBV",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Trim strongly overbought position near its 52-week high after a sharp run."
+     "fraction": 0.35
     },
     {
      "symbol": "COST",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.3,
-     "reason": "Reduce overbought exposure near its 52-week high."
+     "fraction": 0.3
     },
     {
      "symbol": "AMZN",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Slightly reduce concentration amid weak short-term momentum and unconfirmed regulatory headlines."
+     "fraction": 0
     },
     {
      "symbol": "UNP",
      "action": "target",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Reduce exposure after severe five-day weakness and deteriorating momentum."
+     "fraction": 0
     },
     {
      "symbol": "MSFT",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Add modestly to a high-quality holding after oversold short-term weakness while maintaining cash in an uncertain regime."
+     "fraction": 0
     },
     {
      "symbol": "GOOGL",
      "action": "target",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Maintain current exposure; short-term oversold conditions offset broader uncertainty."
+     "fraction": 0
     }
-   ],
-   "note": "Keep elevated cash and avoid chasing extended defensive winners; modestly rebalance toward quality while trimming overbought positions."
+   ]
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with mixed trend; retain substantial cash and current diversified positions. Avoid chasing overbought leaders or reacting to unconfirmed headlines."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with mixed trend; retain substantial cash and current diversified holdings. Avoid adding to strongly declining or event-sensitive names without confirmation."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility and several holdings facing earnings or extended downside; retain cash and avoid adding ahead of event risk."
+   "orders": []
   },
   {
    "orders": [
@@ -1171,54 +1107,45 @@
      "symbol": "AMZN",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Severe downtrend and weak momentum in a risk-off market; reduce concentrated loss exposure."
+     "fraction": 0.5
     },
     {
      "symbol": "GOOGL",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Persistent downtrend with negative news tone and elevated macro risk; trim position."
+     "fraction": 0.35
     },
     {
      "symbol": "MSFT",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.3,
-     "reason": "Technology weakness and below-trend price action ahead of NFP; modestly reduce risk."
+     "fraction": 0.3
     },
     {
      "symbol": "CVX",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Strong gain and extended energy momentum; take partial profits while retaining exposure."
+     "fraction": 0.25
     },
     {
      "symbol": "KO",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Defensive consumer staple with positive trend and relative resilience in risk-off conditions."
+     "fraction": 0
     },
     {
      "symbol": "JNJ",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Defensive healthcare exposure with low volatility and deeply oversold short-term momentum."
+     "fraction": 0
     }
-   ],
-   "note": "Raise liquidity and rotate modestly toward defensive holdings ahead of NFP; avoid aggressive buying during broad risk-off conditions."
+   ]
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility and broad downtrends; retain substantial cash and avoid adding exposure at the next open."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with weak breadth and downtrend; retain substantial cash and avoid adding exposure after the close."
+   "orders": []
   },
   {
    "orders": [
@@ -1226,55 +1153,45 @@
      "symbol": "CVX",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim extended energy winner in uncertain, risk-off regime."
+     "fraction": 0.25
     },
     {
      "symbol": "JPM",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.2,
-     "reason": "Reduce concentrated rebound exposure after sharp short-term rally."
+     "fraction": 0.2
     },
     {
      "symbol": "UNP",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim weak trend position following downgrade and persistent technical weakness."
+     "fraction": 0.25
     },
     {
      "symbol": "GOOGL",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Increase quality large-cap exposure at depressed valuation while retaining substantial cash."
+     "fraction": 0
     },
     {
      "symbol": "JNJ",
      "action": "target",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Add defensive healthcare exposure with strong trend and lower volatility."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain elevated cash near 50%; avoid chasing heavily overbought rebound names."
+   ]
   },
   {
-   "orders": [],
-   "note": "Uncertain, down-trending market with elevated volatility; retain substantial cash and avoid adding risk at the next open."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, risk-off regime with broad downside and elevated volatility; retain substantial cash and avoid adding exposure at the next open."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with elevated volatility, weak breadth, and OPEX nearby; retain 51% cash and avoid adding exposure while existing holdings are broadly below trend."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, down-trending market with elevated volatility; retain substantial cash and avoid adding after short-term rallies."
+   "orders": []
   },
   {
    "orders": [
@@ -1282,43 +1199,36 @@
      "symbol": "COST",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim an extended position in a risk-off market; retain core exposure."
+     "fraction": 0.5
     },
     {
      "symbol": "GOOGL",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Reduce concentrated technology exposure after a sharp rebound and amid weak breadth."
+     "fraction": 0.25
     },
     {
      "symbol": "MSFT",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Trim technology concentration while the broad trend remains down."
+     "fraction": 0.25
     },
     {
      "symbol": "ABBV",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Increase defensive healthcare exposure; strong trend and positive momentum."
+     "fraction": 0
     },
     {
      "symbol": "JNJ",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Add a defensive healthcare holding with positive long-term trend and low volatility."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash in the risk-off regime; favor defensive healthcare and avoid chasing oversold cyclicals."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold elevated cash ahead of CPI amid uncertain regime, weak breadth, downtrend, and high volatility; no sufficiently strong risk-adjusted entry or exit signal."
+   "orders": []
   },
   {
    "orders": [
@@ -1326,84 +1236,66 @@
      "symbol": "JNJ",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Guidance cut and weak price action create an unfavorable risk/reward."
+     "fraction": 1
     },
     {
      "symbol": "AMZN",
      "action": "target",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Strong rebound but extremely overbought short-term; modestly increase while retaining risk control."
+     "fraction": 0
     },
     {
      "symbol": "GOOGL",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Improving momentum and reasonable valuation proxy, but maintain moderate sizing in an uncertain regime."
+     "fraction": 0
     },
     {
      "symbol": "UNH",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Strong trend, defensive sector exposure, and positive earnings-related sentiment."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain elevated cash in an uncertain, down-trending market; avoid chasing highly overbought semiconductor and speculative rebounds."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold current positions and elevated cash ahead of the nearby FOMC event; market trend and breadth remain weak, while several candidates have earnings or event risk."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, down-trending market with elevated volatility; retain substantial cash and avoid chasing short-term overbought rallies or reacting to unconfirmed headlines."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold current positions and elevated cash ahead of the imminent CPI release; uncertain regime and declining SPY trend favor avoiding new exposure."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold current portfolio; market is neutral with elevated breadth and widespread short-term overbought conditions, so avoid chasing strength or reacting to unconfirmed headlines."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, down-trending market with elevated volatility; retain substantial cash and avoid adding risk after the broad selloff."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, risk-off market with declining breadth and SPY trend; retain substantial cash and existing diversified positions."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, down-trending market with weak breadth; retain elevated cash and avoid adding after the rebound."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, risk-off regime with downtrending market and weak breadth; retain elevated cash and avoid adding exposure despite oversold readings."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold current positions and cash ahead of the FOMC aftermath; risk is elevated, breadth and trend are weak, and no confirmed company-specific news justifies adding exposure."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with weak breadth and downtrend; retain elevated cash and avoid adding after broad rebound days."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, down-trending market with elevated volatility; retain substantial cash and avoid chasing short-term rebounds."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with CPI nearby and broad downtrends; retain elevated cash and avoid adding exposure before the event."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Risk-off regime with weak breadth and downtrend; retain substantial cash and avoid adding exposure after short-term rebounds."
+   "orders": []
   },
   {
    "orders": [
@@ -1411,39 +1303,33 @@
      "symbol": "GOOGL",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Severe post-earnings gap lower with heavy volume and negative trend; reduce event and momentum risk."
+     "fraction": 0.5
     },
     {
      "symbol": "MSFT",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Large post-earnings decline on heavy volume with weak trend; trim concentrated technology downside."
+     "fraction": 0.5
     },
     {
      "symbol": "CVX",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Strong run has left the position overbought near its 52-week high; take partial profits despite favorable trend."
+     "fraction": 0.25
     },
     {
      "symbol": "ABBV",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Position is sharply overbought after a strong advance; modest profit-taking reduces reversal risk."
+     "fraction": 0.25
     },
     {
      "symbol": "V",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Positive earnings reaction, strong relative momentum, and buyback support; add a measured quality-financials position."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash in an uncertain, down-trending market; trim post-earnings technology weakness and overbought winners while adding only modestly to Visa."
+   ]
   },
   {
    "orders": [
@@ -1451,69 +1337,57 @@
      "symbol": "AMZN",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Severe multi-week breakdown and unconfirmed red-flag news; reduce concentrated downside ahead of FOMC."
+     "fraction": 0.5
     },
     {
      "symbol": "UNP",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Persistent weakness with negative analyst downgrade; trim risk in an uncertain regime."
+     "fraction": 0.5
     },
     {
      "symbol": "GOOGL",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Strong downtrend and negative recent momentum; reduce exposure before macro event."
+     "fraction": 0.5
     },
     {
      "symbol": "MSFT",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Downtrend and weak short-term momentum; preserve cash ahead of FOMC."
+     "fraction": 0.5
     },
     {
      "symbol": "CVX",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Large gain and near 52-week high; take partial profits while maintaining energy exposure."
+     "fraction": 0.25
     },
     {
      "symbol": "JNJ",
      "action": "buy",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Defensive healthcare exposure with positive strategic acquisition news and relatively low volatility."
+     "fraction": 0
     },
     {
      "symbol": "KO",
      "action": "buy",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Defensive consumer staple with stable trend and lower volatility for uncertain conditions."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash ahead of the FOMC; favor defensive additions and trim weak or extended holdings."
+   ]
   },
   {
-   "orders": [],
-   "note": "Hold elevated cash ahead of CPI and with the market regime uncertain, breadth weak, and SPY trend down; no sufficiently strong risk-adjusted entry warrants deployment."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with SPY trend down and elevated volatility; retain substantial cash and avoid chasing short-term strength or acting on unconfirmed headlines."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain regime with elevated cash already; existing holdings are broadly diversified, while many candidates are short-term overbought. Hold positions and await clearer signals."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Hold current portfolio; elevated cash is appropriate ahead of NFP and with mixed market regime. Avoid chasing overbought rallies or reacting to unconfirmed headlines."
+   "orders": []
   },
   {
    "orders": [
@@ -1521,47 +1395,39 @@
      "symbol": "ABBV",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.35,
-     "reason": "Extended after a sharp run; RSI14 77 and RSI2 96 warrant trimming."
+     "fraction": 0.35
     },
     {
      "symbol": "PG",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.25,
-     "reason": "Strong recent advance with RSI14 75 and RSI2 90; reduce concentration and overbought exposure."
+     "fraction": 0.25
     },
     {
      "symbol": "GOOGL",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Severely oversold short-term with RSI2 near 3 and substantial discount to longer-term averages; small contrarian allocation despite weak trend."
+     "fraction": 0
     },
     {
      "symbol": "COST",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Oversold RSI2 near 11 after a pullback; defensive business and upcoming earnings provide a measured entry."
+     "fraction": 0
     },
     {
      "symbol": "JPM",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Positive medium-term trend and modest rebound, while portfolio financial exposure remains concentrated in BRK-B; add only a small weight."
+     "fraction": 0
     }
-   ],
-   "note": "Maintain substantial cash ahead of PPI and with SPY trend down; use small, diversified additions rather than chasing extended winners."
+   ]
   },
   {
-   "orders": [],
-   "note": "Uncertain, down-trending market with weak breadth; retain elevated cash and avoid adding risk after broad declines."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Uncertain, down-trending market with elevated volatility; retain substantial cash and avoid adding risk after broad declines."
+   "orders": []
   }
  ]
 }

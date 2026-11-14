@@ -8,9 +8,10 @@ backtester: "what had been published about SYMBOL by the close of DAY?"
 
 The archive is one JSON Lines file per symbol. Items come from:
 
-* the package itself: 2020, 2022 and 2026 headlines for the stocks of the built-in
-  watchlists (Benzinga headlines, titles only; for 2026 also SEC 8-K filings),
-  read-only, see ``default_bundles``;
+* the headline files of the research periods (2020, 2022 and 2026 headlines for the
+  stocks of the built-in watchlists: licensed headlines, titles only; for 2026 also
+  SEC 8-K filings), read-only, when you have them: they are licensed and are not
+  distributed with the package, see ``riskaware.news.files`` and ``default_bundles``;
 * SEC EDGAR 8-K filings (``riskaware news-history build``), public and stamped
   with the time SEC accepted them;
 * your own Benzinga API key (``--source benzinga``), kept local;
@@ -46,21 +47,25 @@ from zoneinfo import ZoneInfo
 from .. import marketcal as mc
 from ..config import RISKAWARE_HOME, NewsConfig
 from ..types import NewsItem
+from .files import PACKAGE_NEWS_DIR, PERIOD_FILES, news_file
 from .relevance import company_names
 from .verify import NewsReport, analyze_news
 
 log = logging.getLogger(__name__)
 NY = ZoneInfo("America/New_York")
 DEFAULT_ROOT = RISKAWARE_HOME / "news"
-#: Headlines that ship with the package (titles only), read-only; see ``load_bundle``.
-BUNDLE_DIR = Path(__file__).with_name("data")
-BUNDLE_PATH = BUNDLE_DIR / "news_2026.jsonl.gz"
-#: Earlier years that ship with the package, read together with ``BUNDLE_PATH`` by default.
-EARLIER_BUNDLES: tuple[Path, ...] = (BUNDLE_DIR / "news_2020.jsonl.gz", BUNDLE_DIR / "news_2022.jsonl.gz")
+#: The package's own folder, where versions up to 0.7.2 shipped the headline files (still read, see ``news.files``).
+BUNDLE_DIR = PACKAGE_NEWS_DIR
+#: The 2026 headline file (titles only), read-only, where ``news.files`` finds it when this module is imported:
+#: ``$RISKAWARE_NEWS_DIR``, then ``~/.riskaware/data/news``, then the package folder. The headlines are licensed and
+#: are not distributed with the package; without a copy this path does not exist and nothing is read.
+BUNDLE_PATH = news_file(PERIOD_FILES[-1])
+#: The earlier years (2020, 2022), found the same way and read together with ``BUNDLE_PATH`` by default.
+EARLIER_BUNDLES: tuple[Path, ...] = tuple(news_file(name) for name in PERIOD_FILES[:-1])
 
 
 def default_bundles() -> list[Path]:
-    """The headline files an archive reads besides your own items: every year that ships with the package."""
+    """The headline files an archive reads besides your own items: every period's file you have."""
     return [*EARLIER_BUNDLES, BUNDLE_PATH]
 #: An item stamped later than this after the moment it is added is bad data and is dropped.
 MAX_FUTURE = timedelta(days=1)
@@ -161,7 +166,7 @@ def _load_bundle(path: str, mtime: float) -> dict[str, tuple[dict, ...]]:
 
 
 def load_bundle(path: str | Path | None = None) -> dict[str, tuple[dict, ...]]:
-    """The headlines of one bundled file (the 2026 one by default), by symbol, oldest first (empty if missing)."""
+    """The headlines of one headline file (the 2026 one by default), by symbol, oldest first (empty if missing)."""
     p = Path(path) if path is not None else BUNDLE_PATH
     if not p.is_file():
         return {}
@@ -188,8 +193,8 @@ def load_bundles(paths: Iterable[str | Path]) -> dict[str, tuple[dict, ...]]:
 class NewsArchive:
     """One JSON Lines file per symbol, sorted by publication time, de-duplicated.
 
-    Reads also include the headlines bundled with the package (``bundled=True``); writes and deletes only touch
-    your own files.
+    Reads also include the headline files of the research periods when you have them (``bundled=True``, see
+    ``news.files``); writes and deletes only touch your own files.
     """
 
     def __init__(self, root: str | Path | None = None, bundled: bool = True, bundle_path: str | Path | None = None,
@@ -219,7 +224,7 @@ class NewsArchive:
         return sorted([*local, *(r for r in extra if _key(r) not in seen)], key=lambda r: r["ts"])
 
     def bundle_info(self) -> dict | None:
-        """What the bundled file holds: item and symbol counts, first and last item, items per feed."""
+        """What the headline files hold: item and symbol counts, first and last item, items per feed (None: no file)."""
         b = self.bundle()
         if not b:
             return None

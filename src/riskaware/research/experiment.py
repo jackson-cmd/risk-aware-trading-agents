@@ -24,6 +24,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 import json
+import logging
 import math
 import platform
 import random
@@ -42,6 +43,7 @@ from ..backtest import metrics as M
 from ..backtest.engine import Backtester, BacktestResult, describe_costs
 from ..config import RISKAWARE_HOME, AppConfig, BacktestConfig, ExecutionConfig
 from ..data.events import EventCalendar
+from ..news.files import missing_message
 from ..news.history import NY, NewsArchive, PointInTimeNews, decision_time
 from ..news.relevance import company_names
 from ..risk import RiskManager
@@ -54,6 +56,8 @@ from .day import NO_LOCAL_NEWS, _WithExtra, research_config
 from .execution import PlainPlanner
 from .periods import DEFAULT_PERIOD, get_period
 
+log = logging.getLogger(__name__)
+
 RUNS_DIR = RISKAWARE_HOME / "research" / "runs"
 CASH_VEHICLES = {"SGOV", "BIL", "SHV"}
 KEY_METRICS = ["total_return", "cagr", "volatility", "sharpe", "sortino", "max_drawdown", "calmar", "win_rate",
@@ -65,8 +69,8 @@ PROTOCOL = {
                  "trading on daily bars, no intraday trading)",
     "prices": "total-return prices (split- and dividend-adjusted) from the bundled file; indicators only look back",
     "cash": "uninvested cash earns the daily return of the T-bill ETF BIL",
-    "news": "the period's bundled headlines, run through the same relevance filter and cross-verification as live "
-            "trading",
+    "news": "the period's headline file (your copy: the headlines are not distributed with the package), run "
+            "through the same relevance filter and cross-verification as live trading",
 }
 
 
@@ -171,6 +175,7 @@ class ExperimentResult:
                        "worst": trade_rows(worst)},
             "refused": dict(list(self.rejections.items())[:6]),
             **({"account": acct} if (acct := self.account()) else {}),
+            **({"news_missing": missing} if (missing := news_missing(self.experiment)) else {}),
             "notes": self.notes,
         }
 
@@ -297,6 +302,15 @@ def _archive(exp: Experiment) -> NewsArchive:
     return _WithExtra(base, exp.extra_news) if exp.extra_news else base
 
 
+def news_missing(exp: Experiment) -> str | None:
+    """With news on: why the run sees no headlines when the period's headline file is missing (None when present)."""
+    per = get_period(exp.period)
+    if not exp.news or per.has_news:
+        return None
+    return (f"news is on, but no copy of {per.news} was found, so this run saw no headlines"
+            + (" except the ones it added (extra_news)" if exp.extra_news else "") + f": {missing_message(per.news)}")
+
+
 def _news(cfg: AppConfig, archive: NewsArchive, symbols: list[str]) -> PointInTimeNews | None:
     stocks = [s for s in symbols if s in archive.symbols()]
     pit = PointInTimeNews(archive, cfg.news, stocks, names=lambda s: company_names(s, fetch=False))
@@ -320,12 +334,12 @@ def _run(market: FrozenMarket, cfg: AppConfig, exp: Experiment, factory: Callabl
 
 # ----------------------------------------------------------------------------------- leak check
 FAKE_HEADLINES = [
-    ("{n} soars after blowout quarter and raised full-year guidance", "benzinga", "Benzinga", ""),
-    ("{n} plunges after SEC opens fraud investigation into its accounting", "benzinga", "Benzinga", ""),
+    ("{n} soars after blowout quarter and raised full-year guidance", "headlines", "Newswire", ""),
+    ("{n} plunges after SEC opens fraud investigation into its accounting", "headlines", "Newswire", ""),
     ("{n} beats estimates and announces a record buyback", "rss", "Reuters", ""),
     ("{n} CEO resigns as auditors flag material weakness", "rss", "Reuters", ""),
     ("8-K: Item 1.03 Bankruptcy or receivership", "sec", "SEC EDGAR", "items:1.03"),
-    ("{n} wins a major government contract, shares jump", "benzinga", "Benzinga", ""),
+    ("{n} wins a major government contract, shares jump", "headlines", "Newswire", ""),
 ]
 
 
@@ -478,6 +492,9 @@ def run_experiment(exp: Experiment, factory: Callable[[], Strategy] | None = Non
             return load_strategy(exp.strategy, params)
 
     archive = _archive(exp) if exp.news else None
+    missing = news_missing(exp)
+    if missing:
+        log.warning(missing)
     res, rec, plan, bt = _run(market, cfg, exp, factory, symbols, start, end, archive)
     first = factory()
     strat_name = res.strategy or first.name
@@ -518,8 +535,8 @@ def run_experiment(exp: Experiment, factory: Callable[[], Strategy] | None = Non
     result = ExperimentResult(
         run_id=run_id, folder=None, experiment=exp, strategy=strat_name, start=res.start, end=res.end,
         symbols=symbols, metrics=metrics, spy=spy, equal_weight=ew_metrics, stats=stats, periods=periods, leak=leak,
-        trades=res.trades, decisions=decisions, equity=equity, notes=list(res.notes), rejections=dict(res.rejections),
-        execution=execution, backtest=res)
+        trades=res.trades, decisions=decisions, equity=equity, notes=([missing] if missing else []) + list(res.notes),
+        rejections=dict(res.rejections), execution=execution, backtest=res)
     if save:
         folder = Path(out_dir).expanduser() if out_dir else RUNS_DIR / run_id
         save_run(result, folder, first, code, chart=chart)
@@ -616,6 +633,8 @@ def save_run(result: ExperimentResult, folder: Path, strategy: Strategy, code: s
         "leak_check": result.leak,
         "reproduce": reproduce_command(exp) if not code else "riskaware research run --code strategy.py (same settings)",
     }
+    if result.notes:
+        manifest["notes"] = list(result.notes)
     (folder / "manifest.json").write_text(json.dumps(manifest, indent=2, default=str) + "\n", encoding="utf-8")
     metrics = {"strategy": result.metrics, "spy": result.spy, "equal_weight": result.equal_weight,
                "vs_spy": result.stats, "periods": result.periods}
@@ -734,8 +753,14 @@ def render_report(r: ExperimentResult) -> str:
     if r.notes:
         lines += ["## Notes", ""] + [f"- {n}" for n in r.notes] + [""]
     ds = dataset_info(exp.period)
+    news = ds["news"]
+    news_line = (f"news `{news['file']}` sha256 `{news['sha256'][:16]}...`"
+                 + ("" if news["matches_manifest"] else f" (the manifest says `{(news['manifest_sha256'] or '')[:16]}...`)")
+                 if news["sha256"] else
+                 f"news `{news['file']}`: not found (not distributed with the package; the manifest's sha256 is "
+                 f"`{(news['manifest_sha256'] or '')[:16]}...`)")
     lines += ["## Data", "", f"- {ds['name']}, version {ds['version']}: `{ds['prices']['file']}` sha256 "
-              f"`{ds['prices']['sha256'][:16]}...`; news `{ds['news']['file']}` sha256 `{(ds['news']['sha256'] or '')[:16]}...`",
+              f"`{ds['prices']['sha256'][:16]}...`; {news_line}",
               f"- Reproduce: `{reproduce_command(exp)}`", ""]
     return "\n".join(lines)
 

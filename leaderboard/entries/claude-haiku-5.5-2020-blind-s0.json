@@ -59,7 +59,7 @@
    "decisions.csv": "a56086bf54a3df7901b1709f8dfe7b85bc468a00a89e66ef7ce071b5240baa05",
    "policy_log.json": "d683e9c3e721da3f506c73d107097dc060c8be4536016bb97591079341f06a78"
   },
-  "replies_sha256": "1e983ede92e2d40d4e22c48d33d5abf401c3712fb4896795aba35d10549ca363",
+  "replies_sha256": "fc90a8fe1d94f27c0f2e2fa08a59c6409a7af4db25146f46283b048944f0e746",
   "observations_sha256": "b127182b5a63c2b44d69fcd157b52450d1c3ae9ed6b3d229c8d923f125ba5836",
   "costs_seen_by_model": "realistic",
   "rescored_from": null
@@ -1015,16 +1015,13 @@
  "notes": null,
  "replies": [
   {
-   "orders": [],
-   "note": "Holding all cash on day 1. Regime is RISK_ON, but the signals are mostly overbought short-term (RSI2 extremely high across many names), and the news is unconfirmed, single-source, or mixed (e.g., the S33 negative channel-check headline). No strong, confirmed setup justifies opening positions yet; I'll revisit once trend and news confirmation build over the next few observations."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Holding all cash. Market regime is UNCERTAIN with a high risk score (7.7), a Fear & Greed reading of 79 (greed territory), and an NFP macro event nearby. Most names are extended (RSI14 and RSI2 near overbought, many well above EMA20/50), and news is almost entirely unconfirmed single-source. No setup is compelling enough to justify deploying capital into this environment, so I'm waiting for better conditions."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Holding all cash for now. Regime is RISK_ON with low VIX, but nearly every stock is extended (RSI14 and RSI2 very high across the board), and the news flow is mostly unconfirmed single-source analyst notes with no clear edge. Waiting for a pullback or a cleaner setup before deploying capital."
+   "orders": []
   },
   {
    "orders": [
@@ -1032,25 +1029,21 @@
      "symbol": "S12",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "RSI2 at 2.5 and pullback to near EMA50 in a risk-on regime; short-term oversold bounce candidate with contained ATR."
+     "fraction": 0
     },
     {
      "symbol": "S20",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "RSI2 3.8 oversold in an uptrend (above EMA200), mean-reversion setup in a risk-on market."
+     "fraction": 0
     },
     {
      "symbol": "S17",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Deeply oversold (RSI2 0.8, RSI14 33) while still above EMA200; short-term reversal setup, though volume-driven selloff warrants caution."
+     "fraction": 0
     }
-   ],
-   "note": "Risk-on regime with high breadth; cautious mean-reversion entries in oversold names still above long-term trend. Held to a small number of 10% positions. Avoided overbought names (S09, S14, S50) and names with weak or unconfirmed news. Small sample of signals; sizing kept modest."
+   ]
   },
   {
    "orders": [
@@ -1058,24 +1051,20 @@
      "symbol": "S28",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong momentum (21d +19.8%, 5d +9.3%) with a high news score and multiple analyst price-target raises; overbought (RSI14 79, RSI2 80), so kept to a starter-size position."
+     "fraction": 0
     },
     {
      "symbol": "S52",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Multiple analyst upgrades and target raises (SunTrust, BMO, Stephens) with a strong positive news score; trend intact (above EMA200), and it has pulled back modestly today."
+     "fraction": 0
     },
     {
      "symbol": "S17",
      "action": "sell",
-     "fraction": 1,
-     "reason": "Position is down about 5% with falling momentum (21d -7.3%, below EMA20 and EMA50); exit the loser rather than average down."
+     "fraction": 1
     }
-   ],
-   "note": "Market regime is UNCERTAIN with coronavirus-related selloff pressure across many names; I am keeping most of the portfolio in cash and adding only two starter positions in names with strong news and trend support. Holding S12 and S20 for now given modest gains and mixed signals."
+   ]
   },
   {
    "orders": [
@@ -1083,11 +1072,9 @@
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Negative news flow (Funko downgrade, KKR/Coty report unconfirmed) and modest 5-day gain; take profit with cash deployment left for stronger setups."
+     "fraction": 1
     }
-   ],
-   "note": "Risk-on regime with strong breadth, but most news is unconfirmed single-source and many names are extended (high RSI2, far above EMA20). Holding current winners S20, S28, S52; trimming S12 on weaker news and lower conviction. Staying largely in cash (~60%) and deferring new entries until pullbacks or confirmed catalysts appear."
+   ]
   },
   {
    "orders": [
@@ -1095,15 +1082,12 @@
      "symbol": "S39",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strongest news flow (score 0.36, multiple analyst PT raises after solid beat-and-raise), RISK_ON regime, trend strong; modest weight given overbought RSI14 77 and gap of +7% day"
+     "fraction": 0
     }
-   ],
-   "note": "Cash-heavy (69%) in a RISK_ON regime; adding one of the best-supported names with a starter position. Holding existing S20, S28, S52. Avoided chasing extended names (S24, S50, S16) and names with recall/investigation flags (S40, S32, S50)."
+   ]
   },
   {
-   "orders": [],
-   "note": "Holding all positions. Market regime is UNCERTAIN (risk score 46, VIX 25, mixed SPY trend) and the broad selloff is news-driven, mostly unconfirmed single-source headlines, so no strong edge to act on. Portfolio is about 61% cash with four 10% positions; S39 (-4.5%, held 4 days) is the weakest but has no company-specific negative news beyond the broad tech selloff, so I'm keeping it and will reassess next step."
+   "orders": []
   },
   {
    "orders": [
@@ -1111,30 +1095,24 @@
      "symbol": "S20",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Position down 10.1% after 24 days, price well below all EMAs and RSI14 at 27; cut the loss in a RISK_OFF regime with VIX at 33 and FOMC ahead."
+     "fraction": 1
     },
     {
      "symbol": "S52",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Position down 3.9%, price below EMA20 and EMA50 with a weak 5-day trend, and the market is in RISK_OFF with a high VIX."
+     "fraction": 1
     }
-   ],
-   "note": "Risk-off regime (risk score 71, VIX 33, fear/greed 12) with FOMC nearby, so I am cutting the two weakest holdings (S20, S52) and holding the rest. No new buys: the news flow is mostly unconfirmed single-source headlines, and I see no high-conviction setup that justifies adding exposure in this environment. Cash stays at about 61%."
+   ]
   },
   {
-   "orders": [],
-   "note": "Market is in RISK_OFF (risk score 89, VIX 54, breadth 9%) with nearly all stocks down sharply and news mostly unconfirmed single-source headlines. Holding the current two small positions (S28, S39) and staying ~82% cash rather than catching falling knives; no new entries or exits given the lack of confirmed signals."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "RISK_OFF regime with risk_score 100, VIX at 82.7, breadth 0, and nearly every stock down sharply into an FOMC event. Cash is 84% of equity, so there is little reason to add exposure into this panic. The news flow is mostly unconfirmed single-source analyst notes and coronavirus headlines, not enough to justify new entries. Holding the existing S28 and S39 positions and waiting for the regime to stabilize."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Market is RISK_OFF (risk score 89, VIX 61.6, breadth 0, SPY trending down) and the portfolio is 84% cash. Nothing in the candidate list has the combination of confirmed, non-opinion news and a constructive trend needed to justify a new long, and the two open positions (S28, S39) are down 25% and 26% with no fresh red flags. Holding everything is the disciplined choice until breadth and trend improve."
+   "orders": []
   },
   {
    "orders": [
@@ -1142,30 +1120,24 @@
      "symbol": "S28",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Position down 15% after 39 days with a RISK_OFF regime; trim exposure to limit further drawdown."
+     "fraction": 0.5
     },
     {
      "symbol": "S39",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Position down 7% in a RISK_OFF market with spy_trend down; trim risk while holding a core position."
+     "fraction": 0.5
     }
-   ],
-   "note": "Regime is RISK_OFF (risk score 88, VIX 57, breadth 0, SPY trending down), so I'm staying mostly in cash (~82%). Headlines are mostly unconfirmed and single-source, so I'm not adding new positions on news alone. I'm trimming the two losing holdings by half to reduce drawdown exposure."
+   ]
   },
   {
-   "orders": [],
-   "note": "Regime is RISK_OFF (risk score 80.6, VIX 45, breadth 0, SPY trending down) and the portfolio is already 91% cash. Today's rally is a single-day bounce with most news unconfirmed, so I'm holding cash rather than adding exposure. Existing positions S28 and S39 are small and I'm not forcing exits without a clear signal. Revisit for entries once the regime improves."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Market is RISK_OFF (risk score 70.6, VIX 37.8, SPY trend down, breadth 27%). Portfolio is 90% cash with two small positions (S28 down 10.8%, S39 slightly negative). Most headlines are unconfirmed single-source items, and several stocks show extreme short-term RSI and sharp 1-day gains, so chasing is risky. Holding everything and staying in cash until the regime improves."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Market is in RISK_OFF (risk score 76, VIX 45, breadth 9%, SPY trending down) and the portfolio is 91% cash. News is overwhelmingly unconfirmed single-source, so there is no reliable edge to act on. Holding the two existing positions (S28, S39) and staying in cash until regime conditions improve."
+   "orders": []
   },
   {
    "orders": [
@@ -1173,15 +1145,12 @@
      "symbol": "S28",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Position down 12.6% over 59 days with negative momentum; cut loss in a RISK_OFF regime with VIX at 33.6 and SPY trending down."
+     "fraction": 1
     }
-   ],
-   "note": "Market is RISK_OFF (risk score 70, VIX 33.6, breadth 27%, SPY trend down) with FOMC nearby, so I am staying mostly in cash (90% cash share). I exit the losing S28 position and hold S39, which is up 1.9% and has positive news flow, without adding new exposure. No new buys given the defensive regime and mostly unconfirmed headlines."
+   ]
   },
   {
-   "orders": [],
-   "note": "Market is RISK_OFF (risk score 60, VIX 33.6, breadth 27%, SPY trending down) and 94.7% of equity is already cash. News is almost entirely unconfirmed single-source headlines, so there is no reliable catalyst to act on. Holding the existing S39 position and staying in cash until the regime improves."
+   "orders": []
   },
   {
    "orders": [
@@ -1189,34 +1158,28 @@
      "symbol": "S02",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong 21d momentum and trend above all EMAs; headline support from price-target raise, though unconfirmed and market is risk-off, so kept to a small starter weight."
+     "fraction": 0
     }
-   ],
-   "note": "Market is RISK_OFF (VIX 33, breadth 27%, SPY trending down) with PPI event near, so the portfolio stays mostly in cash (94%). Only a single small starter position in S02 with a tight thesis; holding S39 as is. Will reassess if breadth and regime improve."
+   ]
   },
   {
    "orders": [
     {
      "symbol": "S39",
      "action": "sell",
-     "fraction": 0.5,
-     "reason": "Extended (RSI14 72, RSI2 97, +13% in 5d, 13% above EMA20) with a lawsuit headline; take partial profit while keeping core position given strong analyst support."
+     "fraction": 0.5
     },
     {
      "symbol": "S28",
      "action": "buy",
-     "weight": 0.08,
-     "reason": "Strong 21d momentum (+27%) and volume growth signal, though RSI2 is very elevated; small starter position."
+     "weight": 0.08
     },
     {
      "symbol": "S01",
      "action": "buy",
-     "weight": 0.08,
-     "reason": "Trend strength with price above all EMAs, near 52w high, and a confirmed-source-light but positive initiation from Oppenheimer."
+     "weight": 0.08
     }
-   ],
-   "note": "Risk-off regime (VIX 30.5) with low breadth argues for staying mostly in cash; only small, trend-supported adds and partial trim of an extended winner."
+   ]
   },
   {
    "orders": [
@@ -1224,51 +1187,42 @@
      "symbol": "S28",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Position down 5.1% after a -2.5% day with negative 5-day momentum; cut the loser and limit drawdown."
+     "fraction": 1
     },
     {
      "symbol": "S03",
      "action": "target",
-     "weight": 0.08,
-     "reason": "Strong momentum (21d +14%, rel volume 2.7x) with mildly positive, though unconfirmed, news flow; small starter size given uncertain regime and extended RSI."
+     "weight": 0.08
     },
     {
      "symbol": "S30",
      "action": "target",
-     "weight": 0.08,
-     "reason": "Solid uptrend above all EMAs, 12.6% 21-day gain, analyst price-target raises and an LG panel supply headline; moderate size."
+     "weight": 0.08
     }
-   ],
-   "note": "Regime is UNCERTAIN (VIX 27.6, VIX/VIX3M near 0.91), so I keep most of the portfolio in cash and only add two modest momentum positions. Holding S01, S02, and S39 (S39 is a winner, +19%, but I'm not adding to it). Selling S28 to cut the loser. News is largely unconfirmed, so sizing stays small."
+   ]
   },
   {
    "orders": [
     {
      "symbol": "S01",
      "action": "sell",
-     "fraction": 0.5,
-     "reason": "RSI14 75 and RSI2 near 100, stretched 24% above EMA200; take partial profit on a 5.7% gain; news unconfirmed."
+     "fraction": 0.5
     },
     {
      "symbol": "S39",
      "action": "target",
-     "weight": 0.06,
-     "reason": "Strong 22.6% gain over 74 days, trend intact (above EMA200 by ~40%); modest add to existing winner with RSI14 near 62."
+     "weight": 0.06
     }
-   ],
-   "note": "Market regime UNCERTAIN with VIX ~25.7 and very high fear/greed reading; keeping cash high (~63%). Trimming overbought S01 and adding modestly to the trend leader S39. All news is unconfirmed single-source, so it carries little weight in these decisions."
+   ]
   },
   {
    "orders": [
     {
      "symbol": "S39",
      "action": "sell",
-     "fraction": 0.5,
-     "reason": "Trim a large winner (+18%, held 79 days) with RSI2 at 93.6 and the stock stretched 18% above EMA50; lock in partial gains while keeping exposure to the trend."
+     "fraction": 0.5
     }
-   ],
-   "note": "Risk score is moderate and the VIX is elevated at 27.6, with FOMC and PPI due. Cash is already 63%, so I'm not adding new names. Partially trimming the most overextended winner and holding the rest."
+   ]
   },
   {
    "orders": [
@@ -1276,18 +1230,15 @@
      "symbol": "S12",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Pullback to near EMA50 with RSI2 at 25 and strong multi-source analyst price-target raises; small starter position given RISK_OFF regime and unconfirmed headlines."
+     "fraction": 0
     },
     {
      "symbol": "S20",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Oversold short-term (RSI2 34) with positive homebuilder target-raise coverage; small starter size due to high ATR and unconfirmed news."
+     "fraction": 0
     }
-   ],
-   "note": "Market is RISK_OFF (VIX 33.5), so sizing is kept small and most of the portfolio stays in cash. Headlines are all unconfirmed single-source, so no position is sized up. Existing holdings are held; S03 has a weak news score and negative short-term momentum but no sell is forced here."
+   ]
   },
   {
    "orders": [
@@ -1295,40 +1246,33 @@
      "symbol": "S03",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Position is down 5.6% and sits 20% below its 52-week high, with an unconfirmed single-source news flow in a RISK_OFF regime; cutting the loss."
+     "fraction": 1
     },
     {
      "symbol": "S12",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Down 4.2% four days into the position, price is below EMA20/50/200 and 32% off its 52-week high, with weak unconfirmed news."
+     "fraction": 1
     },
     {
      "symbol": "S20",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Down 3.8% after a 4% one-day drop, below all EMAs with a deep drawdown; thin unconfirmed news does not justify holding."
+     "fraction": 1
     }
-   ],
-   "note": "Market is RISK_OFF (VIX 33.8, breadth 45%). Trimming the three losing positions and holding the winners (S02, S30, S39, S01). Cash remains high at roughly 57%+ after these exits, so no new buys this step given the weak unconfirmed news backdrop."
+   ]
   },
   {
    "orders": [
     {
      "symbol": "S50",
      "action": "sell",
-     "fraction": 0.0,
-     "reason": "No position held in S50; placeholder ignored"
+     "fraction": 0.0
     }
-   ],
-   "note": "Holding. Market is RISK_OFF (risk score 36, VIX 28.6) with NFP upcoming, and most headlines are unconfirmed and single-source, so no new entries. Existing positions S01, S02, S30 and S39 are all in gain and remain within normal trend and volatility ranges, so no changes this step. Cash stays high at about 73%."
+   ]
   },
   {
-   "orders": [],
-   "note": "Holding. Market regime is UNCERTAIN with VIX near 29 and PPI due, and the portfolio is already 72% cash with four positions that are in gain. Most momentum candidates are stretched (RSI2 above 90) and the news is largely unconfirmed single-source analyst notes, so I see no edge in adding exposure today. The 'nothing to sell' problem from the last orders is noted: S50 is not held, so no order is placed for it."
+   "orders": []
   },
   {
    "orders": [
@@ -1336,30 +1280,24 @@
      "symbol": "S39",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Trim a small position after a long winning run; RSI/short-term momentum softening and market regime UNCERTAIN with VIX elevated."
+     "fraction": 0.5
     }
-   ],
-   "note": "Market regime is UNCERTAIN (risk score 25.9, VIX 28, vix/vix3m 0.89) and most headlines are unconfirmed single-source items, so I'm keeping the portfolio mostly in cash (~73%) and making only a modest trim of S39 to lock in gains. No new buys: the candidate news is largely unconfirmed analyst price-target noise, and S50 (RSI 75, +53% in 21 days) and S27 (RSI 76) look overextended. Will reassess if the regime turns to risk-on with confirmed catalysts."
+   ]
   },
   {
    "orders": [
     {
      "symbol": "S30",
      "action": "sell",
-     "fraction": 0.5,
-     "reason": "Stock fell 4.6% on the day with a 12-headline single-source cluster that includes a Texas AG probe and a multi-state consumer protection probe; red flag 'fraud' attached. Trim half to reduce event risk while keeping the position's 17% gain partly locked."
+     "fraction": 0.5
     }
-   ],
-   "note": "Portfolio is 75% cash in an uncertain regime (VIX 26, VIX/VIX3M 0.86). Most new headlines are unconfirmed single-source items, so I am not acting on them broadly. Trimming S30 for its negative news and fraud flag. Holding S01, S02, S39 and staying mostly in cash until the regime clarifies."
+   ]
   },
   {
-   "orders": [],
-   "note": "Holding. Market regime is UNCERTAIN (VIX 24.8, risk score 17.8) with a steep macro-concern headline backdrop, and news is almost entirely unconfirmed single-source. Portfolio is 79% cash and up 1% since start; no compelling, well-confirmed entry signal justifies adding risk, and existing positions have no exit trigger in the data. Waiting for clearer confirmation."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Holding. Market regime is UNCERTAIN with elevated fear/greed (85) and VIX ~22.6, and news is largely unconfirmed single-source chatter. Existing positions (S01, S02, S30, S39) are profitable and within normal trend; no compelling new entry with confirmed catalyst. Cash share is high (~77%), so no forced action; keep waiting for clearer setups."
+   "orders": []
   },
   {
    "orders": [
@@ -1367,11 +1305,9 @@
      "symbol": "S30",
      "action": "target",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Strong trend (vs_ema200 +46%) and +45% gain; modest trim-to-target while RSI2 is elevated, keeping exposure. Headlines are single-source and unconfirmed, so no added conviction from news."
+     "fraction": 0
     }
-   ],
-   "note": "Market regime UNCERTAIN with VIX 22 and VIX/VIX3M 0.79 (elevated near-term fear), and fear_greed at 87 (extreme greed). Portfolio is 78% cash; I'm holding most positions and making only a small adjustment. No new buys: the news flow is almost entirely unconfirmed single-source headlines, and the setups are extended. Holding, not chasing."
+   ]
   },
   {
    "orders": [
@@ -1379,67 +1315,53 @@
      "symbol": "S39",
      "action": "target",
      "weight": 0.06,
-     "fraction": 0,
-     "reason": "Strong Q2 with multiple analyst price-target raises and heavy volume; stock already a 54% winner, so modestly raise the position while staying cautious on premium valuation and high RSI."
+     "fraction": 0
     },
     {
      "symbol": "S02",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Trim toward a smaller weight: news is unconfirmed and includes a privacy lawsuit, RSI2 is extremely overbought, and the position has run up sharply."
+     "fraction": 0
     }
-   ],
-   "note": "Market regime is UNCERTAIN with elevated fear/greed (80) and VIX near 22.7, so the portfolio stays mostly in cash. Headlines are mostly unconfirmed single-source items and were given limited weight; the main actions are a small add to S39 for its fundamental momentum and a trim of S02 to manage overbought risk and legal headline exposure. Other holdings are held."
+   ]
   },
   {
    "orders": [
     {
      "symbol": "S02",
      "action": "sell",
-     "fraction": 0.5,
-     "reason": "Extremely overbought (RSI14 86.6, RSI2 99.6), price far above EMAs, and news is all unconfirmed single-source; trim to lock in gains while keeping exposure."
+     "fraction": 0.5
     },
     {
      "symbol": "S30",
      "action": "sell",
-     "fraction": 0.5,
-     "reason": "RSI14 75 and a 32% 21-day run-up; the iOS ad-tracking headline is a headwind for the core ad business. Trim risk."
+     "fraction": 0.5
     }
-   ],
-   "note": "Market regime is UNCERTAIN with elevated fear/greed (78.9) and VIX 24.5. Holding most of the 73% cash position and only trimming the two most extended winners; no new buys given overbought breadth and mostly unconfirmed headlines."
+   ]
   },
   {
-   "orders": [],
-   "note": "Holding. Regime is RISK_OFF (VIX 33.6) with an NFP release near, and news is almost entirely unconfirmed single-source analyst notes, so there is no strong edge to act on. The portfolio is already ~81% cash; existing positions are held without new entries."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Holding. Market regime is UNCERTAIN (VIX 26.9, VIX/VIX3M 0.86), portfolio is 82% cash with four positions in profit, and no stock shows a confirmed, high-conviction catalyst. News is almost entirely unconfirmed and single-source, so I'm not acting on headlines. S54 carries a data_breach red flag but I hold no position there, and I'm not initiating new entries in an uncertain regime."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Market regime is UNCERTAIN with mixed SPY trend, VIX elevated at 25.8, and OPEX nearby. Most headlines are unconfirmed or single-source, so I see no reliable edge to act on. Existing positions S01, S02, S30 and S39 are profitable and within normal volatility. Holding the portfolio, which is about 82% cash, and waiting for a clearer regime before adding exposure."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Holding. Market regime is UNCERTAIN (risk score 32, VIX 26.4 with VIX/VIX3M near 0.82, SPY trend mixed) and news is almost entirely unconfirmed single-source, so there is no strong edge to justify new positions. Existing four positions (S01, S02, S30, S39) are within normal risk and no exit signal is present. Cash is 82% of equity, so no buys are warranted until regime and confirmation improve."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Market regime is UNCERTAIN (VIX 27.6, VIX/VIX3M 0.853, mixed SPY trend) and nearly all news is unconfirmed, so there is no high-conviction signal to act on. Portfolio is 82% cash with four positions, all with positive gains. Holding everything and waiting for clearer confirmation."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Holding all positions. Market regime is UNCERTAIN with VIX at 25 and a VIX/VIX3M ratio of 0.884, which signals elevated near-term stress. Cash is 81% of equity, so there is ample room to add later. News is mostly unconfirmed single-source flow, so no new entries are justified on it. S30 has a data-breach red flag, but the existing position is up 43% and its weight is small, so no action is taken. Revisit if the regime turns RISK-ON with confirmed catalysts."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Market regime is UNCERTAIN with VIX at 27.4 and cash at 81%. The four existing positions (S01, S02, S30, S39) show mixed signals with no decisive catalyst, and the new headlines are mostly unconfirmed single-source analyst notes. Holding everything and waiting for clearer confirmation is the prudent choice."
+   "orders": []
   },
   {
-   "orders": [],
-   "note": "Holding. Regime is UNCERTAIN (risk score 26.4, VIX 27.6 with a near-1 VIX/VIX3M ratio), and news is almost entirely unconfirmed single-source chatter, so there is no strong signal to act on. Existing positions S01, S02, S30, and S39 are small and still within normal ranges, and cash is 82%. Staying patient until the regime or confirmed catalysts improve."
+   "orders": []
   },
   {
    "orders": [
@@ -1447,11 +1369,9 @@
      "symbol": "S17",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0,
-     "reason": "Strong confirmed-volume bounce (+5.5%, rel vol 2.5x) on news-driven momentum in a risk-off regime; small starter position at default weight."
+     "fraction": 0
     }
-   ],
-   "note": "Market is RISK_OFF (VIX 38, risk score 57) with cash at 83%. Most headlines are unconfirmed single-source items, so I'm mostly holding cash and keeping existing positions. A single small starter position in S17 is the only new order, to avoid overcommitting in a volatile tape."
+   ]
   },
   {
    "orders": [
@@ -1459,11 +1379,9 @@
      "symbol": "S17",
      "action": "target",
      "weight": 0.08,
-     "fraction": 0,
-     "reason": "Trim recent 4-day position toward a more modest weight; momentum and trend intact but regime is UNCERTAIN and VIX elevated."
+     "fraction": 0
     }
-   ],
-   "note": "Regime UNCERTAIN with VIX ~24.9 and VIX/VIX3M near 0.91, which signals some near-term stress. Holding most positions (established winners S02, S39, S30 with strong gains) and trimming only the most recently added, largest-weight position S17 to reduce concentration. Cash remains high at ~70%, so no new buys are warranted given weak conviction in the news flow (most headlines unconfirmed)."
+   ]
   },
   {
    "orders": [
@@ -1471,18 +1389,15 @@
      "symbol": "S17",
      "action": "sell",
      "weight": 0,
-     "fraction": 0.5,
-     "reason": "Stretched: RSI14 71, RSI2 81, 8% above EMA20 after a 16% monthly run; trim into strength while keeping exposure to the momentum trend"
+     "fraction": 0.5
     },
     {
      "symbol": "S45",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Strong 21d momentum (+21%) with price near 52w high and above all EMAs; small starter position, moderated by elevated RSI"
+     "fraction": 0
     }
-   ],
-   "note": "Market regime UNCERTAIN with VIX 23 and VIX/VIX3M near 0.9, so sizing stays small and cash remains high at ~73%. Most news is unconfirmed single-source chatter, so it is given little weight. Holding the rest of the book; no new large positions."
+   ]
   },
   {
    "orders": [
@@ -1490,15 +1405,12 @@
      "symbol": "S45",
      "action": "sell",
      "weight": 0,
-     "fraction": 1,
-     "reason": "Position is down 6.3% after only 4 days held, with no confirmed positive catalyst; cutting the loser to limit drawdown."
+     "fraction": 1
     }
-   ],
-   "note": "Market regime is UNCERTAIN with VIX near 23.7 and a VIX/VIX3M ratio above 0.9, so I am keeping the portfolio mostly in cash (about 73%). Headlines are overwhelmingly unconfirmed or opinion pieces, so I am not adding new positions. Holding the winners (S02, S30, S39, S17, S01) and exiting only the recent laggard S45."
+   ]
   },
   {
-   "orders": [],
-   "note": "Holding all positions. Market regime is UNCERTAIN with VIX near 20.6 and VIX/VIX3M at 0.85, and nearly all headlines are unconfirmed single-source items, so there is no reliable catalyst to act on. Cash is 77%, leaving room to deploy later if a confirmed signal appears."
+   "orders": []
   },
   {
    "orders": [
@@ -1506,22 +1418,18 @@
      "symbol": "S39",
      "action": "target",
      "weight": 0.08,
-     "fraction": 1.0,
-     "reason": "Modest add to a held winner with positive CFO commentary and strong trend (above EMA200 by 26%); keeps position within 10% default sizing."
+     "fraction": 1.0
     },
     {
      "symbol": "S30",
      "action": "target",
      "weight": 0.06,
-     "fraction": 1.0,
-     "reason": "Held winner (+52% gain), positive supplier/Mac chip news flow, trend intact; modest add toward target weight."
+     "fraction": 1.0
     }
-   ],
-   "note": "Market regime UNCERTAIN with elevated fear/greed (81) and VIX 21; portfolio is ~77% cash, so I'm only nudging exposure in held names with confirming trend and news, and avoiding chasing overbought names (S50, S25, S33 with RSI >75 and extended moves)."
+   ]
   },
   {
-   "orders": [],
-   "note": "Holding all positions. Market regime is UNCERTAIN with an FOMC event nearby, and most headlines are unconfirmed single-source items, so there is no strong new signal to act on. Existing positions have healthy gains (S02, S17, S30, S39), and the portfolio is 74% cash, so the current stance is defensible until the macro event passes."
+   "orders": []
   },
   {
    "orders": [
@@ -1529,22 +1437,18 @@
      "symbol": "S03",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Strong momentum and volume spike, but RSI14 74 and RSI2 92 are overbought and news is unconfirmed; small starter position only."
+     "fraction": 0
     },
     {
      "symbol": "S08",
      "action": "buy",
      "weight": 0.05,
-     "fraction": 0,
-     "reason": "Positive earnings-driven momentum, above all EMAs with elevated volume; modest size given overbought RSI2 and uncertain regime."
+     "fraction": 0
     }
-   ],
-   "note": "Market regime UNCERTAIN with VIX 25 and VIX/VIX3M near 0.91, so I keep most of the portfolio in cash (73%) and only open two small starter positions in names with trend, volume and mildly supportive headlines. No sells: existing holdings are profitable and not showing breakdown signals. Headlines are largely unconfirmed, so sizing stays conservative."
+   ]
   },
   {
-   "orders": [],
-   "note": "Holding. Regime is UNCERTAIN with VIX at 23 and VIX/VIX3M near 0.88, and news is mostly unconfirmed single-source headlines, so there is no clear edge to act on. Existing positions are within normal weights and no stop or thesis breaks are visible. Cash stays at about 64%."
+   "orders": []
   }
  ]
 }

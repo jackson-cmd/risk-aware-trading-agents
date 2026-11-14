@@ -107,6 +107,8 @@ jobs:
           python -m pip install --upgrade build twine
           python -m build
           python -m twine check --strict dist/*
+      - name: No headline file in the package (the research headlines are licensed)
+        run: python scripts/check_dist.py dist
       - name: Build the Claude Desktop extension
         run: python scripts/build_mcpb.py --out dist-mcpb   # kept out of dist/, which goes to PyPI as it is
       - name: Attach them to the draft
