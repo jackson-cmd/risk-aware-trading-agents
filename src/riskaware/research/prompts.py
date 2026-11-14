@@ -420,7 +420,7 @@ class VariantPolicy:
         usage = dict(getattr(self.provider, "last_usage", None) or {})
         rec = {"step": obs.get("step"), "day": obs.get("day"), "status": status, "seconds": round(time.time() - t0, 2),
                "prompt_tokens": usage.get("prompt_tokens"), "completion_tokens": usage.get("completion_tokens"),
-               "retries": tries}
+               "prompt_chars": len(self.variant.text) + len(user), "retries": tries}
         if status != "ok":
             rec["error"] = (error or "")[:300]
             raw = getattr(self.provider, "last_raw", None)

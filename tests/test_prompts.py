@@ -247,6 +247,14 @@ def test_attribution_puts_a_lower_exposure_in_the_exposure_part(tmp_path):
     assert a["exposure_variant"] < a["exposure_baseline"]
 
 
+def test_a_capped_prompt_is_flagged_as_possibly_cut():
+    calls = [{"prompt_tokens": 2050, "prompt_chars": 11_000 + 300 * i} for i in range(10)]
+    assert R.truncated(calls, 2050 * 10 / sum(c["prompt_chars"] for c in calls))
+    fine = [{"prompt_tokens": 2700 + 80 * i, "prompt_chars": 11_000 + 300 * i} for i in range(10)]
+    assert not R.truncated(fine, 0.24)
+    assert R.truncated(fine[:3], 0.05)
+
+
 # ----------------------------------------------------------------------------------- statistics
 def test_sign_flip_holm_and_bootstrap():
     assert R.sign_flip_p(np.array([1.0, 1.0, 1.0])) == pytest.approx(2 / 8)

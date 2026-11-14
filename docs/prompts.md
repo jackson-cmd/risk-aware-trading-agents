@@ -10,41 +10,42 @@ period and seed, and the report says which differences are larger than the gap b
 
 ## Results so far
 
-The first batch is a pilot: the baseline and two rule prompts (`risk_rules` and `trend_news`, below), four models
-(`gpt-5.6-luna`, `claude-haiku-5-5`, `gemini-3.1-flash-lite`, `llama3.2`), the three periods, blind, the `core`
-universe, a decision every fifth trading day, one seed. 36 runs, $0.26 in all. Each prompt is paired with the
-baseline on the same model and period: twelve pairs.
+The first batch is a pilot: the baseline and two rule prompts (`risk_rules` and `trend_news`, below) on three models
+(`gpt-5.6-luna`, `claude-haiku-5-5`, `gemini-3.1-flash-lite`), the three periods, blind, the `core` universe, a decision
+every fifth trading day, one seed: 27 runs, $0.26. Each prompt is paired with the baseline on the same model and
+period: nine pairs. A fourth model, `llama3.2` on the TAMU gateway, is left out: the gateway cuts long prompts for
+it (an 11,000-token prompt came back as 2,050 tokens read), so there is no telling whether it saw the whole
+observation.
 
 | Against the baseline | `risk_rules` | `trend_news` |
 |---|---:|---:|
-| Total return | +9.8 pp (95% CI +2.0 to +16.3), better in 10 of 12 | +18.6 pp (+6.2 to +33.9), 9 of 12 |
-| Sharpe | +0.28 (-0.01 to +0.57) | +0.39 (+0.09 to +0.68) |
-| Maximum drawdown | 5.8 pp smaller (3.1 to 8.5) | 7.5 pp smaller (3.5 to 11.5) |
-| Return in 2026 / 2022 / 2020 | +2.3 / +17.8 / +9.2 pp | -1.9 / +25.9 / +31.8 pp |
-| Holm-corrected p (return) | 0.057 | 0.057 |
+| Total return | +7.3 pp (95% CI -0.7 to +14.5), better in 8 of 9 | +8.9 pp (+1.9 to +14.9), 6 of 9 |
+| Sharpe | +0.28 (-0.07 to +0.63) | +0.29 (-0.04 to +0.62) |
+| Maximum drawdown | 6.7 pp smaller (3.5 to 9.9) | 6.9 pp smaller (3.9 to 9.2) |
+| Return in 2026 / 2022 / 2020 | +3.2 / +16.9 / +1.9 pp | -2.8 / +20.7 / +8.6 pp |
+| Holm-corrected p (return; drawdown) | 0.23; 0.11 | 0.23; 0.11 |
 
-- **Rules in the prompt helped, mostly in the bear market.** Both prompts lost less than the baseline in 2022 for every
-  model and did about as well in 2026's rising market. After correcting for testing two prompts, neither passes 5%:
-  suggestive, not yet established. `trend_news`'s 2020 figure is mostly one `llama3.2` run that held TSLA (+110.8%).
+- **Rules in the prompt helped in the bear market.** In 2022 both prompts lost less than the baseline with every
+  model (+16.9 and +20.7 pp on average). In 2026's rising market the difference was small (+3.2 and -2.8 pp). After
+  correcting for testing two prompts, nothing passes 5%: suggestive, not established.
 - **The gain came from how much stock the models held, not from which stocks.** Splitting the return differences
-  (sums of daily returns, see "Where a difference comes from"): `risk_rules` +11.2 pp = exposure level +7.7, exposure
-  timing +2.8, selection +1.0; `trend_news` +17.9 pp = +11.7, +4.5, +1.5. In 2022 the rules cut the average share of
-  equity in stocks from 57% to 25% (`risk_rules`) and 16% (`trend_news`), and that alone accounts for the gain;
-  selection was slightly negative.
-- **"Less stock" is not the whole story.** In 2020 the rules *raised* exposure for the two most cautious models
-  (`claude-haiku-5-5` from 19% to 49%, `llama3.2` from 19% to 41%), which paid off in the rebound. The rules change how
-  invested a model is and when; whether that pays depends on the market.
+  (sums of daily returns, see "Where a difference comes from"): `risk_rules` +9.0 pp = exposure level +4.6, exposure
+  timing +3.7, selection +1.0; `trend_news` +10.5 pp = +6.5, +6.0 and -2.3. In 2022 the rules cut the average share of
+  equity in stocks from 44% to 19% (`risk_rules`) and 15% (`trend_news`); exposure explains all of that year's gain,
+  and selection added little (+1.4 pp) or took away (-5.3 pp).
+- **"Less stock" is not the whole story.** In 2020 the rules *raised* the exposure of the most cautious model,
+  `claude-haiku-5-5`, from 19% to 49% (`risk_rules`) and 45% (`trend_news`), and that paid off in the rebound. The
+  rules change how invested a model is and when; whether that pays depends on the market.
 - **The decisions themselves did not get better.** Scored one by one (research/analysis.py: each buy against SPY over
-  the next five trading days, each sell by what it avoided), the baseline's decisions were right 37% to 45% of the
-  time and trailed SPY by 0.2% to 0.5% each, depending on the model. The rule prompts moved the hit rate by +0.7 pp
-  (`risk_rules`) and +3.7 pp (`trend_news`) and the five-day excess by +0.1 and -0.2 pp, all within the noise (Holm
-  p 0.7 to 0.9). The rules changed how much the agents held, not how well they picked.
-- No reply in any of the 36 runs broke the format; invalid orders (unknown symbols, sells of stocks not held) stayed
-  between 0% and 7% of orders under every prompt.
+  the next five trading days, each sell by what it avoided), the baseline's decisions were right 37% to 42% of the time
+  and trailed SPY by 0.2% to 0.5% each, depending on the model. The rule prompts moved the hit rate by +0.8 pp
+  (`risk_rules`) and +5.3 pp (`trend_news`) and the five-day excess by +0.05 pp, all within the noise (Holm p 0.23 to
+  1). The rules changed how much the agents held, not how well they picked.
+- No reply in the 27 runs broke the format; invalid orders (unknown symbols, sells of stocks not held) stayed between
+  0% and 5% of orders under every prompt.
 
 The single-factor grid follows (every variant below, four seeds, one model) and asks the next questions: which of the
 four rules carries the effect, and whether a plain cash floor (`cash_30`, `cash_50`) does as well.
-
 
 ## The variants
 
@@ -89,10 +90,11 @@ mistaken for the blind aliases of real stocks (S01 to S64).
 ## What stays the same
 
 Within a lab every run uses the same model, temperature, reply cap, universe, number of positions, cash, slippage and
-blind mode. A run is one variant on one period with one seed. The seed fixes two things: which alias each stock gets
-in blind mode, and the sampling seed the model API is given (OpenAI-compatible servers and Ollama take one). Two
-variants on the same period and seed therefore see the same aliases and draw from the same random stream, so the
-difference between them is as much the prompt's doing as an experiment with a stochastic model allows.
+blind mode. A run is one variant on one period with one seed. The seed fixes which alias each stock gets in blind
+mode, so two variants on the same period and seed see the same market under the same names; with `--api-seed` it is
+also sent as the API's sampling seed (OpenAI-compatible servers and Ollama take one). Without it, as in the results
+above, the model samples freely at the lab's temperature, and the seeds are independent repeats that show how much
+the same prompt varies from run to run.
 
 Every run passes through the same harness as any other LLM run (`agent.run_policy`): the agent sees only what was
 known at that day's close, its orders fill at the next open, and the look-ahead check replays its replies on copies of
@@ -238,7 +240,8 @@ each) and writes the prompt board for the website (format `rta-prompt-board-1`):
     `residual`, the mean exposure of the variant and the baseline, and the same by period);
   - `cost`: calls, input and output tokens, list price;
 - `across_models` (null with one lab): the variants every lab has, compared with the baseline over all models,
-  periods and seeds at once, with `vs_baseline` and `attribution` as above.
+  periods and seeds at once, with `vs_baseline` and `attribution` as above;
+- `notes` (`en`, `zh`, or null): what a reader should know, such as a model left out and why (`--note`, `--note-zh`).
 
 Fractions are fractions (0.123 is 12.3%); Sharpe ratios are annualised.
 
@@ -247,6 +250,8 @@ Fractions are fractions (0.123 is 12.3%); Sharpe ratios are annualised.
 - One model per lab. A prompt that helps one model can hurt another; run the lab again with your model before
   relying on a result.
 - Blind mode lowers the chance that a model recognises a stock or a date; it cannot rule it out.
+- A gateway or a local server can cut a long prompt without saying so. Every call records the prompt's length and
+  the tokens the model read, and the report flags a run whose model read far fewer tokens than its prompts hold.
 - The cost model is the research kit's default (5 bps of slippage, no commission). Turnover is reported so that a
   variant that only wins by trading more can be spotted.
 - Three periods are three markets, not a sample of all markets. A result that holds in all three is stronger than

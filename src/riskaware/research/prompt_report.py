@@ -60,6 +60,10 @@ def read_run(folder: str | Path) -> dict[str, Any] | None:
         "completion_tokens": sum(int(c.get("completion_tokens") or 0) for c in calls),
         "seconds": sum(float(c.get("seconds") or 0) for c in calls),
     }
+    sized = [c for c in calls if c.get("prompt_chars") and c.get("prompt_tokens")]
+    ratio = (sum(int(c["prompt_tokens"]) for c in sized) / sum(int(c["prompt_chars"]) for c in sized)) if sized else None
+    row["tokens_per_char"] = ratio
+    row["possibly_truncated"] = truncated(sized, ratio)
     for k in ("total_return", "sharpe", "max_drawdown", "volatility", "turnover", "avg_exposure", "trades",
               "round_trips", "win_rate"):
         row[k] = _num(st.get(k))
@@ -71,6 +75,24 @@ def read_run(folder: str | Path) -> dict[str, Any] | None:
     row["excess_vs_spy"] = tr - row["spy_total_return"] if None not in (tr, row["spy_total_return"]) else None
     row["excess_vs_equal_weight"] = tr - row["ew_total_return"] if None not in (tr, row["ew_total_return"]) else None
     return row
+
+
+TRUNCATED_BELOW = 0.15  # tokens read per prompt character: the observations run about 0.2 to 0.4 depending on the
+# tokenizer; far below that, the model read less than it was sent (a gateway or a local server cut the prompt)
+
+
+def truncated(calls: list[dict[str, Any]], ratio: float | None) -> bool:
+    """Did the model read less than it was sent? Either far fewer tokens per character than any tokenizer gives, or
+    a cap: many calls report exactly the same number of input tokens although their prompts differ in length."""
+    if ratio is not None and ratio < TRUNCATED_BELOW:
+        return True
+    if len(calls) < 5:
+        return False
+    from collections import Counter
+
+    tokens, n = Counter(int(c["prompt_tokens"]) for c in calls).most_common(1)[0]
+    lengths = {int(c["prompt_chars"]) for c in calls if int(c["prompt_tokens"]) == tokens}
+    return n >= 0.3 * len(calls) and len(lengths) > 1 and max(lengths) > 1.05 * min(lengths)
 
 
 def collect(lab: str | Path) -> list[dict[str, Any]]:
@@ -512,6 +534,15 @@ def render(r: dict[str, Any]) -> str:
                      f"{_f2(b['spy']['sharpe'])} | {_pct(b['equal_weight']['total_return'])} | "
                      f"{_f2(b['equal_weight']['sharpe'])} |")
     lines.append("")
+    cut = [x for x in r.get("runs", []) if x.get("possibly_truncated")]
+    if cut:
+        lines += [f"**Possibly cut prompts:** in {len(cut)} run{'s' if len(cut) != 1 else ''} the model read only "
+                  f"{min(x['tokens_per_char'] for x in cut):.2f} to {max(x['tokens_per_char'] for x in cut):.2f} tokens "
+                  "per prompt character (about 0.2 to 0.4 is normal), or many calls read exactly the same number of "
+                  "tokens: a gateway or server may have cut the prompts, so the model may not have seen the whole "
+                  "observation. Runs: "
+                  + ", ".join(f"`{x['variant']}` {x['period']} s{x['seed']}" for x in cut[:8])
+                  + (" ..." if len(cut) > 8 else "") + ".", ""]
     pw = r.get("power") or {}
     if pw and not pw.get("can_pass"):
         lines += [f"**Too few pairs to show anything:** with {pw['pairs']} pairs per variant and {pw['variants']} "
@@ -661,19 +692,22 @@ def across(reports: list[dict[str, Any]]) -> dict[str, Any] | None:
                           "attribution": _attr(at.get(n))} for n in names]}
 
 
-def site_payload(reports: dict[str, Any] | list[dict[str, Any]]) -> dict[str, Any]:
+def site_payload(reports: dict[str, Any] | list[dict[str, Any]], notes: dict[str, str] | None = None) -> dict[str, Any]:
     """The prompt board for the website (site/assets/data/prompts.json): one board per lab (one model each) and,
-    with several labs, the comparison across models. The format is described in docs/prompts.md."""
+    with several labs, the comparison across models; ``notes`` ({"en", "zh"}) says what a reader should know (a model
+    left out, say). The format is described in docs/prompts.md."""
     reports = [reports] if isinstance(reports, dict) else list(reports)
     return {"format": "rta-prompt-board-1", "generated_utc": _now(),
             "set_version": reports[0]["set_version"], "baseline": BASELINE, "primary_metric": PRIMARY,
-            "boards": [board_entry(r) for r in reports], "across_models": across(reports), "method": METHOD}
+            "boards": [board_entry(r) for r in reports], "across_models": across(reports), "method": METHOD,
+            "notes": notes}
 
 
-def board(labs: Iterable[str | Path], site: str | Path | None = None) -> dict[str, Any]:
+def board(labs: Iterable[str | Path], site: str | Path | None = None,
+          notes: dict[str, str] | None = None) -> dict[str, Any]:
     """Report every lab (one model each) and combine them into the website's prompt board."""
     reports = [report(lab) for lab in labs]
-    out = site_payload(reports)
+    out = site_payload(reports, notes)
     if site:
         p = Path(site)
         p.parent.mkdir(parents=True, exist_ok=True)

@@ -176,13 +176,15 @@ def report_cmd(
 def board_cmd(
     labs: list[Path] = typer.Argument(..., help="Lab folders, one model each"),
     site: Path = typer.Option(Path("site/assets/data/prompts.json"), help="Where to write the website's data"),
+    note: Optional[str] = typer.Option(None, help="A note for readers, in English (a model left out, say)"),
+    note_zh: Optional[str] = typer.Option(None, help="The same note in Chinese"),
 ) -> None:
     """Combine labs (one model each) into the website's prompt board. / 把几个模型的实验合成网站上的 prompt 榜"""
     from .prompt_report import board
 
     con = _console()
     try:
-        out = board(labs, site=site)
+        out = board(labs, site=site, notes={"en": note, "zh": note_zh or note} if note else None)
     except (ValueError, FileNotFoundError) as exc:
         con.print(f"[red]{escape(str(exc))}[/]")
         raise typer.Exit(2) from exc

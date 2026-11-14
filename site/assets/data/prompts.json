@@ -1,6 +1,6 @@
 {
  "format": "rta-prompt-board-1",
- "generated_utc": "2026-11-14T03:04:22+00:00",
+ "generated_utc": "2026-11-14T03:32:43+00:00",
  "set_version": "1",
  "baseline": "baseline",
  "primary_metric": "sharpe",
@@ -2800,946 +2800,13 @@
     "completion_tokens": 70153,
     "list_price_usd": null
    }
-  },
-  {
-   "model": "compat:protected.llama3.2",
-   "lab_note": "the coordinating session's pilot of 2026-11-13, imported (seed 0, no API seed)",
-   "settings": {
-    "universe": "core",
-    "symbols": null,
-    "max_positions": 5,
-    "temperature": 0.2,
-    "blind": true,
-    "news": true,
-    "periods": [
-     "2020",
-     "2022",
-     "2026"
-    ],
-    "seeds": [
-     0
-    ],
-    "api_seed": false
-   },
-   "benchmarks": {
-    "2026": {
-     "start": "2026-01-02",
-     "end": "2026-11-11",
-     "spy": {
-      "total_return": 0.1209,
-      "sharpe": 0.7652,
-      "max_drawdown": -0.0888
-     },
-     "equal_weight": {
-      "total_return": 0.063,
-      "sharpe": 0.276,
-      "max_drawdown": -0.1529
-     }
-    },
-    "2022": {
-     "start": "2022-01-03",
-     "end": "2022-12-30",
-     "spy": {
-      "total_return": -0.1865,
-      "sharpe": -0.7953,
-      "max_drawdown": -0.245
-     },
-     "equal_weight": {
-      "total_return": -0.4252,
-      "sharpe": -1.3355,
-      "max_drawdown": -0.4422
-     }
-    },
-    "2020": {
-     "start": "2020-01-02",
-     "end": "2020-12-31",
-     "spy": {
-      "total_return": 0.1724,
-      "sharpe": 0.634,
-      "max_drawdown": -0.3372
-     },
-     "equal_weight": {
-      "total_return": 1.277,
-      "sharpe": 2.0788,
-      "max_drawdown": -0.335
-     }
-    }
-   },
-   "noise": {
-    "sharpe_mean_abs_gap_between_seeds": null,
-    "sharpe_sd_by_period": {}
-   },
-   "power": {
-    "pairs": 3,
-    "variants": 2,
-    "smallest_p_holm": 0.5,
-    "can_pass": false,
-    "pairs_needed": 7
-   },
-   "variants": [
-    {
-     "name": "baseline",
-     "factor": "baseline",
-     "about": {
-      "en": "The package's own prompt (agent.SYSTEM_PROMPT): 3 headlines per stock, a decision every 5 trading days, the reply held to a strict JSON schema.",
-      "zh": "包里自带的 prompt（agent.SYSTEM_PROMPT）：每只股票 3 条新闻，每 5 个交易日决策一次，回复受严格 JSON schema 约束。"
-     },
-     "prompt_sha256": "6d90b43da0983a3bfe061a1364143052cfbfca5383b9018020cef06eeaf7ce7f",
-     "variant_sha256": "06cd0c4d4b036d06d44f47ea7948d3638dbe5d2665d5e2adaa7c5eb4db053ec4",
-     "runs": 3,
-     "settings": {
-      "max_news": 3,
-      "decide_every": 5,
-      "reasoning": false,
-      "response_format": "schema"
-     },
-     "metrics": {
-      "sharpe": {
-       "mean": -0.0151,
-       "by_period": {
-        "2026": 0.3473,
-        "2022": -1.4835,
-        "2020": 1.091
-       }
-      },
-      "total_return": {
-       "mean": -0.1026,
-       "by_period": {
-        "2026": 0.0527,
-        "2022": -0.4568,
-        "2020": 0.0963
-       }
-      },
-      "max_drawdown": {
-       "mean": -0.1947,
-       "by_period": {
-        "2026": -0.0542,
-        "2022": -0.4737,
-        "2020": -0.056
-       }
-      },
-      "excess_vs_spy": {
-       "mean": -0.1382,
-       "by_period": {
-        "2026": -0.0681,
-        "2022": -0.2704,
-        "2020": -0.076
-       }
-      },
-      "avg_exposure": {
-       "mean": 0.4549,
-       "by_period": {
-        "2026": 0.21,
-        "2022": 0.9667,
-        "2020": 0.1879
-       }
-      },
-      "turnover": {
-       "mean": 1.023,
-       "by_period": {
-        "2026": 0.4895,
-        "2022": 0.9217,
-        "2020": 1.6577
-       }
-      },
-      "format_error_rate": {
-       "mean": 0.0,
-       "by_period": {
-        "2026": 0.0,
-        "2022": 0.0,
-        "2020": 0.0
-       }
-      },
-      "invalid_order_rate": {
-       "mean": 0.0172,
-       "by_period": {
-        "2026": 0.0,
-        "2022": 0.0517,
-        "2020": 0.0
-       }
-      },
-      "hit_rate_5d": {
-       "mean": 0.4535,
-       "by_period": {
-        "2026": 0.375,
-        "2022": 0.3333,
-        "2020": 0.6522
-       }
-      },
-      "decision_excess_5d": {
-       "mean": -0.0028,
-       "by_period": {
-        "2026": -0.0053,
-        "2022": -0.0129,
-        "2020": 0.0098
-       }
-      },
-      "decision_ic": {
-       "mean": 0.0189,
-       "by_period": {
-        "2026": -0.0856,
-        "2022": 0.0648,
-        "2020": 0.0774
-       }
-      },
-      "holdings_ic": {
-       "mean": -0.0286,
-       "by_period": {
-        "2026": 0.013,
-        "2022": -0.083,
-        "2020": -0.0159
-       }
-      }
-     },
-     "tokens_per_step": 2655,
-     "vs_baseline": null,
-     "attribution": null
-    },
-    {
-     "name": "risk_rules",
-     "factor": "risk_rules",
-     "about": {
-      "en": "Four risk rules: at most 25% per stock, at least 30% cash when the regime is UNCERTAIN or RISK_OFF, sell 8% below the purchase price, prefer stocks above their 200-day average.",
-      "zh": "四条风险规则：单只不超过 25%，UNCERTAIN 或 RISK_OFF 时至少留 30% 现金，跌破买入价 8% 卖出，优先买在 200 日均线之上的股票。"
-     },
-     "prompt_sha256": "40290e17f262aff3bc79880b18c4fcc5af0e2e9bc8c29086dac7311a30f39c36",
-     "variant_sha256": "c847eb02bb8cbc90a77e1c981873b3592cb090dd1a8da3b1c5e13a66ac85581a",
-     "runs": 3,
-     "settings": {
-      "max_news": 3,
-      "decide_every": 5,
-      "reasoning": false,
-      "response_format": "schema"
-     },
-     "metrics": {
-      "sharpe": {
-       "mean": 0.276,
-       "by_period": {
-        "2026": 0.199,
-        "2022": -1.3393,
-        "2020": 1.9683
-       }
-      },
-      "total_return": {
-       "mean": 0.0681,
-       "by_period": {
-        "2026": 0.046,
-        "2022": -0.2515,
-        "2020": 0.4099
-       }
-      },
-      "max_drawdown": {
-       "mean": -0.1645,
-       "by_period": {
-        "2026": -0.116,
-        "2022": -0.3012,
-        "2020": -0.0764
-       }
-      },
-      "excess_vs_spy": {
-       "mean": 0.0325,
-       "by_period": {
-        "2026": -0.0749,
-        "2022": -0.0651,
-        "2020": 0.2375
-       }
-      },
-      "avg_exposure": {
-       "mean": 0.4014,
-       "by_period": {
-        "2026": 0.3833,
-        "2022": 0.4081,
-        "2020": 0.4126
-       }
-      },
-      "turnover": {
-       "mean": 2.1661,
-       "by_period": {
-        "2026": 2.4633,
-        "2022": 2.0989,
-        "2020": 1.936
-       }
-      },
-      "format_error_rate": {
-       "mean": 0.0,
-       "by_period": {
-        "2026": 0.0,
-        "2022": 0.0,
-        "2020": 0.0
-       }
-      },
-      "invalid_order_rate": {
-       "mean": 0.1732,
-       "by_period": {
-        "2026": 0.2558,
-        "2022": 0.2222,
-        "2020": 0.0417
-       }
-      },
-      "hit_rate_5d": {
-       "mean": 0.4557,
-       "by_period": {
-        "2026": 0.36,
-        "2022": 0.4615,
-        "2020": 0.5455
-       }
-      },
-      "decision_excess_5d": {
-       "mean": 0.0009,
-       "by_period": {
-        "2026": -0.0052,
-        "2022": -0.0012,
-        "2020": 0.0092
-       }
-      },
-      "decision_ic": {
-       "mean": -0.0169,
-       "by_period": {
-        "2026": -0.0931,
-        "2022": 0.0552,
-        "2020": -0.0128
-       }
-      },
-      "holdings_ic": {
-       "mean": -0.0137,
-       "by_period": {
-        "2026": 0.0003,
-        "2022": -0.0506,
-        "2020": 0.0093
-       }
-      }
-     },
-     "tokens_per_step": 2739,
-     "vs_baseline": {
-      "sharpe": {
-       "diff": 0.2911,
-       "ci95": [
-        -0.1483,
-        0.8773
-       ],
-       "p": 0.75,
-       "p_holm": 0.75,
-       "q_bh": 0.75,
-       "pairs": 3,
-       "wins": 2,
-       "losses": 1,
-       "by_period": {
-        "2026": -0.1483,
-        "2022": 0.1441,
-        "2020": 0.8773
-       },
-       "verdict": "noise"
-      },
-      "total_return": {
-       "diff": 0.1707,
-       "ci95": [
-        -0.0068,
-        0.3135
-       ],
-       "p": 0.5,
-       "p_holm": 0.5,
-       "q_bh": 0.5,
-       "pairs": 3,
-       "wins": 2,
-       "losses": 1,
-       "by_period": {
-        "2026": -0.0068,
-        "2022": 0.2053,
-        "2020": 0.3135
-       },
-       "verdict": "noise"
-      },
-      "max_drawdown": {
-       "diff": 0.0301,
-       "ci95": [
-        -0.0618,
-        0.1725
-       ],
-       "p": 1.0,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 1,
-       "losses": 2,
-       "by_period": {
-        "2026": -0.0618,
-        "2022": 0.1725,
-        "2020": -0.0204
-       },
-       "verdict": "noise"
-      },
-      "turnover": {
-       "diff": 1.1431,
-       "ci95": [
-        0.2783,
-        1.9738
-       ],
-       "p": 0.25,
-       "p_holm": 0.5,
-       "q_bh": 0.25,
-       "pairs": 3,
-       "wins": 3,
-       "losses": 0,
-       "by_period": {
-        "2026": 1.9738,
-        "2022": 1.1772,
-        "2020": 0.2783
-       },
-       "verdict": "same"
-      },
-      "avg_exposure": {
-       "diff": -0.0535,
-       "ci95": [
-        -0.5585,
-        0.2247
-       ],
-       "p": 1.0,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 2,
-       "losses": 1,
-       "by_period": {
-        "2026": 0.1733,
-        "2022": -0.5585,
-        "2020": 0.2247
-       },
-       "verdict": "same"
-      },
-      "format_error_rate": {
-       "diff": 0.0,
-       "ci95": [
-        0.0,
-        0.0
-       ],
-       "p": 1.0,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 0,
-       "losses": 0,
-       "by_period": {
-        "2026": 0.0,
-        "2022": 0.0,
-        "2020": 0.0
-       },
-       "verdict": "noise"
-      },
-      "invalid_order_rate": {
-       "diff": 0.156,
-       "ci95": [
-        0.0417,
-        0.2558
-       ],
-       "p": 0.25,
-       "p_holm": 0.5,
-       "q_bh": 0.5,
-       "pairs": 3,
-       "wins": 3,
-       "losses": 0,
-       "by_period": {
-        "2026": 0.2558,
-        "2022": 0.1705,
-        "2020": 0.0417
-       },
-       "verdict": "noise"
-      },
-      "hit_rate_5d": {
-       "diff": 0.0022,
-       "ci95": [
-        -0.1067,
-        0.1282
-       ],
-       "p": 1.0,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 1,
-       "losses": 2,
-       "by_period": {
-        "2026": -0.015,
-        "2022": 0.1282,
-        "2020": -0.1067
-       },
-       "verdict": "noise"
-      },
-      "decision_excess_5d": {
-       "diff": 0.0037,
-       "ci95": [
-        -0.0006,
-        0.0117
-       ],
-       "p": 0.75,
-       "p_holm": 1.0,
-       "q_bh": 0.75,
-       "pairs": 3,
-       "wins": 2,
-       "losses": 1,
-       "by_period": {
-        "2026": 0.0001,
-        "2022": 0.0117,
-        "2020": -0.0006
-       },
-       "verdict": "noise"
-      },
-      "decision_ic": {
-       "diff": -0.0358,
-       "ci95": [
-        -0.0902,
-        -0.0075
-       ],
-       "p": 0.25,
-       "p_holm": 0.5,
-       "q_bh": 0.25,
-       "pairs": 3,
-       "wins": 0,
-       "losses": 3,
-       "by_period": {
-        "2026": -0.0075,
-        "2022": -0.0097,
-        "2020": -0.0902
-       },
-       "verdict": "noise"
-      },
-      "holdings_ic": {
-       "diff": 0.015,
-       "ci95": [
-        -0.0127,
-        0.0323
-       ],
-       "p": 0.5,
-       "p_holm": 1.0,
-       "q_bh": 0.5,
-       "pairs": 3,
-       "wins": 2,
-       "losses": 1,
-       "by_period": {
-        "2026": -0.0127,
-        "2022": 0.0323,
-        "2020": 0.0253
-       },
-       "verdict": "noise"
-      }
-     },
-     "attribution": {
-      "total": 0.1779,
-      "exposure_level": 0.17,
-      "exposure_timing": -0.0005,
-      "selection": 0.008,
-      "residual": 0.0004,
-      "exposure_variant": 0.4015,
-      "exposure_baseline": 0.4549,
-      "by_period": {
-       "2026": {
-        "total": -0.0027,
-        "exposure_level": 0.0268,
-        "exposure_timing": -0.0091,
-        "selection": -0.0213,
-        "residual": 0.0008,
-        "exposure_variant": 0.3842,
-        "exposure_baseline": 0.21
-       },
-       "2022": {
-        "total": 0.2719,
-        "exposure_level": 0.3227,
-        "exposure_timing": -0.0505,
-        "selection": -0.0035,
-        "residual": 0.0032,
-        "exposure_variant": 0.408,
-        "exposure_baseline": 0.9668
-       },
-       "2020": {
-        "total": 0.2646,
-        "exposure_level": 0.1606,
-        "exposure_timing": 0.058,
-        "selection": 0.0488,
-        "residual": -0.0028,
-        "exposure_variant": 0.4123,
-        "exposure_baseline": 0.1878
-       }
-      }
-     }
-    },
-    {
-     "name": "trend_news",
-     "factor": "decision_rule",
-     "about": {
-      "en": "A decision rule: buy only when the trend and the news are both positive, sell when the trend breaks or confirmed bad news arrives, otherwise hold; the judgement goes in each reason.",
-      "zh": "一条决策规则：趋势和新闻都向好才买，趋势破位或有已确认的坏消息就卖，否则持有，判断写进每笔订单的 reason。"
-     },
-     "prompt_sha256": "bbc47f0f84b6365ac4d08bc06c1f5f3c06c1ae029bd0208838fb60f3b1ddd312",
-     "variant_sha256": "925dfc61a809bbc5904fe9525199aae140c67c43cc38d5a67df92efd3f919702",
-     "runs": 3,
-     "settings": {
-      "max_news": 3,
-      "decide_every": 5,
-      "reasoning": false,
-      "response_format": "schema"
-     },
-     "metrics": {
-      "sharpe": {
-       "mean": 0.6748,
-       "by_period": {
-        "2026": 0.4685,
-        "2022": -0.994,
-        "2020": 2.5498
-       }
-      },
-      "total_return": {
-       "mean": 0.3742,
-       "by_period": {
-        "2026": 0.0588,
-        "2022": -0.0441,
-        "2020": 1.1078
-       }
-      },
-      "max_drawdown": {
-       "mean": -0.1007,
-       "by_period": {
-        "2026": -0.0468,
-        "2022": -0.0647,
-        "2020": -0.1905
-       }
-      },
-      "excess_vs_spy": {
-       "mean": 0.3386,
-       "by_period": {
-        "2026": -0.062,
-        "2022": 0.1424,
-        "2020": 0.9355
-       }
-      },
-      "avg_exposure": {
-       "mean": 0.3502,
-       "by_period": {
-        "2026": 0.2002,
-        "2022": 0.1661,
-        "2020": 0.6843
-       }
-      },
-      "turnover": {
-       "mean": 0.3208,
-       "by_period": {
-        "2026": 0.3203,
-        "2022": 0.1048,
-        "2020": 0.5373
-       }
-      },
-      "format_error_rate": {
-       "mean": 0.0,
-       "by_period": {
-        "2026": 0.0,
-        "2022": 0.0,
-        "2020": 0.0
-       }
-      },
-      "invalid_order_rate": {
-       "mean": 0.0299,
-       "by_period": {
-        "2026": 0.0,
-        "2022": 0.0,
-        "2020": 0.0896
-       }
-      },
-      "hit_rate_5d": {
-       "mean": 0.4444,
-       "by_period": {
-        "2026": 0.6667,
-        "2022": 0.0,
-        "2020": 0.6667
-       }
-      },
-      "decision_excess_5d": {
-       "mean": -0.0139,
-       "by_period": {
-        "2026": -0.0044,
-        "2022": -0.0328,
-        "2020": -0.0044
-       }
-      },
-      "decision_ic": {
-       "mean": -0.2019,
-       "by_period": {
-        "2026": -0.1826,
-        "2022": -0.2739,
-        "2020": -0.1492
-       }
-      },
-      "holdings_ic": {
-       "mean": 0.0073,
-       "by_period": {
-        "2026": -0.0065,
-        "2022": 0.0164,
-        "2020": 0.0119
-       }
-      }
-     },
-     "tokens_per_step": 2699,
-     "vs_baseline": {
-      "sharpe": {
-       "diff": 0.6898,
-       "ci95": [
-        0.1212,
-        1.4588
-       ],
-       "p": 0.25,
-       "p_holm": 0.5,
-       "q_bh": 0.5,
-       "pairs": 3,
-       "wins": 3,
-       "losses": 0,
-       "by_period": {
-        "2026": 0.1212,
-        "2022": 0.4895,
-        "2020": 1.4588
-       },
-       "verdict": "noise"
-      },
-      "total_return": {
-       "diff": 0.4768,
-       "ci95": [
-        0.0061,
-        1.0115
-       ],
-       "p": 0.25,
-       "p_holm": 0.5,
-       "q_bh": 0.5,
-       "pairs": 3,
-       "wins": 3,
-       "losses": 0,
-       "by_period": {
-        "2026": 0.0061,
-        "2022": 0.4128,
-        "2020": 1.0115
-       },
-       "verdict": "noise"
-      },
-      "max_drawdown": {
-       "diff": 0.094,
-       "ci95": [
-        -0.1345,
-        0.409
-       ],
-       "p": 0.75,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 2,
-       "losses": 1,
-       "by_period": {
-        "2026": 0.0074,
-        "2022": 0.409,
-        "2020": -0.1345
-       },
-       "verdict": "noise"
-      },
-      "turnover": {
-       "diff": -0.7021,
-       "ci95": [
-        -1.1203,
-        -0.1692
-       ],
-       "p": 0.25,
-       "p_holm": 0.5,
-       "q_bh": 0.25,
-       "pairs": 3,
-       "wins": 0,
-       "losses": 3,
-       "by_period": {
-        "2026": -0.1692,
-        "2022": -0.8169,
-        "2020": -1.1203
-       },
-       "verdict": "same"
-      },
-      "avg_exposure": {
-       "diff": -0.1047,
-       "ci95": [
-        -0.8006,
-        0.4964
-       ],
-       "p": 0.75,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 1,
-       "losses": 2,
-       "by_period": {
-        "2026": -0.0098,
-        "2022": -0.8006,
-        "2020": 0.4964
-       },
-       "verdict": "same"
-      },
-      "format_error_rate": {
-       "diff": 0.0,
-       "ci95": [
-        0.0,
-        0.0
-       ],
-       "p": 1.0,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 0,
-       "losses": 0,
-       "by_period": {
-        "2026": 0.0,
-        "2022": 0.0,
-        "2020": 0.0
-       },
-       "verdict": "noise"
-      },
-      "invalid_order_rate": {
-       "diff": 0.0126,
-       "ci95": [
-        -0.0517,
-        0.0896
-       ],
-       "p": 1.0,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 1,
-       "losses": 1,
-       "by_period": {
-        "2026": 0.0,
-        "2022": -0.0517,
-        "2020": 0.0896
-       },
-       "verdict": "noise"
-      },
-      "hit_rate_5d": {
-       "diff": -0.0091,
-       "ci95": [
-        -0.3333,
-        0.2917
-       ],
-       "p": 1.0,
-       "p_holm": 1.0,
-       "q_bh": 1.0,
-       "pairs": 3,
-       "wins": 2,
-       "losses": 1,
-       "by_period": {
-        "2026": 0.2917,
-        "2022": -0.3333,
-        "2020": 0.0145
-       },
-       "verdict": "noise"
-      },
-      "decision_excess_5d": {
-       "diff": -0.0111,
-       "ci95": [
-        -0.0199,
-        0.0009
-       ],
-       "p": 0.5,
-       "p_holm": 1.0,
-       "q_bh": 0.75,
-       "pairs": 3,
-       "wins": 1,
-       "losses": 2,
-       "by_period": {
-        "2026": 0.0009,
-        "2022": -0.0199,
-        "2020": -0.0142
-       },
-       "verdict": "noise"
-      },
-      "decision_ic": {
-       "diff": -0.2208,
-       "ci95": [
-        -0.3387,
-        -0.097
-       ],
-       "p": 0.25,
-       "p_holm": 0.5,
-       "q_bh": 0.25,
-       "pairs": 3,
-       "wins": 0,
-       "losses": 3,
-       "by_period": {
-        "2026": -0.097,
-        "2022": -0.3387,
-        "2020": -0.2266
-       },
-       "verdict": "noise"
-      },
-      "holdings_ic": {
-       "diff": 0.0359,
-       "ci95": [
-        -0.0196,
-        0.0994
-       ],
-       "p": 0.5,
-       "p_holm": 1.0,
-       "q_bh": 0.5,
-       "pairs": 3,
-       "wins": 2,
-       "losses": 1,
-       "by_period": {
-        "2026": -0.0196,
-        "2022": 0.0994,
-        "2020": 0.0278
-       },
-       "verdict": "noise"
-      }
-     },
-     "attribution": {
-      "total": 0.4004,
-      "exposure_level": 0.2717,
-      "exposure_timing": -0.003,
-      "selection": 0.1274,
-      "residual": 0.0043,
-      "exposure_variant": 0.3497,
-      "exposure_baseline": 0.4549,
-      "by_period": {
-       "2026": {
-        "total": 0.0053,
-        "exposure_level": -0.0016,
-        "exposure_timing": 0.0118,
-        "selection": 0.0003,
-        "residual": -0.0052,
-        "exposure_variant": 0.1999,
-        "exposure_baseline": 0.21
-       },
-       "2022": {
-        "total": 0.4959,
-        "exposure_level": 0.4624,
-        "exposure_timing": -0.0265,
-        "selection": 0.0467,
-        "residual": 0.0134,
-        "exposure_variant": 0.1661,
-        "exposure_baseline": 0.9668
-       },
-       "2020": {
-        "total": 0.6999,
-        "exposure_level": 0.3543,
-        "exposure_timing": 0.0058,
-        "selection": 0.3352,
-        "residual": 0.0046,
-        "exposure_variant": 0.6831,
-        "exposure_baseline": 0.1878
-       }
-      }
-     }
-    }
-   ],
-   "cost": {
-    "calls": 435,
-    "prompt_tokens": 1143742,
-    "completion_tokens": 29708,
-    "list_price_usd": null
-   }
   }
  ],
  "across_models": {
   "models": [
    "openai:gpt-5.6-luna",
    "anthropic:claude-haiku-5-5",
-   "compat:protected.gemini-3.1-flash-lite",
-   "compat:protected.llama3.2"
+   "compat:protected.gemini-3.1-flash-lite"
   ],
   "pairs_by": "model x period x seed",
   "variants": [
@@ -3762,97 +2829,97 @@
     },
     "vs_baseline": {
      "sharpe": {
-      "diff": 0.2847,
+      "diff": 0.2825,
       "ci95": [
-       -0.0058,
-       0.5731
+       -0.065,
+       0.6333
       ],
-      "p": 0.1006,
-      "p_holm": 0.1484,
-      "q_bh": 0.1006,
-      "pairs": 12,
-      "wins": 8,
-      "losses": 4,
+      "p": 0.168,
+      "p_holm": 0.3359,
+      "q_bh": 0.2305,
+      "pairs": 9,
+      "wins": 6,
+      "losses": 3,
       "by_period": {
-       "2026": 0.2404,
-       "2022": 0.1719,
-       "2020": 0.4417
+       "2026": 0.3699,
+       "2022": 0.1812,
+       "2020": 0.2965
       },
       "verdict": "noise"
      },
      "total_return": {
-      "diff": 0.0975,
+      "diff": 0.0731,
       "ci95": [
-       0.0205,
-       0.1627
+       -0.0073,
+       0.1454
       ],
-      "p": 0.0459,
-      "p_holm": 0.0566,
-      "q_bh": 0.0459,
-      "pairs": 12,
-      "wins": 10,
-      "losses": 2,
+      "p": 0.1523,
+      "p_holm": 0.2344,
+      "q_bh": 0.1523,
+      "pairs": 9,
+      "wins": 8,
+      "losses": 1,
       "by_period": {
-       "2026": 0.0225,
-       "2022": 0.1779,
-       "2020": 0.0922
+       "2026": 0.0323,
+       "2022": 0.1687,
+       "2020": 0.0185
       },
       "verdict": "noise"
      },
      "max_drawdown": {
-      "diff": 0.0581,
+      "diff": 0.0674,
       "ci95": [
-       0.0314,
-       0.085
+       0.0349,
+       0.0987
       ],
-      "p": 0.0708,
-      "p_holm": 0.1416,
-      "q_bh": 0.1255,
-      "pairs": 12,
-      "wins": 8,
-      "losses": 4,
+      "p": 0.0547,
+      "p_holm": 0.1094,
+      "q_bh": 0.0859,
+      "pairs": 9,
+      "wins": 7,
+      "losses": 2,
       "by_period": {
-       "2026": -0.005,
-       "2022": 0.1751,
-       "2020": 0.0041
+       "2026": 0.014,
+       "2022": 0.176,
+       "2020": 0.0122
       },
       "verdict": "noise"
      },
      "avg_exposure": {
-      "diff": -0.0862,
+      "diff": -0.0971,
       "ci95": [
-       -0.2107,
-       0.0391
+       -0.2282,
+       0.059
       ],
-      "p": 0.3203,
-      "p_holm": 0.4346,
-      "q_bh": 0.3203,
-      "pairs": 12,
-      "wins": 4,
-      "losses": 8,
+      "p": 0.2812,
+      "p_holm": 0.2891,
+      "q_bh": 0.2812,
+      "pairs": 9,
+      "wins": 2,
+      "losses": 7,
       "by_period": {
-       "2026": 0.053,
-       "2022": -0.3231,
-       "2020": 0.0115
+       "2026": 0.0128,
+       "2022": -0.2447,
+       "2020": -0.0596
       },
       "verdict": "same"
      },
      "turnover": {
-      "diff": -0.9298,
+      "diff": -1.6208,
       "ci95": [
-       -2.1504,
-       0.1376
+       -2.8898,
+       -0.4761
       ],
-      "p": 0.1787,
-      "p_holm": 0.3574,
-      "q_bh": 0.3574,
-      "pairs": 12,
-      "wins": 5,
+      "p": 0.0469,
+      "p_holm": 0.0938,
+      "q_bh": 0.0938,
+      "pairs": 9,
+      "wins": 2,
       "losses": 7,
       "by_period": {
-       "2026": -0.6859,
-       "2022": -0.2932,
-       "2020": -1.8104
+       "2026": -1.5725,
+       "2022": -0.7834,
+       "2020": -2.5066
       },
       "verdict": "same"
      },
@@ -3865,7 +2932,7 @@
       "p": 1.0,
       "p_holm": 1.0,
       "q_bh": 1.0,
-      "pairs": 12,
+      "pairs": 9,
       "wins": 0,
       "losses": 0,
       "by_period": {
@@ -3876,136 +2943,136 @@
       "verdict": "noise"
      },
      "invalid_order_rate": {
-      "diff": 0.0339,
+      "diff": -0.0068,
       "ci95": [
-       -0.0071,
-       0.0816
+       -0.0184,
+       0.0047
       ],
-      "p": 0.2959,
-      "p_holm": 0.5918,
-      "q_bh": 0.5918,
-      "pairs": 12,
-      "wins": 7,
+      "p": 0.4141,
+      "p_holm": 0.8281,
+      "q_bh": 0.7031,
+      "pairs": 9,
+      "wins": 4,
       "losses": 4,
       "by_period": {
-       "2026": 0.0694,
-       "2022": 0.0253,
-       "2020": 0.007
+       "2026": 0.0073,
+       "2022": -0.0231,
+       "2020": -0.0045
       },
       "verdict": "noise"
      },
      "hit_rate_5d": {
-      "diff": 0.0069,
+      "diff": 0.0084,
       "ci95": [
-       -0.055,
-       0.0737
+       -0.071,
+       0.0896
       ],
-      "p": 0.8589,
-      "p_holm": 0.8589,
-      "q_bh": 0.8589,
-      "pairs": 12,
-      "wins": 5,
-      "losses": 7,
+      "p": 0.8555,
+      "p_holm": 0.8555,
+      "q_bh": 0.8555,
+      "pairs": 9,
+      "wins": 4,
+      "losses": 5,
       "by_period": {
-       "2026": -0.0428,
-       "2022": 0.0693,
-       "2020": -0.0059
+       "2026": -0.0521,
+       "2022": 0.0496,
+       "2020": 0.0277
       },
       "verdict": "noise"
      },
      "decision_excess_5d": {
-      "diff": 0.0013,
+      "diff": 0.0005,
       "ci95": [
-       -0.0041,
-       0.0062
+       -0.0061,
+       0.0067
       ],
-      "p": 0.7051,
-      "p_holm": 0.7295,
-      "q_bh": 0.7051,
-      "pairs": 12,
-      "wins": 7,
-      "losses": 5,
+      "p": 0.918,
+      "p_holm": 1.0,
+      "q_bh": 0.918,
+      "pairs": 9,
+      "wins": 5,
+      "losses": 4,
       "by_period": {
-       "2026": -0.0067,
-       "2022": 0.0071,
-       "2020": 0.0036
+       "2026": -0.0089,
+       "2022": 0.0056,
+       "2020": 0.0049
       },
       "verdict": "noise"
      },
      "decision_ic": {
-      "diff": -0.0251,
+      "diff": -0.0215,
       "ci95": [
-       -0.0517,
-       0.0026
+       -0.0521,
+       0.0135
       ],
-      "p": 0.1543,
-      "p_holm": 0.1543,
-      "q_bh": 0.1543,
-      "pairs": 12,
+      "p": 0.3125,
+      "p_holm": 0.4766,
+      "q_bh": 0.3125,
+      "pairs": 9,
       "wins": 3,
-      "losses": 9,
+      "losses": 6,
       "by_period": {
-       "2026": -0.0353,
-       "2022": 0.0098,
-       "2020": -0.0498
+       "2026": -0.0446,
+       "2022": 0.0163,
+       "2020": -0.0363
       },
       "verdict": "noise"
      },
      "holdings_ic": {
-      "diff": 0.0263,
+      "diff": 0.03,
       "ci95": [
-       0.0116,
-       0.0409
+       0.0123,
+       0.0467
       ],
-      "p": 0.0532,
-      "p_holm": 0.1064,
-      "q_bh": 0.1064,
-      "pairs": 12,
-      "wins": 9,
-      "losses": 3,
+      "p": 0.1016,
+      "p_holm": 0.2031,
+      "q_bh": 0.2031,
+      "pairs": 9,
+      "wins": 7,
+      "losses": 2,
       "by_period": {
-       "2026": -0.0061,
-       "2022": 0.07,
-       "2020": 0.0149
+       "2026": -0.0039,
+       "2022": 0.0826,
+       "2020": 0.0115
       },
       "verdict": "noise"
      }
     },
     "attribution": {
-     "total": 0.112,
-     "exposure_level": 0.0772,
-     "exposure_timing": 0.0275,
-     "selection": 0.0097,
-     "residual": -0.0024,
-     "exposure_variant": 0.4358,
-     "exposure_baseline": 0.5218,
+     "total": 0.09,
+     "exposure_level": 0.0463,
+     "exposure_timing": 0.0369,
+     "selection": 0.0103,
+     "residual": -0.0034,
+     "exposure_variant": 0.4472,
+     "exposure_baseline": 0.5441,
      "by_period": {
       "2026": {
-       "total": 0.0215,
-       "exposure_level": 0.0037,
-       "exposure_timing": 0.0108,
-       "selection": 0.0058,
-       "residual": 0.0012,
-       "exposure_variant": 0.6231,
-       "exposure_baseline": 0.5692
+       "total": 0.0296,
+       "exposure_level": -0.0041,
+       "exposure_timing": 0.0175,
+       "selection": 0.0148,
+       "residual": 0.0013,
+       "exposure_variant": 0.7028,
+       "exposure_baseline": 0.689
       },
       "2022": {
-       "total": 0.2344,
-       "exposure_level": 0.1778,
-       "exposure_timing": 0.0429,
-       "selection": 0.0093,
-       "residual": 0.0044,
-       "exposure_variant": 0.2464,
-       "exposure_baseline": 0.5699
+       "total": 0.2219,
+       "exposure_level": 0.1295,
+       "exposure_timing": 0.0741,
+       "selection": 0.0136,
+       "residual": 0.0047,
+       "exposure_variant": 0.1925,
+       "exposure_baseline": 0.4376
       },
       "2020": {
-       "total": 0.0802,
-       "exposure_level": 0.0502,
-       "exposure_timing": 0.0289,
-       "selection": 0.014,
-       "residual": -0.0129,
-       "exposure_variant": 0.4379,
-       "exposure_baseline": 0.4262
+       "total": 0.0187,
+       "exposure_level": 0.0135,
+       "exposure_timing": 0.0191,
+       "selection": 0.0024,
+       "residual": -0.0163,
+       "exposure_variant": 0.4464,
+       "exposure_baseline": 0.5057
       }
      }
     }
@@ -4019,97 +3086,97 @@
     },
     "vs_baseline": {
      "sharpe": {
-      "diff": 0.3864,
+      "diff": 0.2852,
       "ci95": [
-       0.0893,
-       0.6754
+       -0.04,
+       0.6243
       ],
-      "p": 0.0742,
-      "p_holm": 0.1484,
-      "q_bh": 0.1006,
-      "pairs": 12,
-      "wins": 9,
+      "p": 0.2305,
+      "p_holm": 0.3359,
+      "q_bh": 0.2305,
+      "pairs": 9,
+      "wins": 6,
       "losses": 3,
       "by_period": {
-       "2026": -0.1289,
-       "2022": 0.6113,
-       "2020": 0.6768
+       "2026": -0.2123,
+       "2022": 0.6518,
+       "2020": 0.4161
       },
       "verdict": "noise"
      },
      "total_return": {
-      "diff": 0.1857,
+      "diff": 0.0887,
       "ci95": [
-       0.0623,
-       0.3388
+       0.0185,
+       0.1487
       ],
-      "p": 0.0283,
-      "p_holm": 0.0566,
-      "q_bh": 0.0459,
-      "pairs": 12,
-      "wins": 9,
+      "p": 0.1172,
+      "p_holm": 0.2344,
+      "q_bh": 0.1523,
+      "pairs": 9,
+      "wins": 6,
       "losses": 3,
       "by_period": {
-       "2026": -0.0191,
-       "2022": 0.2587,
-       "2020": 0.3175
+       "2026": -0.0275,
+       "2022": 0.2073,
+       "2020": 0.0861
       },
       "verdict": "noise"
      },
      "max_drawdown": {
-      "diff": 0.0751,
+      "diff": 0.0687,
       "ci95": [
-       0.0353,
-       0.1151
+       0.039,
+       0.0919
       ],
-      "p": 0.1255,
-      "p_holm": 0.1416,
-      "q_bh": 0.1255,
-      "pairs": 12,
-      "wins": 9,
-      "losses": 3,
+      "p": 0.0859,
+      "p_holm": 0.1094,
+      "q_bh": 0.0859,
+      "pairs": 9,
+      "wins": 7,
+      "losses": 2,
       "by_period": {
-       "2026": 0.0082,
-       "2022": 0.2518,
-       "2020": -0.0348
+       "2026": 0.0084,
+       "2022": 0.1994,
+       "2020": -0.0016
       },
       "verdict": "noise"
      },
      "avg_exposure": {
-      "diff": -0.1329,
+      "diff": -0.1423,
       "ci95": [
-       -0.2759,
-       0.0084
+       -0.2671,
+       -0.0011
       ],
-      "p": 0.2173,
-      "p_holm": 0.4346,
-      "q_bh": 0.3203,
-      "pairs": 12,
-      "wins": 4,
-      "losses": 8,
+      "p": 0.1445,
+      "p_holm": 0.2891,
+      "q_bh": 0.2812,
+      "pairs": 9,
+      "wins": 3,
+      "losses": 6,
       "by_period": {
-       "2026": -0.125,
-       "2022": -0.4144,
-       "2020": 0.1406
+       "2026": -0.1633,
+       "2022": -0.2857,
+       "2020": 0.0221
       },
       "verdict": "same"
      },
      "turnover": {
-      "diff": 0.2028,
+      "diff": 0.5044,
       "ci95": [
-       -0.5508,
-       0.9662
+       -0.3831,
+       1.3423
       ],
-      "p": 0.668,
-      "p_holm": 0.668,
-      "q_bh": 0.668,
-      "pairs": 12,
+      "p": 0.4102,
+      "p_holm": 0.4102,
+      "q_bh": 0.4102,
+      "pairs": 9,
       "wins": 5,
-      "losses": 7,
+      "losses": 4,
       "by_period": {
-       "2026": 1.0583,
-       "2022": -0.9282,
-       "2020": 0.4782
+       "2026": 1.4674,
+       "2022": -0.9652,
+       "2020": 1.0111
       },
       "verdict": "same"
      },
@@ -4122,7 +3189,7 @@
       "p": 1.0,
       "p_holm": 1.0,
       "q_bh": 1.0,
-      "pairs": 12,
+      "pairs": 9,
       "wins": 0,
       "losses": 0,
       "by_period": {
@@ -4133,136 +3200,136 @@
       "verdict": "noise"
      },
      "invalid_order_rate": {
-      "diff": 0.0007,
+      "diff": -0.0033,
       "ci95": [
-       -0.0148,
-       0.0171
+       -0.0167,
+       0.0087
       ],
-      "p": 0.9531,
-      "p_holm": 0.9531,
-      "q_bh": 0.9531,
-      "pairs": 12,
-      "wins": 5,
-      "losses": 6,
+      "p": 0.7031,
+      "p_holm": 0.8281,
+      "q_bh": 0.7031,
+      "pairs": 9,
+      "wins": 4,
+      "losses": 5,
       "by_period": {
-       "2026": 0.0068,
-       "2022": -0.0292,
-       "2020": 0.0245
+       "2026": 0.0091,
+       "2022": -0.0217,
+       "2020": 0.0028
       },
       "verdict": "noise"
      },
      "hit_rate_5d": {
-      "diff": 0.0373,
+      "diff": 0.0528,
       "ci95": [
-       -0.0466,
-       0.1195
+       0.0052,
+       0.1094
       ],
-      "p": 0.4219,
-      "p_holm": 0.8438,
-      "q_bh": 0.8438,
-      "pairs": 12,
-      "wins": 7,
-      "losses": 5,
+      "p": 0.1133,
+      "p_holm": 0.2266,
+      "q_bh": 0.2266,
+      "pairs": 9,
+      "wins": 5,
+      "losses": 4,
       "by_period": {
-       "2026": 0.0799,
-       "2022": -0.0086,
-       "2020": 0.0407
+       "2026": 0.0093,
+       "2022": 0.0997,
+       "2020": 0.0495
       },
       "verdict": "noise"
      },
      "decision_excess_5d": {
-      "diff": -0.0024,
+      "diff": 0.0005,
       "ci95": [
-       -0.0071,
-       0.0021
+       -0.0026,
+       0.004
       ],
-      "p": 0.3647,
-      "p_holm": 0.7295,
-      "q_bh": 0.7051,
-      "pairs": 12,
-      "wins": 5,
-      "losses": 7,
+      "p": 0.8711,
+      "p_holm": 1.0,
+      "q_bh": 0.918,
+      "pairs": 9,
+      "wins": 4,
+      "losses": 5,
       "by_period": {
-       "2026": -0.0021,
-       "2022": -0.0058,
-       "2020": 0.0007
+       "2026": -0.0031,
+       "2022": -0.0011,
+       "2020": 0.0057
       },
       "verdict": "noise"
      },
      "decision_ic": {
-      "diff": -0.0771,
+      "diff": -0.0293,
       "ci95": [
-       -0.1373,
-       -0.0227
+       -0.0636,
+       0.0069
       ],
-      "p": 0.0327,
-      "p_holm": 0.0654,
-      "q_bh": 0.0654,
-      "pairs": 12,
+      "p": 0.2383,
+      "p_holm": 0.4766,
+      "q_bh": 0.3125,
+      "pairs": 9,
       "wins": 4,
-      "losses": 8,
+      "losses": 5,
       "by_period": {
-       "2026": -0.0429,
-       "2022": -0.1404,
-       "2020": -0.0481
+       "2026": -0.0249,
+       "2022": -0.0743,
+       "2020": 0.0114
       },
       "verdict": "noise"
      },
      "holdings_ic": {
-      "diff": -0.0069,
+      "diff": -0.0211,
       "ci95": [
-       -0.036,
-       0.023
+       -0.0502,
+       0.005
       ],
-      "p": 0.686,
-      "p_holm": 0.686,
-      "q_bh": 0.686,
-      "pairs": 12,
-      "wins": 5,
-      "losses": 7,
+      "p": 0.2656,
+      "p_holm": 0.2656,
+      "q_bh": 0.2656,
+      "pairs": 9,
+      "wins": 3,
+      "losses": 6,
       "by_period": {
-       "2026": -0.0267,
-       "2022": -0.0124,
-       "2020": 0.0185
+       "2026": -0.029,
+       "2022": -0.0496,
+       "2020": 0.0154
       },
       "verdict": "noise"
      }
     },
     "attribution": {
-     "total": 0.1789,
-     "exposure_level": 0.1165,
-     "exposure_timing": 0.0446,
-     "selection": 0.0149,
-     "residual": 0.0028,
-     "exposure_variant": 0.3889,
-     "exposure_baseline": 0.5218,
+     "total": 0.105,
+     "exposure_level": 0.0648,
+     "exposure_timing": 0.0604,
+     "selection": -0.0226,
+     "residual": 0.0024,
+     "exposure_variant": 0.402,
+     "exposure_baseline": 0.5441,
      "by_period": {
       "2026": {
-       "total": -0.0225,
-       "exposure_level": -0.0037,
-       "exposure_timing": 0.0235,
-       "selection": -0.0402,
-       "residual": -0.0021,
-       "exposure_variant": 0.4453,
-       "exposure_baseline": 0.5692
+       "total": -0.0317,
+       "exposure_level": -0.0044,
+       "exposure_timing": 0.0274,
+       "selection": -0.0536,
+       "residual": -0.0011,
+       "exposure_variant": 0.5271,
+       "exposure_baseline": 0.689
       },
       "2022": {
-       "total": 0.3262,
-       "exposure_level": 0.2297,
-       "exposure_timing": 0.1038,
-       "selection": -0.0277,
-       "residual": 0.0204,
-       "exposure_variant": 0.1553,
-       "exposure_baseline": 0.5699
+       "total": 0.2696,
+       "exposure_level": 0.1521,
+       "exposure_timing": 0.1472,
+       "selection": -0.0525,
+       "residual": 0.0228,
+       "exposure_variant": 0.1516,
+       "exposure_baseline": 0.4376
       },
       "2020": {
-       "total": 0.2329,
-       "exposure_level": 0.1236,
-       "exposure_timing": 0.0064,
-       "selection": 0.1126,
-       "residual": -0.0098,
-       "exposure_variant": 0.5661,
-       "exposure_baseline": 0.4262
+       "total": 0.0772,
+       "exposure_level": 0.0467,
+       "exposure_timing": 0.0067,
+       "selection": 0.0384,
+       "residual": -0.0146,
+       "exposure_variant": 0.5271,
+       "exposure_baseline": 0.5057
       }
      }
     }
@@ -4272,5 +3339,9 @@
  "method": {
   "en": "Each variant changes one factor of the baseline prompt. Paired differences (same model, period and seed), mean over periods, 95% bootstrap interval, exact sign-flip p-value, Holm correction across the variants; 'noise' means the difference cannot be told apart from running the same prompt again. The attribution splits a return difference into holding more or less stock (level, timing) and holding other stocks (selection), in sums of daily returns.",
   "zh": "每个变体只改基线 prompt 的一个因素。配对差（同一模型、同一时段、同一种子），按时段平均，95% bootstrap 区间，精确符号翻转检验，按变体个数做 Holm 校正；「noise」表示这个差别和把同一个 prompt 再跑一遍分不开。归因把收益差拆成持股多少（水平、择时）和持哪些股票（选股），按每日收益相加计算。"
+ },
+ "notes": {
+  "en": "Pilot, one seed. llama3.2 on the TAMU gateway is left out: the gateway cuts long prompts for that model, so it may not have seen the whole observation.",
+  "zh": "这是 pilot，只有一个种子。TAMU 网关上的 llama3.2 没有算进来：网关会截断这个模型的长 prompt，它可能没看到完整的观察。"
  }
 }
