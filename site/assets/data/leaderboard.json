@@ -1,6 +1,6 @@
 {
  "bench": "rta-bench-1",
- "entries": 47,
+ "entries": 65,
  "generated_utc": "2026-11-14",
  "models": 6,
  "periods": {
@@ -717,103 +717,427 @@
     {
      "blind": {
       "after_cutoff": null,
-      "alpha_annual": -0.002078,
+      "alpha_annual": 0.073697,
       "analysis": {
        "by_sector": [
         {
-         "contribution": 0.020183,
+         "contribution": 0.151158,
+         "group": "Technology",
+         "runs": 2
+        },
+        {
+         "contribution": 0.056215,
+         "group": "Consumer Discretionary",
+         "runs": 3
+        },
+        {
+         "contribution": 0.043518,
+         "group": "Health Care",
+         "runs": 2
+        },
+        {
+         "contribution": 0.009096,
+         "group": "Industrials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.00504,
          "group": "Financials",
+         "runs": 1
+        },
+        {
+         "contribution": -0.006613,
+         "group": "Communication Services",
+         "runs": 2
+        },
+        {
+         "contribution": -0.021908,
+         "group": "Consumer Staples",
+         "runs": 3
+        },
+        {
+         "contribution": -0.022053,
+         "group": "Utilities",
+         "runs": 2
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": 0.175253,
+         "group": "news",
+         "runs": 3
+        },
+        {
+         "contribution": -0.011955,
+         "group": "other",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.084503,
+        "alpha_t": -0.684,
+        "best_trade_share": 0.316485,
+        "beta_growth": 0.581485,
+        "beta_market": 0.478371,
+        "beta_momentum": 0.12753,
+        "beta_size": -0.028284,
+        "buy_excess_5d": 0.012146,
+        "buy_excess_5d_t": 2.723813,
+        "capm_alpha_annual": 0.073697,
+        "capm_alpha_t": 0.489754,
+        "concentrated": true,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": 0.003361,
+        "decision_excess_5d_t": 0.916351,
+        "decision_hit_rate_5d": 0.524904,
+        "decision_ic": 0.0224,
+        "decision_ic_t": 1.01627,
+        "decisions": 118.666667,
+        "exposure_return_annual": 0.260333,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.035083,
+        "holdings_ic_t": 1.113882,
+        "long_contribution": 0.163298,
+        "news_decision_share": 0.480844,
+        "news_entry_pnl": 17525.346174,
+        "r2": 0.646213,
+        "return_without_best_trade": 0.113914,
+        "sell_avoided_5d": -0.006319,
+        "sell_avoided_5d_t": -1.109452,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": 0.172352,
+        "total_return": 0.163562
+       }
+      },
+      "avg_exposure": 0.806221,
+      "avg_holding_days": 27.985675,
+      "beta": 0.482472,
+      "excess_vs_equal_weight": -0.23714,
+      "excess_vs_spy": -0.00879,
+      "files": [
+       "gemini-3.5-flash-2020-blind-s0.json",
+       "gemini-3.5-flash-2020-blind-s1.json",
+       "gemini-3.5-flash-2020-blind-s2.json"
+      ],
+      "max_drawdown": -0.196101,
+      "n": 3,
+      "round_trips": 57.0,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": 0.749567,
+      "sharpe_range": [
+       0.491401,
+       0.953794
+      ],
+      "steps": 51,
+      "total_return": 0.163562,
+      "total_return_range": [
+       0.101138,
+       0.208257
+      ],
+      "turnover": 5.392319,
+      "usage": {
+       "calls": 153.0,
+       "input_tokens": 2126873.0,
+       "list_price_usd": 3.4937,
+       "output_tokens": 33712.0
+      }
+     },
+     "cutoff": "2025-01",
+     "memory": {
+      "beyond_control": 0.06408548996521679,
+      "beyond_control_ci95": [
+       -0.07959760831144111,
+       0.21650274511978695
+      ],
+      "ci95": [
+       -0.08596144262714035,
+       0.11176663521831402
+      ],
+      "measured_on": null,
+      "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff",
+      "score": 0.014205682272909081,
+      "verdict": "inconclusive",
+      "why": "too few pairs to tell: AUC gap +0.014 before the cutoff and -0.050 after it (the control), difference +0.064, 95% CI [-0.080, +0.217]"
+     },
+     "model": "gemini-3.5-flash",
+     "named": {
+      "after_cutoff": null,
+      "alpha_annual": 0.02721,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.060016,
+         "group": "Consumer Discretionary",
+         "runs": 3
+        },
+        {
+         "contribution": 0.05229,
+         "group": "Technology",
+         "runs": 3
+        },
+        {
+         "contribution": 0.023783,
+         "group": "Health Care",
+         "runs": 3
+        },
+        {
+         "contribution": 0.002638,
+         "group": "Consumer Staples",
+         "runs": 3
+        },
+        {
+         "contribution": -0.010518,
+         "group": "Financials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.018082,
+         "group": "Utilities",
+         "runs": 3
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": 0.077389,
+         "group": "news",
+         "runs": 3
+        },
+        {
+         "contribution": 0.044484,
+         "group": "other",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.12104,
+        "alpha_t": -1.084319,
+        "best_trade_share": 0.393431,
+        "beta_growth": 0.597183,
+        "beta_market": 0.54414,
+        "beta_momentum": 0.075966,
+        "beta_size": -0.130872,
+        "buy_excess_5d": 0.007475,
+        "buy_excess_5d_t": 1.544435,
+        "capm_alpha_annual": 0.02721,
+        "capm_alpha_t": 0.188169,
+        "concentrated": true,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": 8e-06,
+        "decision_excess_5d_t": -0.020034,
+        "decision_hit_rate_5d": 0.48905,
+        "decision_ic": 0.000415,
+        "decision_ic_t": 0.021904,
+        "decisions": 89.666667,
+        "exposure_return_annual": 0.261213,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.010944,
+        "holdings_ic_t": 0.369309,
+        "long_contribution": 0.121873,
+        "news_decision_share": 0.380305,
+        "news_entry_pnl": 7738.909435,
+        "r2": 0.741752,
+        "return_without_best_trade": 0.07802,
+        "sell_avoided_5d": -0.009281,
+        "sell_avoided_5d_t": -1.600521,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": 0.172352,
+        "total_return": 0.121959
+       }
+      },
+      "avg_exposure": 0.868446,
+      "avg_holding_days": 26.933413,
+      "beta": 0.53363,
+      "excess_vs_equal_weight": -0.278743,
+      "excess_vs_spy": -0.050393,
+      "files": [
+       "gemini-3.5-flash-2020-named-s0.json",
+       "gemini-3.5-flash-2020-named-s1.json",
+       "gemini-3.5-flash-2020-named-s2.json"
+      ],
+      "max_drawdown": -0.198985,
+      "n": 3,
+      "round_trips": 40.333333,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": 0.581903,
+      "sharpe_range": [
+       0.468495,
+       0.724677
+      ],
+      "steps": 51,
+      "total_return": 0.121959,
+      "total_return_range": [
+       0.092899,
+       0.166826
+      ],
+      "turnover": 4.035691,
+      "usage": {
+       "calls": 153.0,
+       "input_tokens": 2097441.0,
+       "list_price_usd": 3.3883,
+       "output_tokens": 26898.0
+      }
+     },
+     "named_minus_blind": -0.041603,
+     "open_weights": false,
+     "provider": "Google",
+     "slug": "gemini-3.5-flash",
+     "status": "may_remember"
+    },
+    {
+     "blind": {
+      "after_cutoff": null,
+      "alpha_annual": 0.065425,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.065453,
+         "group": "Financials",
+         "runs": 3
+        },
+        {
+         "contribution": 0.05703,
+         "group": "Technology",
+         "runs": 2
+        },
+        {
+         "contribution": 0.008002,
+         "group": "Consumer Discretionary",
+         "runs": 1
+        },
+        {
+         "contribution": -0.000878,
+         "group": "Health Care",
+         "runs": 1
+        },
+        {
+         "contribution": -0.002931,
+         "group": "Consumer Staples",
+         "runs": 1
+        },
+        {
+         "contribution": -0.005438,
+         "group": "Industrials",
          "runs": 1
         }
        ],
        "by_trigger": [
         {
-         "contribution": 0.020183,
+         "contribution": 0.132765,
+         "group": "no reason",
+         "runs": 2
+        },
+        {
+         "contribution": 0.021822,
          "group": "other",
-         "runs": 1
+         "runs": 2
         }
        ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought beat SPY by 3.76% on average (1 buys, 100% of them ahead of SPY; t = n/a, ).",
-        "Decision IC: on the 1 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.213 with the next five days' returns (IC IR n/a, t = n/a, ).",
-        "Holdings IC: the weights it held after each of 50 decision days had a mean rank IC of 0.007 with the next five days' returns (t = 0.3, within noise).",
-        "Factor exposures: market 0.10 (t 13.3), size 0.00 (t 0.1), growth -0.08 (t -2.9), momentum 0.06 (t 3.9); together they explain 69% of the daily variation (R²).",
-        "Of its +2.1% a year over T-bills (arithmetic mean): market +2.2%, growth -1.7%, momentum +1.2%, size +0.0%; the alpha left is +0.3% a year (t = 0.2, within noise).",
-        "Verdict: most of the return is factor exposure (+1.7% a year, market above all); the alpha left is not significant.",
-        "P&L: +$2,381 in all, +$2,018 from 1 positions and +$363 of interest on idle cash.",
-        "By market regime of the previous close: risk-on 26 days +0.7% (SPY -4.3%); uncertain 142 days -1.6% (SPY +14.2%); risk-off 85 days +3.3% (SPY +7.2%).",
-        "News: no entry or exit gave news as its reason. News can still have shaped the run: a filter that keeps it out of a stock leaves no decision behind, so compare with the run without news.",
-        "Concentration: the profit rests on the best two positions, which made 100% of the positions' net P&L and 100% of all their gains; the best was SPGI bought 2020-01-03 and still open at the end, +$2,018. Had the best position made nothing, the run would have returned +0.4% instead of +2.4%."
-       ],
-       "runs": 1,
+       "findings": null,
+       "runs": 3,
        "summary": {
-        "alpha_annual": 0.003454,
-        "alpha_t": 0.174519,
-        "best_trade_share": 1.0,
-        "beta_growth": -0.075479,
-        "beta_market": 0.102287,
-        "beta_momentum": 0.05611,
-        "beta_size": 0.00155,
-        "buy_excess_5d": 0.03765,
-        "buy_excess_5d_t": null,
-        "capm_alpha_annual": -0.002078,
-        "capm_alpha_t": -0.103526,
+        "alpha_annual": 0.076872,
+        "alpha_t": 0.394252,
+        "best_trade_share": 1.054094,
+        "beta_growth": 0.012151,
+        "beta_market": 0.187723,
+        "beta_momentum": -0.071952,
+        "beta_size": 0.025222,
+        "buy_excess_5d": 0.013261,
+        "buy_excess_5d_t": 0.726623,
+        "capm_alpha_annual": 0.065425,
+        "capm_alpha_t": 0.45293,
         "concentrated": true,
         "cover_excess_5d": null,
         "cover_excess_5d_t": null,
-        "decision_excess_5d": 0.03765,
-        "decision_excess_5d_t": null,
-        "decision_hit_rate_5d": 1.0,
-        "decision_ic": 0.212731,
-        "decision_ic_t": null,
-        "decisions": 1.0,
-        "exposure_return_annual": 0.017083,
+        "decision_excess_5d": 0.005211,
+        "decision_excess_5d_t": -1.110544,
+        "decision_hit_rate_5d": 0.633333,
+        "decision_ic": 0.056333,
+        "decision_ic_t": -0.426407,
+        "decisions": 8.666667,
+        "exposure_return_annual": 0.027733,
         "fees_contribution": 0.0,
         "forced_fills": 0.0,
-        "holdings_ic": 0.006507,
-        "holdings_ic_t": 0.32493,
-        "long_contribution": 0.020183,
-        "news_decision_share": 0.0,
+        "holdings_ic": 0.006504,
+        "holdings_ic_t": 0.352465,
+        "long_contribution": 0.103058,
+        "news_decision_share": 0.016667,
         "news_entry_pnl": 0.0,
-        "r2": 0.691221,
-        "return_without_best_trade": 0.003626,
-        "sell_avoided_5d": null,
-        "sell_avoided_5d_t": null,
+        "r2": 0.552732,
+        "return_without_best_trade": 0.004055,
+        "sell_avoided_5d": -0.028301,
+        "sell_avoided_5d_t": -1.216004,
         "short_avoided_5d": null,
         "short_avoided_5d_t": null,
         "short_contribution": 0.0,
         "spy_return": 0.172352,
-        "total_return": 0.023473
+        "total_return": 0.106041
        }
       },
-      "avg_exposure": 0.11108,
-      "avg_holding_days": null,
-      "beta": 0.106833,
-      "excess_vs_equal_weight": -0.377229,
-      "excess_vs_spy": -0.148879,
+      "avg_exposure": 0.255436,
+      "avg_holding_days": 78.072866,
+      "beta": 0.185078,
+      "excess_vs_equal_weight": -0.294661,
+      "excess_vs_spy": -0.066311,
       "files": [
-       "llama3.2-2020-blind-s0.json"
+       "llama3.2-2020-blind-s0.json",
+       "llama3.2-2020-blind-s1.json",
+       "llama3.2-2020-blind-s2.json"
       ],
-      "max_drawdown": -0.039505,
-      "n": 1,
-      "round_trips": 0.0,
+      "max_drawdown": -0.089168,
+      "n": 3,
+      "round_trips": 3.666667,
       "run_dates": [
        "2026-11-14"
       ],
       "seeds": [
-       0
+       0,
+       1,
+       2
       ],
-      "sharpe": 0.462698,
-      "sharpe_range": null,
+      "sharpe": 0.726222,
+      "sharpe_range": [
+       0.462698,
+       0.979459
+      ],
       "steps": 51,
-      "total_return": 0.023473,
-      "total_return_range": null,
-      "turnover": 0.048431,
+      "total_return": 0.106041,
+      "total_return_range": [
+       0.023473,
+       0.214319
+      ],
+      "turnover": 0.496121,
       "usage": {
-       "calls": 51.0,
-       "input_tokens": 549644.0,
+       "calls": 153.0,
+       "input_tokens": 1654346.0,
        "list_price_usd": 0.0,
-       "output_tokens": 4925.0
+       "output_tokens": 15386.0
       }
      },
      "cutoff": "2023-12",
@@ -853,459 +1177,18 @@
      "model": "llama3.2",
      "named": {
       "after_cutoff": null,
-      "alpha_annual": 0.091784,
+      "alpha_annual": 0.096208,
       "analysis": {
        "by_sector": [
         {
-         "contribution": 0.145354,
+         "contribution": 0.150649,
          "group": "Technology",
-         "runs": 1
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": 0.145354,
-         "group": "other",
-         "runs": 1
-        }
-       ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought beat SPY by 3.45% on average (2 buys, 100% of them ahead of SPY; t = 3.6, significant at 5%).",
-        "Sells: over the five trading days from the fill, the stocks it sold lagged SPY by 0.52%, so selling avoided that (1 sells; t = n/a, ).",
-        "Decision IC: on the 3 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.138 with the next five days' returns (IC IR 2.96, t = 5.1, significant at 5%).",
-        "Holdings IC: the weights it held after each of 50 decision days had a mean rank IC of 0.024 with the next five days' returns (t = 1.3, within noise).",
-        "Factor exposures: market 0.23 (t 17.3), size -0.03 (t -1.2), growth 0.25 (t 4.9), momentum 0.03 (t 1.3); together they explain 75% of the daily variation (R²).",
-        "Of its +14.0% a year over T-bills (arithmetic mean): growth +5.7%, market +4.8%, momentum +0.7%, size -0.1%; the alpha left is +2.9% a year (t = 0.6, within noise).",
-        "Verdict: most of the return is factor exposure (+11.1% a year, growth above all); the alpha left is not significant.",
-        "P&L: +$14,862 in all, +$14,535 from 1 positions and +$326 of interest on idle cash.",
-        "By market regime of the previous close: risk-on 26 days -0.9% (SPY -4.3%); uncertain 142 days +11.2% (SPY +14.2%); risk-off 85 days +4.2% (SPY +7.2%).",
-        "News: no entry or exit gave news as its reason. News can still have shaped the run: a filter that keeps it out of a stock leaves no decision behind, so compare with the run without news.",
-        "Concentration: the profit rests on the best two positions, which made 100% of the positions' net P&L and 100% of all their gains; the best was AAPL bought 2020-01-03 and still open at the end, +$14,535. Had the best position made nothing, the run would have returned +0.3% instead of +14.9%."
-       ],
-       "runs": 1,
-       "summary": {
-        "alpha_annual": 0.028978,
-        "alpha_t": 0.590072,
-        "best_trade_share": 1.0,
-        "beta_growth": 0.250534,
-        "beta_market": 0.227264,
-        "beta_momentum": 0.03134,
-        "beta_size": -0.028888,
-        "buy_excess_5d": 0.034455,
-        "buy_excess_5d_t": 3.607644,
-        "capm_alpha_annual": 0.091784,
-        "capm_alpha_t": 1.446325,
-        "concentrated": true,
-        "cover_excess_5d": null,
-        "cover_excess_5d_t": null,
-        "decision_excess_5d": 0.024718,
-        "decision_excess_5d_t": 2.20898,
-        "decision_hit_rate_5d": 1.0,
-        "decision_ic": 0.137649,
-        "decision_ic_t": 5.132911,
-        "decisions": 3.0,
-        "exposure_return_annual": 0.110552,
-        "fees_contribution": 0.0,
-        "forced_fills": 0.0,
-        "holdings_ic": 0.023526,
-        "holdings_ic_t": 1.275654,
-        "long_contribution": 0.145354,
-        "news_decision_share": 0.0,
-        "news_entry_pnl": 0.0,
-        "r2": 0.749542,
-        "return_without_best_trade": 0.003264,
-        "sell_avoided_5d": 0.005244,
-        "sell_avoided_5d_t": null,
-        "short_avoided_5d": null,
-        "short_avoided_5d_t": null,
-        "short_contribution": 0.0,
-        "spy_return": 0.172352,
-        "total_return": 0.148241
-       }
-      },
-      "avg_exposure": 0.219902,
-      "avg_holding_days": 190.0,
-      "beta": 0.225552,
-      "excess_vs_equal_weight": -0.252461,
-      "excess_vs_spy": -0.024111,
-      "files": [
-       "llama3.2-2020-named-s0.json"
-      ],
-      "max_drawdown": -0.064983,
-      "n": 1,
-      "round_trips": 1.0,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0
-      ],
-      "sharpe": 1.408132,
-      "sharpe_range": null,
-      "steps": 51,
-      "total_return": 0.148241,
-      "total_return_range": null,
-      "turnover": 0.134223,
-      "usage": {
-       "calls": 51.0,
-       "input_tokens": 547897.0,
-       "list_price_usd": 0.0,
-       "output_tokens": 2983.0
-      }
-     },
-     "named_minus_blind": 0.124768,
-     "open_weights": true,
-     "provider": "Meta",
-     "slug": "llama3.2",
-     "status": "may_remember"
-    },
-    {
-     "blind": {
-      "after_cutoff": null,
-      "alpha_annual": -0.019067,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": 0.021447,
-         "group": "Technology",
-         "runs": 1
-        },
-        {
-         "contribution": 0.021024,
-         "group": "Consumer Discretionary",
-         "runs": 1
-        },
-        {
-         "contribution": 0.014794,
-         "group": "Health Care",
-         "runs": 1
-        },
-        {
-         "contribution": 0.013226,
-         "group": "Financials",
-         "runs": 1
-        },
-        {
-         "contribution": -0.011192,
-         "group": "Communication Services",
-         "runs": 1
-        },
-        {
-         "contribution": -0.016726,
-         "group": "Consumer Staples",
-         "runs": 1
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": 0.074233,
-         "group": "news",
-         "runs": 1
-        },
-        {
-         "contribution": -0.018322,
-         "group": "other",
-         "runs": 1
-        }
-       ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought beat SPY by 0.70% on average (48 buys, 54% of them ahead of SPY; t = 1.1, within noise).",
-        "Sells: over the five trading days from the fill, the stocks it sold beat SPY by 0.67%, so selling gave that up (46 sells; t = -0.9, within noise).",
-        "Decision IC: on the 30 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.005 with the next five days' returns (IC IR 0.04, t = 0.2, within noise).",
-        "Holdings IC: the weights it held after each of 44 decision days had a mean rank IC of 0.034 with the next five days' returns (t = 1.3, within noise).",
-        "Factor exposures: market 0.43 (t 5.4), size -0.03 (t -0.4), growth 0.32 (t 1.8), momentum 0.11 (t 1.6); together they explain 60% of the daily variation (R²).",
-        "Of the +7.2% a year it earned over T-bills (arithmetic mean): market +9.0%, growth +7.2%, momentum +2.4%, size -0.2%; the alpha left is -11.3% a year (t = -1.0, within noise).",
-        "Verdict: most of the return is factor exposure (+18.5% a year, market above all); the alpha left is not significant.",
-        "P&L: +$5,657 in all, +$5,591 from 46 positions and +$66 of interest on idle cash.",
-        "By holding period: 61+ days made the most (+$13,091, 6 positions); 21-60 days the least (-$4,425, 17 positions).",
-        "By sector: Technology made the most (+$2,145, 16 positions); Consumer Staples the least (-$1,673, 7 positions).",
-        "By stock: NVDA made the most (+$6,273, 2 positions); ADBE the least (-$1,843, 2 positions).",
-        "By market regime of the previous close: risk-on 26 days +0.9% (SPY -4.3%); uncertain 142 days +6.2% (SPY +14.2%); risk-off 85 days -1.4% (SPY +7.2%).",
-        "News: 31 positions opened on news made +$7,423, the other 15 -$1,832; 7 positions closed on news made +$1,545; over the five days from the fill, news-triggered buys beat SPY by 1.25% (t 1.8).",
-        "Concentration: the profit rests on the best two positions, which made 153% of the positions' net P&L and 43% of all their gains; the best was NVDA bought 2020-04-29 and sold 2020-11-02, +$6,627. Had the best position made nothing, the run would have returned -1.0% instead of +5.7%."
-       ],
-       "runs": 1,
-       "summary": {
-        "alpha_annual": -0.113018,
-        "alpha_t": -0.969302,
-        "best_trade_share": 1.185296,
-        "beta_growth": 0.318033,
-        "beta_market": 0.426769,
-        "beta_momentum": 0.107526,
-        "beta_size": -0.030039,
-        "buy_excess_5d": 0.007017,
-        "buy_excess_5d_t": 1.147991,
-        "capm_alpha_annual": -0.019067,
-        "capm_alpha_t": -0.150462,
-        "concentrated": true,
-        "decision_excess_5d": 0.000287,
-        "decision_excess_5d_t": 0.052819,
-        "decision_hit_rate_5d": 0.478723,
-        "decision_ic": 0.005453,
-        "decision_ic_t": 0.200348,
-        "decisions": 94.0,
-        "exposure_return_annual": 0.185027,
-        "holdings_ic": 0.034212,
-        "holdings_ic_t": 1.339854,
-        "news_decision_share": 0.425532,
-        "news_entry_pnl": 7423.310007,
-        "r2": 0.603229,
-        "return_without_best_trade": -0.009702,
-        "sell_avoided_5d": -0.006735,
-        "sell_avoided_5d_t": -0.873092,
-        "spy_return": 0.172352,
-        "total_return": 0.056223
-       }
-      },
-      "avg_exposure": 0.639045,
-      "avg_holding_days": 29.220376,
-      "beta": 0.430236,
-      "excess_vs_equal_weight": -0.344479,
-      "excess_vs_spy": -0.116129,
-      "files": [
-       "gemini-3.5-flash-2020-blind-s0.json"
-      ],
-      "max_drawdown": -0.196813,
-      "n": 1,
-      "round_trips": 46.0,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0
-      ],
-      "sharpe": 0.353163,
-      "sharpe_range": null,
-      "steps": 51,
-      "total_return": 0.056223,
-      "total_return_range": null,
-      "turnover": 4.177558,
-      "usage": {
-       "calls": 51.0,
-       "input_tokens": 705136.0,
-       "list_price_usd": 1.137,
-       "output_tokens": 8809.0
-      }
-     },
-     "cutoff": "2025-01",
-     "memory": {
-      "beyond_control": 0.06408548996521679,
-      "beyond_control_ci95": [
-       -0.07959760831144111,
-       0.21650274511978695
-      ],
-      "ci95": [
-       -0.08596144262714035,
-       0.11176663521831402
-      ],
-      "measured_on": null,
-      "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff",
-      "score": 0.014205682272909081,
-      "verdict": "inconclusive",
-      "why": "too few pairs to tell: AUC gap +0.014 before the cutoff and -0.050 after it (the control), difference +0.064, 95% CI [-0.080, +0.217]"
-     },
-     "model": "gemini-3.5-flash",
-     "named": {
-      "after_cutoff": null,
-      "alpha_annual": 0.090168,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": 0.146528,
-         "group": "Technology",
-         "runs": 1
-        },
-        {
-         "contribution": 0.052319,
-         "group": "Consumer Discretionary",
-         "runs": 1
-        },
-        {
-         "contribution": 0.019808,
-         "group": "Communication Services",
-         "runs": 1
-        },
-        {
-         "contribution": 0.001675,
-         "group": "Financials",
-         "runs": 1
-        },
-        {
-         "contribution": -0.017416,
-         "group": "Consumer Staples",
-         "runs": 1
-        },
-        {
-         "contribution": -0.034444,
-         "group": "Utilities",
-         "runs": 1
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": 0.163798,
-         "group": "other",
-         "runs": 1
-        },
-        {
-         "contribution": 0.022424,
-         "group": "news",
-         "runs": 1
-        }
-       ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought beat SPY by 0.87% on average (43 buys, 63% of them ahead of SPY; t = 2.6, significant at 5%).",
-        "Sells: over the five trading days from the fill, the stocks it sold beat SPY by 0.38%, so selling gave that up (30 sells; t = -0.5, within noise).",
-        "Decision IC: on the 28 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.038 with the next five days' returns (IC IR 0.27, t = 1.4, within noise).",
-        "Holdings IC: the weights it held after each of 47 decision days had a mean rank IC of 0.038 with the next five days' returns (t = 1.1, within noise).",
-        "Factor exposures: market 0.52 (t 5.8), size -0.05 (t -0.7), growth 0.77 (t 4.5), momentum 0.14 (t 2.1); together they explain 71% of the daily variation (R²).",
-        "Of its +20.1% a year over T-bills (arithmetic mean): growth +17.4%, market +11.1%, momentum +3.0%, size -0.3%; the alpha left is -11.2% a year (t = -0.9, within noise).",
-        "Verdict: most of the return is factor exposure (+31.3% a year, growth above all); the alpha left is not significant.",
-        "P&L: +$18,679 in all, +$18,622 from 40 positions and +$57 of interest on idle cash.",
-        "By holding period: 61+ days made the most (+$27,743, 11 positions); 21-60 days lost the most (-$6,936, 17 positions).",
-        "By sector: Technology made the most (+$14,653, 12 positions); Utilities lost the most (-$3,444, 1 position).",
-        "By stock: AMZN made the most (+$5,502, 2 positions); NEE lost the most (-$3,444, 1 position).",
-        "By market regime of the previous close: risk-on 26 days -0.1% (SPY -4.3%); uncertain 142 days +10.9% (SPY +14.2%); risk-off 85 days +7.1% (SPY +7.2%).",
-        "News: 24 positions opened on news made +$2,242, the other 16 +$16,380; 6 positions closed on news made +$3,670; over the five days from the fill, news-triggered buys beat SPY by 1.04% (t 2.1).",
-        "Concentration: the gains are spread out (the best two positions made 29% of them) but winners and losers nearly cancel, so the best two made 53% of the net P&L; the best was AMZN bought 2020-04-07 and still open at the end, +$5,442. Had the best position made nothing, the run would have returned +13.2% instead of +18.7%."
-       ],
-       "runs": 1,
-       "summary": {
-        "alpha_annual": -0.111779,
-        "alpha_t": -0.913447,
-        "best_trade_share": 0.292223,
-        "beta_growth": 0.767982,
-        "beta_market": 0.52264,
-        "beta_momentum": 0.136425,
-        "beta_size": -0.050211,
-        "buy_excess_5d": 0.008678,
-        "buy_excess_5d_t": 2.573333,
-        "capm_alpha_annual": 0.090168,
-        "capm_alpha_t": 0.520292,
-        "concentrated": true,
-        "cover_excess_5d": null,
-        "cover_excess_5d_t": null,
-        "decision_excess_5d": 0.003564,
-        "decision_excess_5d_t": 0.887074,
-        "decision_hit_rate_5d": 0.547945,
-        "decision_ic": 0.037852,
-        "decision_ic_t": 1.40324,
-        "decisions": 73.0,
-        "exposure_return_annual": 0.312951,
-        "fees_contribution": 0.0,
-        "forced_fills": 0.0,
-        "holdings_ic": 0.038442,
-        "holdings_ic_t": 1.091133,
-        "long_contribution": 0.186222,
-        "news_decision_share": 0.410959,
-        "news_entry_pnl": 2242.398385,
-        "r2": 0.710369,
-        "return_without_best_trade": 0.132372,
-        "sell_avoided_5d": -0.003766,
-        "sell_avoided_5d_t": -0.514376,
-        "short_avoided_5d": null,
-        "short_avoided_5d_t": null,
-        "short_contribution": 0.0,
-        "spy_return": 0.172352,
-        "total_return": 0.186401
-       }
-      },
-      "avg_exposure": 0.891157,
-      "avg_holding_days": 40.011764,
-      "beta": 0.524369,
-      "excess_vs_equal_weight": -0.214301,
-      "excess_vs_spy": 0.014049,
-      "files": [
-       "gemini-3.5-flash-2020-named-s0.json"
-      ],
-      "max_drawdown": -0.224648,
-      "n": 1,
-      "round_trips": 30.0,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0
-      ],
-      "sharpe": 0.775913,
-      "sharpe_range": null,
-      "steps": 51,
-      "total_return": 0.186401,
-      "total_return_range": null,
-      "turnover": 3.295093,
-      "usage": {
-       "calls": 51.0,
-       "input_tokens": 699564.0,
-       "list_price_usd": 1.1205,
-       "output_tokens": 7908.0
-      }
-     },
-     "named_minus_blind": 0.130178,
-     "open_weights": false,
-     "provider": "Google",
-     "slug": "gemini-3.5-flash",
-     "status": "may_remember"
-    },
-    {
-     "blind": {
-      "after_cutoff": null,
-      "alpha_annual": -0.031345,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": 0.042512,
-         "group": "Technology",
-         "runs": 3
-        },
-        {
-         "contribution": 0.012445,
-         "group": "Materials",
-         "runs": 1
-        },
-        {
-         "contribution": 0.011385,
-         "group": "Consumer Discretionary",
-         "runs": 1
-        },
-        {
-         "contribution": 0.008448,
-         "group": "Health Care",
-         "runs": 2
-        },
-        {
-         "contribution": 0.001672,
-         "group": "Financials",
-         "runs": 3
-        },
-        {
-         "contribution": 0.001661,
-         "group": "Consumer Staples",
-         "runs": 2
-        },
-        {
-         "contribution": -0.000865,
-         "group": "Communication Services",
-         "runs": 1
-        },
-        {
-         "contribution": -0.01452,
-         "group": "Industrials",
-         "runs": 2
-        },
-        {
-         "contribution": -0.02772,
-         "group": "Utilities",
          "runs": 3
         }
        ],
        "by_trigger": [
         {
-         "contribution": 0.023672,
-         "group": "news",
-         "runs": 3
-        },
-        {
-         "contribution": -0.001829,
+         "contribution": 0.150649,
          "group": "other",
          "runs": 3
         }
@@ -1313,50 +1196,58 @@
        "findings": null,
        "runs": 3,
        "summary": {
-        "alpha_annual": -0.067131,
-        "alpha_t": -0.775658,
-        "best_trade_share": 0.64614,
-        "beta_growth": 0.162049,
-        "beta_market": 0.281584,
-        "beta_momentum": 0.004882,
-        "beta_size": -0.078225,
-        "buy_excess_5d": 0.004389,
-        "buy_excess_5d_t": 0.972029,
-        "capm_alpha_annual": -0.031345,
-        "capm_alpha_t": -0.372567,
+        "alpha_annual": 0.031968,
+        "alpha_t": 0.641915,
+        "best_trade_share": 1.0,
+        "beta_growth": 0.256481,
+        "beta_market": 0.228548,
+        "beta_momentum": 0.031573,
+        "beta_size": -0.027799,
+        "buy_excess_5d": 0.033874,
+        "buy_excess_5d_t": 4.290835,
+        "capm_alpha_annual": 0.096208,
+        "capm_alpha_t": 1.49704,
         "concentrated": true,
-        "decision_excess_5d": 0.000721,
-        "decision_excess_5d_t": 0.167983,
-        "decision_hit_rate_5d": 0.512174,
-        "decision_ic": 0.005449,
-        "decision_ic_t": 0.205886,
-        "decisions": 160.0,
-        "exposure_return_annual": 0.093596,
-        "holdings_ic": -0.022267,
-        "holdings_ic_t": -1.201336,
-        "news_decision_share": 0.166224,
-        "news_entry_pnl": 2367.209989,
-        "r2": 0.586773,
-        "return_without_best_trade": 0.002558,
-        "sell_avoided_5d": -0.001274,
-        "sell_avoided_5d_t": -0.493896,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": 0.032265,
+        "decision_excess_5d_t": 3.902066,
+        "decision_hit_rate_5d": 1.0,
+        "decision_ic": 0.155029,
+        "decision_ic_t": 7.711397,
+        "decisions": 3.0,
+        "exposure_return_annual": 0.112281,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.023526,
+        "holdings_ic_t": 1.275654,
+        "long_contribution": 0.150649,
+        "news_decision_share": 0.333333,
+        "news_entry_pnl": 0.0,
+        "r2": 0.743435,
+        "return_without_best_trade": 0.003263,
+        "sell_avoided_5d": 0.028793,
+        "sell_avoided_5d_t": null,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
         "spy_return": 0.172352,
-        "total_return": 0.022789
+        "total_return": 0.153534
        }
       },
-      "avg_exposure": 0.446433,
-      "avg_holding_days": 28.348178,
-      "beta": 0.273092,
-      "excess_vs_equal_weight": -0.377913,
-      "excess_vs_spy": -0.149563,
+      "avg_exposure": 0.225138,
+      "avg_holding_days": 182.5,
+      "beta": 0.226945,
+      "excess_vs_equal_weight": -0.247168,
+      "excess_vs_spy": -0.018818,
       "files": [
-       "gpt-5.6-luna-2020-blind-s0.json",
-       "gpt-5.6-luna-2020-blind-s1.json",
-       "gpt-5.6-luna-2020-blind-s2.json"
+       "llama3.2-2020-named-s0.json",
+       "llama3.2-2020-named-s1.json",
+       "llama3.2-2020-named-s2.json"
       ],
-      "max_drawdown": -0.153112,
+      "max_drawdown": -0.064983,
       "n": 3,
-      "round_trips": 106.333333,
+      "round_trips": 0.666667,
       "run_dates": [
        "2026-11-14"
       ],
@@ -1365,23 +1256,175 @@
        1,
        2
       ],
-      "sharpe": 0.197493,
+      "sharpe": 1.436702,
       "sharpe_range": [
-       -0.054066,
-       0.451642
+       1.408132,
+       1.459285
       ],
       "steps": 51,
-      "total_return": 0.022789,
+      "total_return": 0.153534,
       "total_return_range": [
-       -0.008911,
-       0.05667
+       0.148241,
+       0.162334
       ],
-      "turnover": 4.105936,
+      "turnover": 0.121686,
       "usage": {
        "calls": 153.0,
-       "input_tokens": 1691713.0,
-       "list_price_usd": 0.3701,
-       "output_tokens": 26461.0
+       "input_tokens": 1643693.0,
+       "list_price_usd": 0.0,
+       "output_tokens": 9109.0
+      }
+     },
+     "named_minus_blind": 0.047493,
+     "open_weights": true,
+     "provider": "Meta",
+     "slug": "llama3.2",
+     "status": "may_remember"
+    },
+    {
+     "blind": {
+      "after_cutoff": null,
+      "alpha_annual": -0.063129,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.039477,
+         "group": "Technology",
+         "runs": 2
+        },
+        {
+         "contribution": 0.012813,
+         "group": "Consumer Discretionary",
+         "runs": 3
+        },
+        {
+         "contribution": 0.001582,
+         "group": "Communication Services",
+         "runs": 1
+        },
+        {
+         "contribution": -0.00107,
+         "group": "Consumer Staples",
+         "runs": 3
+        },
+        {
+         "contribution": -0.005379,
+         "group": "Financials",
+         "runs": 2
+        },
+        {
+         "contribution": -0.006081,
+         "group": "Industrials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.012886,
+         "group": "Utilities",
+         "runs": 1
+        },
+        {
+         "contribution": -0.016085,
+         "group": "Materials",
+         "runs": 1
+        },
+        {
+         "contribution": -0.019604,
+         "group": "Health Care",
+         "runs": 2
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": 0.021229,
+         "group": "news",
+         "runs": 3
+        },
+        {
+         "contribution": -0.026947,
+         "group": "other",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.100699,
+        "alpha_t": -1.016226,
+        "best_trade_share": 0.316723,
+        "beta_growth": 0.184646,
+        "beta_market": 0.309182,
+        "beta_momentum": -0.008142,
+        "beta_size": -0.102294,
+        "buy_excess_5d": 4.7e-05,
+        "buy_excess_5d_t": 0.061623,
+        "capm_alpha_annual": -0.063129,
+        "capm_alpha_t": -0.650148,
+        "concentrated": true,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": -0.002236,
+        "decision_excess_5d_t": -0.388334,
+        "decision_hit_rate_5d": 0.513643,
+        "decision_ic": 0.00531,
+        "decision_ic_t": 0.168763,
+        "decisions": 121.666667,
+        "exposure_return_annual": 0.100468,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": -0.008728,
+        "holdings_ic_t": -0.396199,
+        "long_contribution": -0.005719,
+        "news_decision_share": 0.182389,
+        "news_entry_pnl": 2122.850872,
+        "r2": 0.587869,
+        "return_without_best_trade": -0.025079,
+        "sell_avoided_5d": -0.003434,
+        "sell_avoided_5d_t": -0.499337,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": 0.172352,
+        "total_return": -0.004827
+       }
+      },
+      "avg_exposure": 0.398104,
+      "avg_holding_days": 28.145642,
+      "beta": 0.297123,
+      "excess_vs_equal_weight": -0.405529,
+      "excess_vs_spy": -0.177179,
+      "files": [
+       "gpt-5.6-luna-2020-blind-s0.json",
+       "gpt-5.6-luna-2020-blind-s1.json",
+       "gpt-5.6-luna-2020-blind-s2.json"
+      ],
+      "max_drawdown": -0.153662,
+      "n": 3,
+      "round_trips": 82.333333,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": 0.090087,
+      "sharpe_range": [
+       -0.361806,
+       0.597034
+      ],
+      "steps": 51,
+      "total_return": -0.004827,
+      "total_return_range": [
+       -0.076126,
+       0.061234
+      ],
+      "turnover": 3.329345,
+      "usage": {
+       "calls": 153.0,
+       "input_tokens": 1694465.0,
+       "list_price_usd": 0.3649,
+       "output_tokens": 21751.0
       }
      },
      "cutoff": "2026-02-16",
@@ -1404,109 +1447,112 @@
      "model": "gpt-5.6-luna",
      "named": {
       "after_cutoff": null,
-      "alpha_annual": 0.03615,
+      "alpha_annual": -0.008384,
       "analysis": {
        "by_sector": [
         {
-         "contribution": 0.045084,
+         "contribution": 0.052981,
+         "group": "Consumer Discretionary",
+         "runs": 3
+        },
+        {
+         "contribution": 0.03551,
          "group": "Technology",
          "runs": 3
         },
         {
-         "contribution": 0.039016,
+         "contribution": 0.02398,
          "group": "Consumer Staples",
-         "runs": 3
-        },
-        {
-         "contribution": 0.032275,
-         "group": "Health Care",
-         "runs": 2
-        },
-        {
-         "contribution": 0.025515,
-         "group": "Consumer Discretionary",
-         "runs": 2
-        },
-        {
-         "contribution": 0.00928,
-         "group": "Industrials",
-         "runs": 3
-        },
-        {
-         "contribution": -0.000514,
-         "group": "Financials",
-         "runs": 2
-        },
-        {
-         "contribution": -0.0094,
-         "group": "Materials",
          "runs": 1
         },
         {
-         "contribution": -0.010849,
-         "group": "Energy",
+         "contribution": 0.021133,
+         "group": "Utilities",
          "runs": 2
+        },
+        {
+         "contribution": 0.021027,
+         "group": "Health Care",
+         "runs": 3
+        },
+        {
+         "contribution": -0.005202,
+         "group": "Financials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.045631,
+         "group": "Industrials",
+         "runs": 3
         }
        ],
        "by_trigger": [
         {
-         "contribution": 0.150981,
+         "contribution": 0.117201,
          "group": "other",
          "runs": 3
         },
         {
-         "contribution": 0.028594,
+         "contribution": 0.001348,
          "group": "news",
-         "runs": 2
+         "runs": 3
         }
        ],
        "findings": null,
        "runs": 3,
        "summary": {
-        "alpha_annual": 0.017535,
-        "alpha_t": 0.319341,
-        "best_trade_share": 0.218127,
-        "beta_growth": 0.111895,
-        "beta_market": 0.708617,
-        "beta_momentum": -0.014803,
-        "beta_size": -0.138119,
-        "buy_excess_5d": -0.000814,
-        "buy_excess_5d_t": 0.167161,
-        "capm_alpha_annual": 0.03615,
-        "capm_alpha_t": 0.591849,
-        "concentrated": false,
-        "decision_excess_5d": -0.004666,
-        "decision_excess_5d_t": -0.954748,
-        "decision_hit_rate_5d": 0.472099,
-        "decision_ic": -0.039564,
-        "decision_ic_t": -0.795984,
-        "decisions": 55.333333,
-        "exposure_return_annual": 0.165226,
-        "holdings_ic": -0.001832,
-        "holdings_ic_t": -0.092986,
-        "news_decision_share": 0.118338,
-        "news_entry_pnl": 1906.243969,
-        "r2": 0.939162,
-        "return_without_best_trade": 0.13391,
-        "sell_avoided_5d": -0.006993,
-        "sell_avoided_5d_t": -1.002573,
+        "alpha_annual": -0.051255,
+        "alpha_t": -0.652499,
+        "best_trade_share": 0.578391,
+        "beta_growth": 0.201291,
+        "beta_market": 0.712402,
+        "beta_momentum": 0.008511,
+        "beta_size": -0.172554,
+        "buy_excess_5d": 0.005756,
+        "buy_excess_5d_t": 1.705652,
+        "capm_alpha_annual": -0.008384,
+        "capm_alpha_t": -0.056022,
+        "concentrated": true,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": 0.000432,
+        "decision_excess_5d_t": 0.119296,
+        "decision_hit_rate_5d": 0.589447,
+        "decision_ic": 0.007854,
+        "decision_ic_t": 0.146981,
+        "decisions": 56.666667,
+        "exposure_return_annual": 0.189805,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.0054,
+        "holdings_ic_t": 0.246991,
+        "long_contribution": 0.118549,
+        "news_decision_share": 0.094247,
+        "news_entry_pnl": 134.83192,
+        "r2": 0.927529,
+        "return_without_best_trade": 0.066113,
+        "sell_avoided_5d": -0.003477,
+        "sell_avoided_5d_t": -0.285715,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
         "spy_return": 0.172352,
-        "total_return": 0.17045
+        "total_return": 0.118726
        }
       },
-      "avg_exposure": 0.726845,
-      "avg_holding_days": 81.875046,
-      "beta": 0.692584,
-      "excess_vs_equal_weight": -0.230252,
-      "excess_vs_spy": -0.001902,
+      "avg_exposure": 0.65876,
+      "avg_holding_days": 87.64972,
+      "beta": 0.694105,
+      "excess_vs_equal_weight": -0.281976,
+      "excess_vs_spy": -0.053626,
       "files": [
        "gpt-5.6-luna-2020-named-s0.json",
        "gpt-5.6-luna-2020-named-s1.json",
        "gpt-5.6-luna-2020-named-s2.json"
       ],
-      "max_drawdown": -0.224241,
+      "max_drawdown": -0.245474,
       "n": 3,
-      "round_trips": 33.333333,
+      "round_trips": 33.666667,
       "run_dates": [
        "2026-11-14"
       ],
@@ -1515,26 +1561,26 @@
        1,
        2
       ],
-      "sharpe": 0.752407,
+      "sharpe": 0.577819,
       "sharpe_range": [
-       0.653385,
-       0.850696
+       0.322094,
+       0.720604
       ],
       "steps": 51,
-      "total_return": 0.17045,
+      "total_return": 0.118726,
       "total_return_range": [
-       0.124531,
-       0.207452
+       0.0554,
+       0.155297
       ],
-      "turnover": 1.030393,
+      "turnover": 1.008265,
       "usage": {
        "calls": 153.0,
-       "input_tokens": 1694201.0,
-       "list_price_usd": 0.3542,
-       "output_tokens": 12800.0
+       "input_tokens": 1691347.0,
+       "list_price_usd": 0.3533,
+       "output_tokens": 12521.0
       }
      },
-     "named_minus_blind": 0.147661,
+     "named_minus_blind": 0.123553,
      "open_weights": false,
      "provider": "OpenAI",
      "slug": "gpt-5.6-luna",
@@ -2250,68 +2296,48 @@
     {
      "blind": {
       "after_cutoff": null,
-      "alpha_annual": 0.005538,
+      "alpha_annual": 0.028732,
       "analysis": {
        "by_sector": [
         {
-         "contribution": 0.024854,
-         "group": "Health Care",
-         "runs": 3
-        },
-        {
-         "contribution": 0.0238,
-         "group": "Energy",
-         "runs": 2
-        },
-        {
-         "contribution": 0.009357,
+         "contribution": 0.013213,
          "group": "Industrials",
-         "runs": 2
-        },
-        {
-         "contribution": 0.001393,
-         "group": "Real Estate",
          "runs": 1
         },
         {
-         "contribution": -0.008465,
+         "contribution": 0.006053,
+         "group": "Consumer Discretionary",
+         "runs": 2
+        },
+        {
+         "contribution": 0.002087,
+         "group": "Health Care",
+         "runs": 1
+        },
+        {
+         "contribution": -0.004273,
          "group": "Financials",
          "runs": 3
         },
         {
-         "contribution": -0.009498,
-         "group": "Materials",
-         "runs": 1
-        },
-        {
-         "contribution": -0.010071,
-         "group": "Consumer Staples",
-         "runs": 1
-        },
-        {
-         "contribution": -0.012089,
-         "group": "Consumer Discretionary",
-         "runs": 1
-        },
-        {
-         "contribution": -0.016587,
-         "group": "Utilities",
-         "runs": 1
-        },
-        {
-         "contribution": -0.02927,
+         "contribution": -0.043589,
          "group": "Technology",
-         "runs": 3
+         "runs": 2
         }
        ],
        "by_trigger": [
         {
-         "contribution": 0.009755,
-         "group": "news",
-         "runs": 3
+         "contribution": 0.048944,
+         "group": "no reason",
+         "runs": 1
         },
         {
-         "contribution": -0.043334,
+         "contribution": -0.011154,
+         "group": "news",
+         "runs": 1
+        },
+        {
+         "contribution": -0.036794,
          "group": "other",
          "runs": 3
         }
@@ -2319,625 +2345,83 @@
        "findings": null,
        "runs": 3,
        "summary": {
-        "alpha_annual": -0.017641,
-        "alpha_t": -0.300879,
-        "best_trade_share": 0.509877,
-        "beta_growth": -0.190621,
-        "beta_market": 0.304992,
-        "beta_momentum": 0.045979,
-        "beta_size": -0.067708,
-        "buy_excess_5d": 0.005164,
-        "buy_excess_5d_t": 1.280823,
-        "capm_alpha_annual": 0.005538,
-        "capm_alpha_t": 0.164137,
-        "concentrated": true,
-        "decision_excess_5d": -0.000324,
-        "decision_excess_5d_t": -0.08061,
-        "decision_hit_rate_5d": 0.495988,
-        "decision_ic": -0.002352,
-        "decision_ic_t": -0.096997,
-        "decisions": 169.666667,
-        "exposure_return_annual": -0.020105,
-        "holdings_ic": 0.03178,
-        "holdings_ic_t": 1.052292,
-        "news_decision_share": 0.153687,
-        "news_entry_pnl": 975.486182,
-        "r2": 0.628631,
-        "return_without_best_trade": -0.038226,
-        "sell_avoided_5d": -0.002955,
-        "sell_avoided_5d_t": -0.737906,
-        "spy_return": -0.186464,
-        "total_return": -0.024699
-       }
-      },
-      "avg_exposure": 0.407599,
-      "avg_holding_days": 25.914736,
-      "beta": 0.224585,
-      "excess_vs_equal_weight": 0.098802,
-      "excess_vs_spy": 0.161765,
-      "files": [
-       "gpt-5.6-luna-2022-blind-s0.json",
-       "gpt-5.6-luna-2022-blind-s1.json",
-       "gpt-5.6-luna-2022-blind-s2.json"
-      ],
-      "max_drawdown": -0.085112,
-      "n": 3,
-      "round_trips": 112.666667,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0,
-       1,
-       2
-      ],
-      "sharpe": -0.496612,
-      "sharpe_range": [
-       -1.014384,
-       0.393331
-      ],
-      "steps": 50,
-      "total_return": -0.024699,
-      "total_return_range": [
-       -0.071741,
-       0.041231
-      ],
-      "turnover": 4.078815,
-      "usage": {
-       "calls": 150.0,
-       "input_tokens": 1783976.0,
-       "list_price_usd": 0.389,
-       "output_tokens": 26804.0
-      }
-     },
-     "cutoff": "2026-02-16",
-     "memory": {
-      "beyond_control": -0.05253333333333343,
-      "beyond_control_ci95": [
-       -0.22930225587023276,
-       0.12641406209681835
-      ],
-      "ci95": [
-       -0.15411434262961507,
-       0.1311767792882845
-      ],
-      "measured_on": null,
-      "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff",
-      "score": -0.01333333333333342,
-      "verdict": "inconclusive",
-      "why": "too few pairs to tell: AUC gap -0.013 before the cutoff and +0.039 after it (the control), difference -0.053, 95% CI [-0.229, +0.126]"
-     },
-     "model": "gpt-5.6-luna",
-     "named": {
-      "after_cutoff": null,
-      "alpha_annual": -0.005466,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": 0.034914,
-         "group": "Energy",
-         "runs": 3
-        },
-        {
-         "contribution": 0.001778,
-         "group": "Financials",
-         "runs": 1
-        },
-        {
-         "contribution": 0.001664,
-         "group": "Health Care",
-         "runs": 3
-        },
-        {
-         "contribution": -0.006502,
-         "group": "Industrials",
-         "runs": 2
-        },
-        {
-         "contribution": -0.006782,
-         "group": "Consumer Staples",
-         "runs": 1
-        },
-        {
-         "contribution": -0.030693,
-         "group": "Communication Services",
-         "runs": 3
-        },
-        {
-         "contribution": -0.03563,
-         "group": "Consumer Discretionary",
-         "runs": 2
-        },
-        {
-         "contribution": -0.045432,
-         "group": "Technology",
-         "runs": 3
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": 0.002762,
-         "group": "news",
-         "runs": 1
-        },
-        {
-         "contribution": -0.100676,
-         "group": "other",
-         "runs": 3
-        }
-       ],
-       "findings": null,
-       "runs": 3,
-       "summary": {
-        "alpha_annual": -0.00151,
-        "alpha_t": -0.038452,
+        "alpha_annual": 0.027089,
+        "alpha_t": -0.050425,
         "best_trade_share": null,
-        "beta_growth": 0.032112,
-        "beta_market": 0.551403,
-        "beta_momentum": 0.082159,
-        "beta_size": -0.133726,
-        "buy_excess_5d": 0.002149,
-        "buy_excess_5d_t": 0.53657,
-        "capm_alpha_annual": -0.005466,
-        "capm_alpha_t": -0.105768,
-        "concentrated": false,
-        "decision_excess_5d": -0.001416,
-        "decision_excess_5d_t": -0.425735,
-        "decision_hit_rate_5d": 0.416963,
-        "decision_ic": -0.016985,
-        "decision_ic_t": -0.527207,
-        "decisions": 77.666667,
-        "exposure_return_annual": -0.102607,
-        "holdings_ic": -0.015026,
-        "holdings_ic_t": -0.824415,
-        "news_decision_share": 0.178765,
-        "news_entry_pnl": 92.060767,
-        "r2": 0.896821,
-        "return_without_best_trade": -0.128441,
-        "sell_avoided_5d": -0.003957,
-        "sell_avoided_5d_t": -0.720203,
-        "spy_return": -0.186464,
-        "total_return": -0.093428
-       }
-      },
-      "avg_exposure": 0.610695,
-      "avg_holding_days": 80.25855,
-      "beta": 0.51188,
-      "excess_vs_equal_weight": 0.030073,
-      "excess_vs_spy": 0.093036,
-      "files": [
-       "gpt-5.6-luna-2022-named-s0.json",
-       "gpt-5.6-luna-2022-named-s1.json",
-       "gpt-5.6-luna-2022-named-s2.json"
-      ],
-      "max_drawdown": -0.155236,
-      "n": 3,
-      "round_trips": 45.333333,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0,
-       1,
-       2
-      ],
-      "sharpe": -0.785719,
-      "sharpe_range": [
-       -0.892055,
-       -0.699717
-      ],
-      "steps": 50,
-      "total_return": -0.093428,
-      "total_return_range": [
-       -0.107251,
-       -0.079519
-      ],
-      "turnover": 1.232668,
-      "usage": {
-       "calls": 150.0,
-       "input_tokens": 1786355.0,
-       "list_price_usd": 0.3764,
-       "output_tokens": 15909.0
-      }
-     },
-     "named_minus_blind": -0.068729,
-     "open_weights": false,
-     "provider": "OpenAI",
-     "slug": "gpt-5.6-luna",
-     "status": "may_remember"
-    },
-    {
-     "blind": {
-      "after_cutoff": null,
-      "alpha_annual": -0.037187,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": 0.052119,
-         "group": "Health Care",
-         "runs": 3
-        },
-        {
-         "contribution": 0.033691,
-         "group": "Energy",
-         "runs": 3
-        },
-        {
-         "contribution": -0.007803,
-         "group": "Communication Services",
-         "runs": 1
-        },
-        {
-         "contribution": -0.016027,
-         "group": "Consumer Staples",
-         "runs": 2
-        },
-        {
-         "contribution": -0.021029,
-         "group": "Financials",
-         "runs": 3
-        },
-        {
-         "contribution": -0.033865,
-         "group": "Consumer Discretionary",
-         "runs": 2
-        },
-        {
-         "contribution": -0.042154,
-         "group": "Technology",
-         "runs": 2
-        },
-        {
-         "contribution": -0.053353,
-         "group": "Industrials",
-         "runs": 2
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": -0.01303,
-         "group": "news",
-         "runs": 3
-        },
-        {
-         "contribution": -0.07604,
-         "group": "other",
-         "runs": 3
-        }
-       ],
-       "findings": null,
-       "runs": 3,
-       "summary": {
-        "alpha_annual": -0.090026,
-        "alpha_t": -1.241448,
-        "best_trade_share": null,
-        "beta_growth": -0.4363,
-        "beta_market": 0.470602,
-        "beta_momentum": 0.069524,
-        "beta_size": -0.075154,
-        "buy_excess_5d": 0.007841,
-        "buy_excess_5d_t": 1.482101,
-        "capm_alpha_annual": -0.037187,
-        "capm_alpha_t": -0.444605,
-        "concentrated": false,
-        "decision_excess_5d": 0.005294,
-        "decision_excess_5d_t": 1.701079,
-        "decision_hit_rate_5d": 0.54921,
-        "decision_ic": 0.024422,
-        "decision_ic_t": 1.121713,
-        "decisions": 118.666667,
-        "exposure_return_annual": -0.006793,
-        "holdings_ic": 0.042019,
-        "holdings_ic_t": 1.470154,
-        "news_decision_share": 0.372839,
-        "news_entry_pnl": -1303.004733,
-        "r2": 0.546756,
-        "return_without_best_trade": -0.110784,
-        "sell_avoided_5d": 0.002965,
-        "sell_avoided_5d_t": 0.571886,
-        "spy_return": -0.186464,
-        "total_return": -0.083785
-       }
-      },
-      "avg_exposure": 0.629633,
-      "avg_holding_days": 24.658639,
-      "beta": 0.309424,
-      "excess_vs_equal_weight": 0.039716,
-      "excess_vs_spy": 0.102679,
-      "files": [
-       "gemini-3.5-flash-2022-blind-s0.json",
-       "gemini-3.5-flash-2022-blind-s1.json",
-       "gemini-3.5-flash-2022-blind-s2.json"
-      ],
-      "max_drawdown": -0.143948,
-      "n": 3,
-      "round_trips": 59.666667,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0,
-       1,
-       2
-      ],
-      "sharpe": -0.768809,
-      "sharpe_range": [
-       -1.034873,
-       -0.238101
-      ],
-      "steps": 50,
-      "total_return": -0.083785,
-      "total_return_range": [
-       -0.12531,
-       -0.011866
-      ],
-      "turnover": 5.307422,
-      "usage": {
-       "calls": 150.0,
-       "input_tokens": 2215354.0,
-       "list_price_usd": 3.6212,
-       "output_tokens": 33130.0
-      }
-     },
-     "cutoff": "2025-01",
-     "memory": {
-      "beyond_control": 0.26217147435897437,
-      "beyond_control_ci95": [
-       0.10692519251739968,
-       0.41460789037310525
-      ],
-      "ci95": [
-       0.10234197443181825,
-       0.31672936965397164
-      ],
-      "measured_on": null,
-      "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff",
-      "score": 0.21229166666666666,
-      "verdict": "contaminated",
-      "why": "named records help more before the cutoff than after it: AUC gap +0.212 before the cutoff and -0.050 after it (the control), difference +0.262, 95% CI [+0.107, +0.415]"
-     },
-     "model": "gemini-3.5-flash",
-     "named": {
-      "after_cutoff": null,
-      "alpha_annual": 0.004391,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": 0.051325,
-         "group": "Health Care",
-         "runs": 1
-        },
-        {
-         "contribution": 0.041496,
-         "group": "Energy",
-         "runs": 1
-        },
-        {
-         "contribution": 0.010876,
-         "group": "Communication Services",
-         "runs": 1
-        },
-        {
-         "contribution": -0.031342,
-         "group": "Technology",
-         "runs": 1
-        },
-        {
-         "contribution": -0.043192,
-         "group": "Financials",
-         "runs": 1
-        },
-        {
-         "contribution": -0.053356,
-         "group": "Consumer Staples",
-         "runs": 1
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": -0.023191,
-         "group": "news",
-         "runs": 1
-        },
-        {
-         "contribution": -0.06695,
-         "group": "other",
-         "runs": 1
-        }
-       ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought trailed SPY by 0.12% on average (46 buys, 52% of them ahead of SPY; t = -0.3, within noise).",
-        "Sells: over the five trading days from the fill, the stocks it sold beat SPY by 1.04%, so selling gave that up (39 sells; t = -1.5, within noise).",
-        "Decision IC: on the 31 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of -0.029 with the next five days' returns (IC IR -0.21, t = -1.2, within noise).",
-        "Holdings IC: the weights it held after each of 50 decision days had a mean rank IC of 0.024 with the next five days' returns (t = 0.7, within noise).",
-        "Factor exposures: market 0.75 (t 20.1), size -0.16 (t -3.1), growth -0.50 (t -6.1), momentum 0.16 (t 3.1); together they explain 76% of the daily variation (R²).",
-        "Of its -9.5% a year over T-bills (arithmetic mean): market -14.4%, growth +8.9%, momentum +1.2%, size +0.4%; the alpha left is -5.6% a year (t = -0.7, within noise).",
-        "Verdict: the exposures account for -3.9% a year of it, and the -5.6% a year left over is not significant: one period of daily returns cannot tell it from luck.",
-        "P&L: -$8,915 in all, -$9,014 from 46 positions and +$99 of interest on idle cash.",
-        "By holding period: 61+ days made the most (+$9,204, 12 positions); 21-60 days lost the most (-$5,586, 14 positions).",
-        "By sector: Health Care made the most (+$5,133, 13 positions); Consumer Staples lost the most (-$5,336, 7 positions).",
-        "By stock: XOM made the most (+$2,763, 4 positions); COST lost the most (-$3,129, 3 positions).",
-        "By market regime of the previous close: risk-on 11 days -3.6% (SPY -5.1%); neutral 6 days -1.4% (SPY -3.3%); uncertain 162 days -11.5% (SPY -19.0%); risk-off 72 days +8.3% (SPY +9.5%).",
-        "News: 18 positions opened on news made -$2,319, the other 28 -$6,695; 4 positions closed on news made -$2,902; over the five days from the fill, news-triggered buys beat SPY by 0.17% (t 0.2).",
-        "Concentration: the positions lost $9,014 in all; the best was XOM bought 2022-01-04 and sold 2022-02-16, +$2,425. Had the best position made nothing, the run would have returned -11.3% instead of -8.9%."
-       ],
-       "runs": 1,
-       "summary": {
-        "alpha_annual": -0.056123,
-        "alpha_t": -0.745151,
-        "best_trade_share": null,
-        "beta_growth": -0.504579,
-        "beta_market": 0.746272,
-        "beta_momentum": 0.161292,
-        "beta_size": -0.164986,
-        "buy_excess_5d": -0.001221,
-        "buy_excess_5d_t": -0.298162,
-        "capm_alpha_annual": 0.004391,
-        "capm_alpha_t": 0.042811,
+        "beta_growth": -0.008731,
+        "beta_market": 0.252236,
+        "beta_momentum": -0.040955,
+        "beta_size": 0.013178,
+        "buy_excess_5d": -0.006626,
+        "buy_excess_5d_t": -0.203234,
+        "capm_alpha_annual": 0.028732,
+        "capm_alpha_t": -0.034975,
         "concentrated": false,
         "cover_excess_5d": null,
         "cover_excess_5d_t": null,
-        "decision_excess_5d": -0.005434,
-        "decision_excess_5d_t": -1.288168,
-        "decision_hit_rate_5d": 0.458824,
-        "decision_ic": -0.029196,
-        "decision_ic_t": -1.158257,
-        "decisions": 85.0,
-        "exposure_return_annual": -0.038996,
+        "decision_excess_5d": -0.002272,
+        "decision_excess_5d_t": 0.36771,
+        "decision_hit_rate_5d": 0.366667,
+        "decision_ic": -0.008203,
+        "decision_ic_t": 0.109088,
+        "decisions": 4.666667,
+        "exposure_return_annual": -0.050335,
         "fees_contribution": 0.0,
         "forced_fills": 0.0,
-        "holdings_ic": 0.023602,
-        "holdings_ic_t": 0.718972,
-        "long_contribution": -0.090141,
-        "news_decision_share": 0.258824,
-        "news_entry_pnl": -2319.076488,
-        "r2": 0.757506,
-        "return_without_best_trade": -0.113407,
-        "sell_avoided_5d": -0.010402,
-        "sell_avoided_5d_t": -1.533861,
+        "holdings_ic": -0.006797,
+        "holdings_ic_t": -0.38996,
+        "long_contribution": -0.024197,
+        "news_decision_share": 0.133333,
+        "news_entry_pnl": -371.79743,
+        "r2": 0.573685,
+        "return_without_best_trade": -0.023385,
+        "sell_avoided_5d": 0.049652,
+        "sell_avoided_5d_t": 4.137159,
         "short_avoided_5d": null,
         "short_avoided_5d_t": null,
         "short_contribution": 0.0,
         "spy_return": -0.186464,
-        "total_return": -0.089054
+        "total_return": -0.015511
        }
       },
-      "avg_exposure": 0.926965,
-      "avg_holding_days": 43.224692,
-      "beta": 0.516335,
-      "excess_vs_equal_weight": 0.034447,
-      "excess_vs_spy": 0.09741,
+      "avg_exposure": 0.25823,
+      "avg_holding_days": 37.541652,
+      "beta": 0.269701,
+      "excess_vs_equal_weight": 0.10799,
+      "excess_vs_spy": 0.170953,
       "files": [
-       "gemini-3.5-flash-2022-named-s0.json"
+       "llama3.2-2022-blind-s0.json",
+       "llama3.2-2022-blind-s1.json",
+       "llama3.2-2022-blind-s2.json"
       ],
-      "max_drawdown": -0.183085,
-      "n": 1,
-      "round_trips": 39.0,
+      "max_drawdown": -0.085675,
+      "n": 3,
+      "round_trips": 0.666667,
       "run_dates": [
        "2026-11-14"
       ],
       "seeds": [
-       0
+       0,
+       1,
+       2
       ],
-      "sharpe": -0.58978,
-      "sharpe_range": null,
+      "sharpe": -0.615363,
+      "sharpe_range": [
+       -1.191246,
+       -0.129505
+      ],
       "steps": 50,
-      "total_return": -0.089054,
-      "total_return_range": null,
-      "turnover": 4.130268,
+      "total_return": -0.015511,
+      "total_return_range": [
+       -0.030259,
+       -0.00237
+      ],
+      "turnover": 0.275148,
       "usage": {
-       "calls": 50.0,
-       "input_tokens": 732537.0,
-       "list_price_usd": 1.1781,
-       "output_tokens": 8805.0
-      }
-     },
-     "named_minus_blind": -0.005269,
-     "open_weights": false,
-     "provider": "Google",
-     "slug": "gemini-3.5-flash",
-     "status": "may_remember"
-    },
-    {
-     "blind": {
-      "after_cutoff": null,
-      "alpha_annual": -0.014215,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": -0.026681,
-         "group": "Financials",
-         "runs": 1
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": -0.026681,
-         "group": "other",
-         "runs": 1
-        }
-       ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought trailed SPY by 3.51% on average (1 buys, 0% of them ahead of SPY; t = n/a, ).",
-        "Decision IC: on the 1 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of -0.096 with the next five days' returns (IC IR n/a, t = n/a, ).",
-        "Holdings IC: the weights it held after each of 50 decision days had a mean rank IC of -0.013 with the next five days' returns (t = -0.8, within noise).",
-        "Factor exposures: market 0.07 (t 12.4), size -0.01 (t -1.1), growth 0.01 (t 0.7), momentum 0.00 (t 0.6); together they explain 56% of the daily variation (R²).",
-        "Of its -2.8% a year over T-bills (arithmetic mean): market -1.4%, growth -0.2%, momentum +0.0%, size +0.0%; the alpha left is -1.3% a year (t = -0.9, within noise).",
-        "Verdict: most of the loss is factor exposure (-1.5% a year, market above all); the alpha left is not significant.",
-        "P&L: -$1,401 in all, -$2,668 from 1 positions and +$1,267 of interest on idle cash.",
-        "By market regime of the previous close: risk-on 11 days -0.7% (SPY -5.1%); neutral 6 days -0.5% (SPY -3.3%); uncertain 162 days -1.1% (SPY -19.0%); risk-off 72 days +1.0% (SPY +9.5%).",
-        "News: no entry or exit gave news as its reason. News can still have shaped the run: a filter that keeps it out of a stock leaves no decision behind, so compare with the run without news.",
-        "Concentration: the positions lost $2,668 in all; the best was SPGI bought 2022-01-04 and still open at the end, -$2,668. Had the best position made nothing, the run would have returned -1.4% instead of -1.4%."
-       ],
-       "runs": 1,
-       "summary": {
-        "alpha_annual": -0.013165,
-        "alpha_t": -0.867083,
-        "best_trade_share": null,
-        "beta_growth": 0.008813,
-        "beta_market": 0.071616,
-        "beta_momentum": 0.003907,
-        "beta_size": -0.009008,
-        "buy_excess_5d": -0.035108,
-        "buy_excess_5d_t": null,
-        "capm_alpha_annual": -0.014215,
-        "capm_alpha_t": -0.939484,
-        "concentrated": false,
-        "cover_excess_5d": null,
-        "cover_excess_5d_t": null,
-        "decision_excess_5d": -0.035108,
-        "decision_excess_5d_t": null,
-        "decision_hit_rate_5d": 0.0,
-        "decision_ic": -0.095937,
-        "decision_ic_t": null,
-        "decisions": 1.0,
-        "exposure_return_annual": -0.014845,
-        "fees_contribution": 0.0,
-        "forced_fills": 0.0,
-        "holdings_ic": -0.013348,
-        "holdings_ic_t": -0.849143,
-        "long_contribution": -0.026681,
-        "news_decision_share": 0.0,
-        "news_entry_pnl": 0.0,
-        "r2": 0.558904,
-        "return_without_best_trade": -0.014012,
-        "sell_avoided_5d": null,
-        "sell_avoided_5d_t": null,
-        "short_avoided_5d": null,
-        "short_avoided_5d_t": null,
-        "short_contribution": 0.0,
-        "spy_return": -0.186464,
-        "total_return": -0.013905
-       }
-      },
-      "avg_exposure": 0.07707,
-      "avg_holding_days": null,
-      "beta": 0.07158,
-      "excess_vs_equal_weight": 0.109596,
-      "excess_vs_spy": 0.172559,
-      "files": [
-       "llama3.2-2022-blind-s0.json"
-      ],
-      "max_drawdown": -0.031204,
-      "n": 1,
-      "round_trips": 0.0,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0
-      ],
-      "sharpe": -1.191246,
-      "sharpe_range": null,
-      "steps": 50,
-      "total_return": -0.013905,
-      "total_return_range": null,
-      "turnover": 0.050142,
-      "usage": {
-       "calls": 50.0,
-       "input_tokens": 578110.0,
+       "calls": 150.0,
+       "input_tokens": 1740207.0,
        "list_price_usd": 0.0,
-       "output_tokens": 2985.0
+       "output_tokens": 13583.0
       }
      },
      "cutoff": "2023-12",
@@ -2977,116 +2461,733 @@
      "model": "llama3.2",
      "named": {
       "after_cutoff": null,
-      "alpha_annual": -0.032215,
+      "alpha_annual": -0.027517,
       "analysis": {
        "by_sector": [
         {
-         "contribution": -0.087024,
-         "group": "Technology",
+         "contribution": 0.003356,
+         "group": "Health Care",
          "runs": 1
+        },
+        {
+         "contribution": -0.008227,
+         "group": "Financials",
+         "runs": 1
+        },
+        {
+         "contribution": -0.022693,
+         "group": "Consumer Discretionary",
+         "runs": 1
+        },
+        {
+         "contribution": -0.088187,
+         "group": "Technology",
+         "runs": 3
         }
        ],
        "by_trigger": [
         {
-         "contribution": -0.027056,
-         "group": "no reason",
-         "runs": 1
+         "contribution": -0.057683,
+         "group": "other",
+         "runs": 3
         },
         {
-         "contribution": -0.059968,
-         "group": "other",
-         "runs": 1
+         "contribution": -0.059538,
+         "group": "no reason",
+         "runs": 2
         }
        ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought trailed SPY by 0.49% on average (10 buys, 30% of them ahead of SPY; t = -0.8, within noise).",
-        "Sells: over the five trading days from the fill, the stocks it sold beat SPY by 0.43%, so selling gave that up (3 sells; t = -0.4, within noise).",
-        "Decision IC: on the 13 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of -0.044 with the next five days' returns (IC IR -0.40, t = -1.4, within noise).",
-        "Holdings IC: the weights it held after each of 50 decision days had a mean rank IC of -0.021 with the next five days' returns (t = -1.2, within noise).",
-        "Factor exposures: market 0.25 (t 21.4), size -0.06 (t -2.9), growth 0.29 (t 9.6), momentum 0.04 (t 3.0); together they explain 87% of the daily variation (R²).",
-        "Of its -9.1% a year over T-bills (arithmetic mean): growth -5.1%, market -4.8%, momentum +0.3%, size +0.1%; the alpha left is +0.3% a year (t = 0.1, within noise).",
-        "Verdict: most of the loss is factor exposure (-9.4% a year, growth above all); the alpha left is not significant.",
-        "P&L: -$7,659 in all, -$8,702 from 2 positions and +$1,043 of interest on idle cash.",
-        "By stock: ADBE lost the least (-$2,706, 1 position); AAPL lost the most (-$5,997, 1 position).",
-        "By market regime of the previous close: risk-on 11 days -2.0% (SPY -5.1%); neutral 6 days -0.4% (SPY -3.3%); uncertain 162 days -8.5% (SPY -19.0%); risk-off 72 days +3.5% (SPY +9.5%).",
-        "News: no entry or exit gave news as its reason. News can still have shaped the run: a filter that keeps it out of a stock leaves no decision behind, so compare with the run without news.",
-        "Concentration: the positions lost $8,702 in all; the best was ADBE bought 2022-01-11 and sold 2022-06-13, -$2,706. Had the best position made nothing, the run would have returned -7.7% instead of -7.7%."
-       ],
-       "runs": 1,
+       "findings": null,
+       "runs": 3,
        "summary": {
-        "alpha_annual": 0.002915,
-        "alpha_t": 0.097433,
+        "alpha_annual": -0.003759,
+        "alpha_t": 0.047565,
         "best_trade_share": null,
-        "beta_growth": 0.286636,
-        "beta_market": 0.247993,
-        "beta_momentum": 0.042324,
-        "beta_size": -0.05771,
-        "buy_excess_5d": -0.004857,
-        "buy_excess_5d_t": -0.803981,
-        "capm_alpha_annual": -0.032215,
-        "capm_alpha_t": -0.858858,
+        "beta_growth": 0.203154,
+        "beta_market": 0.330833,
+        "beta_momentum": -0.012193,
+        "beta_size": -0.079615,
+        "buy_excess_5d": -0.003647,
+        "buy_excess_5d_t": -0.527211,
+        "capm_alpha_annual": -0.027517,
+        "capm_alpha_t": -0.57915,
         "concentrated": false,
         "cover_excess_5d": null,
         "cover_excess_5d_t": null,
-        "decision_excess_5d": -0.004718,
-        "decision_excess_5d_t": -0.938221,
-        "decision_hit_rate_5d": 0.384615,
-        "decision_ic": -0.043958,
-        "decision_ic_t": -1.439476,
-        "decisions": 13.0,
-        "exposure_return_annual": -0.093861,
+        "decision_excess_5d": -0.002609,
+        "decision_excess_5d_t": -0.47491,
+        "decision_hit_rate_5d": 0.428205,
+        "decision_ic": -0.031527,
+        "decision_ic_t": -0.972528,
+        "decisions": 14.0,
+        "exposure_return_annual": -0.098416,
         "fees_contribution": 0.0,
         "forced_fills": 0.0,
-        "holdings_ic": -0.020585,
-        "holdings_ic_t": -1.210549,
-        "long_contribution": -0.087024,
-        "news_decision_share": 0.384615,
+        "holdings_ic": -0.021799,
+        "holdings_ic_t": -1.322065,
+        "long_contribution": -0.097375,
+        "news_decision_share": 0.359951,
         "news_entry_pnl": 0.0,
-        "r2": 0.867269,
-        "return_without_best_trade": -0.076591,
-        "sell_avoided_5d": -0.004254,
-        "sell_avoided_5d_t": -0.405862,
+        "r2": 0.856543,
+        "return_without_best_trade": -0.089411,
+        "sell_avoided_5d": 0.001367,
+        "sell_avoided_5d_t": 0.167432,
         "short_avoided_5d": null,
         "short_avoided_5d_t": null,
         "short_contribution": 0.0,
         "spy_return": -0.186464,
-        "total_return": -0.076491
+        "total_return": -0.088192
        }
       },
-      "avg_exposure": 0.226046,
-      "avg_holding_days": 115.619875,
-      "beta": 0.304744,
-      "excess_vs_equal_weight": 0.04701,
-      "excess_vs_spy": 0.109973,
+      "avg_exposure": 0.294751,
+      "avg_holding_days": 119.905395,
+      "beta": 0.38739,
+      "excess_vs_equal_weight": 0.035309,
+      "excess_vs_spy": 0.098272,
       "files": [
-       "llama3.2-2022-named-s0.json"
+       "llama3.2-2022-named-s0.json",
+       "llama3.2-2022-named-s1.json",
+       "llama3.2-2022-named-s2.json"
       ],
-      "max_drawdown": -0.08531,
-      "n": 1,
-      "round_trips": 3.0,
+      "max_drawdown": -0.1087,
+      "n": 3,
+      "round_trips": 2.666667,
       "run_dates": [
        "2026-11-14"
       ],
       "seeds": [
-       0
+       0,
+       1,
+       2
       ],
-      "sharpe": -1.098714,
-      "sharpe_range": null,
+      "sharpe": -0.968585,
+      "sharpe_range": [
+       -1.098714,
+       -0.797703
+      ],
       "steps": 50,
-      "total_return": -0.076491,
-      "total_return_range": null,
-      "turnover": 0.235601,
+      "total_return": -0.088192,
+      "total_return_range": [
+       -0.144194,
+       -0.043892
+      ],
+      "turnover": 0.258319,
       "usage": {
-       "calls": 50.0,
-       "input_tokens": 576864.0,
+       "calls": 150.0,
+       "input_tokens": 1733462.0,
        "list_price_usd": 0.0,
-       "output_tokens": 3048.0
+       "output_tokens": 10738.0
       }
      },
-     "named_minus_blind": -0.062586,
+     "named_minus_blind": -0.072681,
      "open_weights": true,
      "provider": "Meta",
      "slug": "llama3.2",
+     "status": "may_remember"
+    },
+    {
+     "blind": {
+      "after_cutoff": null,
+      "alpha_annual": -0.025727,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.024486,
+         "group": "Health Care",
+         "runs": 3
+        },
+        {
+         "contribution": 0.009015,
+         "group": "Energy",
+         "runs": 3
+        },
+        {
+         "contribution": 0.000899,
+         "group": "Communication Services",
+         "runs": 1
+        },
+        {
+         "contribution": -0.010675,
+         "group": "Consumer Staples",
+         "runs": 2
+        },
+        {
+         "contribution": -0.010977,
+         "group": "Industrials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.016622,
+         "group": "Consumer Discretionary",
+         "runs": 3
+        },
+        {
+         "contribution": -0.029023,
+         "group": "Technology",
+         "runs": 3
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": 0.002761,
+         "group": "news",
+         "runs": 3
+        },
+        {
+         "contribution": -0.061429,
+         "group": "other",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.042145,
+        "alpha_t": -1.11445,
+        "best_trade_share": null,
+        "beta_growth": -0.14154,
+        "beta_market": 0.268907,
+        "beta_momentum": 0.066045,
+        "beta_size": -0.027761,
+        "buy_excess_5d": 0.004674,
+        "buy_excess_5d_t": 1.085243,
+        "capm_alpha_annual": -0.025727,
+        "capm_alpha_t": -0.614716,
+        "concentrated": false,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": -0.001723,
+        "decision_excess_5d_t": -0.558028,
+        "decision_hit_rate_5d": 0.491737,
+        "decision_ic": -0.015515,
+        "decision_ic_t": -0.595651,
+        "decisions": 164.0,
+        "exposure_return_annual": -0.021415,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.027423,
+        "holdings_ic_t": 0.965511,
+        "long_contribution": -0.058668,
+        "news_decision_share": 0.174341,
+        "news_entry_pnl": 276.073993,
+        "r2": 0.620816,
+        "return_without_best_trade": -0.061534,
+        "sell_avoided_5d": -0.005018,
+        "sell_avoided_5d_t": -1.244007,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": -0.186464,
+        "total_return": -0.049695
+       }
+      },
+      "avg_exposure": 0.370506,
+      "avg_holding_days": 25.783974,
+      "beta": 0.196308,
+      "excess_vs_equal_weight": 0.073806,
+      "excess_vs_spy": 0.136769,
+      "files": [
+       "gpt-5.6-luna-2022-blind-s0.json",
+       "gpt-5.6-luna-2022-blind-s1.json",
+       "gpt-5.6-luna-2022-blind-s2.json"
+      ],
+      "max_drawdown": -0.077288,
+      "n": 3,
+      "round_trips": 108.666667,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": -0.959283,
+      "sharpe_range": [
+       -1.346211,
+       -0.56567
+      ],
+      "steps": 50,
+      "total_return": -0.049695,
+      "total_return_range": [
+       -0.070379,
+       -0.023285
+      ],
+      "turnover": 3.84358,
+      "usage": {
+       "calls": 150.0,
+       "input_tokens": 1785053.0,
+       "list_price_usd": 0.3873,
+       "output_tokens": 25182.0
+      }
+     },
+     "cutoff": "2026-02-16",
+     "memory": {
+      "beyond_control": -0.05253333333333343,
+      "beyond_control_ci95": [
+       -0.22930225587023276,
+       0.12641406209681835
+      ],
+      "ci95": [
+       -0.15411434262961507,
+       0.1311767792882845
+      ],
+      "measured_on": null,
+      "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff",
+      "score": -0.01333333333333342,
+      "verdict": "inconclusive",
+      "why": "too few pairs to tell: AUC gap -0.013 before the cutoff and +0.039 after it (the control), difference -0.053, 95% CI [-0.229, +0.126]"
+     },
+     "model": "gpt-5.6-luna",
+     "named": {
+      "after_cutoff": null,
+      "alpha_annual": -0.010612,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.016561,
+         "group": "Energy",
+         "runs": 3
+        },
+        {
+         "contribution": 0.003979,
+         "group": "Financials",
+         "runs": 3
+        },
+        {
+         "contribution": 0.001057,
+         "group": "Utilities",
+         "runs": 1
+        },
+        {
+         "contribution": -0.004118,
+         "group": "Health Care",
+         "runs": 2
+        },
+        {
+         "contribution": -0.011841,
+         "group": "Industrials",
+         "runs": 1
+        },
+        {
+         "contribution": -0.017988,
+         "group": "Consumer Staples",
+         "runs": 1
+        },
+        {
+         "contribution": -0.027172,
+         "group": "Communication Services",
+         "runs": 3
+        },
+        {
+         "contribution": -0.03798,
+         "group": "Consumer Discretionary",
+         "runs": 1
+        },
+        {
+         "contribution": -0.044782,
+         "group": "Technology",
+         "runs": 3
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": -0.004887,
+         "group": "news",
+         "runs": 3
+        },
+        {
+         "contribution": -0.101316,
+         "group": "other",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.001575,
+        "alpha_t": 0.028276,
+        "best_trade_share": null,
+        "beta_growth": 0.065727,
+        "beta_market": 0.572627,
+        "beta_momentum": 0.126724,
+        "beta_size": -0.114614,
+        "buy_excess_5d": 0.002184,
+        "buy_excess_5d_t": 0.768957,
+        "capm_alpha_annual": -0.010612,
+        "capm_alpha_t": -0.134515,
+        "concentrated": false,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": -0.000298,
+        "decision_excess_5d_t": -0.028952,
+        "decision_hit_rate_5d": 0.461303,
+        "decision_ic": -0.006886,
+        "decision_ic_t": -0.106783,
+        "decisions": 69.0,
+        "exposure_return_annual": -0.109945,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": -0.013672,
+        "holdings_ic_t": -0.79278,
+        "long_contribution": -0.106203,
+        "news_decision_share": 0.208298,
+        "news_entry_pnl": -488.675265,
+        "r2": 0.877282,
+        "return_without_best_trade": -0.119207,
+        "sell_avoided_5d": -0.00236,
+        "sell_avoided_5d_t": -0.403203,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": -0.186464,
+        "total_return": -0.100315
+       }
+      },
+      "avg_exposure": 0.63409,
+      "avg_holding_days": 95.534754,
+      "beta": 0.523588,
+      "excess_vs_equal_weight": 0.023186,
+      "excess_vs_spy": 0.086149,
+      "files": [
+       "gpt-5.6-luna-2022-named-s0.json",
+       "gpt-5.6-luna-2022-named-s1.json",
+       "gpt-5.6-luna-2022-named-s2.json"
+      ],
+      "max_drawdown": -0.163449,
+      "n": 3,
+      "round_trips": 41.0,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": -0.795087,
+      "sharpe_range": [
+       -1.036546,
+       -0.617438
+      ],
+      "steps": 50,
+      "total_return": -0.100315,
+      "total_return_range": [
+       -0.140737,
+       -0.077766
+      ],
+      "turnover": 1.124191,
+      "usage": {
+       "calls": 150.0,
+       "input_tokens": 1784768.0,
+       "list_price_usd": 0.3742,
+       "output_tokens": 14349.0
+      }
+     },
+     "named_minus_blind": -0.05062,
+     "open_weights": false,
+     "provider": "OpenAI",
+     "slug": "gpt-5.6-luna",
+     "status": "may_remember"
+    },
+    {
+     "blind": {
+      "after_cutoff": null,
+      "alpha_annual": -0.05571,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.049705,
+         "group": "Health Care",
+         "runs": 3
+        },
+        {
+         "contribution": 0.035309,
+         "group": "Energy",
+         "runs": 3
+        },
+        {
+         "contribution": -0.006524,
+         "group": "Communication Services",
+         "runs": 2
+        },
+        {
+         "contribution": -0.026619,
+         "group": "Financials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.031899,
+         "group": "Consumer Staples",
+         "runs": 2
+        },
+        {
+         "contribution": -0.043213,
+         "group": "Consumer Discretionary",
+         "runs": 1
+        },
+        {
+         "contribution": -0.043816,
+         "group": "Technology",
+         "runs": 2
+        },
+        {
+         "contribution": -0.053353,
+         "group": "Industrials",
+         "runs": 2
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": -0.053864,
+         "group": "other",
+         "runs": 3
+        },
+        {
+         "contribution": -0.057057,
+         "group": "news",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.11097,
+        "alpha_t": -1.50129,
+        "best_trade_share": null,
+        "beta_growth": -0.453485,
+        "beta_market": 0.503988,
+        "beta_momentum": 0.062031,
+        "beta_size": -0.093588,
+        "buy_excess_5d": 0.006735,
+        "buy_excess_5d_t": 1.735393,
+        "capm_alpha_annual": -0.05571,
+        "capm_alpha_t": -0.668793,
+        "concentrated": false,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": 0.004763,
+        "decision_excess_5d_t": 1.378194,
+        "decision_hit_rate_5d": 0.551022,
+        "decision_ic": 0.022687,
+        "decision_ic_t": 1.039809,
+        "decisions": 134.333333,
+        "exposure_return_annual": -0.010252,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.042422,
+        "holdings_ic_t": 1.522314,
+        "long_contribution": -0.110921,
+        "news_decision_share": 0.357181,
+        "news_entry_pnl": -5705.692581,
+        "r2": 0.575144,
+        "return_without_best_trade": -0.13699,
+        "sell_avoided_5d": 0.002712,
+        "sell_avoided_5d_t": 0.486661,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": -0.186464,
+        "total_return": -0.107477
+       }
+      },
+      "avg_exposure": 0.691637,
+      "avg_holding_days": 22.586625,
+      "beta": 0.339934,
+      "excess_vs_equal_weight": 0.016024,
+      "excess_vs_spy": 0.078987,
+      "files": [
+       "gemini-3.5-flash-2022-blind-s0.json",
+       "gemini-3.5-flash-2022-blind-s1.json",
+       "gemini-3.5-flash-2022-blind-s2.json"
+      ],
+      "max_drawdown": -0.158627,
+      "n": 3,
+      "round_trips": 66.333333,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": -0.972961,
+      "sharpe_range": [
+       -1.034873,
+       -0.850557
+      ],
+      "steps": 50,
+      "total_return": -0.107477,
+      "total_return_range": [
+       -0.12531,
+       -0.08294
+      ],
+      "turnover": 6.072651,
+      "usage": {
+       "calls": 150.0,
+       "input_tokens": 2218170.0,
+       "list_price_usd": 3.6581,
+       "output_tokens": 36762.0
+      }
+     },
+     "cutoff": "2025-01",
+     "memory": {
+      "beyond_control": 0.26217147435897437,
+      "beyond_control_ci95": [
+       0.10692519251739968,
+       0.41460789037310525
+      ],
+      "ci95": [
+       0.10234197443181825,
+       0.31672936965397164
+      ],
+      "measured_on": null,
+      "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff",
+      "score": 0.21229166666666666,
+      "verdict": "contaminated",
+      "why": "named records help more before the cutoff than after it: AUC gap +0.212 before the cutoff and -0.050 after it (the control), difference +0.262, 95% CI [+0.107, +0.415]"
+     },
+     "model": "gemini-3.5-flash",
+     "named": {
+      "after_cutoff": null,
+      "alpha_annual": 0.034468,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.06734,
+         "group": "Health Care",
+         "runs": 3
+        },
+        {
+         "contribution": 0.054457,
+         "group": "Energy",
+         "runs": 3
+        },
+        {
+         "contribution": 0.011427,
+         "group": "Communication Services",
+         "runs": 3
+        },
+        {
+         "contribution": -0.034156,
+         "group": "Technology",
+         "runs": 2
+        },
+        {
+         "contribution": -0.036638,
+         "group": "Financials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.039452,
+         "group": "Consumer Discretionary",
+         "runs": 1
+        },
+        {
+         "contribution": -0.065466,
+         "group": "Consumer Staples",
+         "runs": 3
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": 0.008913,
+         "group": "news",
+         "runs": 3
+        },
+        {
+         "contribution": -0.067107,
+         "group": "other",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.026046,
+        "alpha_t": -0.340059,
+        "best_trade_share": null,
+        "beta_growth": -0.502537,
+        "beta_market": 0.726389,
+        "beta_momentum": 0.162586,
+        "beta_size": -0.19097,
+        "buy_excess_5d": 0.001345,
+        "buy_excess_5d_t": 0.321745,
+        "capm_alpha_annual": 0.034468,
+        "capm_alpha_t": 0.346684,
+        "concentrated": false,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": -0.001015,
+        "decision_excess_5d_t": -0.186471,
+        "decision_hit_rate_5d": 0.488783,
+        "decision_ic": -0.000682,
+        "decision_ic_t": 0.00244,
+        "decisions": 92.0,
+        "exposure_return_annual": -0.034759,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.032893,
+        "holdings_ic_t": 0.965934,
+        "long_contribution": -0.058193,
+        "news_decision_share": 0.3013,
+        "news_entry_pnl": 891.312479,
+        "r2": 0.742064,
+        "return_without_best_trade": -0.088156,
+        "sell_avoided_5d": -0.003661,
+        "sell_avoided_5d_t": -0.50406,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": -0.186464,
+        "total_return": -0.05701
+       }
+      },
+      "avg_exposure": 0.905814,
+      "avg_holding_days": 37.572545,
+      "beta": 0.494348,
+      "excess_vs_equal_weight": 0.066491,
+      "excess_vs_spy": 0.129454,
+      "files": [
+       "gemini-3.5-flash-2022-named-s0.json",
+       "gemini-3.5-flash-2022-named-s1.json",
+       "gemini-3.5-flash-2022-named-s2.json"
+      ],
+      "max_drawdown": -0.157997,
+      "n": 3,
+      "round_trips": 43.333333,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": -0.383553,
+      "sharpe_range": [
+       -0.446177,
+       -0.346037
+      ],
+      "steps": 50,
+      "total_return": -0.05701,
+      "total_return_range": [
+       -0.068302,
+       -0.050836
+      ],
+      "turnover": 4.294541,
+      "usage": {
+       "calls": 150.0,
+       "input_tokens": 2197363.0,
+       "list_price_usd": 3.5426,
+       "output_tokens": 27399.0
+      }
+     },
+     "named_minus_blind": 0.050467,
+     "open_weights": false,
+     "provider": "Google",
+     "slug": "gemini-3.5-flash",
      "status": "may_remember"
     }
    ],
@@ -3868,461 +3969,149 @@
     {
      "blind": {
       "after_cutoff": {
-       "days": 216,
-       "equal_weight_sharpe": 0.848303,
-       "equal_weight_total_return": 0.114246,
-       "excess_vs_equal_weight": -0.062608,
-       "excess_vs_spy": -0.069232,
-       "from": "2026-01-02",
-       "max_drawdown": -0.108474,
-       "sharpe": 0.227288,
-       "sharpe_range": [
-        0.149895,
-        0.28381
-       ],
-       "spy_sharpe": 0.76515,
-       "spy_total_return": 0.12087,
-       "to": "2026-11-11",
-       "total_return": 0.051638,
-       "total_return_range": [
-        0.040861,
-        0.060142
-       ],
-       "volatility": 0.156867
-      },
-      "alpha_annual": -0.044321,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": 0.087467,
-         "group": "Health Care",
-         "runs": 3
-        },
-        {
-         "contribution": 0.022497,
-         "group": "Technology",
-         "runs": 2
-        },
-        {
-         "contribution": 0.014095,
-         "group": "Energy",
-         "runs": 3
-        },
-        {
-         "contribution": 0.013899,
-         "group": "Industrials",
-         "runs": 2
-        },
-        {
-         "contribution": -0.01254,
-         "group": "Consumer Staples",
-         "runs": 2
-        },
-        {
-         "contribution": -0.024215,
-         "group": "Consumer Discretionary",
-         "runs": 3
-        },
-        {
-         "contribution": -0.028545,
-         "group": "Financials",
-         "runs": 1
-        },
-        {
-         "contribution": -0.031824,
-         "group": "Communication Services",
-         "runs": 2
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": 0.092169,
-         "group": "other",
-         "runs": 3
-        },
-        {
-         "contribution": -0.041632,
-         "group": "news",
-         "runs": 3
-        }
-       ],
-       "findings": null,
-       "runs": 3,
-       "summary": {
-        "alpha_annual": -0.030652,
-        "alpha_t": -0.250703,
-        "best_trade_share": 1.295109,
-        "beta_growth": -0.021274,
-        "beta_market": 0.700271,
-        "beta_momentum": 0.073941,
-        "beta_size": 0.258802,
-        "buy_excess_5d": -0.007455,
-        "buy_excess_5d_t": -1.428899,
-        "capm_alpha_annual": -0.044321,
-        "capm_alpha_t": -0.34275,
-        "concentrated": true,
-        "decision_excess_5d": -0.003646,
-        "decision_excess_5d_t": -0.952546,
-        "decision_hit_rate_5d": 0.511469,
-        "decision_ic": -0.010853,
-        "decision_ic_t": -0.508018,
-        "decisions": 139.666667,
-        "exposure_return_annual": 0.066105,
-        "holdings_ic": -0.028579,
-        "holdings_ic_t": -1.281982,
-        "news_decision_share": 0.384138,
-        "news_entry_pnl": -4163.142854,
-        "r2": 0.489305,
-        "return_without_best_trade": -0.014352,
-        "sell_avoided_5d": 0.000558,
-        "sell_avoided_5d_t": 0.137025,
-        "spy_return": 0.12087,
-        "total_return": 0.051638
-       }
-      },
-      "avg_exposure": 0.960006,
-      "avg_holding_days": 28.546668,
-      "beta": 0.742472,
-      "excess_vs_equal_weight": -0.062608,
-      "excess_vs_spy": -0.069232,
-      "files": [
-       "gemini-3.5-flash-2026-blind-s0.json",
-       "gemini-3.5-flash-2026-blind-s1.json",
-       "gemini-3.5-flash-2026-blind-s2.json"
-      ],
-      "max_drawdown": -0.108474,
-      "n": 3,
-      "round_trips": 67.666667,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0,
-       1,
-       2
-      ],
-      "sharpe": 0.227288,
-      "sharpe_range": [
-       0.149895,
-       0.28381
-      ],
-      "steps": 44,
-      "total_return": 0.051638,
-      "total_return_range": [
-       0.040861,
-       0.060142
-      ],
-      "turnover": 7.233578,
-      "usage": {
-       "calls": 132.0,
-       "input_tokens": 1809753.0,
-       "list_price_usd": 3.0297,
-       "output_tokens": 35018.0
-      }
-     },
-     "cutoff": "2025-01",
-     "memory": {
-      "beyond_control": null,
-      "beyond_control_ci95": null,
-      "ci95": [
-       -0.15927828394953178,
-       0.05865783004899907
-      ],
-      "measured_on": null,
-      "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff",
-      "score": -0.04987980769230771,
-      "verdict": "clean",
-      "why": "every point starts after the training cutoff, so the model cannot have read how it ended"
-     },
-     "model": "gemini-3.5-flash",
-     "named": {
-      "after_cutoff": {
-       "days": 216,
-       "equal_weight_sharpe": 0.848303,
-       "equal_weight_total_return": 0.114246,
-       "excess_vs_equal_weight": -0.020571,
-       "excess_vs_spy": -0.027195,
-       "from": "2026-01-02",
-       "max_drawdown": -0.068761,
-       "sharpe": 0.54189,
-       "sharpe_range": null,
-       "spy_sharpe": 0.76515,
-       "spy_total_return": 0.12087,
-       "to": "2026-11-11",
-       "total_return": 0.093675,
-       "total_return_range": null,
-       "volatility": 0.147114
-      },
-      "alpha_annual": -0.001859,
-      "analysis": {
-       "by_sector": [
-        {
-         "contribution": 0.093399,
-         "group": "Health Care",
-         "runs": 1
-        },
-        {
-         "contribution": 0.026216,
-         "group": "Energy",
-         "runs": 1
-        },
-        {
-         "contribution": 0.017857,
-         "group": "Industrials",
-         "runs": 1
-        },
-        {
-         "contribution": -0.002077,
-         "group": "Consumer Staples",
-         "runs": 1
-        },
-        {
-         "contribution": -0.020749,
-         "group": "Communication Services",
-         "runs": 1
-        },
-        {
-         "contribution": -0.03265,
-         "group": "Consumer Discretionary",
-         "runs": 1
-        }
-       ],
-       "by_trigger": [
-        {
-         "contribution": 0.07027,
-         "group": "other",
-         "runs": 1
-        },
-        {
-         "contribution": 0.02107,
-         "group": "news",
-         "runs": 1
-        }
-       ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought beat SPY by 0.92% on average (39 buys, 54% of them ahead of SPY; t = 1.7, within noise).",
-        "Sells: over the five trading days from the fill, the stocks it sold lagged SPY by 0.77%, so selling avoided that (31 sells; t = 1.3, within noise).",
-        "Decision IC: on the 30 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.030 with the next five days' returns (IC IR 0.22, t = 1.2, within noise).",
-        "Holdings IC: the weights it held after each of 43 decision days had a mean rank IC of -0.009 with the next five days' returns (t = -0.3, within noise).",
-        "Factor exposures: market 0.75 (t 9.5), size 0.16 (t 3.0), growth -0.08 (t -0.7), momentum 0.10 (t 3.5); together they explain 57% of the daily variation (R²).",
-        "Of the +8.0% a year it earned over T-bills (arithmetic mean): market +8.0%, momentum -2.4%, size +0.5%, growth -0.2%; the alpha left is +2.0% a year (t = 0.2, within noise).",
-        "Verdict: most of the return is factor exposure (+6.0% a year, market above all); the alpha left is not significant.",
-        "P&L: +$9,415 in all, +$9,134 from 37 positions and +$281 of interest on idle cash.",
-        "By holding period: 61+ days made the most (+$19,649, 13 positions); 11-20 days the least (-$4,633, 7 positions).",
-        "By sector: Health Care made the most (+$9,340, 7 positions); Consumer Discretionary the least (-$3,265, 6 positions).",
-        "By stock: CAT made the most (+$4,509, 1 position); AMZN the least (-$2,065, 3 positions).",
-        "By market regime of the previous close: risk-on 96 days +0.7% (SPY +2.0%); neutral 18 days +1.1% (SPY +4.5%); uncertain 97 days +6.7% (SPY +4.8%); risk-off 6 days +0.7% (SPY +0.3%).",
-        "News: 18 positions opened on news made +$2,107, the other 19 +$7,027; 8 positions closed on news made +$2,565; over the five days from the fill, news-triggered buys beat SPY by 1.22% (t 1.3).",
-        "Concentration: the gains are spread out (the best two positions made 36% of them) but winners and losers nearly cancel, so the best two made 93% of the net P&L; the best was CAT bought 2026-01-05 and sold 2026-07-21, +$4,509. Had the best position made nothing, the run would have returned +4.9% instead of +9.4%."
-       ],
-       "runs": 1,
-       "summary": {
-        "alpha_annual": 0.020193,
-        "alpha_t": 0.182529,
-        "best_trade_share": 0.493597,
-        "beta_growth": -0.08327,
-        "beta_market": 0.74784,
-        "beta_momentum": 0.104033,
-        "beta_size": 0.163307,
-        "buy_excess_5d": 0.009223,
-        "buy_excess_5d_t": 1.734606,
-        "capm_alpha_annual": -0.001859,
-        "capm_alpha_t": -0.016109,
-        "concentrated": true,
-        "decision_excess_5d": 0.008566,
-        "decision_excess_5d_t": 2.199317,
-        "decision_hit_rate_5d": 0.542857,
-        "decision_ic": 0.02968,
-        "decision_ic_t": 1.178577,
-        "decisions": 70.0,
-        "exposure_return_annual": 0.059527,
-        "holdings_ic": -0.008658,
-        "holdings_ic_t": -0.343405,
-        "news_decision_share": 0.333333,
-        "news_entry_pnl": 2107.041482,
-        "r2": 0.568914,
-        "return_without_best_trade": 0.049069,
-        "sell_avoided_5d": 0.00774,
-        "sell_avoided_5d_t": 1.288286,
-        "spy_return": 0.12087,
-        "total_return": 0.093675
-       }
-      },
-      "avg_exposure": 0.924651,
-      "avg_holding_days": 51.616653,
-      "beta": 0.759272,
-      "excess_vs_equal_weight": -0.020571,
-      "excess_vs_spy": -0.027195,
-      "files": [
-       "gemini-3.5-flash-2026-named-s0.json"
-      ],
-      "max_drawdown": -0.068761,
-      "n": 1,
-      "round_trips": 37.0,
-      "run_dates": [
-       "2026-11-14"
-      ],
-      "seeds": [
-       0
-      ],
-      "sharpe": 0.54189,
-      "sharpe_range": null,
-      "steps": 44,
-      "total_return": 0.093675,
-      "total_return_range": null,
-      "turnover": 3.678393,
-      "usage": {
-       "calls": 44.0,
-       "input_tokens": 594197.0,
-       "list_price_usd": 0.9484,
-       "output_tokens": 6342.0
-      }
-     },
-     "named_minus_blind": 0.042037,
-     "named_minus_blind_after_cutoff": 0.042037,
-     "open_weights": false,
-     "provider": "Google",
-     "slug": "gemini-3.5-flash",
-     "status": "clean"
-    },
-    {
-     "blind": {
-      "after_cutoff": {
        "days": 187,
        "equal_weight_sharpe": 0.935723,
        "equal_weight_total_return": 0.107209,
-       "excess_vs_equal_weight": -0.090409,
-       "excess_vs_spy": -0.106405,
+       "excess_vs_equal_weight": -0.061779,
+       "excess_vs_spy": -0.077775,
        "from": "2026-02-13",
-       "max_drawdown": -0.048179,
-       "sharpe": -0.150842,
+       "max_drawdown": -0.036582,
+       "sharpe": 0.335632,
        "sharpe_range": [
-        -0.904134,
-        0.636617
+        -0.379239,
+        1.729767
        ],
        "spy_sharpe": 0.916899,
        "spy_total_return": 0.123205,
        "to": "2026-11-11",
-       "total_return": 0.0168,
+       "total_return": 0.04543,
        "total_return_range": [
-        -0.01856,
-        0.053098
+        0.008466,
+        0.117679
        ],
-       "volatility": 0.062522
+       "volatility": 0.06211
       },
-      "alpha_annual": 0.003705,
+      "alpha_annual": 0.057998,
       "analysis": {
        "by_sector": [
         {
-         "contribution": 0.050992,
-         "group": "Industrials",
-         "runs": 1
-        },
-        {
-         "contribution": 0.025104,
-         "group": "Energy",
+         "contribution": 0.0311,
+         "group": "Health Care",
          "runs": 2
         },
         {
-         "contribution": 0.013654,
-         "group": "Consumer Staples",
+         "contribution": 0.031027,
+         "group": "Industrials",
          "runs": 3
         },
         {
-         "contribution": 0.007666,
+         "contribution": 0.029025,
+         "group": "Energy",
+         "runs": 3
+        },
+        {
+         "contribution": 0.015524,
+         "group": "Consumer Staples",
+         "runs": 1
+        },
+        {
+         "contribution": 0.0086,
          "group": "Real Estate",
          "runs": 1
         },
         {
-         "contribution": 0.001359,
-         "group": "Materials",
-         "runs": 1
+         "contribution": -0.003547,
+         "group": "Consumer Discretionary",
+         "runs": 2
         },
         {
-         "contribution": -0.001017,
+         "contribution": -0.006686,
          "group": "Utilities",
+         "runs": 2
+        },
+        {
+         "contribution": -0.008942,
+         "group": "Communication Services",
          "runs": 1
         },
         {
-         "contribution": -0.002069,
-         "group": "Health Care",
-         "runs": 3
-        },
-        {
-         "contribution": -0.00432,
-         "group": "Technology",
-         "runs": 3
-        },
-        {
-         "contribution": -0.013181,
+         "contribution": -0.00965,
          "group": "Financials",
          "runs": 1
         },
         {
-         "contribution": -0.014873,
-         "group": "Consumer Discretionary",
+         "contribution": -0.019932,
+         "group": "Technology",
          "runs": 2
         }
        ],
        "by_trigger": [
         {
-         "contribution": 0.030452,
-         "group": "news",
+         "contribution": 0.052144,
+         "group": "other",
          "runs": 3
         },
         {
-         "contribution": 0.007619,
-         "group": "other",
+         "contribution": 0.033266,
+         "group": "news",
          "runs": 3
         }
        ],
        "findings": null,
        "runs": 3,
        "summary": {
-        "alpha_annual": 0.010679,
-        "alpha_t": 0.214647,
-        "best_trade_share": 0.374792,
-        "beta_growth": -0.331522,
-        "beta_market": 0.357556,
-        "beta_momentum": 0.062896,
-        "beta_size": 0.046967,
-        "buy_excess_5d": 0.001547,
-        "buy_excess_5d_t": 0.350909,
-        "capm_alpha_annual": 0.003705,
-        "capm_alpha_t": 0.024963,
+        "alpha_annual": 0.058696,
+        "alpha_t": 0.917292,
+        "best_trade_share": 0.334317,
+        "beta_growth": -0.355781,
+        "beta_market": 0.347626,
+        "beta_momentum": 0.046387,
+        "beta_size": 0.105722,
+        "buy_excess_5d": -0.000717,
+        "buy_excess_5d_t": -0.199453,
+        "capm_alpha_annual": 0.057998,
+        "capm_alpha_t": 0.802843,
         "concentrated": true,
-        "decision_excess_5d": -0.001934,
-        "decision_excess_5d_t": -0.858331,
-        "decision_hit_rate_5d": 0.482023,
-        "decision_ic": 0.004339,
-        "decision_ic_t": 0.070703,
-        "decisions": 173.666667,
-        "exposure_return_annual": 0.017274,
-        "holdings_ic": -0.010365,
-        "holdings_ic_t": -0.516358,
-        "news_decision_share": 0.188543,
-        "news_entry_pnl": 3045.242131,
-        "r2": 0.436072,
-        "return_without_best_trade": 0.034292,
-        "sell_avoided_5d": -0.00367,
-        "sell_avoided_5d_t": -1.005149,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": -0.002786,
+        "decision_excess_5d_t": -0.904485,
+        "decision_hit_rate_5d": 0.482998,
+        "decision_ic": -0.014671,
+        "decision_ic_t": -0.613145,
+        "decisions": 177.666667,
+        "exposure_return_annual": 0.021415,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.003888,
+        "holdings_ic_t": 0.171815,
+        "long_contribution": 0.085409,
+        "news_decision_share": 0.174377,
+        "news_entry_pnl": 3326.568745,
+        "r2": 0.392262,
+        "return_without_best_trade": 0.081107,
+        "sell_avoided_5d": -0.003789,
+        "sell_avoided_5d_t": -0.857939,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
         "spy_return": 0.12087,
-        "total_return": 0.054248
+        "total_return": 0.10261
        }
       },
-      "avg_exposure": 0.48951,
-      "avg_holding_days": 24.386761,
-      "beta": 0.225686,
-      "excess_vs_equal_weight": -0.059998,
-      "excess_vs_spy": -0.066622,
+      "avg_exposure": 0.470381,
+      "avg_holding_days": 25.53365,
+      "beta": 0.20581,
+      "excess_vs_equal_weight": -0.011636,
+      "excess_vs_spy": -0.01826,
       "files": [
        "gpt-5.6-luna-2026-blind-s0.json",
        "gpt-5.6-luna-2026-blind-s1.json",
        "gpt-5.6-luna-2026-blind-s2.json"
       ],
-      "max_drawdown": -0.04838,
+      "max_drawdown": -0.036582,
       "n": 3,
-      "round_trips": 121.333333,
+      "round_trips": 126.333333,
       "run_dates": [
        "2026-11-14"
       ],
@@ -4331,23 +4120,23 @@
        1,
        2
       ],
-      "sharpe": 0.424885,
+      "sharpe": 1.099159,
       "sharpe_range": [
-       -0.21673,
-       0.977063
+       0.723859,
+       1.845646
       ],
       "steps": 44,
-      "total_return": 0.054248,
+      "total_return": 0.10261,
       "total_return_range": [
-       0.015266,
-       0.086127
+       0.073108,
+       0.160954
       ],
-      "turnover": 5.253953,
+      "turnover": 5.022479,
       "usage": {
        "calls": 132.0,
-       "input_tokens": 1435723.0,
-       "list_price_usd": 0.3213,
-       "output_tokens": 28438.0
+       "input_tokens": 1439207.0,
+       "list_price_usd": 0.3235,
+       "output_tokens": 29708.0
       }
      },
      "cutoff": "2026-02-16",
@@ -4373,133 +4162,136 @@
        "days": 187,
        "equal_weight_sharpe": 0.935723,
        "equal_weight_total_return": 0.107209,
-       "excess_vs_equal_weight": 0.025318,
-       "excess_vs_spy": 0.009322,
+       "excess_vs_equal_weight": 0.022626,
+       "excess_vs_spy": 0.00663,
        "from": "2026-02-13",
-       "max_drawdown": -0.061335,
-       "sharpe": 1.50039,
+       "max_drawdown": -0.079036,
+       "sharpe": 1.334337,
        "sharpe_range": [
-        0.837535,
-        2.037565
+        0.905854,
+        1.76578
        ],
        "spy_sharpe": 0.916899,
        "spy_total_return": 0.123205,
        "to": "2026-11-11",
-       "total_return": 0.132527,
+       "total_return": 0.129835,
        "total_return_range": [
-        0.084451,
-        0.17348
+        0.083022,
+        0.180588
        ],
-       "volatility": 0.090679
+       "volatility": 0.096544
       },
-      "alpha_annual": 0.006348,
+      "alpha_annual": 0.022904,
       "analysis": {
        "by_sector": [
         {
-         "contribution": 0.054448,
-         "group": "Technology",
+         "contribution": 0.023353,
+         "group": "Financials",
          "runs": 2
         },
         {
-         "contribution": 0.02836,
+         "contribution": 0.022087,
          "group": "Industrials",
          "runs": 2
         },
         {
-         "contribution": 0.009543,
-         "group": "Health Care",
-         "runs": 2
-        },
-        {
-         "contribution": 0.006636,
-         "group": "Financials",
+         "contribution": 0.019686,
+         "group": "Technology",
          "runs": 3
         },
         {
-         "contribution": 0.004806,
-         "group": "Real Estate",
-         "runs": 1
-        },
-        {
-         "contribution": 0.004352,
+         "contribution": 0.016658,
          "group": "Consumer Discretionary",
          "runs": 2
         },
         {
-         "contribution": 0.000467,
-         "group": "Consumer Staples",
-         "runs": 2
+         "contribution": 0.015575,
+         "group": "Health Care",
+         "runs": 3
         },
         {
-         "contribution": -0.002416,
-         "group": "Utilities",
+         "contribution": 0.003918,
+         "group": "Real Estate",
+         "runs": 3
+        },
+        {
+         "contribution": 0.003072,
+         "group": "Consumer Staples",
          "runs": 1
         },
         {
-         "contribution": -0.01197,
+         "contribution": 0.002569,
          "group": "Communication Services",
-         "runs": 3
+         "runs": 2
         }
        ],
        "by_trigger": [
         {
-         "contribution": 0.060746,
+         "contribution": 0.091156,
          "group": "other",
          "runs": 3
         },
         {
-         "contribution": 0.011002,
+         "contribution": 0.002021,
          "group": "news",
-         "runs": 3
+         "runs": 1
         }
        ],
        "findings": null,
        "runs": 3,
        "summary": {
-        "alpha_annual": 0.002192,
-        "alpha_t": 0.146825,
-        "best_trade_share": 0.693763,
-        "beta_growth": -0.384692,
-        "beta_market": 0.686494,
-        "beta_momentum": 0.019598,
-        "beta_size": -0.038751,
-        "buy_excess_5d": 0.001114,
-        "buy_excess_5d_t": 0.084842,
-        "capm_alpha_annual": 0.006348,
-        "capm_alpha_t": 0.136397,
+        "alpha_annual": 0.010204,
+        "alpha_t": 0.153699,
+        "best_trade_share": 0.299585,
+        "beta_growth": -0.516443,
+        "beta_market": 0.779636,
+        "beta_momentum": 0.001264,
+        "beta_size": -0.030606,
+        "buy_excess_5d": 0.000126,
+        "buy_excess_5d_t": 0.044549,
+        "capm_alpha_annual": 0.022904,
+        "capm_alpha_t": 0.293271,
         "concentrated": true,
-        "decision_excess_5d": -0.003994,
-        "decision_excess_5d_t": -0.684503,
-        "decision_hit_rate_5d": 0.512987,
-        "decision_ic": -0.01406,
-        "decision_ic_t": -0.41055,
-        "decisions": 98.666667,
-        "exposure_return_annual": 0.058559,
-        "holdings_ic": 0.004855,
-        "holdings_ic_t": 0.144895,
-        "news_decision_share": 0.12088,
-        "news_entry_pnl": 1100.192227,
-        "r2": 0.666428,
-        "return_without_best_trade": 0.043544,
-        "sell_avoided_5d": -0.007403,
-        "sell_avoided_5d_t": -1.223491,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": -0.001351,
+        "decision_excess_5d_t": -0.289787,
+        "decision_hit_rate_5d": 0.510329,
+        "decision_ic": -0.019801,
+        "decision_ic_t": -0.537039,
+        "decisions": 70.666667,
+        "exposure_return_annual": 0.069905,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": 0.005783,
+        "holdings_ic_t": 0.346796,
+        "long_contribution": 0.091829,
+        "news_decision_share": 0.11549,
+        "news_entry_pnl": 67.353652,
+        "r2": 0.750927,
+        "return_without_best_trade": 0.074364,
+        "sell_avoided_5d": -0.002741,
+        "sell_avoided_5d_t": -0.172794,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
         "spy_return": 0.12087,
-        "total_return": 0.081799
+        "total_return": 0.099913
        }
       },
-      "avg_exposure": 0.678614,
-      "avg_holding_days": 84.5301,
-      "beta": 0.506337,
-      "excess_vs_equal_weight": -0.032447,
-      "excess_vs_spy": -0.039071,
+      "avg_exposure": 0.748447,
+      "avg_holding_days": 104.449676,
+      "beta": 0.532423,
+      "excess_vs_equal_weight": -0.014333,
+      "excess_vs_spy": -0.020957,
       "files": [
        "gpt-5.6-luna-2026-named-s0.json",
        "gpt-5.6-luna-2026-named-s1.json",
        "gpt-5.6-luna-2026-named-s2.json"
       ],
-      "max_drawdown": -0.097224,
+      "max_drawdown": -0.09676,
       "n": 3,
-      "round_trips": 60.0,
+      "round_trips": 43.666667,
       "run_dates": [
        "2026-11-14"
       ],
@@ -4508,31 +4300,368 @@
        1,
        2
       ],
-      "sharpe": 0.62309,
+      "sharpe": 0.786383,
       "sharpe_range": [
-       0.266213,
-       1.00464
+       0.533455,
+       1.128592
       ],
       "steps": 44,
-      "total_return": 0.081799,
+      "total_return": 0.099913,
       "total_return_range": [
-       0.050817,
-       0.114373
+       0.074604,
+       0.142568
       ],
-      "turnover": 1.551551,
+      "turnover": 1.170806,
       "usage": {
        "calls": 132.0,
-       "input_tokens": 1431303.0,
-       "list_price_usd": 0.3091,
-       "output_tokens": 18961.0
+       "input_tokens": 1431790.0,
+       "list_price_usd": 0.3044,
+       "output_tokens": 15014.0
       }
      },
-     "named_minus_blind": 0.027551,
-     "named_minus_blind_after_cutoff": 0.115727,
+     "named_minus_blind": -0.002697,
+     "named_minus_blind_after_cutoff": 0.084405,
      "open_weights": false,
      "provider": "OpenAI",
      "slug": "gpt-5.6-luna",
      "status": "partly"
+    },
+    {
+     "blind": {
+      "after_cutoff": {
+       "days": 216,
+       "equal_weight_sharpe": 0.848303,
+       "equal_weight_total_return": 0.114246,
+       "excess_vs_equal_weight": -0.048863,
+       "excess_vs_spy": -0.055487,
+       "from": "2026-01-02",
+       "max_drawdown": -0.100508,
+       "sharpe": 0.325717,
+       "sharpe_range": [
+        0.149895,
+        0.543446
+       ],
+       "spy_sharpe": 0.76515,
+       "spy_total_return": 0.12087,
+       "to": "2026-11-11",
+       "total_return": 0.065383,
+       "total_return_range": [
+        0.040861,
+        0.095147
+       ],
+       "volatility": 0.157953
+      },
+      "alpha_annual": -0.029174,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.088283,
+         "group": "Health Care",
+         "runs": 3
+        },
+        {
+         "contribution": 0.020642,
+         "group": "Technology",
+         "runs": 3
+        },
+        {
+         "contribution": 0.015697,
+         "group": "Energy",
+         "runs": 3
+        },
+        {
+         "contribution": 0.005,
+         "group": "Industrials",
+         "runs": 2
+        },
+        {
+         "contribution": -0.017121,
+         "group": "Consumer Staples",
+         "runs": 1
+        },
+        {
+         "contribution": -0.024098,
+         "group": "Consumer Discretionary",
+         "runs": 3
+        },
+        {
+         "contribution": -0.024648,
+         "group": "Communication Services",
+         "runs": 2
+        },
+        {
+         "contribution": -0.028545,
+         "group": "Financials",
+         "runs": 1
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": 0.052767,
+         "group": "other",
+         "runs": 3
+        },
+        {
+         "contribution": 0.011894,
+         "group": "news",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.013333,
+        "alpha_t": -0.093869,
+        "best_trade_share": 1.125042,
+        "beta_growth": -0.040903,
+        "beta_market": 0.703753,
+        "beta_momentum": 0.085224,
+        "beta_size": 0.27359,
+        "buy_excess_5d": -0.005308,
+        "buy_excess_5d_t": -1.016205,
+        "capm_alpha_annual": -0.029174,
+        "capm_alpha_t": -0.213733,
+        "concentrated": true,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": -0.002736,
+        "decision_excess_5d_t": -0.662786,
+        "decision_hit_rate_5d": 0.530457,
+        "decision_ic": -0.002676,
+        "decision_ic_t": -0.107227,
+        "decisions": 139.0,
+        "exposure_return_annual": 0.063866,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": -0.022328,
+        "holdings_ic_t": -0.986034,
+        "long_contribution": 0.064661,
+        "news_decision_share": 0.385081,
+        "news_entry_pnl": 1189.426262,
+        "r2": 0.491357,
+        "return_without_best_trade": 0.000315,
+        "sell_avoided_5d": 0.000194,
+        "sell_avoided_5d_t": 0.050604,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": 0.12087,
+        "total_return": 0.065383
+       }
+      },
+      "avg_exposure": 0.972167,
+      "avg_holding_days": 30.795886,
+      "beta": 0.741852,
+      "excess_vs_equal_weight": -0.048863,
+      "excess_vs_spy": -0.055487,
+      "files": [
+       "gemini-3.5-flash-2026-blind-s0.json",
+       "gemini-3.5-flash-2026-blind-s1.json",
+       "gemini-3.5-flash-2026-blind-s2.json"
+      ],
+      "max_drawdown": -0.100508,
+      "n": 3,
+      "round_trips": 66.666667,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": 0.325717,
+      "sharpe_range": [
+       0.149895,
+       0.543446
+      ],
+      "steps": 44,
+      "total_return": 0.065383,
+      "total_return_range": [
+       0.040861,
+       0.095147
+      ],
+      "turnover": 7.183559,
+      "usage": {
+       "calls": 132.0,
+       "input_tokens": 1811529.0,
+       "list_price_usd": 3.0528,
+       "output_tokens": 37284.0
+      }
+     },
+     "cutoff": "2025-01",
+     "memory": {
+      "beyond_control": null,
+      "beyond_control_ci95": null,
+      "ci95": [
+       -0.15927828394953178,
+       0.05865783004899907
+      ],
+      "measured_on": null,
+      "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff",
+      "score": -0.04987980769230771,
+      "verdict": "clean",
+      "why": "every point starts after the training cutoff, so the model cannot have read how it ended"
+     },
+     "model": "gemini-3.5-flash",
+     "named": {
+      "after_cutoff": {
+       "days": 216,
+       "equal_weight_sharpe": 0.848303,
+       "equal_weight_total_return": 0.114246,
+       "excess_vs_equal_weight": -0.107915,
+       "excess_vs_spy": -0.114539,
+       "from": "2026-01-02",
+       "max_drawdown": -0.10973,
+       "sharpe": -0.111383,
+       "sharpe_range": [
+        -0.199219,
+        -0.031619
+       ],
+       "spy_sharpe": 0.76515,
+       "spy_total_return": 0.12087,
+       "to": "2026-11-11",
+       "total_return": 0.006331,
+       "total_return_range": [
+        -0.006049,
+        0.01677
+       ],
+       "volatility": 0.150747
+      },
+      "alpha_annual": -0.100986,
+      "analysis": {
+       "by_sector": [
+        {
+         "contribution": 0.067868,
+         "group": "Health Care",
+         "runs": 3
+        },
+        {
+         "contribution": 0.024899,
+         "group": "Energy",
+         "runs": 3
+        },
+        {
+         "contribution": 0.015036,
+         "group": "Industrials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.028273,
+         "group": "Financials",
+         "runs": 3
+        },
+        {
+         "contribution": -0.031242,
+         "group": "Communication Services",
+         "runs": 3
+        },
+        {
+         "contribution": -0.042161,
+         "group": "Consumer Discretionary",
+         "runs": 3
+        }
+       ],
+       "by_trigger": [
+        {
+         "contribution": 0.02671,
+         "group": "other",
+         "runs": 3
+        },
+        {
+         "contribution": -0.021012,
+         "group": "news",
+         "runs": 3
+        }
+       ],
+       "findings": null,
+       "runs": 3,
+       "summary": {
+        "alpha_annual": -0.070074,
+        "alpha_t": -0.701455,
+        "best_trade_share": 5.633532,
+        "beta_growth": -0.148573,
+        "beta_market": 0.78502,
+        "beta_momentum": 0.14651,
+        "beta_size": 0.197526,
+        "buy_excess_5d": -0.004686,
+        "buy_excess_5d_t": -0.920089,
+        "capm_alpha_annual": -0.100986,
+        "capm_alpha_t": -0.916185,
+        "concentrated": true,
+        "cover_excess_5d": null,
+        "cover_excess_5d_t": null,
+        "decision_excess_5d": 0.000983,
+        "decision_excess_5d_t": 0.255378,
+        "decision_hit_rate_5d": 0.510432,
+        "decision_ic": 0.001661,
+        "decision_ic_t": 0.080118,
+        "decisions": 113.666667,
+        "exposure_return_annual": 0.053179,
+        "fees_contribution": 0.0,
+        "forced_fills": 0.0,
+        "holdings_ic": -0.033531,
+        "holdings_ic_t": -1.30612,
+        "long_contribution": 0.005698,
+        "news_decision_share": 0.354201,
+        "news_entry_pnl": -2101.226807,
+        "r2": 0.611315,
+        "return_without_best_trade": -0.048811,
+        "sell_avoided_5d": 0.008036,
+        "sell_avoided_5d_t": 1.434698,
+        "short_avoided_5d": null,
+        "short_avoided_5d_t": null,
+        "short_contribution": 0.0,
+        "spy_return": 0.12087,
+        "total_return": 0.006331
+       }
+      },
+      "avg_exposure": 0.97502,
+      "avg_holding_days": 37.087564,
+      "beta": 0.782647,
+      "excess_vs_equal_weight": -0.107915,
+      "excess_vs_spy": -0.114539,
+      "files": [
+       "gemini-3.5-flash-2026-named-s0.json",
+       "gemini-3.5-flash-2026-named-s1.json",
+       "gemini-3.5-flash-2026-named-s2.json"
+      ],
+      "max_drawdown": -0.10973,
+      "n": 3,
+      "round_trips": 52.0,
+      "run_dates": [
+       "2026-11-14"
+      ],
+      "seeds": [
+       0,
+       1,
+       2
+      ],
+      "sharpe": -0.111383,
+      "sharpe_range": [
+       -0.199219,
+       -0.031619
+      ],
+      "steps": 44,
+      "total_return": 0.006331,
+      "total_return_range": [
+       -0.006049,
+       0.01677
+      ],
+      "turnover": 5.683501,
+      "usage": {
+       "calls": 132.0,
+       "input_tokens": 1785598.0,
+       "list_price_usd": 2.9497,
+       "output_tokens": 30149.0
+      }
+     },
+     "named_minus_blind": -0.059052,
+     "named_minus_blind_after_cutoff": -0.059052,
+     "open_weights": false,
+     "provider": "Google",
+     "slug": "gemini-3.5-flash",
+     "status": "clean"
     },
     {
      "blind": {
@@ -4689,121 +4818,140 @@
        "days": 216,
        "equal_weight_sharpe": 0.848303,
        "equal_weight_total_return": 0.114246,
-       "excess_vs_equal_weight": -0.008254,
-       "excess_vs_spy": -0.014878,
+       "excess_vs_equal_weight": -0.041527,
+       "excess_vs_spy": -0.048151,
        "from": "2026-01-02",
-       "max_drawdown": -0.040356,
-       "sharpe": 1.069882,
-       "sharpe_range": null,
+       "max_drawdown": -0.062236,
+       "sharpe": 0.560731,
+       "sharpe_range": [
+        0.284338,
+        1.069882
+       ],
        "spy_sharpe": 0.76515,
        "spy_total_return": 0.12087,
        "to": "2026-11-11",
-       "total_return": 0.105992,
-       "total_return_range": null,
-       "volatility": 0.079573
+       "total_return": 0.072719,
+       "total_return_range": [
+        0.049143,
+        0.105992
+       ],
+       "volatility": 0.100575
       },
-      "alpha_annual": 0.06653,
+      "alpha_annual": 0.019453,
       "analysis": {
        "by_sector": [
         {
-         "contribution": 0.083647,
+         "contribution": 0.067106,
          "group": "Technology",
-         "runs": 1
+         "runs": 3
+        },
+        {
+         "contribution": -0.010441,
+         "group": "Financials",
+         "runs": 2
+        },
+        {
+         "contribution": -0.011226,
+         "group": "Consumer Discretionary",
+         "runs": 2
         }
        ],
        "by_trigger": [
         {
-         "contribution": 0.083647,
+         "contribution": 0.070026,
          "group": "other",
-         "runs": 1
+         "runs": 3
+        },
+        {
+         "contribution": -0.026047,
+         "group": "no reason",
+         "runs": 2
         }
        ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought trailed SPY by 5.26% on average (1 buys, 0% of them ahead of SPY; t = n/a, ).",
-        "Sells: over the five trading days from the fill, the stocks it sold lagged SPY by 0.79%, so selling avoided that (1 sells; t = n/a, ).",
-        "Decision IC: on the 2 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of -0.125 with the next five days' returns (IC IR -0.92, t = -1.3, within noise).",
-        "Holdings IC: the weights it held after each of 43 decision days had a mean rank IC of 0.017 with the next five days' returns (t = 0.9, within noise).",
-        "Factor exposures: market 0.30 (t 5.9), size -0.02 (t -0.3), growth -0.26 (t -3.6), momentum -0.02 (t -0.6); together they explain 17% of the daily variation (R²).",
-        "Of its +8.5% a year over T-bills (arithmetic mean): market +3.2%, growth -0.6%, momentum +0.4%, size -0.1%; the alpha left is +5.6% a year (t = 0.7, within noise).",
-        "Verdict: the exposures account for +2.9% a year of it, and the +5.6% a year left over is not significant: one period of daily returns cannot tell it from luck.",
-        "P&L: +$10,648 in all, +$8,365 from 1 positions and +$2,283 of interest on idle cash.",
-        "By market regime of the previous close: risk-on 96 days +7.2% (SPY +2.0%); neutral 18 days +0.8% (SPY +4.5%); uncertain 97 days +1.8% (SPY +4.8%); risk-off 6 days +0.5% (SPY +0.3%).",
-        "News: no entry or exit gave news as its reason. News can still have shaped the run: a filter that keeps it out of a stock leaves no decision behind, so compare with the run without news.",
-        "Concentration: the profit rests on the best two positions, which made 100% of the positions' net P&L and 100% of all their gains; the best was AAPL bought 2026-01-05 and still open at the end, +$8,365. Had the best position made nothing, the run would have returned +2.3% instead of +10.6%."
-       ],
-       "runs": 1,
+       "findings": null,
+       "runs": 3,
        "summary": {
-        "alpha_annual": 0.055635,
-        "alpha_t": 0.700524,
-        "best_trade_share": 1.0,
-        "beta_growth": -0.257063,
-        "beta_market": 0.301688,
-        "beta_momentum": -0.016628,
-        "beta_size": -0.01628,
-        "buy_excess_5d": -0.05261,
-        "buy_excess_5d_t": null,
-        "capm_alpha_annual": 0.06653,
-        "capm_alpha_t": 0.801749,
+        "alpha_annual": 0.015481,
+        "alpha_t": 0.189495,
+        "best_trade_share": 1.54129,
+        "beta_growth": -0.192278,
+        "beta_market": 0.394895,
+        "beta_momentum": -0.000147,
+        "beta_size": -0.055073,
+        "buy_excess_5d": -0.025023,
+        "buy_excess_5d_t": -1.084856,
+        "capm_alpha_annual": 0.019453,
+        "capm_alpha_t": 0.25041,
         "concentrated": true,
         "cover_excess_5d": null,
         "cover_excess_5d_t": null,
-        "decision_excess_5d": -0.022337,
-        "decision_excess_5d_t": -0.737835,
-        "decision_hit_rate_5d": 0.5,
-        "decision_ic": -0.125136,
-        "decision_ic_t": -1.304348,
-        "decisions": 2.0,
-        "exposure_return_annual": 0.029499,
+        "decision_excess_5d": -0.011496,
+        "decision_excess_5d_t": -0.65487,
+        "decision_hit_rate_5d": 0.443723,
+        "decision_ic": -0.065946,
+        "decision_ic_t": -0.816845,
+        "decisions": 6.666667,
+        "exposure_return_annual": 0.03596,
         "fees_contribution": 0.0,
         "forced_fills": 0.0,
-        "holdings_ic": 0.016588,
-        "holdings_ic_t": 0.931628,
-        "long_contribution": 0.083647,
-        "news_decision_share": 0.5,
+        "holdings_ic": 0.006944,
+        "holdings_ic_t": 0.386163,
+        "long_contribution": 0.052661,
+        "news_decision_share": 0.214286,
         "news_entry_pnl": 0.0,
-        "r2": 0.174825,
-        "return_without_best_trade": 0.022828,
-        "sell_avoided_5d": 0.007937,
-        "sell_avoided_5d_t": null,
+        "r2": 0.225861,
+        "return_without_best_trade": 0.003162,
+        "sell_avoided_5d": -0.000377,
+        "sell_avoided_5d_t": 3.712462,
         "short_avoided_5d": null,
         "short_avoided_5d_t": null,
         "short_contribution": 0.0,
         "spy_return": 0.12087,
-        "total_return": 0.105992
+        "total_return": 0.072719
        }
       },
-      "avg_exposure": 0.294341,
-      "avg_holding_days": 185.0,
-      "beta": 0.173157,
-      "excess_vs_equal_weight": -0.008254,
-      "excess_vs_spy": -0.014878,
+      "avg_exposure": 0.356629,
+      "avg_holding_days": 137.139895,
+      "beta": 0.297719,
+      "excess_vs_equal_weight": -0.041527,
+      "excess_vs_spy": -0.048151,
       "files": [
-       "llama3.2-2026-named-s0.json"
+       "llama3.2-2026-named-s0.json",
+       "llama3.2-2026-named-s1.json",
+       "llama3.2-2026-named-s2.json"
       ],
-      "max_drawdown": -0.040356,
-      "n": 1,
-      "round_trips": 1.0,
+      "max_drawdown": -0.062236,
+      "n": 3,
+      "round_trips": 2.333333,
       "run_dates": [
        "2026-11-14"
       ],
       "seeds": [
-       0
+       0,
+       1,
+       2
       ],
-      "sharpe": 1.069882,
-      "sharpe_range": null,
+      "sharpe": 0.560731,
+      "sharpe_range": [
+       0.284338,
+       1.069882
+      ],
       "steps": 44,
-      "total_return": 0.105992,
-      "total_return_range": null,
-      "turnover": 0.251665,
+      "total_return": 0.072719,
+      "total_return_range": [
+       0.049143,
+       0.105992
+      ],
+      "turnover": 0.592731,
       "usage": {
-       "calls": 44.0,
-       "input_tokens": 461244.0,
+       "calls": 132.0,
+       "input_tokens": 1385878.0,
        "list_price_usd": 0.0,
-       "output_tokens": 2677.0
+       "output_tokens": 11692.0
       }
      },
-     "named_minus_blind": 0.079245,
-     "named_minus_blind_after_cutoff": 0.079245,
+     "named_minus_blind": 0.045972,
+     "named_minus_blind_after_cutoff": 0.045972,
      "open_weights": true,
      "provider": "Meta",
      "slug": "llama3.2",

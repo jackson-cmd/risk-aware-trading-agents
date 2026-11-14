@@ -15,6 +15,8 @@
    "reasoning_effort": "minimal",
    "temperature": 0.2,
    "max_tokens": 2000,
+   "json_mode": true,
+   "api_seed": 0,
    "system_prompt_sha256": "0aa00937be0942da26653df3a645bce43153b5ef86761e36b962bb8ee3e4a352"
   }
  },
@@ -43,53 +45,53 @@
   "news_sha256": "8a499cacaf1491603b12031953f12e141c7035a759ef4d4aff904ab771dfefd9"
  },
  "record": {
-  "run_id": "20261113-210858-llm-gemini-3-5-flash-2026-blind-2026-news-realistic",
+  "run_id": "20261114-003139-rtabench-e9-gemini-gemini-3-5-flash-blin-2026-news-realistic",
   "riskaware": {
    "version": "0.7.2",
-   "git_commit": "ed141a51de4a"
+   "git_commit": "6cb7146b71cf"
   },
-  "created_utc": "2026-11-14T03:09:12+00:00",
+  "created_utc": "2026-11-14T06:32:36+00:00",
   "files_sha256": {
-   "manifest.json": "7c6ed73ce675c888012fcfb40b7efd5f5405e71c069d1041bfa1e69e6e42ca30",
-   "metrics.json": "2c391d4c79b31815b0cfa0ced1c3a08eca194bf52a18c2d4461557c438660c7e",
-   "equity.csv": "bb5a1b283c585a87d68240d859f4a8021b6092ca0058f01e723be7f60bd82593",
-   "trades.csv": "ccf8cc38671256c6c542e849748ae59913b87a27da112b5b732200edb381c6b5",
-   "decisions.csv": "844ce225a6c5a121ea0510133f99f28b2deefd5cedde3de20244b117a057d0a0",
-   "policy_log.json": "cd49b85ae339c582e7035a733f56eb3273769ead36440d375b69208ec84652fa"
+   "manifest.json": "3b4b9d8fa7cc35f1aabb373fb5f811fa8ff613045169998d86c06ce39b18268b",
+   "metrics.json": "2074bf83da9332fd413cc276baad25af0dd20dd7c26a0fdf44e3ef06a1374d7c",
+   "equity.csv": "74debd17f0824e34fbf67d10fa01c84ca00ae2a970dd7ea3994fcf5e980aa82d",
+   "trades.csv": "19a30adfda734fb39d8b0fa95359da77d82d139394477eece706749b92e150b3",
+   "decisions.csv": "cf41d35d167a9cc21012b59b8b2a8b134db632dd3ff476a45e5ecdd0dfd65f02",
+   "policy_log.json": "89dbc7a733c43214fafc6e9e5a52d833e7c75e6f7573d45f6a39b878b2b4f9aa"
   },
-  "replies_sha256": "c960ac9998bbd2d2a320d3ce8869210737920989f14f28c36995b929d3b64a21",
-  "observations_sha256": "5ef42d06d7eb291b816f1db05891836aee263c4163db164fe126450c858cf3c2",
-  "costs_seen_by_model": "fixed",
-  "rescored_from": "20261113-203052-llm-gemini-3-5-flash-2026-blind-2026-news"
+  "replies_sha256": "62ad1c01576180d56141139e9f2e3b8831c25e0b476a4e8059901eaa1e85030d",
+  "observations_sha256": "7c74b4665f28b3aee8b3a037f4cf6408e6266272864b6696bbdb7f7430c265fc",
+  "costs_seen_by_model": "realistic",
+  "rescored_from": null
  },
  "look_ahead_check": "pass",
  "metrics": {
-  "total_return": 0.053911,
-  "cagr": 0.06319,
-  "volatility": 0.147209,
-  "sharpe": 0.24816,
-  "sortino": 0.358451,
-  "max_drawdown": -0.095881,
-  "calmar": 0.659048,
-  "win_rate": 0.306452,
-  "profit_factor": 0.74163,
-  "round_trips": 62.0,
-  "avg_holding_days": 29.891249,
-  "turnover": 6.442843,
-  "avg_exposure": 0.942933,
-  "trades": 128.0,
-  "excess_vs_equal_weight": -0.060335,
-  "excess_vs_spy": -0.066959
+  "total_return": 0.095147,
+  "cagr": 0.111889,
+  "volatility": 0.150468,
+  "sharpe": 0.543446,
+  "sortino": 0.862503,
+  "max_drawdown": -0.071983,
+  "calmar": 1.55438,
+  "win_rate": 0.271186,
+  "profit_factor": 1.053441,
+  "round_trips": 59.0,
+  "avg_holding_days": 36.638903,
+  "turnover": 6.292785,
+  "avg_exposure": 0.979416,
+  "trades": 127.0,
+  "excess_vs_equal_weight": -0.019099,
+  "excess_vs_spy": -0.025723
  },
  "vs_spy": {
-  "beta": 0.707254,
-  "alpha_annual": -0.039459,
-  "excess_return_annual": -0.070912,
-  "information_ratio": -0.608651,
-  "t_stat_excess": -0.563501,
-  "sharpe_ci95_low": -1.420318,
-  "sharpe_ci95_high": 1.693077,
-  "p_sharpe_above_spy": 0.301,
+  "beta": 0.705395,
+  "alpha_annual": 0.005981,
+  "excess_return_annual": -0.025672,
+  "information_ratio": -0.212183,
+  "t_stat_excess": -0.196443,
+  "sharpe_ci95_low": -1.193507,
+  "sharpe_ci95_high": 2.021685,
+  "p_sharpe_above_spy": 0.4175,
   "days": 216.0
  },
  "anchors": {
@@ -108,10 +110,10 @@
   "from": "2026-01-02",
   "to": "2026-11-11",
   "days": 216,
-  "total_return": 0.053911,
-  "sharpe": 0.24816,
-  "max_drawdown": -0.095881,
-  "volatility": 0.147209,
+  "total_return": 0.095147,
+  "sharpe": 0.543446,
+  "max_drawdown": -0.071983,
+  "volatility": 0.150468,
   "spy_total_return": 0.12087,
   "spy_sharpe": 0.76515,
   "spy_max_drawdown": -0.08885,
@@ -120,66 +122,74 @@
   "equal_weight_sharpe": 0.848303,
   "equal_weight_max_drawdown": -0.071956,
   "equal_weight_volatility": 0.114603,
-  "excess_vs_spy": -0.066959,
-  "excess_vs_equal_weight": -0.060335
+  "excess_vs_spy": -0.025723,
+  "excess_vs_equal_weight": -0.019099
  },
  "analysis": {
-  "run_id": "20261113-210858-llm-gemini-3-5-flash-2026-blind-2026-news-realistic",
-  "strategy": "llm:gemini-3.5-flash:2026-blind",
+  "run_id": "20261114-003139-rtabench-e9-gemini-gemini-3-5-flash-blin-2026-news-realistic",
+  "strategy": "rtabench_e9_gemini-gemini-3.5-flash-blind-2026-s0",
   "kind": "policy",
   "period": "2026",
   "start": "2026-01-02",
   "end": "2026-11-11",
   "stocks": 56,
   "news": true,
-  "total_return": 0.053911,
+  "total_return": 0.095147,
   "spy_return": 0.12087,
   "summary": {
-   "total_return": 0.053911,
+   "total_return": 0.095147,
    "spy_return": 0.12087,
-   "decisions": 126,
-   "decision_excess_5d": -0.00266,
-   "decision_excess_5d_t": -0.852943,
-   "decision_hit_rate_5d": 0.531746,
-   "buy_excess_5d": -0.006481,
-   "buy_excess_5d_t": -1.246039,
-   "sell_avoided_5d": 0.001285,
-   "sell_avoided_5d_t": 0.29258,
-   "decision_ic": -0.006798,
-   "decision_ic_t": -0.403137,
-   "holdings_ic": -0.022798,
-   "holdings_ic_t": -1.063205,
-   "alpha_annual": -0.02348,
-   "alpha_t": -0.211696,
-   "capm_alpha_annual": -0.039459,
-   "capm_alpha_t": -0.337055,
-   "beta_market": 0.695627,
-   "beta_size": 0.22557,
-   "beta_growth": -0.086207,
-   "beta_momentum": 0.086444,
-   "r2": 0.504035,
-   "exposure_return_annual": 0.060011,
-   "news_decision_share": 0.359375,
-   "news_entry_pnl": -5340.063717,
-   "best_trade_share": 1.074489,
-   "return_without_best_trade": -0.001766,
+   "decisions": 124,
+   "decision_excess_5d": 6.9e-05,
+   "decision_excess_5d_t": 0.016336,
+   "decision_hit_rate_5d": 0.58871,
+   "buy_excess_5d": -4e-05,
+   "buy_excess_5d_t": -0.007959,
+   "sell_avoided_5d": 0.000193,
+   "sell_avoided_5d_t": 0.033317,
+   "short_avoided_5d": null,
+   "short_avoided_5d_t": null,
+   "cover_excess_5d": null,
+   "cover_excess_5d_t": null,
+   "decision_ic": 0.017734,
+   "decision_ic_t": 0.799237,
+   "holdings_ic": -0.004046,
+   "holdings_ic_t": -0.175362,
+   "alpha_annual": 0.028477,
+   "alpha_t": 0.258805,
+   "capm_alpha_annual": 0.005981,
+   "capm_alpha_t": 0.049995,
+   "beta_market": 0.706071,
+   "beta_size": 0.269934,
+   "beta_growth": -0.145093,
+   "beta_momentum": 0.120292,
+   "r2": 0.51019,
+   "exposure_return_annual": 0.053294,
+   "news_decision_share": 0.362205,
+   "news_entry_pnl": 10717.64363,
+   "long_contribution": 0.094616,
+   "short_contribution": 0.0,
+   "fees_contribution": -0.0,
+   "forced_fills": 0,
+   "best_trade_share": 0.564288,
+   "return_without_best_trade": 0.042235,
    "concentrated": true
   },
   "findings": [
-   "Buys: over the five trading days from the fill, the stocks it bought trailed SPY by 0.65% on average (64 buys, 50% of them ahead of SPY; t = -1.2, within noise).",
-   "Sells: over the five trading days from the fill, the stocks it sold lagged SPY by 0.13%, so selling avoided that (62 sells; t = 0.3, within noise).",
-   "Decision IC: on the 41 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of -0.007 with the next five days' returns (IC IR -0.06, t = -0.4, within noise).",
-   "Holdings IC: the weights it held after each of 43 decision days had a mean rank IC of -0.023 with the next five days' returns (t = -1.1, within noise).",
-   "Factor exposures: market 0.70 (t 8.0), size 0.23 (t 3.1), growth -0.09 (t -0.7), momentum 0.09 (t 2.4); together they explain 50% of the daily variation (R²).",
-   "Of the +3.7% a year it earned over T-bills (arithmetic mean): market +7.5%, momentum -2.0%, size +0.7%, growth -0.2%; the alpha left is -2.3% a year (t = -0.2, within noise).",
-   "Verdict: most of the return is factor exposure (+6.0% a year, market above all); the alpha left is not significant.",
-   "P&L: +$5,437 in all, +$5,225 from 65 positions and +$213 of interest on idle cash.",
-   "By holding period: 61+ days made the most (+$19,071, 12 positions); 3-5 days the least (-$10,651, 22 positions).",
-   "By sector: Health Care made the most (+$7,930, 14 positions); Communication Services the least (-$2,158, 6 positions).",
-   "By stock: AMD made the most (+$5,410, 2 positions); ORCL the least (-$1,956, 2 positions).",
-   "By market regime of the previous close: risk-on 96 days -3.1% (SPY +2.0%); neutral 18 days -2.9% (SPY +4.5%); uncertain 97 days +11.3% (SPY +4.8%); risk-off 6 days +0.7% (SPY +0.3%).",
-   "News: 33 positions opened on news made -$5,340, the other 32 +$10,565; 12 positions closed on news made -$1,915; over the five days from the fill, news-triggered buys trailed SPY by 0.82% (t -1.4).",
-   "Concentration: the profit rests on the best two positions, which made 190% of the positions' net P&L and 40% of all their gains; the best was AMD bought 2026-04-23 and sold 2026-08-11, +$5,614. Had the best position made nothing, the run would have returned -0.2% instead of +5.4%."
+   "Buys: over the five trading days from the fill, the stocks it bought trailed SPY by 0.00% on average (66 buys, 58% of them ahead of SPY; t = -0.0, within noise).",
+   "Sells: over the five trading days from the fill, the stocks it sold lagged SPY by 0.02%, so selling avoided that (58 sells; t = 0.0, within noise).",
+   "Decision IC: on the 40 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.018 with the next five days' returns (IC IR 0.13, t = 0.8, within noise).",
+   "Holdings IC: the weights it held after each of 43 decision days had a mean rank IC of -0.004 with the next five days' returns (t = -0.2, within noise).",
+   "Factor exposures: market 0.71 (t 9.2), size 0.27 (t 4.0), growth -0.15 (t -1.1), momentum 0.12 (t 3.1); together they explain 51% of the daily variation (R²).",
+   "Of its +8.2% a year over T-bills (arithmetic mean): market +7.6%, momentum -2.8%, size +0.9%, growth -0.4%; the alpha left is +2.8% a year (t = 0.3, within noise).",
+   "Verdict: most of the return is factor exposure (+5.3% a year, market above all); the alpha left is not significant.",
+   "P&L: +$9,563 in all, +$9,462 from 65 positions and +$101 of interest on idle cash.",
+   "By holding period: 61+ days made the most (+$14,398, 12 positions); 3-5 days lost the most (-$4,838, 16 positions).",
+   "By sector: Health Care made the most (+$8,175, 13 positions); Industrials lost the most (-$1,210, 10 positions).",
+   "By stock: AMD made the most (+$5,281, 2 positions); NVDA lost the most (-$1,664, 4 positions).",
+   "By market regime of the previous close: risk-on 96 days -0.3% (SPY +2.0%); neutral 18 days -2.5% (SPY +4.5%); uncertain 97 days +10.9% (SPY +4.8%); risk-off 6 days +1.6% (SPY +0.3%).",
+   "News: 36 positions opened on news made +$10,718, the other 29 -$1,256; 8 positions closed on news made +$5,412; over the five days from the fill, news-triggered buys beat SPY by 0.50% (t 0.7).",
+   "Concentration: the gains are spread out (the best two positions made 36% of them) but winners and losers nearly cancel, so the best two made 91% of the net P&L; the best was AMD bought 2026-04-23 and sold 2026-07-28, +$5,339. Had the best position made nothing, the run would have returned +4.2% instead of +9.6%."
   ],
   "decisions": {
    "horizons": [
@@ -189,141 +199,270 @@
    ],
    "buys": {
     "1d": {
-     "n": 66,
-     "mean": 0.000842,
-     "median": 0.001123,
-     "hit_rate": 0.560606,
-     "se": 0.001918,
-     "t": 0.439218,
-     "t_iid": 0.491205
+     "n": 68,
+     "mean": 0.002202,
+     "median": 0.001143,
+     "hit_rate": 0.544118,
+     "se": 0.001802,
+     "t": 1.221905,
+     "t_iid": 1.339796
     },
     "5d": {
-     "n": 64,
-     "mean": -0.006481,
-     "median": -0.000173,
-     "hit_rate": 0.5,
-     "se": 0.005202,
-     "t": -1.246039,
-     "t_iid": -1.224698
+     "n": 66,
+     "mean": -4e-05,
+     "median": 0.00433,
+     "hit_rate": 0.575758,
+     "se": 0.005044,
+     "t": -0.007959,
+     "t_iid": -0.009068
     },
     "20d": {
-     "n": 61,
-     "mean": -0.006776,
-     "median": -0.025505,
-     "hit_rate": 0.42623,
-     "se": 0.012638,
-     "t": -0.536191,
-     "t_iid": -0.52888
+     "n": 63,
+     "mean": 0.003168,
+     "median": -0.009277,
+     "hit_rate": 0.444444,
+     "se": 0.011026,
+     "t": 0.287344,
+     "t_iid": 0.264187
     }
    },
    "sells": {
     "1d": {
-     "n": 62,
-     "mean": 0.000562,
-     "median": -3.7e-05,
-     "hit_rate": 0.5,
-     "se": 0.001532,
-     "t": 0.366628,
-     "t_iid": 0.332745
+     "n": 59,
+     "mean": 0.001091,
+     "median": -0.002896,
+     "hit_rate": 0.423729,
+     "se": 0.00193,
+     "t": 0.565173,
+     "t_iid": 0.594272
     },
     "5d": {
-     "n": 62,
-     "mean": 0.001285,
-     "median": 0.00572,
-     "hit_rate": 0.564516,
-     "se": 0.004392,
-     "t": 0.29258,
-     "t_iid": 0.278259
+     "n": 58,
+     "mean": 0.000193,
+     "median": 0.00602,
+     "hit_rate": 0.603448,
+     "se": 0.005779,
+     "t": 0.033317,
+     "t_iid": 0.033967
     },
     "20d": {
-     "n": 58,
-     "mean": 0.013641,
-     "median": 0.017245,
-     "hit_rate": 0.655172,
-     "se": 0.010546,
-     "t": 1.293484,
-     "t_iid": 1.227133
+     "n": 53,
+     "mean": 0.006264,
+     "median": 0.001894,
+     "hit_rate": 0.528302,
+     "se": 0.012574,
+     "t": 0.498187,
+     "t_iid": 0.637431
+    }
+   },
+   "shorts": {
+    "1d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "5d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "20d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    }
+   },
+   "covers": {
+    "1d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "5d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "20d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    }
+   },
+   "forced": {
+    "1d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "5d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "20d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
     }
    },
    "all": {
     "1d": {
-     "n": 128,
-     "mean": 0.000707,
-     "median": 0.000598,
-     "hit_rate": 0.53125,
-     "se": 0.00113,
-     "t": 0.625107,
-     "t_iid": 0.588839
+     "n": 127,
+     "mean": 0.001686,
+     "median": -0.000207,
+     "hit_rate": 0.488189,
+     "se": 0.001233,
+     "t": 1.367052,
+     "t_iid": 1.380013
     },
     "5d": {
-     "n": 126,
-     "mean": -0.00266,
-     "median": 0.004103,
-     "hit_rate": 0.531746,
-     "se": 0.003118,
-     "t": -0.852943,
-     "t_iid": -0.754974
+     "n": 124,
+     "mean": 6.9e-05,
+     "median": 0.004853,
+     "hit_rate": 0.58871,
+     "se": 0.004205,
+     "t": 0.016336,
+     "t_iid": 0.019448
     },
     "20d": {
-     "n": 119,
-     "mean": 0.003175,
-     "median": 0.003455,
-     "hit_rate": 0.537815,
-     "se": 0.005993,
-     "t": 0.529792,
-     "t_iid": 0.37222
+     "n": 116,
+     "mean": 0.004583,
+     "median": -0.003152,
+     "hit_rate": 0.482759,
+     "se": 0.007483,
+     "t": 0.612444,
+     "t_iid": 0.581617
     }
    },
    "by_trigger": {
     "news": {
      "buys": {
-      "n": 33,
-      "mean": -0.008225,
-      "median": 0.002007,
-      "hit_rate": 0.515152,
-      "se": 0.006025,
-      "t": -1.365284,
-      "t_iid": -1.020422
+      "n": 36,
+      "mean": 0.004976,
+      "median": 0.004953,
+      "hit_rate": 0.638889,
+      "se": 0.006882,
+      "t": 0.723019,
+      "t_iid": 0.787915
      },
      "sells": {
-      "n": 12,
-      "mean": 0.007146,
-      "median": 0.008688,
-      "hit_rate": 0.583333,
-      "se": 0.010948,
-      "t": 0.652726,
-      "t_iid": 0.652726
+      "n": 9,
+      "mean": 0.009463,
+      "median": 0.007937,
+      "hit_rate": 0.777778,
+      "se": 0.007911,
+      "t": 1.196129,
+      "t_iid": 1.066542
+     },
+     "shorts": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "hit_rate": null,
+      "se": null,
+      "t": null,
+      "t_iid": null
+     },
+     "covers": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "hit_rate": null,
+      "se": null,
+      "t": null,
+      "t_iid": null
      }
     },
     "other": {
      "buys": {
-      "n": 31,
-      "mean": -0.004625,
-      "median": -0.004561,
-      "hit_rate": 0.483871,
-      "se": 0.006937,
-      "t": -0.666707,
-      "t_iid": -0.671577
+      "n": 30,
+      "mean": -0.006059,
+      "median": -0.001479,
+      "hit_rate": 0.5,
+      "se": 0.006627,
+      "t": -0.91429,
+      "t_iid": -1.001715
      },
      "sells": {
-      "n": 50,
-      "mean": -0.000122,
-      "median": 0.00494,
-      "hit_rate": 0.56,
-      "se": 0.005009,
-      "t": -0.024274,
-      "t_iid": -0.023727
+      "n": 49,
+      "mean": -0.00151,
+      "median": 0.005389,
+      "hit_rate": 0.571429,
+      "se": 0.006734,
+      "t": -0.224253,
+      "t_iid": -0.231998
+     },
+     "shorts": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "hit_rate": null,
+      "se": null,
+      "t": null,
+      "t_iid": null
+     },
+     "covers": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "hit_rate": null,
+      "se": null,
+      "t": null,
+      "t_iid": null
      }
     }
    },
    "counts": {
     "news": {
-     "buys": 34,
-     "sells": 12
+     "buys": 36,
+     "sells": 10,
+     "shorts": 0,
+     "covers": 0,
+     "forced": 0
     },
     "other": {
      "buys": 32,
-     "sells": 50
+     "sells": 49,
+     "shorts": 0,
+     "covers": 0,
+     "forced": 0
     }
    }
   },
@@ -332,24 +471,24 @@
    "universe": 56,
    "decision_days": "the policy's steps (policy_log.json)",
    "decision": {
-    "score": "+1 bought, -1 sold, 0 left alone, on each day it traded",
-    "days": 41,
-    "mean": -0.006798,
-    "std": 0.107968,
-    "ir": -0.062959,
-    "t": -0.403137,
-    "t_iid": -0.403137,
-    "positive_share": 0.439024
+    "score": "+1 bought or covered, -1 sold or shorted, 0 left alone, on each day it traded",
+    "days": 40,
+    "mean": 0.017734,
+    "std": 0.140331,
+    "ir": 0.126371,
+    "t": 0.799237,
+    "t_iid": 0.799237,
+    "positive_share": 0.55
    },
    "holdings": {
-    "score": "the weights it held after each decision (0 for stocks not held)",
+    "score": "the weights it held after each decision (0 for stocks not held, below 0 for shorts)",
     "days": 43,
-    "mean": -0.022798,
-    "std": 0.140609,
-    "ir": -0.162137,
-    "t": -1.063205,
-    "t_iid": -1.063205,
-    "positive_share": 0.465116
+    "mean": -0.004046,
+    "std": 0.15128,
+    "ir": -0.026742,
+    "t": -0.175362,
+    "t_iid": -0.175362,
+    "positive_share": 0.44186
    }
   },
   "factors": {
@@ -361,29 +500,29 @@
     "momentum": "Momentum (top - bottom third)"
    },
    "lags": 4,
-   "alpha_annual": -0.02348,
-   "alpha_t": -0.211696,
+   "alpha_annual": 0.028477,
+   "alpha_t": 0.258805,
    "exposures": {
     "market": {
-     "beta": 0.695627,
-     "t": 8.031826
+     "beta": 0.706071,
+     "t": 9.184942
     },
     "size": {
-     "beta": 0.22557,
-     "t": 3.115351
+     "beta": 0.269934,
+     "t": 4.011629
     },
     "growth": {
-     "beta": -0.086207,
-     "t": -0.665976
+     "beta": -0.145093,
+     "t": -1.11829
     },
     "momentum": {
-     "beta": 0.086444,
-     "t": 2.374902
+     "beta": 0.120292,
+     "t": 3.11331
     }
    },
-   "r2": 0.504035,
-   "adj_r2": 0.494633,
-   "resid_vol_annual": 0.104966,
+   "r2": 0.51019,
+   "adj_r2": 0.500904,
+   "resid_vol_annual": 0.106658,
    "factor_means_annual": {
     "market": 0.107444,
     "size": 0.033241,
@@ -391,90 +530,139 @@
     "momentum": -0.232899
    },
    "contributions_annual": {
-    "market": 0.074741,
-    "size": 0.007498,
-    "growth": -0.002095,
-    "momentum": -0.020133,
-    "alpha": -0.02348
+    "market": 0.075863,
+    "size": 0.008973,
+    "growth": -0.003526,
+    "momentum": -0.028016,
+    "alpha": 0.028477
    },
-   "excess_return_annual": 0.036531,
+   "excess_return_annual": 0.081771,
    "capm": {
-    "beta": 0.707254,
-    "beta_t": 9.601105,
-    "alpha_annual": -0.039459,
-    "alpha_t": -0.337055,
-    "r2": 0.455409
+    "beta": 0.705395,
+    "beta_t": 8.900068,
+    "alpha_annual": 0.005981,
+    "alpha_t": 0.049995,
+    "r2": 0.433315
    }
   },
+  "mode": "long_only",
   "pnl": {
-   "total": 5437.268719,
+   "total": 9562.611677,
    "reconciliation": {
-    "stocks": 5224.668766,
+    "stocks": 9461.616606,
+    "stocks_long": 9461.616606,
+    "stocks_short": 0.0,
     "tbill_etfs": 0.0,
-    "cash_interest": 212.599857,
-    "other": 9.6e-05
+    "cash_interest": 100.995077,
+    "borrow_fees": -0.0,
+    "margin_interest": -0.0,
+    "other": -6e-06
    },
    "positions": 65,
+   "by_direction": [
+    {
+     "group": "long",
+     "pnl": 9461.616606,
+     "contribution": 0.094616,
+     "share": 1.0,
+     "trades": 65,
+     "win_rate": 0.338462,
+     "avg_pnl": 145.563332,
+     "still_open": 9,
+     "long_pnl": 9461.616606,
+     "short_pnl": 0.0,
+     "long_trades": 65,
+     "short_trades": 0
+    }
+   ],
+   "account": {
+    "mode": "long_only",
+    "equity_error": 9.8e-05
+   },
    "by_holding_period": [
     {
      "group": "3-5 days",
-     "pnl": -10650.553651,
-     "contribution": -0.106506,
-     "share": -2.038513,
-     "trades": 22,
-     "win_rate": 0.045455,
-     "avg_pnl": -484.116075,
-     "still_open": 0
+     "pnl": -4838.282133,
+     "contribution": -0.048383,
+     "share": -0.511359,
+     "trades": 16,
+     "win_rate": 0.125,
+     "avg_pnl": -302.392633,
+     "still_open": 0,
+     "long_pnl": -4838.282133,
+     "short_pnl": 0.0,
+     "long_trades": 16,
+     "short_trades": 0
     },
     {
      "group": "6-10 days",
-     "pnl": -2275.695769,
-     "contribution": -0.022757,
-     "share": -0.435567,
+     "pnl": -2994.00648,
+     "contribution": -0.02994,
+     "share": -0.316437,
      "trades": 6,
-     "win_rate": 0.333333,
-     "avg_pnl": -379.282628,
-     "still_open": 1
+     "win_rate": 0.166667,
+     "avg_pnl": -499.00108,
+     "still_open": 1,
+     "long_pnl": -2994.00648,
+     "short_pnl": 0.0,
+     "long_trades": 6,
+     "short_trades": 0
     },
     {
      "group": "11-20 days",
-     "pnl": -2960.863603,
-     "contribution": -0.029609,
-     "share": -0.566708,
-     "trades": 12,
-     "win_rate": 0.166667,
-     "avg_pnl": -246.738634,
-     "still_open": 2
+     "pnl": -2931.450825,
+     "contribution": -0.029315,
+     "share": -0.309826,
+     "trades": 14,
+     "win_rate": 0.071429,
+     "avg_pnl": -209.389345,
+     "still_open": 1,
+     "long_pnl": -2931.450825,
+     "short_pnl": 0.0,
+     "long_trades": 14,
+     "short_trades": 0
     },
     {
      "group": "21-60 days",
-     "pnl": 1831.284039,
-     "contribution": 0.018313,
-     "share": 0.350507,
-     "trades": 11,
-     "win_rate": 0.545455,
-     "avg_pnl": 166.480367,
-     "still_open": 3
+     "pnl": 5615.798857,
+     "contribution": 0.056158,
+     "share": 0.593535,
+     "trades": 15,
+     "win_rate": 0.466667,
+     "avg_pnl": 374.38659,
+     "still_open": 3,
+     "long_pnl": 5615.798857,
+     "short_pnl": 0.0,
+     "long_trades": 15,
+     "short_trades": 0
     },
     {
      "group": "61+ days",
-     "pnl": 19070.902198,
-     "contribution": 0.190709,
-     "share": 3.650165,
+     "pnl": 14397.960941,
+     "contribution": 0.14398,
+     "share": 1.521723,
      "trades": 12,
      "win_rate": 0.75,
-     "avg_pnl": 1589.24185,
-     "still_open": 2
+     "avg_pnl": 1199.830078,
+     "still_open": 2,
+     "long_pnl": 14397.960941,
+     "short_pnl": 0.0,
+     "long_trades": 12,
+     "short_trades": 0
     },
     {
      "group": "same day",
-     "pnl": 209.595552,
-     "contribution": 0.002096,
-     "share": 0.040117,
+     "pnl": 211.596246,
+     "contribution": 0.002116,
+     "share": 0.022364,
      "trades": 2,
      "win_rate": 1.0,
-     "avg_pnl": 104.797776,
-     "still_open": 2
+     "avg_pnl": 105.798123,
+     "still_open": 2,
+     "long_pnl": 211.596246,
+     "short_pnl": 0.0,
+     "long_trades": 2,
+     "short_trades": 0
     }
    ],
    "by_regime": [
@@ -483,329 +671,404 @@
      "label": "risk-on",
      "days": 96,
      "share_of_days": 0.442396,
-     "pnl": -3268.557014,
-     "contribution": -0.032686,
-     "share": -0.60114,
-     "return": -0.031486,
+     "pnl": -341.479898,
+     "contribution": -0.003415,
+     "share": -0.03571,
+     "return": -0.003214,
      "spy_return": 0.020141,
-     "avg_exposure": 0.954412
+     "avg_exposure": 0.97063
     },
     {
      "group": "NEUTRAL",
      "label": "neutral",
      "days": 18,
      "share_of_days": 0.082949,
-     "pnl": -2993.560526,
-     "contribution": -0.029936,
-     "share": -0.550563,
-     "return": -0.028722,
+     "pnl": -2596.367536,
+     "contribution": -0.025964,
+     "share": -0.271512,
+     "return": -0.024653,
      "spy_return": 0.045347,
-     "avg_exposure": 0.83558
+     "avg_exposure": 0.998748
     },
     {
      "group": "UNCERTAIN",
      "label": "uncertain",
      "days": 97,
      "share_of_days": 0.447005,
-     "pnl": 11010.774708,
-     "contribution": 0.110108,
-     "share": 2.025056,
-     "return": 0.113317,
+     "pnl": 10931.276916,
+     "contribution": 0.109313,
+     "share": 1.143127,
+     "return": 0.109361,
      "spy_return": 0.047773,
-     "avg_exposure": 0.952512
+     "avg_exposure": 0.973774
     },
     {
      "group": "RISK_OFF",
      "label": "risk-off",
      "days": 6,
      "share_of_days": 0.02765,
-     "pnl": 688.611551,
-     "contribution": 0.006886,
-     "share": 0.126647,
-     "return": 0.006759,
+     "pnl": 1569.182195,
+     "contribution": 0.015692,
+     "share": 0.164096,
+     "return": 0.015846,
      "spy_return": 0.003154,
-     "avg_exposure": 0.760193
+     "avg_exposure": 0.998529
     }
    ],
    "by_trigger": {
     "entry": [
      {
       "group": "news",
-      "pnl": -5340.063717,
-      "contribution": -0.053401,
-      "share": -1.022087,
-      "trades": 33,
-      "win_rate": 0.363636,
-      "avg_pnl": -161.820113,
-      "still_open": 4
+      "pnl": 10717.64363,
+      "contribution": 0.107176,
+      "share": 1.13275,
+      "trades": 36,
+      "win_rate": 0.388889,
+      "avg_pnl": 297.712323,
+      "still_open": 4,
+      "long_pnl": 10717.64363,
+      "short_pnl": 0.0,
+      "long_trades": 36,
+      "short_trades": 0
      },
      {
       "group": "other",
-      "pnl": 10564.732483,
-      "contribution": 0.105647,
-      "share": 2.022087,
-      "trades": 32,
-      "win_rate": 0.3125,
-      "avg_pnl": 330.14789,
-      "still_open": 6
+      "pnl": -1256.027024,
+      "contribution": -0.01256,
+      "share": -0.13275,
+      "trades": 29,
+      "win_rate": 0.275862,
+      "avg_pnl": -43.311277,
+      "still_open": 5,
+      "long_pnl": -1256.027024,
+      "short_pnl": 0.0,
+      "long_trades": 29,
+      "short_trades": 0
      }
     ],
     "exit": [
      {
       "group": "news",
-      "pnl": -1915.060802,
-      "contribution": -0.019151,
-      "share": -0.366542,
-      "trades": 12,
-      "win_rate": 0.333333,
-      "avg_pnl": -159.5884,
-      "still_open": 0
+      "pnl": 5412.487049,
+      "contribution": 0.054125,
+      "share": 0.572047,
+      "trades": 8,
+      "win_rate": 0.5,
+      "avg_pnl": 676.560881,
+      "still_open": 0,
+      "long_pnl": 5412.487049,
+      "short_pnl": 0.0,
+      "long_trades": 8,
+      "short_trades": 0
      },
      {
       "group": "other",
-      "pnl": -3128.243607,
-      "contribution": -0.031282,
-      "share": -0.598745,
-      "trades": 43,
-      "win_rate": 0.186047,
-      "avg_pnl": -72.749851,
-      "still_open": 0
+      "pnl": -4655.418188,
+      "contribution": -0.046554,
+      "share": -0.492032,
+      "trades": 48,
+      "win_rate": 0.1875,
+      "avg_pnl": -96.987879,
+      "still_open": 0,
+      "long_pnl": -4655.418188,
+      "short_pnl": 0.0,
+      "long_trades": 48,
+      "short_trades": 0
      },
      {
       "group": "still open",
-      "pnl": 10267.973175,
-      "contribution": 0.10268,
-      "share": 1.965287,
-      "trades": 10,
+      "pnl": 8704.547745,
+      "contribution": 0.087045,
+      "share": 0.919985,
+      "trades": 9,
       "win_rate": 1.0,
-      "avg_pnl": 1026.797317,
-      "still_open": 10
+      "avg_pnl": 967.171972,
+      "still_open": 9,
+      "long_pnl": 8704.547745,
+      "short_pnl": 0.0,
+      "long_trades": 9,
+      "short_trades": 0
      }
     ]
    },
    "by_sector": [
     {
      "group": "Health Care",
-     "pnl": 7930.30288,
-     "contribution": 0.079303,
-     "share": 1.517858,
-     "trades": 14,
-     "win_rate": 0.5,
-     "avg_pnl": 566.450206,
-     "still_open": 5
+     "pnl": 8175.235259,
+     "contribution": 0.081752,
+     "share": 0.864042,
+     "trades": 13,
+     "win_rate": 0.538462,
+     "avg_pnl": 628.864251,
+     "still_open": 4,
+     "long_pnl": 8175.235259,
+     "short_pnl": 0.0,
+     "long_trades": 13,
+     "short_trades": 0
     },
     {
      "group": "Energy",
-     "pnl": 2248.879206,
-     "contribution": 0.022489,
-     "share": 0.430435,
-     "trades": 4,
-     "win_rate": 0.75,
-     "avg_pnl": 562.219801,
-     "still_open": 1
+     "pnl": 2729.509117,
+     "contribution": 0.027295,
+     "share": 0.288482,
+     "trades": 5,
+     "win_rate": 0.6,
+     "avg_pnl": 545.901823,
+     "still_open": 1,
+     "long_pnl": 2729.509117,
+     "short_pnl": 0.0,
+     "long_trades": 5,
+     "short_trades": 0
     },
     {
-     "group": "Industrials",
-     "pnl": 569.842758,
-     "contribution": 0.005698,
-     "share": 0.109068,
-     "trades": 9,
-     "win_rate": 0.111111,
-     "avg_pnl": 63.315862,
-     "still_open": 0
-    },
-    {
-     "group": "Consumer Staples",
-     "pnl": -795.89458,
-     "contribution": -0.007959,
-     "share": -0.152334,
-     "trades": 1,
-     "win_rate": 0.0,
-     "avg_pnl": -795.89458,
-     "still_open": 0
-    },
-    {
-     "group": "Consumer Discretionary",
-     "pnl": -899.652573,
-     "contribution": -0.008997,
-     "share": -0.172193,
-     "trades": 1,
-     "win_rate": 0.0,
-     "avg_pnl": -899.652573,
-     "still_open": 0
+     "group": "Technology",
+     "pnl": 1693.120561,
+     "contribution": 0.016931,
+     "share": 0.178946,
+     "trades": 15,
+     "win_rate": 0.266667,
+     "avg_pnl": 112.874704,
+     "still_open": 0,
+     "long_pnl": 1693.120561,
+     "short_pnl": 0.0,
+     "long_trades": 15,
+     "short_trades": 0
     },
     {
      "group": "Communication Services",
-     "pnl": -2158.497215,
-     "contribution": -0.021585,
-     "share": -0.413136,
-     "trades": 6,
-     "win_rate": 0.166667,
-     "avg_pnl": -359.749536,
-     "still_open": 0
+     "pnl": -723.438775,
+     "contribution": -0.007234,
+     "share": -0.07646,
+     "trades": 4,
+     "win_rate": 0.25,
+     "avg_pnl": -180.859694,
+     "still_open": 0,
+     "long_pnl": -723.438775,
+     "short_pnl": 0.0,
+     "long_trades": 4,
+     "short_trades": 0
+    },
+    {
+     "group": "Consumer Discretionary",
+     "pnl": -864.692928,
+     "contribution": -0.008647,
+     "share": -0.09139,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -864.692928,
+     "still_open": 0,
+     "long_pnl": -864.692928,
+     "short_pnl": 0.0,
+     "long_trades": 1,
+     "short_trades": 0
+    },
+    {
+     "group": "Industrials",
+     "pnl": -1210.128476,
+     "contribution": -0.012101,
+     "share": -0.127899,
+     "trades": 10,
+     "win_rate": 0.2,
+     "avg_pnl": -121.012848,
+     "still_open": 1,
+     "long_pnl": -1210.128476,
+     "short_pnl": 0.0,
+     "long_trades": 10,
+     "short_trades": 0
     }
    ],
    "by_stock": [
     {
      "group": "AMD",
-     "pnl": 5410.309648,
-     "contribution": 0.054103,
-     "share": 1.035532,
+     "pnl": 5281.093312,
+     "contribution": 0.052811,
+     "share": 0.55816,
      "trades": 2,
      "win_rate": 0.5,
-     "avg_pnl": 2705.154824,
-     "still_open": 0
-    },
-    {
-     "group": "CAT",
-     "pnl": 4311.46474,
-     "contribution": 0.043115,
-     "share": 0.825213,
-     "trades": 1,
-     "win_rate": 1.0,
-     "avg_pnl": 4311.46474,
-     "still_open": 0
+     "avg_pnl": 2640.546656,
+     "still_open": 0,
+     "long_pnl": 5281.093312,
+     "short_pnl": 0.0,
+     "long_trades": 2,
+     "short_trades": 0
     },
     {
      "group": "MRK",
-     "pnl": 4011.17037,
-     "contribution": 0.040112,
-     "share": 0.767737,
+     "pnl": 3315.398753,
+     "contribution": 0.033154,
+     "share": 0.350405,
      "trades": 1,
      "win_rate": 1.0,
-     "avg_pnl": 4011.17037,
-     "still_open": 1
+     "avg_pnl": 3315.398753,
+     "still_open": 0,
+     "long_pnl": 3315.398753,
+     "short_pnl": 0.0,
+     "long_trades": 1,
+     "short_trades": 0
+    },
+    {
+     "group": "CVX",
+     "pnl": 2914.072305,
+     "contribution": 0.029141,
+     "share": 0.307989,
+     "trades": 2,
+     "win_rate": 1.0,
+     "avg_pnl": 1457.036153,
+     "still_open": 1,
+     "long_pnl": 2914.072305,
+     "short_pnl": 0.0,
+     "long_trades": 2,
+     "short_trades": 0
+    },
+    {
+     "group": "JPM",
+     "pnl": -1182.594555,
+     "contribution": -0.011826,
+     "share": -0.124989,
+     "trades": 2,
+     "win_rate": 0.0,
+     "avg_pnl": -591.297277,
+     "still_open": 0,
+     "long_pnl": -1182.594555,
+     "short_pnl": 0.0,
+     "long_trades": 2,
+     "short_trades": 0
     },
     {
      "group": "TXN",
-     "pnl": -1804.403511,
-     "contribution": -0.018044,
-     "share": -0.345362,
-     "trades": 3,
-     "win_rate": 0.333333,
-     "avg_pnl": -601.467837,
-     "still_open": 1
+     "pnl": -1650.860242,
+     "contribution": -0.016509,
+     "share": -0.17448,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -1650.860242,
+     "still_open": 0,
+     "long_pnl": -1650.860242,
+     "short_pnl": 0.0,
+     "long_trades": 1,
+     "short_trades": 0
     },
     {
-     "group": "META",
-     "pnl": -1882.93758,
-     "contribution": -0.018829,
-     "share": -0.360394,
-     "trades": 2,
+     "group": "NVDA",
+     "pnl": -1663.525107,
+     "contribution": -0.016635,
+     "share": -0.175818,
+     "trades": 4,
      "win_rate": 0.0,
-     "avg_pnl": -941.46879,
-     "still_open": 0
-    },
-    {
-     "group": "ORCL",
-     "pnl": -1956.317447,
-     "contribution": -0.019563,
-     "share": -0.374439,
-     "trades": 2,
-     "win_rate": 0.0,
-     "avg_pnl": -978.158723,
-     "still_open": 0
+     "avg_pnl": -415.881277,
+     "still_open": 0,
+     "long_pnl": -1663.525107,
+     "short_pnl": 0.0,
+     "long_trades": 4,
+     "short_trades": 0
     }
    ],
    "best_trades": [
     {
      "symbol": "AMD",
+     "direction": "long",
      "sector": "Technology",
      "entry": "2026-04-23",
-     "exit": "2026-08-11",
-     "holding_days": 75,
-     "pnl": 5613.848096,
-     "return": 0.562713,
+     "exit": "2026-07-28",
+     "holding_days": 65,
+     "pnl": 5339.074521,
+     "return": 0.53517,
      "open": false,
-     "entry_reason": "Strong momentum and high relative volume driven by AI demand",
-     "exit_reason": "Take profit on S16 which has gained over 55% and is showing short-term weakness (vs_ema20 is -5.3%)"
-    },
-    {
-     "symbol": "CAT",
-     "sector": "Industrials",
-     "entry": "2026-01-05",
-     "exit": "2026-07-21",
-     "holding_days": 135,
-     "pnl": 4311.46474,
-     "return": 0.446106,
-     "open": false,
-     "entry_reason": "Strong industrial sector momentum with high relative volume and positive trend above EMAs.",
-     "exit_reason": "Take profits on S38 as it has broken below its short-term moving averages and shows weak momentum (rsi2 very low, vs_ema20 is -7.15%)"
+     "entry_reason": "Strong momentum stock with positive news sentiment, high relative volume, and trading near 52-week highs.",
+     "exit_reason": "Sell S16 due to negative short-term momentum, high relative volume on a down day, and negative news sentiment regarding China's CXMT IPO."
     },
     {
      "symbol": "MRK",
+     "direction": "long",
      "sector": "Health Care",
      "entry": "2026-01-05",
+     "exit": "2026-10-28",
+     "holding_days": 205,
+     "pnl": 3315.398753,
+     "return": 0.332506,
+     "open": false,
+     "entry_reason": "Strong health care sector performer with high RSI and solid trend alignment.",
+     "exit_reason": "Take profit on S35 after strong gains and recent relative weakness below its 20-day EMA."
+    },
+    {
+     "symbol": "LLY",
+     "direction": "long",
+     "sector": "Health Care",
+     "entry": "2026-09-23",
      "exit": null,
-     "holding_days": 215,
-     "pnl": 4011.17037,
-     "return": 0.402286,
+     "holding_days": 35,
+     "pnl": 2353.557177,
+     "return": 0.22241,
      "open": true,
-     "entry_reason": "Strong health care stock with high RSI14, trading near 52-week highs with positive momentum.",
+     "entry_reason": "Strong positive news score with FDA approval, positive momentum, and trading above key EMAs.",
      "exit_reason": null
     }
    ],
    "worst_trades": [
     {
      "symbol": "TXN",
+     "direction": "long",
      "sector": "Technology",
      "entry": "2026-06-22",
      "exit": "2026-06-29",
      "holding_days": 5,
-     "pnl": -1553.708928,
-     "return": -0.149191,
+     "pnl": -1650.860242,
+     "return": -0.149194,
      "open": false,
-     "entry_reason": "Strong breakout and high relative volume",
-     "exit_reason": "Sharp downward momentum (ret_1d -8.46%, ret_5d -11.59%) violating risk tolerance"
+     "entry_reason": "Strong momentum, high relative volume, and breakout above key moving averages.",
+     "exit_reason": "Position has dropped significantly and underperformed since purchase, cutting losses."
     },
     {
-     "symbol": "ORCL",
-     "sector": "Technology",
-     "entry": "2026-09-09",
-     "exit": "2026-09-16",
-     "holding_days": 5,
-     "pnl": -1542.022755,
-     "return": -0.145427,
+     "symbol": "GE",
+     "direction": "long",
+     "sector": "Industrials",
+     "entry": "2026-01-05",
+     "exit": "2026-01-27",
+     "holding_days": 15,
+     "pnl": -895.450655,
+     "return": -0.089445,
      "open": false,
-     "entry_reason": "Strong momentum play in technology sector with positive analyst coverage and high relative volume",
-     "exit_reason": "Position has dropped significantly (-14.22% gain) in 4 days, showing high volatility and breaking down technically; cutting losses."
+     "entry_reason": "Strong momentum, close to 52-week high, and trading above key moving averages in a RISK_ON regime.",
+     "exit_reason": "Position has lost over 9% and is showing persistent relative weakness with a sharp 5-day decline."
     },
     {
-     "symbol": "QCOM",
-     "sector": "Technology",
-     "entry": "2026-06-22",
-     "exit": "2026-06-29",
-     "holding_days": 5,
-     "pnl": -1471.689888,
-     "return": -0.138006,
+     "symbol": "SBUX",
+     "direction": "long",
+     "sector": "Consumer Discretionary",
+     "entry": "2026-03-11",
+     "exit": "2026-03-25",
+     "holding_days": 10,
+     "pnl": -864.692928,
+     "return": -0.087416,
      "open": false,
-     "entry_reason": "Strong momentum and positive news catalyst",
-     "exit_reason": "High volatility and sharp downward momentum (ret_5d -16.24%, ret_21d -18.56%) violating risk tolerance"
+     "entry_reason": "Strong momentum with RSI14 at 64.94, trading well above its EMA20, EMA50, and EMA200, showing relative strength in a mixed market.",
+     "exit_reason": "Position has lost 9% and is underperforming in a RISK_OFF regime."
     }
    ],
    "concentration": {
     "trades": 65,
     "best_trade": {
      "symbol": "AMD",
+     "direction": "long",
      "sector": "Technology",
      "entry": "2026-04-23",
-     "exit": "2026-08-11",
-     "holding_days": 75,
-     "pnl": 5613.848096,
-     "return": 0.562713,
+     "exit": "2026-07-28",
+     "holding_days": 65,
+     "pnl": 5339.074521,
+     "return": 0.53517,
      "open": false,
-     "entry_reason": "Strong momentum and high relative volume driven by AI demand",
-     "exit_reason": "Take profit on S16 which has gained over 55% and is showing short-term weakness (vs_ema20 is -5.3%)"
+     "entry_reason": "Strong momentum stock with positive news sentiment, high relative volume, and trading near 52-week highs.",
+     "exit_reason": "Sell S16 due to negative short-term momentum, high relative volume on a down day, and negative news sentiment regarding China's CXMT IPO."
     },
-    "best_trade_share": 1.074489,
-    "top2_share": 1.899702,
-    "best_trade_share_of_gains": 0.226874,
-    "top2_share_of_gains": 0.401114,
+    "best_trade_share": 0.564288,
+    "top2_share": 0.914693,
+    "best_trade_share_of_gains": 0.221752,
+    "top2_share_of_gains": 0.359453,
     "best_stock": "AMD",
-    "best_stock_share": 1.035532,
-    "return": 0.054373,
-    "return_without_best_trade": -0.001766,
-    "return_without_top2": -0.04488,
+    "best_stock_share": 0.55816,
+    "return": 0.095626,
+    "return_without_best_trade": 0.042235,
+    "return_without_top2": 0.009081,
     "concentrated": true
    }
   }
@@ -825,14 +1088,13 @@
  },
  "usage": {
   "calls": 44,
-  "input_tokens": 602284,
-  "output_tokens": 9054,
+  "input_tokens": 604060,
+  "output_tokens": 11320,
   "failed": 0,
-  "seconds": 591.8,
-  "list_price_usd": 0.9849
+  "list_price_usd": 1.008
  },
  "steps": 44,
- "submitted": "2026-11-13",
+ "submitted": "2026-11-14",
  "submitter": "Risk-Aware Trading Agents maintainers",
  "notes": null,
  "replies": [
@@ -857,25 +1119,19 @@
      "fraction": 0.0
     },
     {
-     "symbol": "S10",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0.0
-    },
-    {
      "symbol": "S35",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0.0
     },
     {
-     "symbol": "S38",
+     "symbol": "S48",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0.0
     },
     {
-     "symbol": "S48",
+     "symbol": "S10",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0.0
@@ -897,6 +1153,12 @@
      "action": "buy",
      "weight": 0.1,
      "fraction": 0.0
+    },
+    {
+     "symbol": "S22",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
     }
    ]
   },
@@ -905,26 +1167,26 @@
     {
      "symbol": "S48",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S10",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S35",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S26",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S35",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0.0
     }
    ]
   },
@@ -949,13 +1211,13 @@
      "fraction": 0.0
     },
     {
-     "symbol": "S43",
+     "symbol": "S34",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0.0
     },
     {
-     "symbol": "S48",
+     "symbol": "S43",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0.0
@@ -967,14 +1229,14 @@
     {
      "symbol": "S25",
      "action": "sell",
-     "weight": 0,
+     "weight": 0.0,
      "fraction": 1.0
     },
     {
      "symbol": "S44",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
@@ -987,7 +1249,7 @@
      "fraction": 1.0
     },
     {
-     "symbol": "S37",
+     "symbol": "S38",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0
@@ -996,29 +1258,17 @@
   },
   {
    "orders": [
-    {
-     "symbol": "S37",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
     {
      "symbol": "S26",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S47",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S10",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
@@ -1027,38 +1277,26 @@
     {
      "symbol": "S47",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S10",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S44",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S05",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S19",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     },
     {
-     "symbol": "S22",
+     "symbol": "S05",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
@@ -1067,51 +1305,27 @@
     {
      "symbol": "S03",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S22",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S27",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S09",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
   {
    "orders": [
     {
-     "symbol": "S09",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
      "symbol": "S27",
      "action": "sell",
      "weight": 0,
-     "fraction": 1
+     "fraction": 1.0
     },
     {
      "symbol": "S11",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S17",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0
@@ -1123,56 +1337,82 @@
     {
      "symbol": "S19",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S17",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S46",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
   {
-   "orders": []
+   "orders": [
+    {
+     "symbol": "S10",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1
+    }
+   ]
   },
   {
    "orders": [
     {
      "symbol": "S46",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S11",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S48",
-     "action": "target",
+     "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     },
     {
-     "symbol": "S43",
-     "action": "target",
+     "symbol": "S09",
+     "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
   {
-   "orders": []
+   "orders": [
+    {
+     "symbol": "S43",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S48",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S04",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S36",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
   },
   {
    "orders": [
@@ -1183,20 +1423,8 @@
      "fraction": 1.0
     },
     {
-     "symbol": "S03",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0.0
-    },
-    {
      "symbol": "S26",
      "action": "buy",
-     "weight": 0.1,
-     "fraction": 0.0
-    },
-    {
-     "symbol": "S38",
-     "action": "target",
      "weight": 0.1,
      "fraction": 0.0
     }
@@ -1205,22 +1433,16 @@
   {
    "orders": [
     {
-     "symbol": "S45",
+     "symbol": "S09",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S49",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S56",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
@@ -1229,14 +1451,26 @@
     {
      "symbol": "S40",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S36",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S16",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S32",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
     }
    ]
   },
@@ -1245,89 +1479,11 @@
     {
      "symbol": "S15",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1.0
-    },
-    {
-     "symbol": "S18",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S56",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S18",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S16",
-     "action": "target",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S26",
-     "action": "target",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S38",
-     "action": "target",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S55",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S30",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S55",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1.0
-    },
-    {
-     "symbol": "S39",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S39",
-     "action": "sell",
      "weight": 0.0,
      "fraction": 1.0
     },
     {
-     "symbol": "S04",
+     "symbol": "S18",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0.0
@@ -1337,6 +1493,54 @@
   {
    "orders": [
     {
+     "symbol": "S18",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S55",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S55",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S30",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S13",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S34",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
      "symbol": "S04",
      "action": "sell",
      "weight": 0.0,
@@ -1344,6 +1548,12 @@
     },
     {
      "symbol": "S10",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S39",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0.0
@@ -1355,117 +1565,105 @@
     {
      "symbol": "S49",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
-     "symbol": "S44",
+     "symbol": "S03",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
   {
    "orders": [
     {
-     "symbol": "S44",
+     "symbol": "S03",
      "action": "sell",
-     "weight": 0,
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S39",
+     "action": "sell",
+     "weight": 0.0,
      "fraction": 1.0
     },
     {
      "symbol": "S20",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     },
     {
-     "symbol": "S32",
+     "symbol": "S44",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
   {
    "orders": [
     {
-     "symbol": "S43",
+     "symbol": "S10",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
-     "symbol": "S48",
+     "symbol": "S44",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S38",
-     "action": "target",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S16",
-     "action": "target",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S03",
-     "action": "target",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S33",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S37",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S33",
-     "action": "sell",
-     "weight": 0,
+     "weight": 0.0,
      "fraction": 1.0
     },
     {
      "symbol": "S37",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S39",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S37",
      "action": "sell",
-     "weight": 0,
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S39",
+     "action": "sell",
+     "weight": 0.0,
      "fraction": 1.0
     },
     {
      "symbol": "S05",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     },
     {
-     "symbol": "S17",
+     "symbol": "S10",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
   {
    "orders": [
     {
-     "symbol": "S17",
+     "symbol": "S10",
      "action": "sell",
      "weight": 0.0,
      "fraction": 1.0
@@ -1483,14 +1681,118 @@
     {
      "symbol": "S25",
      "action": "sell",
-     "weight": 0,
+     "weight": 0.0,
      "fraction": 1.0
     },
     {
      "symbol": "S19",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S05",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S18",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S26",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S40",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S12",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S19",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S43",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S30",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S41",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S41",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S32",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S39",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S48",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
     }
    ]
   },
@@ -1499,90 +1801,20 @@
     {
      "symbol": "S38",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S56",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S56",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S12",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S10",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S30",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S40",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S41",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S16",
-     "action": "sell",
-     "weight": 0,
+     "weight": 0.0,
      "fraction": 1.0
     },
     {
-     "symbol": "S54",
-     "action": "buy",
+     "symbol": "S18",
+     "action": "target",
      "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S54",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "fraction": 0.0
     },
     {
-     "symbol": "S43",
+     "symbol": "S52",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
@@ -1590,135 +1822,143 @@
    "orders": [
     {
      "symbol": "S40",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S18",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S26",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1.0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S12",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S18",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S19",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    },
-    {
-     "symbol": "S43",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S33",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    },
-    {
-     "symbol": "S47",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S47",
      "action": "sell",
      "weight": 0.0,
      "fraction": 1.0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S20",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1.0
-    },
-    {
-     "symbol": "S03",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1.0
-    },
-    {
-     "symbol": "S16",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
     },
     {
      "symbol": "S51",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
   {
    "orders": [
     {
-     "symbol": "S16",
+     "symbol": "S52",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S43",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S48",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S16",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S39",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S41",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S12",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S20",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S10",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S30",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S30",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S48",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S39",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     },
     {
      "symbol": "S54",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
   {
    "orders": [
     {
-     "symbol": "S32",
+     "symbol": "S22",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S16",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S35",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S17",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     }
    ]
   },
@@ -1731,7 +1971,7 @@
      "fraction": 1
     },
     {
-     "symbol": "S18",
+     "symbol": "S02",
      "action": "buy",
      "weight": 0.1,
      "fraction": 0
@@ -1741,70 +1981,94 @@
   {
    "orders": [
     {
-     "symbol": "S33",
+     "symbol": "S16",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S39",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S51",
      "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
-     "symbol": "S10",
+     "symbol": "S18",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
     },
     {
-     "symbol": "S17",
+     "symbol": "S43",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S39",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
+     "fraction": 0.0
     },
-    {
-     "symbol": "S37",
-     "action": "buy",
-     "weight": 0.1,
-     "fraction": 0
-    }
-   ]
-  },
-  {
-   "orders": [
-    {
-     "symbol": "S17",
-     "action": "sell",
-     "weight": 0,
-     "fraction": 1
-    }
-   ]
-  },
-  {
-   "orders": [
     {
      "symbol": "S31",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S35",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    },
+    {
+     "symbol": "S19",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S30",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S30",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S54",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0
     },
     {
      "symbol": "S05",
      "action": "buy",
      "weight": 0.1,
-     "fraction": 0
+     "fraction": 0.0
+    },
+    {
+     "symbol": "S36",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0
     }
    ]
   }

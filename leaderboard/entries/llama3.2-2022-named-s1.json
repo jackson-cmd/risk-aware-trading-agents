@@ -1,0 +1,1297 @@
+{
+ "bench": "rta-bench-1",
+ "task": "2022-named",
+ "seed": 1,
+ "model": {
+  "name": "llama3.2",
+  "provider": "Meta",
+  "access": "OpenAI-compatible gateway serving Ollama's llama3.2, num_ctx 16384",
+  "training_cutoff": "2023-12",
+  "open_weights": true,
+  "parameters": "3B",
+  "call": {
+   "provider": "ollama via gateway",
+   "model": "llama3.2",
+   "num_ctx": 16384,
+   "temperature": 0.2,
+   "max_tokens": 2000,
+   "json_mode": true,
+   "api_seed": 1,
+   "system_prompt_sha256": "0aa00937be0942da26653df3a645bce43153b5ef86761e36b962bb8ee3e4a352"
+  }
+ },
+ "contamination": "may_remember",
+ "settings": {
+  "universe": "megacap",
+  "decide_every": 5,
+  "max_positions": 10,
+  "position_size": null,
+  "news": true,
+  "max_news": 3,
+  "execution": "plain",
+  "cash": 100000.0,
+  "slippage_bps": 5.0,
+  "commission_per_share": 0.0,
+  "costs": "realistic",
+  "mode": "long_only",
+  "period": "2022",
+  "blind": false,
+  "start": "2022-01-03",
+  "end": "2022-12-30"
+ },
+ "data": {
+  "version": "2022-12-30",
+  "prices_sha256": "6377384cd1902329bf69dcb85338335b15f0e9e4485a753ad005cd370c9238fc",
+  "news_sha256": "d5bf10935f3f2842f2f70e07be9faaa8f2e5b63e720c0825ff713e40e611a468"
+ },
+ "record": {
+  "run_id": "20261114-021756-bench1-llama-s12-llama3-2-named-2022-s1-2022-news-realistic",
+  "riskaware": {
+   "version": "0.7.2",
+   "git_commit": "6cb7146b71cf"
+  },
+  "created_utc": "2026-11-14T08:18:11+00:00",
+  "files_sha256": {
+   "manifest.json": "d3e0cb9f342d99d4edc08799c35ddb1902a2c1adf5c3c38c37438beede67e76b",
+   "metrics.json": "4355cf1ff0b4473e6a75cc6087bb983243568d055c4bc0fc0219c2e536fa7653",
+   "equity.csv": "ff624939656e94e3f719aac9164a6732bb5ffd5a3abd57ac78b246bce80ec292",
+   "trades.csv": "9263866eeea63f2b06fe5b0ee11d3e6d984457ffd5b02185aec13c03cb90d542",
+   "decisions.csv": "9a18d9344fcb7695509b9b8054d458a654af06880239da17115019321f872e70",
+   "policy_log.json": "3c16650f47cf7d99b6f9235553e485801819e220a6a7dae7ea2ca7c2dcab62ed"
+  },
+  "replies_sha256": "faf4e6848ff4bc53496a1100baae84b90a7438d5a1df29ca8bba0366735bb47e",
+  "observations_sha256": "51b1c5f2653006ebf7e5cf70817cdaf39ca4622bc6d4b9be073d7285a0427ae1",
+  "costs_seen_by_model": "realistic",
+  "rescored_from": null
+ },
+ "look_ahead_check": "pass",
+ "metrics": {
+  "total_return": -0.043892,
+  "cagr": -0.044397,
+  "volatility": 0.071296,
+  "sharpe": -0.797703,
+  "sortino": -1.328573,
+  "max_drawdown": -0.061592,
+  "calmar": -0.720835,
+  "win_rate": 0.0,
+  "profit_factor": 0.0,
+  "round_trips": 3.0,
+  "avg_holding_days": 150.261576,
+  "turnover": 0.190008,
+  "avg_exposure": 0.200903,
+  "trades": 14.0,
+  "excess_vs_equal_weight": 0.079609,
+  "excess_vs_spy": 0.142572
+ },
+ "vs_spy": {
+  "beta": 0.260758,
+  "alpha_annual": -0.006619,
+  "excess_return_annual": 0.13585,
+  "information_ratio": 0.743772,
+  "t_stat_excess": 0.740815,
+  "sharpe_ci95_low": -2.606599,
+  "sharpe_ci95_high": 1.10744,
+  "p_sharpe_above_spy": 0.553,
+  "days": 250.0
+ },
+ "anchors": {
+  "spy": {
+   "total_return": -0.186464,
+   "sharpe": -0.79525,
+   "max_drawdown": -0.244964
+  },
+  "equal_weight": {
+   "total_return": -0.123501,
+   "sharpe": -0.528791,
+   "max_drawdown": -0.230743
+  }
+ },
+ "after_cutoff": null,
+ "analysis": {
+  "run_id": "20261114-021756-bench1-llama-s12-llama3-2-named-2022-s1-2022-news-realistic",
+  "strategy": "bench1_llama_s12-llama3.2-named-2022-s1",
+  "kind": "policy",
+  "period": "2022",
+  "start": "2022-01-03",
+  "end": "2022-12-30",
+  "stocks": 56,
+  "news": true,
+  "total_return": -0.043892,
+  "spy_return": -0.186464,
+  "summary": {
+   "total_return": -0.043892,
+   "spy_return": -0.186464,
+   "decisions": 14,
+   "decision_excess_5d": -0.001185,
+   "decision_excess_5d_t": -0.18046,
+   "decision_hit_rate_5d": 0.5,
+   "buy_excess_5d": -0.003963,
+   "buy_excess_5d_t": -0.487373,
+   "sell_avoided_5d": 0.009,
+   "sell_avoided_5d_t": 1.646579,
+   "short_avoided_5d": null,
+   "short_avoided_5d_t": null,
+   "cover_excess_5d": null,
+   "cover_excess_5d_t": null,
+   "decision_ic": -0.022048,
+   "decision_ic_t": -0.654924,
+   "holdings_ic": -0.010345,
+   "holdings_ic_t": -0.657666,
+   "alpha_annual": 0.016499,
+   "alpha_t": 0.569722,
+   "capm_alpha_annual": -0.006619,
+   "capm_alpha_t": -0.189056,
+   "beta_market": 0.221456,
+   "beta_size": -0.076963,
+   "beta_growth": 0.193149,
+   "beta_momentum": 0.01959,
+   "r2": 0.833066,
+   "exposure_return_annual": -0.073372,
+   "news_decision_share": 0.428571,
+   "news_entry_pnl": 0.0,
+   "long_contribution": -0.054795,
+   "short_contribution": 0.0,
+   "fees_contribution": -0.0,
+   "forced_fills": 0,
+   "best_trade_share": null,
+   "return_without_best_trade": -0.043997,
+   "concentrated": false
+  },
+  "findings": [
+   "Buys: over the five trading days from the fill, the stocks it bought trailed SPY by 0.40% on average (11 buys, 36% of them ahead of SPY; t = -0.5, within noise).",
+   "Sells: over the five trading days from the fill, the stocks it sold lagged SPY by 0.90%, so selling avoided that (3 sells; t = 1.6, within noise).",
+   "Decision IC: on the 14 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of -0.022 with the next five days' returns (IC IR -0.18, t = -0.7, within noise).",
+   "Holdings IC: the weights it held after each of 50 decision days had a mean rank IC of -0.010 with the next five days' returns (t = -0.7, within noise).",
+   "Factor exposures: market 0.22 (t 21.8), size -0.08 (t -4.3), growth 0.19 (t 6.5), momentum 0.02 (t 1.6); together they explain 83% of the daily variation (R²).",
+   "Of its -5.7% a year over T-bills (arithmetic mean): market -4.3%, growth -3.4%, size +0.2%, momentum +0.1%; the alpha left is +1.6% a year (t = 0.6, within noise).",
+   "Verdict: most of the loss is factor exposure (-7.3% a year, market above all); the alpha left is not significant.",
+   "P&L: -$4,400 in all, -$5,480 from 1 positions and +$1,080 of interest on idle cash.",
+   "By market regime of the previous close: risk-on 11 days -1.7% (SPY -5.1%); neutral 6 days -0.4% (SPY -3.3%); uncertain 162 days -5.0% (SPY -19.0%); risk-off 72 days +2.7% (SPY +9.5%).",
+   "News: no entry or exit gave news as its reason. News can still have shaped the run: a filter that keeps it out of a stock leaves no decision behind, so compare with the run without news.",
+   "Concentration: the positions lost $5,480 in all; the best was AAPL bought 2022-01-04 and still open at the end, -$5,480. Had the best position made nothing, the run would have returned -4.4% instead of -4.4%."
+  ],
+  "decisions": {
+   "horizons": [
+    1,
+    5,
+    20
+   ],
+   "buys": {
+    "1d": {
+     "n": 11,
+     "mean": -0.000581,
+     "median": -0.002489,
+     "hit_rate": 0.363636,
+     "se": 0.003397,
+     "t": -0.170933,
+     "t_iid": -0.170933
+    },
+    "5d": {
+     "n": 11,
+     "mean": -0.003963,
+     "median": -0.014884,
+     "hit_rate": 0.363636,
+     "se": 0.008131,
+     "t": -0.487373,
+     "t_iid": -0.487373
+    },
+    "20d": {
+     "n": 10,
+     "mean": 0.003542,
+     "median": 0.007488,
+     "hit_rate": 0.6,
+     "se": 0.013121,
+     "t": 0.269948,
+     "t_iid": 0.271355
+    }
+   },
+   "sells": {
+    "1d": {
+     "n": 3,
+     "mean": -0.002571,
+     "median": -0.00109,
+     "hit_rate": 0.333333,
+     "se": 0.003122,
+     "t": -0.823595,
+     "t_iid": -0.823595
+    },
+    "5d": {
+     "n": 3,
+     "mean": 0.009,
+     "median": 0.007736,
+     "hit_rate": 1.0,
+     "se": 0.005466,
+     "t": 1.646579,
+     "t_iid": 1.646579
+    },
+    "20d": {
+     "n": 3,
+     "mean": 0.048362,
+     "median": 0.052622,
+     "hit_rate": 1.0,
+     "se": 0.010996,
+     "t": 4.397969,
+     "t_iid": 4.397969
+    }
+   },
+   "shorts": {
+    "1d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "5d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "20d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    }
+   },
+   "covers": {
+    "1d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "5d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "20d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    }
+   },
+   "forced": {
+    "1d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "5d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    },
+    "20d": {
+     "n": 0,
+     "mean": null,
+     "median": null,
+     "hit_rate": null,
+     "se": null,
+     "t": null,
+     "t_iid": null
+    }
+   },
+   "all": {
+    "1d": {
+     "n": 14,
+     "mean": -0.001007,
+     "median": -0.001948,
+     "hit_rate": 0.357143,
+     "se": 0.002711,
+     "t": -0.371593,
+     "t_iid": -0.371593
+    },
+    "5d": {
+     "n": 14,
+     "mean": -0.001185,
+     "median": -0.001444,
+     "hit_rate": 0.5,
+     "se": 0.006566,
+     "t": -0.18046,
+     "t_iid": -0.18046
+    },
+    "20d": {
+     "n": 13,
+     "mean": 0.013885,
+     "median": 0.010904,
+     "hit_rate": 0.692308,
+     "se": 0.01128,
+     "t": 1.230973,
+     "t_iid": 1.20552
+    }
+   },
+   "by_trigger": {
+    "news": {
+     "buys": {
+      "n": 4,
+      "mean": 0.009387,
+      "median": 0.009848,
+      "hit_rate": 0.5,
+      "se": 0.011667,
+      "t": 0.804573,
+      "t_iid": 0.804573
+     },
+     "sells": {
+      "n": 2,
+      "mean": 0.013386,
+      "median": 0.013386,
+      "hit_rate": 1.0,
+      "se": 0.00565,
+      "t": 2.369296,
+      "t_iid": 2.369296
+     },
+     "shorts": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "hit_rate": null,
+      "se": null,
+      "t": null,
+      "t_iid": null
+     },
+     "covers": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "hit_rate": null,
+      "se": null,
+      "t": null,
+      "t_iid": null
+     }
+    },
+    "other": {
+     "buys": {
+      "n": 7,
+      "mean": -0.011591,
+      "median": -0.021759,
+      "hit_rate": 0.285714,
+      "se": 0.010372,
+      "t": -1.11748,
+      "t_iid": -1.11748
+     },
+     "sells": {
+      "n": 1,
+      "mean": 0.000228,
+      "median": 0.000228,
+      "hit_rate": 1.0,
+      "se": null,
+      "t": null,
+      "t_iid": null
+     },
+     "shorts": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "hit_rate": null,
+      "se": null,
+      "t": null,
+      "t_iid": null
+     },
+     "covers": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "hit_rate": null,
+      "se": null,
+      "t": null,
+      "t_iid": null
+     }
+    }
+   },
+   "counts": {
+    "news": {
+     "buys": 4,
+     "sells": 2,
+     "shorts": 0,
+     "covers": 0,
+     "forced": 0
+    },
+    "other": {
+     "buys": 7,
+     "sells": 1,
+     "shorts": 0,
+     "covers": 0,
+     "forced": 0
+    }
+   }
+  },
+  "ic": {
+   "horizon_days": 5,
+   "universe": 56,
+   "decision_days": "the policy's steps (policy_log.json)",
+   "decision": {
+    "score": "+1 bought or covered, -1 sold or shorted, 0 left alone, on each day it traded",
+    "days": 14,
+    "mean": -0.022048,
+    "std": 0.125961,
+    "ir": -0.175036,
+    "t": -0.654924,
+    "t_iid": -0.654924,
+    "positive_share": 0.428571
+   },
+   "holdings": {
+    "score": "the weights it held after each decision (0 for stocks not held, below 0 for shorts)",
+    "days": 50,
+    "mean": -0.010345,
+    "std": 0.111222,
+    "ir": -0.093008,
+    "t": -0.657666,
+    "t_iid": -0.657666,
+    "positive_share": 0.46
+   }
+  },
+  "factors": {
+   "days": 250,
+   "factors": {
+    "market": "Market (SPY - BIL)",
+    "size": "Size (IWM - SPY)",
+    "growth": "Growth (QQQ - SPY)",
+    "momentum": "Momentum (top - bottom third)"
+   },
+   "lags": 4,
+   "alpha_annual": 0.016499,
+   "alpha_t": 0.569722,
+   "exposures": {
+    "market": {
+     "beta": 0.221456,
+     "t": 21.756412
+    },
+    "size": {
+     "beta": -0.076963,
+     "t": -4.250499
+    },
+    "growth": {
+     "beta": 0.193149,
+     "t": 6.453541
+    },
+    "momentum": {
+     "beta": 0.01959,
+     "t": 1.591715
+    }
+   },
+   "r2": 0.833066,
+   "adj_r2": 0.830341,
+   "resid_vol_annual": 0.029519,
+   "factor_means_annual": {
+    "market": -0.192723,
+    "size": -0.025913,
+    "growth": -0.176471,
+    "momentum": 0.071357
+   },
+   "contributions_annual": {
+    "market": -0.04268,
+    "size": 0.001994,
+    "growth": -0.034085,
+    "momentum": 0.001398,
+    "alpha": 0.016499
+   },
+   "excess_return_annual": -0.056873,
+   "capm": {
+    "beta": 0.260758,
+    "beta_t": 26.361149,
+    "alpha_annual": -0.006619,
+    "alpha_t": -0.189056,
+    "r2": 0.780918
+   }
+  },
+  "mode": "long_only",
+  "pnl": {
+   "total": -4399.669212,
+   "reconciliation": {
+    "stocks": -5479.531398,
+    "stocks_long": -5479.531398,
+    "stocks_short": 0.0,
+    "tbill_etfs": 0.0,
+    "cash_interest": 1079.862185,
+    "borrow_fees": -0.0,
+    "margin_interest": -0.0,
+    "other": 1e-06
+   },
+   "positions": 1,
+   "by_direction": [
+    {
+     "group": "long",
+     "pnl": -5479.531398,
+     "contribution": -0.054795,
+     "share": 1.0,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -5479.531398,
+     "still_open": 1,
+     "long_pnl": -5479.531398,
+     "short_pnl": 0.0,
+     "long_trades": 1,
+     "short_trades": 0
+    }
+   ],
+   "account": {
+    "mode": "long_only",
+    "equity_error": 1.3e-05
+   },
+   "by_holding_period": [
+    {
+     "group": "61+ days",
+     "pnl": -5479.531398,
+     "contribution": -0.054795,
+     "share": 1.0,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -5479.531398,
+     "still_open": 1,
+     "long_pnl": -5479.531398,
+     "short_pnl": 0.0,
+     "long_trades": 1,
+     "short_trades": 0
+    }
+   ],
+   "by_regime": [
+    {
+     "group": "RISK_ON",
+     "label": "risk-on",
+     "days": 11,
+     "share_of_days": 0.043825,
+     "pnl": -1666.416897,
+     "contribution": -0.016664,
+     "share": 0.37876,
+     "return": -0.016617,
+     "spy_return": -0.051243,
+     "avg_exposure": 0.164861
+    },
+    {
+     "group": "NEUTRAL",
+     "label": "neutral",
+     "days": 6,
+     "share_of_days": 0.023904,
+     "pnl": -413.442033,
+     "contribution": -0.004134,
+     "share": 0.093971,
+     "return": -0.004171,
+     "spy_return": -0.033377,
+     "avg_exposure": 0.219592
+    },
+    {
+     "group": "UNCERTAIN",
+     "label": "uncertain",
+     "days": 162,
+     "share_of_days": 0.645418,
+     "pnl": -4949.369012,
+     "contribution": -0.049494,
+     "share": 1.124941,
+     "return": -0.049874,
+     "spy_return": -0.190063,
+     "avg_exposure": 0.204586
+    },
+    {
+     "group": "RISK_OFF",
+     "label": "risk-off",
+     "days": 72,
+     "share_of_days": 0.286853,
+     "pnl": 2629.55873,
+     "contribution": 0.026296,
+     "share": -0.597672,
+     "return": 0.027474,
+     "spy_return": 0.09525,
+     "avg_exposure": 0.193842
+    }
+   ],
+   "by_trigger": {
+    "entry": [
+     {
+      "group": "other",
+      "pnl": -5479.531398,
+      "contribution": -0.054795,
+      "share": 1.0,
+      "trades": 1,
+      "win_rate": 0.0,
+      "avg_pnl": -5479.531398,
+      "still_open": 1,
+      "long_pnl": -5479.531398,
+      "short_pnl": 0.0,
+      "long_trades": 1,
+      "short_trades": 0
+     }
+    ],
+    "exit": [
+     {
+      "group": "still open",
+      "pnl": -5479.531398,
+      "contribution": -0.054795,
+      "share": 1.0,
+      "trades": 1,
+      "win_rate": 0.0,
+      "avg_pnl": -5479.531398,
+      "still_open": 1,
+      "long_pnl": -5479.531398,
+      "short_pnl": 0.0,
+      "long_trades": 1,
+      "short_trades": 0
+     }
+    ]
+   },
+   "by_sector": [
+    {
+     "group": "Technology",
+     "pnl": -5479.531398,
+     "contribution": -0.054795,
+     "share": 1.0,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -5479.531398,
+     "still_open": 1,
+     "long_pnl": -5479.531398,
+     "short_pnl": 0.0,
+     "long_trades": 1,
+     "short_trades": 0
+    }
+   ],
+   "by_stock": [
+    {
+     "group": "AAPL",
+     "pnl": -5479.531398,
+     "contribution": -0.054795,
+     "share": 1.0,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -5479.531398,
+     "still_open": 1,
+     "long_pnl": -5479.531398,
+     "short_pnl": 0.0,
+     "long_trades": 1,
+     "short_trades": 0
+    }
+   ],
+   "best_trades": [
+    {
+     "symbol": "AAPL",
+     "direction": "long",
+     "sector": "Technology",
+     "entry": "2022-01-04",
+     "exit": null,
+     "holding_days": 249,
+     "pnl": -5479.531398,
+     "return": -0.180155,
+     "open": true,
+     "entry_reason": "Fundamental analysis indicates strong growth potential",
+     "exit_reason": null
+    }
+   ],
+   "worst_trades": [
+    {
+     "symbol": "AAPL",
+     "direction": "long",
+     "sector": "Technology",
+     "entry": "2022-01-04",
+     "exit": null,
+     "holding_days": 249,
+     "pnl": -5479.531398,
+     "return": -0.180155,
+     "open": true,
+     "entry_reason": "Fundamental analysis indicates strong growth potential",
+     "exit_reason": null
+    }
+   ],
+   "concentration": {
+    "trades": 1,
+    "best_trade": {
+     "symbol": "AAPL",
+     "direction": "long",
+     "sector": "Technology",
+     "entry": "2022-01-04",
+     "exit": null,
+     "holding_days": 249,
+     "pnl": -5479.531398,
+     "return": -0.180155,
+     "open": true,
+     "entry_reason": "Fundamental analysis indicates strong growth potential",
+     "exit_reason": null
+    },
+    "best_trade_share": null,
+    "top2_share": null,
+    "best_trade_share_of_gains": null,
+    "top2_share_of_gains": null,
+    "best_stock": "AAPL",
+    "best_stock_share": null,
+    "return": -0.043997,
+    "return_without_best_trade": -0.043997,
+    "return_without_top2": -0.043997,
+    "concentrated": false
+   }
+  }
+ },
+ "memory": {
+  "score": 0.07458333333333333,
+  "ci95": [
+   -0.083958877845794,
+   0.21685592336407544
+  ],
+  "p_value": 0.18190904547726136,
+  "verdict": "inconclusive",
+  "why": "too few pairs to tell: AUC gap +0.075 before the cutoff and -0.049 after it (the control), difference +0.124, 95% CI [-0.100, +0.320]",
+  "scored_points": "before",
+  "beyond_control": 0.12406250000000008,
+  "beyond_control_ci95": [
+   -0.09981181168302933,
+   0.31991059966273083
+  ],
+  "recall_score": 0.06122743378756368,
+  "recall_ci95": [
+   -0.21643455879237317,
+   0.3287651931288638
+  ],
+  "recall_verdict": "no sign",
+  "recall_direction_accuracy": 0.46,
+  "recall_majority_baseline": 0.54,
+  "recall_windows": 50,
+  "control_period": "2026",
+  "missing_answers": {
+   "named": 0,
+   "blind": 0,
+   "recall": 0
+  },
+  "paired": "run",
+  "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff"
+ },
+ "usage": {
+  "calls": 50,
+  "input_tokens": 576336,
+  "output_tokens": 2882,
+  "failed": 0,
+  "list_price_usd": 0.0
+ },
+ "steps": 50,
+ "submitted": "2026-11-14",
+ "submitter": "Risk-Aware Trading Agents maintainers",
+ "notes": null,
+ "replies": [
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1905,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1883,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.213,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2134,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.1892,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1952,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2055,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 0
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.207,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2057,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2018,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1923,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1929,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1931,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2049,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2047,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2096,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2154,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.216,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2252,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2307,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.1965,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1958,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1941,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1901,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1865,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2053,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2065,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2152,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.2,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1946,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.1877,
+     "fraction": 1
+    }
+   ]
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.2,
+     "fraction": 0.5
+    }
+   ]
+  }
+ ]
+}
