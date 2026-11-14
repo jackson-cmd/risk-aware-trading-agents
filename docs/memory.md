@@ -46,7 +46,7 @@ print(r.report())               # the report (r.report("zh") in Chinese)
 
 - the last 60 daily closes, oldest first;
 - RSI(14), the distance from EMA 50 and EMA 200, ATR as a share of the price, the distance from the 52-week high, relative volume, and the 21-day return next to SPY's;
-- up to three headlines published before that day's close, with how many hours before the close each appeared (from the period's headline file: the headlines are licensed and not distributed, so without your own copy the records carry none).
+- up to three headlines published before that day's close, with how many hours before the close each appeared (from the period's headline file: the headlines are licensed and not distributed, so without your own copy the records carry none). The conclusions on this page rest on news replayed at its publication time. Without headline data for a period, every record of the run is asked without headlines, so the periods stay comparable (the report and `settings.news_missing` say so).
 
 The **named** record gives the ticker, the company, the sector, the date and the prices as traded. The **blind** record gives an alias (S01), the sector and "day 0", rebases the prices so that the first close is 100, and masks the headlines the way blind trading mode does: the company's names and ticker, its best-known people ("the S01 chief") and products ("[product]"), and every date and year. Per-share dollar amounts in headlines are rebased like the prices, so "raises its price target to $264" keeps its distance from the price and stops naming the stock (the example below paraphrases the headline: the research headlines are licensed and not distributed):
 
