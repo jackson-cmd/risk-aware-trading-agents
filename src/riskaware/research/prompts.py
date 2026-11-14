@@ -280,7 +280,7 @@ def tune(provider: Any, variant: Variant, seed: int | None = None) -> Any:
 
     def request_body(system: str, user: str, schema: dict[str, Any]) -> dict[str, Any]:
         body = build(system, user, schema)
-        body["stream"] = False  # some gateways (TAMU's) stream unless told not to
+        body["stream"] = False  # some OpenAI-compatible gateways stream unless told not to
         if seed is not None:
             body["seed"] = int(seed)
         if variant.response_format == "json":

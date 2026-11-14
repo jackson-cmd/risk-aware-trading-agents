@@ -3341,7 +3341,7 @@
   "zh": "每个变体只改基线 prompt 的一个因素。配对差（同一模型、同一时段、同一种子），按时段平均，95% bootstrap 区间，精确符号翻转检验，按变体个数做 Holm 校正；「noise」表示这个差别和把同一个 prompt 再跑一遍分不开。归因把收益差拆成持股多少（水平、择时）和持哪些股票（选股），按每日收益相加计算。"
  },
  "notes": {
-  "en": "Pilot, one seed. llama3.2 on the TAMU gateway is left out: the gateway cuts long prompts for that model, so it may not have seen the whole observation.",
-  "zh": "这是 pilot，只有一个种子。TAMU 网关上的 llama3.2 没有算进来：网关会截断这个模型的长 prompt，它可能没看到完整的观察。"
+  "en": "Pilot, one seed. llama3.2 on a university LLM gateway is left out: the gateway cuts long prompts for that model, so it may not have seen the whole observation.",
+  "zh": "这是 pilot，只有一个种子。学校 LLM 网关上的 llama3.2 没有算进来：网关会截断这个模型的长 prompt，它可能没看到完整的观察。"
  }
 }

@@ -13,7 +13,7 @@ period and seed, and the report says which differences are larger than the gap b
 The first batch is a pilot: the baseline and two rule prompts (`risk_rules` and `trend_news`, below) on three models
 (`gpt-5.6-luna`, `claude-haiku-5-5`, `gemini-3.1-flash-lite`), the three periods, blind, the `core` universe, a decision
 every fifth trading day, one seed: 27 runs, $0.26. Each prompt is paired with the baseline on the same model and
-period: nine pairs. A fourth model, `llama3.2` on the TAMU gateway, is left out: the gateway cuts long prompts for
+period: nine pairs. A fourth model, `llama3.2` on a university LLM gateway, is left out: the gateway cuts long prompts for
 it (an 11,000-token prompt came back as 2,050 tokens read), so there is no telling whether it saw the whole
 observation.
 
