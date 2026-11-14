@@ -8,6 +8,7 @@ A year's return says little about skill. It is one draw from one market, and a l
 - [Decisions](#decisions)
 - [Factor attribution](#factor-attribution)
 - [Where the P&L came from](#where-the-pl-came-from)
+- [Short selling and margin](#short-selling-and-margin)
 - [What the five swing strategies made their money on](#what-the-five-swing-strategies-made-their-money-on)
 - [Reading the numbers](#reading-the-numbers)
 - [What analysis.json holds](#what-analysisjson-holds)
@@ -81,7 +82,7 @@ The factors' own returns over each test window (annualized arithmetic means):
 
 ## Where the P&L came from
 
-Each position runs from its first buy to the sell that closes it, top-ups and trims included; a position still open at the end is marked at the last close. Its P&L is the cash it returned minus the cash it took, commissions included. The positions and the T-bill interest on idle cash (the cash at each close times BIL's return that day, as the backtest pays it) add up to the run's P&L to the dollar; anything the record does not explain, such as options, shows as a separate line.
+Each position runs from the fill that opens it to the fill that closes it, top-ups and trims included; a position still open at the end is marked at the last close. Its P&L is the cash it returned minus the cash it took, commissions included. The analysis rebuilds the account day by day from the fills, the way the backtest keeps it, so the positions and the T-bill interest on cash (BIL's return each day, as the backtest pays it) add up to the run's P&L to the cent; anything the record does not explain, such as options, shows as a separate line.
 
 Then the P&L by:
 
@@ -92,6 +93,27 @@ Then the P&L by:
 - the best and worst positions, with the reason each was bought;
 
 and how concentrated the profit is: the share of the best position and of the best two in the positions' net P&L and in their gains, and the run's return had the best position made nothing. *Of return* in the tables is the P&L over the starting cash, in percentage points of the run's return.
+
+## Short selling and margin
+
+Records made with `--mode long_short` or `--mode margin` ([short-margin.md](short-margin.md)) hold short positions: negative quantities, opened by a short sale and closed by a cover. The analysis reads them like this:
+
+- **Decisions come in four kinds.** Buys and covers bet on the stock and are credited with its excess return over SPY; sells and shorts bet against it and are credited with the excess they avoided. So a short sale before a stock lags the market scores like a good sale. Fills forced by a margin call or by the close-out at zero equity (tags `margin_call`, `wiped_out`) are listed apart as `forced` and left out of `all` and of the decision IC: the account's rules made them, not the agent. The decision IC scores +1 for buys and covers and -1 for sells and shorts; the holdings IC ranks the signed weights.
+- **Long and short are listed apart.** A short runs from its short sale to its cover, and a fill that crosses zero closes one position and opens the other. `by_direction` gives the long and the short positions' P&L, and every breakdown (holding period, sector, stock, trigger) carries `long_pnl` and `short_pnl`.
+- **Borrow fees and margin interest get their own lines.** They are not in `trades.csv`: the backtest charges them on the account at every close. The analysis rebuilds the account day by day with the record's own margin rules (`MarginRules.daily_costs` with the run's `mode_params`): the borrow fee on the value of the shorts, the T-bill rate plus the spread on borrowed cash, and the T-bill rate earned on cash and short-sale proceeds. The lines add up to the run's P&L to the cent, and agree with `metrics.json["account"]` (which keeps four decimals of the starting cash).
+
+Trend following on two times margin in the spring of 2022 (`riskaware research run --strategy trend_ls --params '{"gross": 2.0}' --universe core --max-positions 9 --mode margin --period 2022 --start 2022-02-01 --end 2022-05-31 --no-news`, then `riskaware research analyze` on the record):
+
+| | P&L |
+|---|---:|
+| Long positions (17) | -$29,990.52 |
+| Short positions (7) | +$3,157.52 |
+| Interest on cash and short-sale proceeds | +$26.23 |
+| Borrow fees | -$46.88 |
+| Margin interest | -$66.33 |
+| Total (-26.9%) | -$26,919.97 |
+
+The levered longs lost money in all 17 positions; the shorts made a little but bet against stocks that went on to beat SPY over five days by 0.95% on average (15 short sales, t = -1.0). Borrowing cost $113 over four months.
 
 ## What the five swing strategies made their money on
 
@@ -171,11 +193,11 @@ For a leaderboard of strategies or LLM agents this means: rank on the decision s
 
 | Key | What |
 |---|---|
-| `summary` | The headline numbers, flat: `decision_excess_5d` and its `_t` (buys and sells together), `buy_excess_5d`, `sell_avoided_5d`, `decision_hit_rate_5d`, `decision_ic`, `holdings_ic`, `alpha_annual` and `alpha_t`, `capm_alpha_annual`, `beta_market`, `beta_size`, `beta_growth`, `beta_momentum`, `r2`, `exposure_return_annual` (the part of the mean excess return a year that the exposures explain; `alpha_annual` is the rest), `news_decision_share` (the share of buys and sells whose reason names news), `news_entry_pnl`, `best_trade_share`, `return_without_best_trade`, `concentrated` |
-| `decisions` | `buys`, `sells` and `all` by horizon (`1d`, `5d`, `20d`): `n`, `mean`, `median`, `hit_rate`, `se`, `t`, `t_iid` (a 95% interval is `mean` ± 1.96 `se`); `by_trigger` for five days; `counts`: every buy and sell by trigger |
+| `summary` | The headline numbers, flat: `decision_excess_5d` and its `_t` (every decision together), `buy_excess_5d`, `sell_avoided_5d`, `short_avoided_5d`, `cover_excess_5d` (each with its `_t`), `decision_hit_rate_5d`, `decision_ic`, `holdings_ic`, `alpha_annual` and `alpha_t`, `capm_alpha_annual`, `beta_market`, `beta_size`, `beta_growth`, `beta_momentum`, `r2`, `exposure_return_annual` (the part of the mean excess return a year that the exposures explain; `alpha_annual` is the rest), `news_decision_share` (the share of decisions whose reason names news), `news_entry_pnl`, `long_contribution`, `short_contribution` and `fees_contribution` (P&L over the starting cash; fees are borrow fees plus margin interest), `forced_fills`, `best_trade_share`, `return_without_best_trade`, `concentrated` |
+| `decisions` | `buys`, `sells`, `shorts`, `covers`, `forced` and `all` (every decision, forced fills left out) by horizon (`1d`, `5d`, `20d`): `n`, `mean`, `median`, `hit_rate`, `se`, `t`, `t_iid` (a 95% interval is `mean` ± 1.96 `se`); `by_trigger` for five days; `counts`: every fill by trigger and kind |
 | `ic` | `decision` and `holdings`: `days`, `mean`, `std`, `ir`, `t`, `t_iid`, `positive_share` |
 | `factors` | `exposures` (beta and t), `alpha_annual`, `alpha_t`, `r2`, `contributions_annual`, `factor_means_annual`, `excess_return_annual`, `capm` |
-| `pnl` | `reconciliation` (stocks, T-bill ETFs, cash interest, other), `by_holding_period`, `by_regime`, `by_trigger` (entry, exit), `by_sector`, `by_stock`, `best_trades`, `worst_trades`, `concentration` |
+| `pnl` | `reconciliation` (`stocks`, `stocks_long`, `stocks_short`, `tbill_etfs`, `cash_interest`, `borrow_fees`, `margin_interest`, `other`: they add up to `total`; fees are negative), `account` (`mode` and `equity_error`, the largest gap between the rebuilt account and equity.csv), `by_direction`, `by_holding_period`, `by_regime`, `by_trigger` (entry, exit), `by_sector`, `by_stock` (each row with `long_pnl` and `short_pnl`), `best_trades`, `worst_trades` (with `direction`), `concentration` |
 | `findings` | The answers in sentences |
 
 The schema is `riskaware.analysis/1`. Code: `src/riskaware/research/analysis.py`; tests with known answers on synthetic data: `tests/test_analysis.py`.

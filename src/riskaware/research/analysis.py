@@ -63,6 +63,15 @@ NEWS_RE = re.compile(
     re.IGNORECASE)
 NO_REASON = {"", "nan", "none", "buy", "sell", "policy buy", "policy sell", "policy target"}
 
+# What a fill was, from its tag (the research kit's planners) or, without a known tag, from the position before it:
+# a buy opens or adds to a long, a sell lowers one, a short opens or adds to a short, a cover lowers one. Margin calls
+# and the close-out at zero equity are forced, not decisions. Buys and covers bet on the stock (+excess), sells and
+# shorts against it (the excess avoided).
+KINDS = ("buys", "sells", "shorts", "covers")
+FORCED_TAGS = {"margin_call", "wiped_out"}
+SHORT_TAGS = {"short", "short_add"}
+COVER_TAGS = {"cover", "cover_trim"}
+
 
 # ----------------------------------------------------------------------------------- statistics
 def mean_test(values: Any, days: Any, overlap: int = 1) -> dict[str, Any]:
@@ -252,6 +261,33 @@ class Record:
         keep &= t["symbol"].map(market.has)
         return t[keep]
 
+    def fills(self, market: FrozenMarket) -> pd.DataFrame:
+        """``share_trades`` with ``sign`` (+1 buy, -1 sell), ``pos_before`` (signed shares held before the fill; a
+        short is negative) and ``kind``: buy, sell, short, cover or forced (see ``KINDS``)."""
+        t = self.share_trades(market)
+        if t.empty:
+            return t.assign(sign=pd.Series(dtype=float), pos_before=pd.Series(dtype=float),
+                            kind=pd.Series(dtype=str))
+        sign = np.where(t["side"].to_numpy() == "BUY", 1.0, -1.0)
+        held: dict[str, float] = {}
+        before, kind = [], []
+        for sym, q, sg, tag in zip(t["symbol"], t["qty"].astype(float), sign, t["tag"].fillna("").astype(str),
+                                   strict=True):
+            b = held.get(sym, 0.0)
+            before.append(b)
+            held[sym] = b + sg * q
+            if tag in FORCED_TAGS:
+                kind.append("forced")
+            elif tag in SHORT_TAGS:
+                kind.append("short")
+            elif tag in COVER_TAGS:
+                kind.append("cover")
+            elif sg > 0:
+                kind.append("cover" if b < -1e-9 else "buy")
+            else:
+                kind.append("sell" if b > 1e-9 else "short")
+        return t.assign(sign=sign, pos_before=before, kind=kind)
+
 
 def is_record(folder: Path) -> bool:
     return (Path(folder) / "manifest.json").is_file() and (Path(folder) / "equity.csv").is_file()
@@ -360,14 +396,15 @@ def trigger(reason: Any) -> str:
 
 # ----------------------------------------------------------------------------------- 1. decisions
 def decision_rows(rec: Record, px: _Prices, market: FrozenMarket) -> pd.DataFrame:
-    """One row per stock buy or sell: its fill day and the excess return over SPY after it, by horizon."""
-    t = rec.share_trades(market)
+    """One row per stock fill: what it was (``kind``), its fill day and the excess return over SPY after it, by
+    horizon; ``signed`` is the excess for a buy or a cover and the excess avoided for a sell or a short."""
+    t = rec.fills(market)
     t = t[~t["symbol"].isin(CASH_VEHICLES)] if len(t) else t
-    base = ["date", "symbol", "side", "tag", "reason", "trigger", "day"]
+    base = ["date", "symbol", "side", "kind", "tag", "reason", "trigger", "day"]
     cols = base + [f"{k}_{h}d" for h in HORIZONS for k in ("excess", "signed")]
     if t.empty:
         return pd.DataFrame(columns=cols)
-    rows = t[["date", "symbol", "side", "tag", "reason"]].copy().reset_index(drop=True)
+    rows = t[["date", "symbol", "side", "kind", "tag", "reason"]].copy().reset_index(drop=True)
     rows["trigger"] = rows["reason"].map(trigger)
     day = px.days(rows["date"])
     col = px.cols(rows["symbol"])
@@ -382,20 +419,26 @@ def decision_rows(rec: Record, px: _Prices, market: FrozenMarket) -> pd.DataFram
 
 
 def decision_stats(rows: pd.DataFrame) -> dict[str, Any]:
-    out: dict[str, Any] = {"horizons": list(HORIZONS), "buys": {}, "sells": {}, "all": {}, "by_trigger": {},
-                           "counts": {}}
-    buys = rows["side"] == "BUY"
-    for trig, g in rows.groupby("trigger"):  # every decision, whether or not a window fits after it
-        out["counts"][str(trig)] = {"buys": int((g["side"] == "BUY").sum()), "sells": int((g["side"] != "BUY").sum())}
+    """By kind (buys, sells, shorts, covers, forced; ``all`` is every decision, forced fills left out) and horizon;
+    by trigger for five days; and how many of each there were."""
+    out: dict[str, Any] = {"horizons": list(HORIZONS), **{k: {} for k in (*KINDS, "forced", "all")},
+                           "by_trigger": {}, "counts": {}}
+    kind = rows["kind"].astype(str) + "s"  # buy -> buys, ..., forced -> forceds
+    kind = kind.where(kind != "forceds", "forced")
+    for trig, g in rows.groupby("trigger"):  # every fill, whether or not a window fits after it
+        k = kind.loc[g.index]
+        out["counts"][str(trig)] = {name: int((k == name).sum()) for name in (*KINDS, "forced")}
+    masks = {name: kind == name for name in (*KINDS, "forced")}
+    masks["all"] = kind != "forced"
     for h in HORIZONS:
         key = f"signed_{h}d"
-        for name, mask in (("buys", buys), ("sells", ~buys), ("all", pd.Series(True, index=rows.index))):
+        for name, mask in masks.items():
             out[name][f"{h}d"] = mean_test(rows.loc[mask, key], rows.loc[mask, "day"], overlap=h)
+    key = f"signed_{IC_HORIZON}d"
     for trig, g in rows.groupby("trigger"):
-        b = g["side"] == "BUY"
-        out["by_trigger"][str(trig)] = {
-            "buys": mean_test(g.loc[b, f"signed_{IC_HORIZON}d"], g.loc[b, "day"], overlap=IC_HORIZON),
-            "sells": mean_test(g.loc[~b, f"signed_{IC_HORIZON}d"], g.loc[~b, "day"], overlap=IC_HORIZON)}
+        k = kind.loc[g.index]
+        out["by_trigger"][str(trig)] = {name: mean_test(g.loc[k == name, key], g.loc[k == name, "day"],
+                                                        overlap=IC_HORIZON) for name in KINDS}
     return out
 
 
@@ -433,8 +476,8 @@ def ic_stats(rec: Record, px: _Prices, q: pd.DataFrame, market: FrozenMarket) ->
     else:
         when = list(rec.equity.index[:-1])
         out["decision_days"] = "every trading day of the run but the last (a strategy decides after every close)"
-    t = rec.share_trades(market)
-    t = t[t["symbol"].isin(universe)] if len(t) else t
+    t = rec.fills(market)
+    t = t[t["symbol"].isin(universe) & (t["kind"] != "forced")] if len(t) else t
     fills: dict[int, pd.Series] = {}
     if len(t):
         signed = t["qty"].astype(float) * np.where(t["side"] == "BUY", 1.0, -1.0)
@@ -466,9 +509,10 @@ def ic_stats(rec: Record, px: _Prices, q: pd.DataFrame, market: FrozenMarket) ->
             if ic is not None:
                 dir_ic.append(ic)
                 dir_days.append(f)
-    out["decision"] = {"score": "+1 bought, -1 sold, 0 left alone, on each day it traded",
+    out["decision"] = {"score": "+1 bought or covered, -1 sold or shorted, 0 left alone, on each day it traded",
                        **ic_summary(dir_ic, dir_days)}
-    out["holdings"] = {"score": "the weights it held after each decision (0 for stocks not held)",
+    out["holdings"] = {"score": "the weights it held after each decision (0 for stocks not held, below 0 for "
+                                "shorts)",
                        **ic_summary(held_ic, held_days)}
     return out
 
@@ -507,8 +551,11 @@ def factor_attribution(rec: Record, fac: pd.DataFrame) -> dict[str, Any]:
 
 # ----------------------------------------------------------------------------------- 3. P&L
 def episodes(rec: Record, px: _Prices, market: FrozenMarket) -> list[dict[str, Any]]:
-    """Every position from its first buy to the sell that closes it; positions still open are marked at the last
-    close. A position's P&L is the cash it returned minus the cash it took, commissions included."""
+    """Every position from the fill that opens it to the fill that closes it: a long from a buy, a short (negative
+    shares) from a short sale. Positions still open are marked at the last close. A position's P&L is the cash it
+    returned minus the cash it took, commissions included: a short sale brings cash in, the cover takes it out. A
+    fill that crosses zero closes the position and opens one on the other side; its commission goes with the
+    closing part, as the backtester books it."""
     from ..universe import sector_of
 
     t = rec.share_trades(market)
@@ -523,23 +570,29 @@ def episodes(rec: Record, px: _Prices, market: FrozenMarket) -> list[dict[str, A
         sym, qty, price = row["symbol"], float(row["qty"]), float(row["price"])
         comm = float(row["commission"]) if pd.notna(row["commission"]) else 0.0
         reason = "" if pd.isna(row["reason"]) else str(row["reason"])
+        sign = 1.0 if row["side"] == "BUY" else -1.0
         ep = open_.get(sym)
-        if row["side"] == "BUY":
-            if ep is None:
-                ep = open_[sym] = {"symbol": sym, "entry": row["date"], "entry_day": int(day), "entry_reason": reason,
-                                   "qty": 0.0, "flow": 0.0, "cost": 0.0, "buys": 0, "sells": 0}
-            ep["qty"] += qty
-            ep["flow"] -= qty * price + comm
-            ep["cost"] += qty * price + comm
-            ep["buys"] += 1
-        elif ep is not None:
-            ep["qty"] -= qty
-            ep["flow"] += qty * price - comm
-            ep["sells"] += 1
-            if ep["qty"] <= 1e-9:
-                ep.update(exit=row["date"], exit_day=int(day), exit_reason=reason, open=False, pnl=ep["flow"])
+        if ep is not None and ep["qty"] * sign < 0:  # against the position: closes or trims it
+            part = min(qty, abs(ep["qty"]))
+            ep["qty"] += sign * part
+            ep["flow"] -= sign * part * price + comm
+            ep["fills"] += 1
+            qty, comm = qty - part, 0.0
+            if abs(ep["qty"]) <= 1e-9:
+                ep.update(qty=0.0, exit=row["date"], exit_day=int(day), exit_reason=reason, open=False,
+                          pnl=ep["flow"])
                 done.append(ep)
                 del open_[sym]
+                ep = None
+        if qty > 1e-9:  # opens a position or adds to it
+            if ep is None:
+                ep = open_[sym] = {"symbol": sym, "direction": "long" if sign > 0 else "short", "entry": row["date"],
+                                   "entry_day": int(day), "entry_reason": reason, "qty": 0.0, "flow": 0.0,
+                                   "cost": 0.0, "fills": 0}
+            ep["qty"] += sign * qty
+            ep["flow"] -= sign * qty * price + comm
+            ep["cost"] += qty * price + comm  # the capital a long took, or the value a short sold
+            ep["fills"] += 1
     for sym, ep in open_.items():
         mark = float(px.close.at[last, sym]) if sym in px.close.columns else math.nan
         ep.update(exit=None, exit_day=last_day, exit_reason=None, open=True, pnl=ep["flow"] + ep["qty"] * mark)
@@ -554,14 +607,53 @@ def episodes(rec: Record, px: _Prices, market: FrozenMarket) -> list[dict[str, A
     return sorted(done, key=lambda e: (e["entry_day"], e["symbol"]))
 
 
-def cash_interest(rec: Record, market: FrozenMarket) -> float | None:
-    """Interest on idle cash: the engine multiplies cash by 1 + BIL's daily return after each day's fills."""
+def replay_account(rec: Record, px: _Prices, market: FrozenMarket) -> dict[str, Any]:
+    """The account rebuilt day by day from the fills, the way the backtester keeps it: the fills at the open, then
+    the day's T-bill (BIL) return on cash (a negative balance pays it), then, in a long_short or margin account, the
+    borrow fee on the shorts and the margin spread on borrowed cash (``MarginRules.daily_costs``, the backtester's
+    own rule). Returns, as P&L: ``cash_interest`` (the T-bill rate on cash and on short-sale proceeds),
+    ``borrow_fees`` and ``margin_interest`` (the loan's T-bill part plus the spread), the last two negative; and
+    ``equity_error``, the largest gap between the rebuilt equity and equity.csv (options or charges the record does
+    not hold make it large)."""
+    from .execution import margin_rules
+
+    exp = rec.experiment
+    try:
+        rules = margin_rules(exp.get("mode") or "long_only", exp.get("mode_params"))
+    except (ValueError, TypeError):
+        rules = None
     eq = rec.equity
-    if "cash_ratio" not in eq or not market.has("BIL"):
-        return None
-    bil = market.frame("BIL")["close"].pct_change().reindex(eq.index).fillna(0.0).clip(-0.01, 0.01)
-    cash = eq["cash_ratio"].astype(float) * eq["equity"].astype(float)
-    return float((cash * bil / (1.0 + bil)).sum())
+    days = eq.index
+    rf = (market.frame("BIL")["close"].pct_change().reindex(days).fillna(0.0).clip(-0.01, 0.01)
+          if market.has("BIL") else pd.Series(0.0, index=days))
+    t = rec.share_trades(market)
+    by_day = {d: g for d, g in t.groupby("date", sort=False)} if len(t) else {}
+    cash, held = rec.cash, {}
+    interest = fees = spread = loan_bill = err = 0.0
+    for d in days:
+        g = by_day.get(d)
+        if g is not None:
+            for side, sym, q, p, c in zip(g["side"], g["symbol"], g["qty"].astype(float), g["price"].astype(float),
+                                          g["commission"].astype(float), strict=True):
+                sg = 1.0 if side == "BUY" else -1.0
+                cash -= sg * q * p + c
+                held[sym] = held.get(sym, 0.0) + sg * q
+        r = float(rf.get(d, 0.0))
+        interest += cash * r
+        cash *= 1.0 + r
+        value = short_v = 0.0
+        for sym, q in held.items():
+            if abs(q) > 1e-9:
+                close = float(px.close.at[d, sym])
+                value += q * close
+                short_v -= min(q, 0.0) * close
+        if rules is not None:
+            fee, spr, loan = rules.daily_costs(cash, short_v)
+            cash -= fee + spr
+            fees, spread, loan_bill = fees + fee, spread + spr, loan_bill + loan * r
+        err = max(err, abs(cash + value - float(eq.at[d, "equity"])))
+    return {"mode": rules.mode if rules is not None else "long_only", "cash_interest": interest + loan_bill,
+            "borrow_fees": -fees, "margin_interest": -(spread + loan_bill), "equity_error": err}
 
 
 def _bucket(days: int) -> str:
@@ -581,10 +673,13 @@ def _group(eps: list[dict[str, Any]], key: str, cash: float, order: list[str] | 
     rows = []
     for g, items in groups.items():
         pnl = float(sum(e["pnl"] for e in items))
+        longs = [e for e in items if e["direction"] == "long"]
         rows.append({"group": g, "pnl": pnl, "contribution": pnl / cash if cash else None,
                      "share": pnl / total if abs(total) > 1e-9 else None,
                      "trades": len(items), "win_rate": sum(e["pnl"] > 0 for e in items) / len(items),
-                     "avg_pnl": pnl / len(items), "still_open": sum(bool(e["open"]) for e in items)})
+                     "avg_pnl": pnl / len(items), "still_open": sum(bool(e["open"]) for e in items),
+                     "long_pnl": float(sum(e["pnl"] for e in longs)), "short_pnl": pnl - sum(e["pnl"] for e in longs),
+                     "long_trades": len(longs), "short_trades": len(items) - len(longs)})
     if order:
         rank = {g: i for i, g in enumerate(order)}
         return sorted(rows, key=lambda r: rank.get(r["group"], len(rank)))
@@ -622,7 +717,8 @@ def regime_table(rec: Record) -> list[dict[str, Any]]:
 
 
 def _trade_row(e: dict[str, Any]) -> dict[str, Any]:
-    return {"symbol": e["symbol"], "sector": e["sector"], "entry": e["entry"], "exit": e["exit"],
+    return {"symbol": e["symbol"], "direction": e["direction"], "sector": e["sector"], "entry": e["entry"],
+            "exit": e["exit"],
             "holding_days": e["holding_days"], "pnl": e["pnl"], "return": e["return"], "open": e["open"],
             "entry_reason": e["entry_reason"], "exit_reason": e["exit_reason"]}
 
@@ -632,9 +728,10 @@ def pnl_breakdown(rec: Record, px: _Prices, market: FrozenMarket) -> dict[str, A
     stocks = [e for e in eps if not e["cash_vehicle"]]
     total = float(rec.equity["equity"].iloc[-1]) - rec.cash
     stock_pnl = float(sum(e["pnl"] for e in stocks))
+    long_pnl = float(sum(e["pnl"] for e in stocks if e["direction"] == "long"))
     tbill_etfs = float(sum(e["pnl"] for e in eps if e["cash_vehicle"]))
-    interest = cash_interest(rec, market)
-    other = total - stock_pnl - tbill_etfs - (interest or 0.0)
+    acct = replay_account(rec, px, market)
+    other = total - stock_pnl - tbill_etfs - acct["cash_interest"] - acct["borrow_fees"] - acct["margin_interest"]
     for e in stocks:
         e["holding"] = _bucket(int(e["holding_days"]))
     ranked = sorted(stocks, key=lambda e: -e["pnl"])
@@ -660,8 +757,14 @@ def pnl_breakdown(rec: Record, px: _Prices, market: FrozenMarket) -> dict[str, A
         })
     return {
         "initial_cash": cash, "total": total, "return": total / cash,
-        "reconciliation": {"stocks": stock_pnl, "tbill_etfs": tbill_etfs, "cash_interest": interest, "other": other},
+        # the lines add up to the run's P&L; borrow fees and margin interest are costs (negative)
+        "reconciliation": {"stocks": stock_pnl, "stocks_long": long_pnl, "stocks_short": stock_pnl - long_pnl,
+                           "tbill_etfs": tbill_etfs, "cash_interest": acct["cash_interest"],
+                           "borrow_fees": acct["borrow_fees"], "margin_interest": acct["margin_interest"],
+                           "other": other},
+        "account": {"mode": acct["mode"], "equity_error": acct["equity_error"]},
         "positions": len(stocks),
+        "by_direction": _group(stocks, "direction", cash, ["long", "short"]),
         "by_holding_period": _group(stocks, "holding", cash,
                                     [f"{lo}+ days" if hi is None else f"{lo}-{hi} days" for lo, hi in HOLDING_BUCKETS]),
         "by_regime": regime_table(rec),
@@ -710,6 +813,11 @@ def analyze_run(run: str | Path, market: FrozenMarket | None = None, save: bool 
         "pnl": pnl_breakdown(rec, px, market),
         "notes": notes,
     }
+    res["mode"] = res["pnl"]["account"]["mode"]
+    gap = res["pnl"]["account"]["equity_error"]
+    if gap > 0.01:
+        notes.append(f"Rebuilt from its fills, the account differs from equity.csv by up to ${gap:,.2f} on a day "
+                     "(options, or charges the record does not list); the reconciliation's 'other' line holds it.")
     res["summary"] = summary(res)
     res["findings"] = findings(res)
     if save:
@@ -730,11 +838,12 @@ def analyze_run(run: str | Path, market: FrozenMarket | None = None, save: bool 
 def summary(res: dict[str, Any]) -> dict[str, Any]:
     """The headline numbers, flat, for leaderboards."""
     d, ic, f, c = res["decisions"], res["ic"], res["factors"], res["pnl"]["concentration"]
-    a5, b5, s5 = d["all"]["5d"], d["buys"]["5d"], d["sells"]["5d"]
+    a5, b5, s5, sh5, cv5 = (d[k]["5d"] for k in ("all", "buys", "sells", "shorts", "covers"))
     ex = f.get("exposures") or {}
     counts = d.get("counts") or {}
-    n_all = sum(v["buys"] + v["sells"] for v in counts.values())
+    n_all = sum(v.get(k, 0) for v in counts.values() for k in KINDS)  # forced fills are not decisions
     news = counts.get("news") or {}
+    rc, cash = res["pnl"]["reconciliation"], res["pnl"]["initial_cash"]
     entry = {r["group"]: r for r in res["pnl"]["by_trigger"]["entry"]}
     contrib = f.get("contributions_annual") or {}
     return {
@@ -743,6 +852,8 @@ def summary(res: dict[str, Any]) -> dict[str, Any]:
         "decision_excess_5d": a5["mean"], "decision_excess_5d_t": a5["t"], "decision_hit_rate_5d": a5["hit_rate"],
         "buy_excess_5d": b5["mean"], "buy_excess_5d_t": b5["t"],
         "sell_avoided_5d": s5["mean"], "sell_avoided_5d_t": s5["t"],
+        "short_avoided_5d": sh5["mean"], "short_avoided_5d_t": sh5["t"],
+        "cover_excess_5d": cv5["mean"], "cover_excess_5d_t": cv5["t"],
         "decision_ic": (ic.get("decision") or {}).get("mean"), "decision_ic_t": (ic.get("decision") or {}).get("t"),
         "holdings_ic": (ic.get("holdings") or {}).get("mean"), "holdings_ic_t": (ic.get("holdings") or {}).get("t"),
         "alpha_annual": f.get("alpha_annual"), "alpha_t": f.get("alpha_t"),
@@ -752,8 +863,12 @@ def summary(res: dict[str, Any]) -> dict[str, Any]:
         "r2": f.get("r2"),
         # the part of the mean excess return a year that the four exposures explain; the rest is alpha_annual
         "exposure_return_annual": sum(contrib[k] for k in FACTORS) if contrib else None,
-        "news_decision_share": (news.get("buys", 0) + news.get("sells", 0)) / n_all if n_all else None,
+        "news_decision_share": sum(news.get(k, 0) for k in KINDS) / n_all if n_all else None,
         "news_entry_pnl": entry["news"]["pnl"] if "news" in entry else (0.0 if entry else None),
+        # P&L over the starting cash: the long positions, the short ones, and borrow fees plus margin interest
+        "long_contribution": rc["stocks_long"] / cash, "short_contribution": rc["stocks_short"] / cash,
+        "fees_contribution": (rc["borrow_fees"] + rc["margin_interest"]) / cash,
+        "forced_fills": sum(v.get("forced", 0) for v in counts.values()),
         "best_trade_share": c.get("best_trade_share"), "return_without_best_trade": c.get("return_without_best_trade"),
         "concentrated": c.get("concentrated"),
     }
@@ -836,13 +951,30 @@ def findings(res: dict[str, Any]) -> list[str]:
                 else f"beat SPY by {pct(-m, 2, False)}, so selling gave that up")
         out.append(f"Sells: over the five trading days from the fill, the stocks it sold {what} ({s5['n']} sells; "
                    f"t = {num(s5['t'], 1)}, {_sig(s5['t'])}).")
-    if not b5["n"] and not s5["n"]:
+    sh5, cv5 = d["shorts"]["5d"], d["covers"]["5d"]
+    if sh5["n"]:
+        m = _f(sh5["mean"]) or 0.0
+        what = (f"lagged SPY by {pct(m, 2, False)}: the shorts were on the right side" if m >= 0
+                else f"beat SPY by {pct(-m, 2, False)}: the shorts bet against stocks that went on to do better")
+        out.append(f"Shorts: over the five trading days from the fill, the stocks it shorted {what} ({sh5['n']} short "
+                   f"sales; t = {num(sh5['t'], 1)}, {_sig(sh5['t'])}).")
+    if cv5["n"]:
+        m = _f(cv5["mean"]) or 0.0
+        out.append(f"Covers: over the five trading days from the fill, the stocks it bought back "
+                   f"{'beat' if m >= 0 else 'trailed'} SPY by {pct(abs(m), 2, False)} ({cv5['n']} covers; "
+                   f"t = {num(cv5['t'], 1)}, {_sig(cv5['t'])}).")
+    forced = d["forced"]["1d"]["n"]
+    if forced:
+        out.append(f"Forced: {forced} fills came from margin calls or the close-out at zero equity; they are left out "
+                   "of the decision statistics.")
+    if not b5["n"] and not s5["n"] and not sh5["n"] and not cv5["n"]:
         out.append("No decision has five trading days of prices after it, so there are no decision statistics.")
     ic = res["ic"]
     di, hi = ic.get("decision") or {}, ic.get("holdings") or {}
     if di.get("days"):
-        out.append(f"Decision IC: on the {di['days']} days it traded, what it bought ranked against what it sold and "
-                   f"left alone by a mean rank IC of {num(di['mean'], 3)} with the next five days' returns (IC IR "
+        what = "bought or covered" if (sh5["n"] or cv5["n"]) else "bought"
+        out.append(f"Decision IC: on the {di['days']} days it traded, what it {what} ranked against what it sold "
+                   f"{'or shorted ' if sh5['n'] else ''}and left alone by a mean rank IC of {num(di['mean'], 3)} with the next five days' returns (IC IR "
                    f"{num(di['ir'])}, t = {num(di['t'], 1)}, {_sig(di['t'])}).")
     if hi.get("days"):
         out.append(f"Holdings IC: the weights it held after each of {hi['days']} decision days had a mean rank IC of "
@@ -855,14 +987,23 @@ def findings(res: dict[str, Any]) -> list[str]:
                    "variation (R²).")
         c = f["contributions_annual"]
         parts = sorted(FACTORS, key=lambda k: -abs(c[k]))
-        out.append(f"Of the {pct(f['excess_return_annual'])} a year it earned over T-bills (arithmetic mean): "
+        out.append(f"Of its {pct(f['excess_return_annual'])} a year over T-bills (arithmetic mean): "
                    + ", ".join(f"{k} {pct(c[k])}" for k in parts)
                    + f"; the alpha left is {pct(f['alpha_annual'])} a year (t = {num(f['alpha_t'], 1)}, "
                    f"{_sig(f['alpha_t'])}).")
         out.append(_factor_verdict(f))
     p = res["pnl"]
     rc = p["reconciliation"]
-    if p["positions"]:
+    longs = {r["group"]: r for r in p["by_direction"]}
+    if "short" in longs:
+        lg, sh = longs.get("long"), longs["short"]
+        fees = rc["borrow_fees"] + rc["margin_interest"]
+        out.append(f"P&L: {money(p['total'])} in all: long positions {money(rc['stocks_long'])} "
+                   f"({_count(lg['trades'] if lg else 0)}), short positions {money(rc['stocks_short'])} "
+                   f"({_count(sh['trades'])}), interest on cash and short-sale proceeds {money(rc['cash_interest'])}, "
+                   f"borrow fees {money(rc['borrow_fees'])} and margin interest {money(rc['margin_interest'])} "
+                   f"({money(fees)} together).")
+    elif p["positions"]:
         out.append(f"P&L: {money(p['total'])} in all, {money(rc['stocks'])} from {p['positions']} positions and "
                    f"{money(rc['cash_interest'])} of interest on idle cash.")
     for key, what in (("by_holding_period", "By holding period"), ("by_sector", "By sector"),
@@ -870,8 +1011,10 @@ def findings(res: dict[str, Any]) -> list[str]:
         rows = p[key]
         if len(rows) >= 2:
             best, worst = max(rows, key=lambda r: r["pnl"]), min(rows, key=lambda r: r["pnl"])
-            out.append(f"{what}: {best['group']} made the most ({money(best['pnl'])}, {_count(best['trades'])}); "
-                       f"{worst['group']} the least ({money(worst['pnl'])}, {_count(worst['trades'])}).")
+            out.append(f"{what}: {best['group']} {'made the most' if best['pnl'] >= 0 else 'lost the least'} "
+                       f"({money(best['pnl'])}, {_count(best['trades'])}); {worst['group']} "
+                       f"{'lost the most' if worst['pnl'] < 0 else 'made the least'} ({money(worst['pnl'])}, "
+                       f"{_count(worst['trades'])}).")
     if p["by_regime"]:
         parts = [f"{r['label']} {r['days']} days {pct(r['return'])} (SPY {pct(r['spy_return'])})" for r in p["by_regime"]]
         out.append("By market regime of the previous close: " + "; ".join(parts) + ".")
@@ -908,11 +1051,12 @@ def _concentration_words(p: dict[str, Any]) -> list[str]:
     bt = c.get("best_trade")
     if not bt:
         return []
-    held = "still open at the end" if bt["open"] else f"sold {_day(bt['exit'])}"
-    best = f"{bt['symbol']} bought {_day(bt['entry'])} and {held}, {money(bt['pnl'])}"
+    short = bt.get("direction") == "short"
+    held = "still open at the end" if bt["open"] else f"{'covered' if short else 'sold'} {_day(bt['exit'])}"
+    best = f"{bt['symbol']} {'shorted' if short else 'bought'} {_day(bt['entry'])} and {held}, {money(bt['pnl'])}"
     stocks = p["reconciliation"]["stocks"]
     if stocks <= 0:
-        text = f"Concentration: the positions lost {money(stocks)} in all; the best was {best}."
+        text = f"Concentration: the positions lost ${abs(stocks):,.0f} in all; the best was {best}."
     elif c["concentrated"]:
         if (c.get("top2_share_of_gains") or 0) >= 0.4:
             text = (f"Concentration: the profit rests on the best two positions, which made "
@@ -935,8 +1079,10 @@ def _table(head: list[str], rows: list[list[str]], align: str | None = None) -> 
     return ["| " + " | ".join(head) + " |", "|" + align] + ["| " + " | ".join(r) + " |" for r in rows] + [""]
 
 
-def _group_rows(rows: list[dict[str, Any]], label: str = "group") -> list[list[str]]:
+def _group_rows(rows: list[dict[str, Any]], label: str = "group", split: bool = False) -> list[list[str]]:
+    """Table rows of a P&L breakdown; ``split`` adds the long and the short positions' P&L."""
     return [[str(r[label]), str(r["trades"]), money(r["pnl"]), pct(r["contribution"]),
+             *([money(r["long_pnl"]), money(r["short_pnl"])] if split else []),
              pct(r["win_rate"], 0, False), str(r["still_open"] or "")] for r in rows]
 
 
@@ -951,13 +1097,18 @@ def render_markdown(res: dict[str, Any]) -> str:
     for n in res.get("notes") or []:
         lines += [f"> {n}", ""]
 
+    shorts = any(d[k]["1d"]["n"] for k in ("shorts", "covers")) or any(
+        r["group"] == "short" for r in p["by_direction"])
     lines += ["## Decisions", "",
               "The stock's return minus SPY's after each buy and sell, from the open of the day the order filled, on "
-              "total-return prices. A sell is credited with the excess it avoided (SPY's return minus the stock's). "
-              "*t* allows for decisions on the same day and for overlapping windows; *t (iid)* treats every decision "
-              "as independent.", ""]
+              "total-return prices. A sell is credited with the excess it avoided (SPY's return minus the stock's)"
+              + ("; so is a short sale, a bet against the stock, while a cover counts like a buy. Fills forced by "
+                 "margin calls are shown apart and left out of *All*" if shorts else "")
+              + ". *t* allows for decisions on the same day and for overlapping windows; *t (iid)* treats every "
+              "decision as independent.", ""]
     rows = []
-    for side, label in (("buys", "Buys"), ("sells", "Sells (avoided)"), ("all", "All")):
+    for side, label in (("buys", "Buys"), ("sells", "Sells (avoided)"), ("shorts", "Shorts (avoided)"),
+                        ("covers", "Covers"), ("forced", "Forced (margin calls)"), ("all", "All")):
         for h in HORIZONS:
             m = d[side][f"{h}d"]
             if m["n"]:
@@ -970,14 +1121,16 @@ def render_markdown(res: dict[str, Any]) -> str:
         lines += ["No decisions with enough prices after them.", ""]
     trig = d["by_trigger"]
     if len(trig) > 1 or "news" in trig:
+        kinds = [("buys", "Buys", "Mean excess"), ("sells", "Sells", "Mean avoided")]
+        if shorts:
+            kinds += [("shorts", "Shorts", "Mean avoided"), ("covers", "Covers", "Mean excess")]
         trows = []
         for g in ("news", "other", "no reason"):
             if g in trig:
-                b, s = trig[g]["buys"], trig[g]["sells"]
-                trows.append([g, str(b["n"]), pct(b["mean"], 2), num(b["t"], 1), str(s["n"]), pct(s["mean"], 2),
-                              num(s["t"], 1)])
+                trows.append([g, *(x for k, _, _ in kinds for x in (str(trig[g][k]["n"]), pct(trig[g][k]["mean"], 2),
+                                                                    num(trig[g][k]["t"], 1)))])
         lines += ["By the reason the decision gave, five days:", ""]
-        lines += _table(["Trigger", "Buys", "Mean excess", "t", "Sells", "Mean avoided", "t"], trows)
+        lines += _table(["Trigger", *(x for _, n, m in kinds for x in (n, m, "t"))], trows)
     lines += ["### Rank IC", "",
               f"Across the {ic.get('universe', 0)} stocks of the universe, the rank correlation between what the agent "
               f"did and the next {IC_HORIZON} days' returns from the open of the fill day. Decision days: "
@@ -986,7 +1139,8 @@ def render_markdown(res: dict[str, Any]) -> str:
         lines += [f"Skipped: {ic['skipped']}.", ""]
     else:
         irows = []
-        for key, label in (("decision", "What it bought (+1) and sold (-1)"), ("holdings", "What it held (weights)")):
+        for key, label in (("decision", "What it bought or covered (+1) and sold or shorted (-1)" if shorts else
+                            "What it bought (+1) and sold (-1)"), ("holdings", "What it held (weights)")):
             m = ic[key]
             irows.append([label, str(m["days"]), num(m["mean"], 3), num(m["std"], 3), num(m["ir"]), num(m["t"], 1),
                           pct(m["positive_share"], 0, False)])
@@ -1012,21 +1166,31 @@ def render_markdown(res: dict[str, Any]) -> str:
 
     rc = p["reconciliation"]
     lines += ["## Where the P&L came from", "",
-              "Each position runs from its first buy to the sell that closes it; positions still open are marked at "
-              "the last close. The parts add up to the run's P&L. *Of return* is the P&L over the starting cash, in "
-              "percentage points of the run's return.", ""]
-    recon = [["Positions in stocks", money(rc["stocks"])]]
-    if abs(rc["tbill_etfs"]) > 0.5:
+              "Each position runs from the fill that opens it to the one that closes it"
+              + (" (a long from a buy, a short from a short sale)" if shorts else "")
+              + "; positions still open are marked at the last close. The parts add up to the run's P&L to the cent. "
+              "*Of return* is the P&L over the starting cash, in percentage points of the run's return.", ""]
+    if shorts:
+        recon = [["Long positions", money(rc["stocks_long"])], ["Short positions", money(rc["stocks_short"])]]
+    else:
+        recon = [["Positions in stocks", money(rc["stocks"])]]
+    if abs(rc["tbill_etfs"]) > 0.005:
         recon.append(["T-bill ETFs", money(rc["tbill_etfs"])])
-    recon.append(["Interest on idle cash", money(rc["cash_interest"])])
-    if abs(rc["other"]) > 1.0:
-        recon.append(["Other (options, costs not in trades.csv)", money(rc["other"])])
+    recon.append(["Interest on cash and short-sale proceeds" if shorts else "Interest on idle cash",
+                  money(rc["cash_interest"])])
+    if shorts or rc["borrow_fees"] or rc["margin_interest"]:
+        recon += [["Borrow fees", money(rc["borrow_fees"])], ["Margin interest", money(rc["margin_interest"])]]
+    if abs(rc["other"]) >= 0.005:
+        recon.append(["Other (options, charges not in the record)", money(rc["other"])])
     recon.append([f"Total ({pct(p['return'])})", money(p["total"])])
     lines += _table(["", "P&L"], recon, "---|---:|")
-    gh = ["Group", "Positions", "P&L", "Of return", "Win rate", "Still open"]
+    gh = ["Group", "Positions", "P&L", "Of return", *(["Long", "Short"] if shorts else []), "Win rate", "Still open"]
+    if shorts:
+        lines += ["### Long and short", ""] + _table(["Side", "Positions", "P&L", "Of return", "Win rate", "Still open"],
+                                                     _group_rows(p["by_direction"]))
     if p["positions"]:
-        lines += ["### By holding period", "", "Trading days from the first buy to the sell that closed the position.",
-                  ""] + _table(gh, _group_rows(p["by_holding_period"]))
+        lines += ["### By holding period", "", "Trading days from the fill that opened the position to the one that "
+                  "closed it.", ""] + _table(gh, _group_rows(p["by_holding_period"], split=shorts))
     if p["by_regime"]:
         lines += ["### By market regime", "", "The regime at the previous close, which positions were held under. "
                   "Returns compound the run's and SPY's daily returns over those days; P&L includes interest.", ""]
@@ -1035,19 +1199,24 @@ def render_markdown(res: dict[str, Any]) -> str:
                           pct(r["spy_return"]), pct(r["avg_exposure"], 0, False)] for r in p["by_regime"]])
     if p["positions"]:
         lines += ["### By trigger", "", "Whether the reason of the entry (or the exit) names news.", ""]
-        lines += _table(["Entry", *gh[1:]], _group_rows(p["by_trigger"]["entry"]))
-        lines += _table(["Exit", *gh[1:]], _group_rows(p["by_trigger"]["exit"]))
-        lines += ["### By sector", ""] + _table(gh, _group_rows(p["by_sector"]))
+        lines += _table(["Entry", *gh[1:]], _group_rows(p["by_trigger"]["entry"], split=shorts))
+        lines += _table(["Exit", *gh[1:]], _group_rows(p["by_trigger"]["exit"], split=shorts))
+        lines += ["### By sector", ""] + _table(gh, _group_rows(p["by_sector"], split=shorts))
         stocks = p["by_stock"]
         shown = stocks if len(stocks) <= 20 else stocks[:10] + stocks[-10:]
         lines += [f"### By stock{'' if len(stocks) <= 20 else f' (best 10 and worst 10 of {len(stocks)})'}", ""]
-        lines += _table(gh, _group_rows(shown))
-        trows = [[t["symbol"], _day(t["entry"]), _day(t["exit"]) or "open", str(t["holding_days"]), money(t["pnl"]),
-                  pct(t["return"]), (t["entry_reason"] or "")[:60].replace("|", "/")]
+        lines += _table(gh, _group_rows(shown, split=shorts))
+        trows = [[t["symbol"], *([t["direction"]] if shorts else []), _day(t["entry"]), _day(t["exit"]) or "open",
+                  str(t["holding_days"]), money(t["pnl"]), pct(t["return"]),
+                  (t["entry_reason"] or "")[:60].replace("|", "/")]
                  for t in p["best_trades"] + p["worst_trades"]]
         lines += ["### Best and worst positions", ""]
-        lines += _table(["Stock", "Bought", "Sold", "Days", "P&L", "Return", "Why it bought"], trows,
-                        "---|---|---|---:|---:|---:|---|")
+        if shorts:
+            lines += _table(["Stock", "Side", "Opened", "Closed", "Days", "P&L", "Return", "Why it opened"], trows,
+                            "---|---|---|---|---:|---:|---:|---|")
+        else:
+            lines += _table(["Stock", "Bought", "Sold", "Days", "P&L", "Return", "Why it bought"], trows,
+                            "---|---|---|---:|---:|---:|---|")
         c = p["concentration"]
         lines += ["### Concentration", ""]
         lines += _table(["", "Best position", "Best two", "Best stock"], [
@@ -1075,8 +1244,12 @@ def render_markdown(res: dict[str, Any]) -> str:
               "trading days before each month end, equal weight, held through the next month. Close-to-close "
               "total-return prices. OLS with Newey-West standard errors (Bartlett, floor(4 (n/100)^(2/9)) lags).",
               "- **P&L**: a position's P&L is the cash it returned minus the cash it took (commissions included), "
-              "plus its value at the last close if still open. Interest on idle cash is the cash at each close times "
-              "BIL's return that day, as the backtest pays it. Triggers read the reason of the decision "
+              "plus its value at the last close if still open; a short's sale brings the cash in and its cover takes it "
+              "out. The account is rebuilt day by day from the fills as the backtest keeps it: cash earns BIL's return "
+              "each day (a negative balance pays it); a long_short or margin account also pays the borrow fee on its "
+              "shorts and the margin spread on borrowed cash, by the record's own margin rules. Interest counts the "
+              "T-bill rate on cash and short-sale proceeds; margin interest is the borrowed cash's T-bill rate plus the "
+              "spread. Triggers read the reason of the decision "
               "(decisions.csv and trades.csv): 'news' when it names news (news, headline, red flag, 8-K, earnings, "
               "analyst, ...).", ""]
     return "\n".join(lines)
@@ -1084,7 +1257,7 @@ def render_markdown(res: dict[str, Any]) -> str:
 
 # ----------------------------------------------------------------------------------- chart
 INK, INK2, GRID, AXIS = "#0b0b0b", "#52514e", "#e1e0d9", "#c3c2b7"
-BLUE, RED, ORANGE, GRAY = "#2a78d6", "#e34948", "#eb6834", "#898781"
+BLUE, RED, ORANGE, GRAY, AQUA = "#2a78d6", "#e34948", "#eb6834", "#898781", "#1baf7a"
 
 
 def _style(ax: Any, value_axis: str = "y") -> None:
@@ -1128,15 +1301,17 @@ def draw(res: dict[str, Any], path: Path) -> None:
     ax = axes[0, 0]
     if d["all"]["1d"]["n"]:
         x = np.arange(len(HORIZONS))
-        w = 0.38
-        for k, (side, label, color) in enumerate((("buys", "Buys: excess earned", BLUE),
-                                                  ("sells", "Sells: excess avoided", ORANGE))):
+        series = [("buys", "Buys: excess earned", BLUE), ("sells", "Sells: excess avoided", ORANGE)]
+        if d["shorts"]["1d"]["n"]:
+            series.append(("shorts", "Shorts: excess avoided", AQUA))
+        w = 0.76 / len(series)
+        for k, (side, label, color) in enumerate(series):
             m = [_f(d[side][f"{h}d"]["mean"]) for h in HORIZONS]
             se = [_f(d[side][f"{h}d"]["se"]) for h in HORIZONS]
             vals = [v * 100 if v is not None else 0.0 for v in m]
             err = [1.96 * s * 100 if s is not None else 0.0 for s in se]
             n = d[side]["1d"]["n"]
-            ax.bar(x + (k - 0.5) * w, vals, w * 0.92, color=color, label=f"{label} ({n})", yerr=err,
+            ax.bar(x + (k - (len(series) - 1) / 2) * w, vals, w * 0.92, color=color, label=f"{label} ({n})", yerr=err,
                    error_kw={"ecolor": INK2, "elinewidth": 0.9, "capsize": 3})
         ax.axhline(0, color=AXIS, linewidth=0.8)
         ax.set_xticks(x, [f"{h} day{'s' if h > 1 else ''}" for h in HORIZONS])
@@ -1214,7 +1389,9 @@ def draw(res: dict[str, Any], path: Path) -> None:
 
 # ----------------------------------------------------------------------------------- many runs, JSON, MCP
 COMPARE = ["strategy", "news", "total_return", "decisions", "decision_excess_5d", "decision_excess_5d_t",
-           "buy_excess_5d", "buy_excess_5d_t", "sell_avoided_5d", "sell_avoided_5d_t", "decision_ic", "decision_ic_t",
+           "buy_excess_5d", "buy_excess_5d_t", "sell_avoided_5d", "sell_avoided_5d_t", "short_avoided_5d",
+           "short_avoided_5d_t", "long_contribution", "short_contribution", "fees_contribution", "decision_ic",
+           "decision_ic_t",
            "holdings_ic", "holdings_ic_t", "alpha_annual", "alpha_t", "beta_market", "beta_size", "beta_growth",
            "beta_momentum", "r2", "best_trade", "best_trade_share", "return_without_best_trade", "run_id"]
 
@@ -1248,7 +1425,9 @@ def analyze_many(folder: str | Path, chart: bool = True,
 
 
 def compare_markdown(t: pd.DataFrame) -> str:
-    head = ["Strategy", "News", "Return", "Decisions", "Buys, 5 days (t)", "Sells avoided (t)", "Decision IC (t)",
+    shorts = bool(len(t)) and bool((t["short_contribution"].fillna(0.0).abs() > 0).any())
+    head = ["Strategy", "News", "Return", "Decisions", "Buys, 5 days (t)", "Sells avoided (t)",
+            *(["Shorts avoided (t)", "Longs", "Shorts", "Fees"] if shorts else []), "Decision IC (t)",
             "Alpha a year (t)", "Market", "Size", "Growth", "Momentum", "R²", "Best position", "Return without it"]
     rows = []
     for _, r in t.iterrows():
@@ -1256,15 +1435,22 @@ def compare_markdown(t: pd.DataFrame) -> str:
         rows.append([str(r["strategy"]), news, pct(r["total_return"]), str(int(r["decisions"] or 0)),
                      f"{pct(r['buy_excess_5d'], 2)} ({num(r['buy_excess_5d_t'], 1)})",
                      f"{pct(r['sell_avoided_5d'], 2)} ({num(r['sell_avoided_5d_t'], 1)})",
+                     *([f"{pct(r['short_avoided_5d'], 2)} ({num(r['short_avoided_5d_t'], 1)})",
+                        pct(r["long_contribution"]), pct(r["short_contribution"]), pct(r["fees_contribution"], 2)]
+                       if shorts else []),
                      f"{num(r['decision_ic'], 3)} ({num(r['decision_ic_t'], 1)})",
                      f"{pct(r['alpha_annual'])} ({num(r['alpha_t'], 1)})",
                      *(num(r[f"beta_{k}"]) for k in FACTORS), pct(r["r2"], 0, False),
                      str(r["best_trade"] or ""), pct(r["return_without_best_trade"])])
     period = t["period"].iloc[0] if len(t) else ""
-    return "\n".join([f"# What drove each run ({period})", "", *_table(head, rows, "---|---|" + "---:|" * 11 + "---|---:|"),
-                      "Buys: the excess return over SPY in the five trading days from the fill; sells: the excess "
-                      "they avoided. t-statistics allow for decisions on the same day and overlapping windows. "
-                      "Decision IC: rank IC of what it bought (+1) and sold (-1) against the next five days. Alpha "
+    align = "---|---|" + "---:|" * (len(head) - 4) + "---|---:|"
+    return "\n".join([f"# What drove each run ({period})", "", *_table(head, rows, align),
+                      "Buys: the excess return over SPY in the five trading days from the fill; sells"
+                      + (" and shorts" if shorts else "") + ": the excess they avoided. t-statistics allow for "
+                      "decisions on the same day and overlapping windows. "
+                      + ("Longs, shorts and fees (borrow fees plus margin interest): P&L over the starting cash. "
+                         if shorts else "")
+                      + "Decision IC: rank IC of what it bought (+1) and sold (-1) against the next five days. Alpha "
                       "and the exposures to the market, size, growth and momentum factors: OLS with Newey-West t. "
                       "Return without it: the run's return had its best position made nothing. Each run's folder has "
                       "its analysis.md.", ""])
@@ -1299,7 +1485,9 @@ def compact(res: dict[str, Any]) -> dict[str, Any]:
 
     out = {k: res[k] for k in ("run_id", "folder", "strategy", "kind", "period", "start", "end", "stocks", "news",
                                "total_return", "spy_return", "summary", "findings", "decisions", "ic", "factors")}
+    out["mode"] = res.get("mode")
     out["pnl"] = {"total": p["total"], "reconciliation": p["reconciliation"], "positions": p["positions"],
+                  "by_direction": p["by_direction"], "account": p["account"],
                   "by_holding_period": p["by_holding_period"], "by_regime": p["by_regime"],
                   "by_trigger": p["by_trigger"], "by_sector": ends(p["by_sector"]), "by_stock": ends(p["by_stock"]),
                   "best_trades": p["best_trades"][:3], "worst_trades": p["worst_trades"][:3],
@@ -1320,11 +1508,15 @@ def print_analysis(res: dict[str, Any], console: Any, L: Any) -> None:
     t = Table(title=L("Excess return over SPY after each decision: mean, hit rate, t",
                       "每个决策之后相对 SPY 的超额收益：均值、命中率、t 值"))
     t.add_column("")
-    for side, en, zh in (("buys", "Buys", "买入"), ("sells", "Sells, avoided", "卖出（躲开的）"), ("all", "All", "全部")):
+    sides = [("buys", "Buys", "买入"), ("sells", "Sells, avoided", "卖出（躲开的）")]
+    if d["shorts"]["1d"]["n"]:
+        sides.append(("shorts", "Shorts, avoided", "卖空（躲开的）"))
+    sides.append(("all", "All", "全部"))
+    for side, en, zh in sides:
         t.add_column(f"{L(en, zh)} ({d[side]['1d']['n']})", justify="right")
     for h in HORIZONS:
         cells = []
-        for side in ("buys", "sells", "all"):
+        for side, _, _ in sides:
             m = d[side][f"{h}d"]
             cells.append(f"{pct(m['mean'], 2)} {pct(m['hit_rate'], 0, False)} t{num(m['t'], 1)}" if m["n"] else "")
         t.add_row(L(f"{h} day{'s' if h > 1 else ''}", f"{h} 日"), *cells)

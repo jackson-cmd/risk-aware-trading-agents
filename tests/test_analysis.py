@@ -16,6 +16,8 @@ from riskaware.research import agent
 from riskaware.research import analysis as A
 from riskaware.research.data import FrozenMarket
 from riskaware.research.experiment import Experiment, run_experiment
+from riskaware.strategy.base import Strategy
+from riskaware.types import Action, Signal
 
 REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
 STOCKS = ["AAA", "BBB", "CCC", "DDD", "EEE", "FFF"]
@@ -167,9 +169,10 @@ def _record(tmp: Path, market: FrozenMarket, betas: dict[str, float], alpha: flo
     eq.index.name = "date"
     tmp.mkdir(parents=True, exist_ok=True)
     eq.to_csv(tmp / "equity.csv")
-    rows = [{"date": str(days[i].date()), "symbol": s, "side": side, "qty": q, "price": px, "value": q * px,
-             "commission": 0.0, "tag": "entry" if side == "BUY" else "exit", "reason": why, "pnl": np.nan,
-             "holding_days": np.nan} for i, s, side, q, px, why in trades]
+    rows = [{"date": str(days[t[0]].date()), "symbol": t[1], "side": t[2], "qty": t[3], "price": t[4],
+             "value": t[3] * t[4], "commission": 0.0,
+             "tag": t[6] if len(t) > 6 else ("entry" if t[2] == "BUY" else "exit"), "reason": t[5], "pnl": np.nan,
+             "holding_days": np.nan} for t in trades]
     pd.DataFrame(rows).to_csv(tmp / "trades.csv", index=False)
     man = {"run_id": tmp.name, "experiment": {"period": "2026", "cash": 100_000.0, "news": True,
                                               "start": str(days[0].date()), "end": str(days[-1].date())},
@@ -216,7 +219,9 @@ def test_decisions_and_ic_on_a_synthetic_record(tmp_path, market):
         assert d["all"][f"{h}d"]["mean"] == pytest.approx(np.mean(buys + sells))
         assert d["all"][f"{h}d"]["hit_rate"] == pytest.approx(np.mean(np.array(buys + sells) > 0))
     assert res["decisions"]["by_trigger"]["news"]["buys"]["n"] == 1
-    assert res["decisions"]["counts"] == {"news": {"buys": 1, "sells": 1}, "other": {"buys": 2, "sells": 2}}
+    zero = {"shorts": 0, "covers": 0, "forced": 0}
+    assert res["decisions"]["counts"] == {"news": {"buys": 1, "sells": 1, **zero}, "other": {"buys": 2, "sells": 2,
+                                                                                         **zero}}
     assert res["summary"]["news_decision_share"] == pytest.approx(2 / 6)
     assert res["summary"]["news_entry_pnl"] == pytest.approx(1000.0)
 
@@ -298,7 +303,7 @@ def test_real_record_adds_up(real_run):
     metrics = json.loads((real_run / "metrics.json").read_text(encoding="utf-8"))
     assert res["total_return"] == pytest.approx(metrics["strategy"]["total_return"], abs=1e-6)
     rc = res["pnl"]["reconciliation"]
-    assert abs(rc["other"]) < 1.0  # positions + interest = the run's P&L, to the dollar
+    assert abs(rc["other"]) < 0.01 and res["pnl"]["account"]["equity_error"] < 0.01  # to the cent
     trades = pd.read_csv(real_run / "trades.csv")
     assert res["decisions"]["buys"]["1d"]["n"] == int((trades["side"] == "BUY").sum())
     assert sum(r["trades"] for r in res["pnl"]["by_stock"]) == res["pnl"]["positions"]
@@ -348,7 +353,7 @@ def test_a_policy_run_from_the_agent(monkeypatch):
     assert res["kind"] == "policy" and res["decisions"]["all"]["1d"]["n"] > 0
     steps = json.loads((Path(r.folder) / "policy_log.json").read_text(encoding="utf-8"))["steps"]
     assert 0 < res["ic"]["holdings"]["days"] <= len(steps)
-    assert abs(res["pnl"]["reconciliation"]["other"]) < 1.0
+    assert abs(res["pnl"]["reconciliation"]["other"]) < 0.01
 
 
 def test_fills_take_the_reason_of_the_order_in_decisions_csv():
@@ -372,3 +377,120 @@ def test_a_folder_without_records_is_an_error(tmp_path):
         A.analyze_many(tmp_path)
     out = CliRunner().invoke(app, ["research", "analyze", str(tmp_path)])
     assert out.exit_code == 2 and "holds none" in " ".join(out.output.split())
+
+
+# ----------------------------------------------------------------------------------- short selling and margin
+SHORT_TRADES = [(5, "AAA", "SELL", 100, 100.0, "bearish: guidance cut", "short"),
+                (5, "BBB", "BUY", 100, 50.0, "breakout", "entry"),
+                (15, "AAA", "BUY", 100, 90.0, "take the gain", "cover"),
+                (20, "BBB", "SELL", 150, 55.0, "turn short", "short"),  # closes the long and opens a short
+                (30, "BBB", "BUY", 50, 60.0, "stop", "cover"),
+                (35, "CCC", "BUY", 60, 100.0, "pullback", "entry"),
+                (40, "CCC", "SELL", 30, 100.0, "margin call: every position cut to 50%", "margin_call"),
+                (45, "CCC", "SELL", 30, 110.0, "target", "exit")]
+
+
+def test_shorts_on_a_synthetic_record(tmp_path, market):
+    folder = _record(tmp_path / "rec", market, {"market": 1.0}, 0.0, SHORT_TRADES)
+    res = A.analyze_run(folder, market=market, chart=False, momentum_universe=STOCKS)
+    d = res["decisions"]
+    assert {k: d[k]["1d"]["n"] for k in ("buys", "sells", "shorts", "covers", "forced", "all")} == {
+        "buys": 2, "sells": 1, "shorts": 2, "covers": 2, "forced": 1, "all": 7}  # a margin call is not a decision
+    f = {s: market.frame(s) for s in ["AAA", "BBB", "SPY"]}
+    cal, days = list(market.calendar), market.calendar[-160:-20]
+
+    def excess(i: int, sym: str, h: int = 5) -> float:
+        k = cal.index(days[i])
+        r = f[sym]["close"].iloc[k + h - 1] / f[sym]["open"].iloc[k] - 1
+        return r - (f["SPY"]["close"].iloc[k + h - 1] / f["SPY"]["open"].iloc[k] - 1)
+
+    # a short sale bets against the stock: it is credited with the excess it avoided; a cover counts like a buy
+    assert d["shorts"]["5d"]["mean"] == pytest.approx(np.mean([-excess(5, "AAA"), -excess(20, "BBB")]))
+    assert d["covers"]["5d"]["mean"] == pytest.approx(np.mean([excess(15, "AAA"), excess(30, "BBB")]))
+    assert res["summary"]["short_avoided_5d"] == pytest.approx(d["shorts"]["5d"]["mean"])
+    assert res["summary"]["forced_fills"] == 1 and res["summary"]["cover_excess_5d"] is not None
+    p = res["pnl"]
+    # AAA short +1,000; BBB long +500, then short -250 from the fill that crossed zero; CCC long +300
+    by_dir = {r["group"]: (r["trades"], round(r["pnl"], 6)) for r in p["by_direction"]}
+    assert by_dir == {"long": (2, 800.0), "short": (2, 750.0)}
+    assert p["reconciliation"]["stocks_long"] == pytest.approx(800.0)
+    assert p["reconciliation"]["stocks_short"] == pytest.approx(750.0)
+    bbb = next(r for r in p["by_stock"] if r["group"] == "BBB")
+    assert (bbb["long_pnl"], bbb["short_pnl"], bbb["trades"]) == (pytest.approx(500.0), pytest.approx(-250.0), 2)
+    best = p["best_trades"][0]
+    assert (best["symbol"], best["direction"], best["holding_days"]) == ("AAA", "short", 10)
+    assert best["pnl"] == pytest.approx(1000.0) and best["return"] == pytest.approx(0.1)
+    assert any("AAA shorted" in x for x in res["findings"])
+    md = A.render_markdown(res)
+    assert "| Shorts (avoided) | 5 days |" in md and "### Long and short" in md and "Short positions" in md
+
+
+class _Fixed(Strategy):
+    """Holds fixed signed weights from the first day on."""
+
+    name = "fixed"
+
+    def __init__(self, weights: dict[str, float], every: int = 5):
+        super().__init__()
+        self.weights, self.every = weights, every
+
+    def on_start(self, universe):
+        self.day = 0
+
+    def on_bar(self, ctx):
+        self.day += 1
+        if (self.day - 1) % self.every:
+            return []
+        out = []
+        for s, w in self.weights.items():
+            pos = ctx.position(s)
+            cur = pos.weight if pos is not None else 0.0
+            if w != cur:
+                out.append(Signal(s, Action.BUY if w > cur else Action.SELL, 0.5, "fixed", target_weight=w))
+        return out
+
+    def warmup_bars(self):
+        return 0
+
+
+@pytest.fixture(scope="module")
+def short_runs(tmp_path_factory):
+    base = tmp_path_factory.mktemp("short-runs")
+    common = {"universe": "core", "news": False, "leak_check": False}
+    runs = {
+        "long_short": (Experiment(strategy="momentum_ls", max_positions=9, mode="long_short", start="2026-02-02",
+                                  end="2026-04-30", **common), None),
+        "margin": (Experiment(strategy="trend_ls", params={"gross": 2.0}, max_positions=9, mode="margin",
+                              period="2022", start="2022-02-01", end="2022-05-31", **common), None),
+        "margin_call": (Experiment(strategy="fixed", mode="margin", period="2020", start="2020-02-03",
+                                   end="2020-04-30", **common), lambda: _Fixed({"TSLA": 2.0}, every=1000)),
+    }
+    return {name: run_experiment(exp, factory=factory, out_dir=base / name, chart=False).folder
+            for name, (exp, factory) in runs.items()}
+
+
+@pytest.mark.parametrize("name", ["long_short", "margin", "margin_call"])
+def test_long_short_and_margin_records_add_up_to_the_cent(short_runs, name):
+    folder = short_runs[name]
+    res = A.analyze_run(folder, chart=False)
+    p, rc = res["pnl"], res["pnl"]["reconciliation"]
+    assert res["mode"] == ("long_short" if name == "long_short" else "margin")
+    assert p["account"]["equity_error"] < 0.01  # the account rebuilt from the fills is the one the backtest kept
+    assert abs(rc["other"]) < 0.01  # positions + interest + borrow fees + margin interest = the run's P&L
+    assert rc["stocks_long"] + rc["stocks_short"] == pytest.approx(rc["stocks"])
+    acct = json.loads((folder / "metrics.json").read_text(encoding="utf-8"))["account"]
+    cash = p["initial_cash"]
+    for mine, theirs, sign in (("stocks_long", "pnl_long", 1), ("stocks_short", "pnl_short", 1),
+                               ("borrow_fees", "borrow_fees", -1), ("margin_interest", "margin_interest", -1),
+                               ("cash_interest", "cash_interest", 1)):
+        # metrics.json keeps them as shares of the starting cash with four decimals
+        assert rc[mine] == pytest.approx(sign * acct[theirs] * cash, abs=0.5e-4 * cash + 0.01), mine
+    assert sum(r["pnl"] for r in p["by_direction"]) == pytest.approx(rc["stocks"])
+    d = res["decisions"]
+    assert d["all"]["1d"]["n"] == sum(d[k]["1d"]["n"] for k in ("buys", "sells", "shorts", "covers"))
+    if name == "margin_call":
+        assert d["forced"]["1d"]["n"] >= 2 and res["summary"]["forced_fills"] == d["forced"]["1d"]["n"]
+        assert rc["margin_interest"] < -1.0  # borrowed cash at 2x and more
+    else:
+        assert d["shorts"]["1d"]["n"] > 0 and {r["group"] for r in p["by_direction"]} == {"long", "short"}
+        assert rc["borrow_fees"] < 0 and res["summary"]["short_contribution"] == pytest.approx(rc["stocks_short"] / cash)
