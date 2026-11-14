@@ -396,3 +396,100 @@ def trade_cmd(
                      news=news, max_positions=max_positions, label=f"llm-{llm.split(':')[0]}")
     res = run_policy(policy, exp, decide_every=decide_every, blind=blind, label=f"llm:{llm}")
     _print_summary({"ok": True, **res.summary()})
+
+
+@app.command("factors")
+def factors_cmd(
+    period: Optional[str] = typer.Option(None, help="One period (2026, 2022 or 2020); default: all three"),
+    llm: bool = typer.Option(False, "--llm", help="Add an LLM sentiment factor (scores cached in "
+                                                  "~/.riskaware/research/headline_scores)"),
+    llm_model: str = typer.Option("ollama:llama3.2:3b", help="provider:model for --llm; local Ollama costs nothing"),
+    llm_limit: Optional[int] = typer.Option(None, help="Score at most this many new headlines in this run"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Score uncached headlines without asking"),
+    charts: Optional[str] = typer.Option(None, help="Chart and report languages, e.g. en,zh (default: --lang)"),
+    out: Optional[Path] = typer.Option(None, help="Folder (default ~/.riskaware/research/factors/<time>)"),
+    as_json: bool = typer.Option(False, "--json", help="Print factors.json"),
+) -> None:
+    """News factors: IC, quintiles, decay, price controls, and calendar-date against publication-time joins.
+    / 新闻因子：IC、分组、衰减、价格因子对照，以及按日历日期和按发布时间对齐的对比"""
+    from . import news_factors as nf
+    from .periods import get_period, period_names
+
+    try:
+        periods = [get_period(period).name] if period else sorted(period_names(), reverse=True)
+    except ValueError as exc:
+        console.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
+    scores = None
+    llm_info = None
+    if llm:
+        try:
+            scorer = nf.HeadlineScorer(llm_model)
+        except ValueError as exc:
+            console.print(f"[red]{escape(str(exc))}[/]")
+            raise typer.Exit(2) from exc
+        pairs = nf.headlines_to_score(periods)
+        todo = scorer.missing(pairs)[: llm_limit if llm_limit is not None else None]
+        if todo:
+            est = scorer.estimate(todo)
+            cost = L("free (runs on this computer)", "免费（在本机运行）") if scorer.local else L(
+                "check these tokens against the provider's price list", "请按服务商的价格表核对这些 token")
+            console.print(L(f"{len(todo)} of {len(pairs)} headlines are not scored yet with {llm_model}: "
+                            f"{est['calls']} calls, about {est['input_tokens']:,} input and {est['output_tokens']:,} "
+                            f"output tokens; {cost}.",
+                            f"{len(pairs)} 条标题里有 {len(todo)} 条还没用 {llm_model} 打分：{est['calls']} 次调用，"
+                            f"约 {est['input_tokens']:,} 个输入 token、{est['output_tokens']:,} 个输出 token；{cost}。"))
+            go = yes or (scorer.local and len(todo) <= 2000) or typer.confirm(L("Score them now?", "现在打分吗？"),
+                                                                              default=scorer.local)
+            if go:
+                try:
+                    with console.status(L("Scoring headlines ...", "正在给标题打分 ...")) as st:
+                        scorer.score(todo, progress=lambda d, n: st.update(f"{d}/{n}"))
+                except nf.LLMUnavailable as exc:
+                    console.print(f"[yellow]{escape(str(exc))}[/] " + L(
+                        "The scores so far are cached; run the command again to go on.",
+                        "已打的分已缓存；再运行一次这个命令就接着打。"))
+        scores = scorer.scores
+        have = sum(1 for s, h in pairs if nf.headline_key(s, h) in scores)
+        llm_info = {"model": llm_model, "scored": have, "headlines": len(pairs),
+                    "coverage": have / len(pairs) if pairs else 0.0, "prompt_version": nf.PROMPT_VERSION,
+                    "cache": str(scorer.path)}
+        if not have:
+            console.print(L("[yellow]No headline has an LLM score yet; the LLM factor is left out.[/]",
+                            "[yellow]还没有标题有 LLM 分数，这次不算 LLM 因子。[/]"))
+            scores = None
+    t0 = time.time()
+    with console.status(L("Computing features and tests ...", "正在计算特征和检验 ...")) as st:
+        study = nf.run_study(periods, llm_scores=scores, progress=lambda m: st.update(m))
+    study.llm = llm_info
+    langs = [x.strip() for x in charts.split(",") if x.strip()] if charts else [lang()]
+    with console.status(L("Writing the report and charts ...", "正在写报告和图 ...")):
+        folder = nf.save_study(study, out, langs=langs)
+    if as_json:
+        console.print_json((folder / "factors.json").read_text(encoding="utf-8"))
+        return
+    _print_factors(study)
+    console.print(f"{L('Folder', '文件夹')}: {folder}  [dim]({time.time() - t0:.0f} s)[/]", soft_wrap=True)
+
+
+def _print_factors(study: Any) -> None:
+    from . import news_factors as nf
+
+    zh = lang() == "zh"
+    t = Table(title=L("News factors (rank IC from the next open; t-statistics are Newey-West)",
+                      "新闻因子（从次日开盘算的秩 IC；t 值用 Newey-West）"))
+    for col, z in (("Factor", "因子"), ("Verdict", "结论"), ("IC 1d (t)", "IC 1天（t）"), ("IC 5d (t)", "IC 5天（t）"),
+                   ("Calendar-date join, 1d", "按日历日期对齐 1天"), ("Inflation (t)", "虚增（t）")):
+        t.add_column(L(col, z), justify="left" if col in ("Factor", "Verdict") else "right")
+    color = {"useful": "green", "weak": "yellow", "noise": "dim"}
+    for name in [*nf.NEWS_FACTORS, *nf.PRICE_FACTORS]:
+        if name not in study.pooled:
+            continue
+        p = study.pooled[name]
+        v = study.verdicts.get(name, {}).get("verdict", "")
+        al = (study.pooled_alignment.get(name) or {}).get("h1") or {}
+        label = nf.ALL_FACTORS[name].label_zh if zh else nf.ALL_FACTORS[name].label
+        shown = nf.TEXT["zh" if zh else "en"].get(v, "") if v else L("price", "价格")
+        t.add_row(label, f"[{color.get(v, 'white')}]{shown}[/]", nf._ic(p.get("h1")), nf._ic(p.get("h5")),
+                  nf._ic(al.get("calendar_close")), nf._ic(al.get("leak")))
+    console.print(t)
