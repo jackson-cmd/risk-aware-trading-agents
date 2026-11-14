@@ -511,6 +511,13 @@ def plan_probe(llm: Any, period: str | int | Iterable[str | int] | None = "2026"
         if extra is not None:
             samples[extra] = draw_samples(extra, max(pairs, recall), horizon, history, seed,
                                           market_view(extra, news=use_news), after=cut[1])
+    # The headlines come from news replayed at its publication time, and that data does not ship with the package.
+    # Where a period has none, every record is asked without headlines, so that the periods stay comparable and
+    # the cache keys say what the prompts held.
+    news_missing = [p for p in samples if use_news and market_view(p, news=True).news is None]
+    if news_missing:
+        use_news = False
+        st["news"] = False
     # The order a run asks in: first the cheap recall items, then the points in blocks of ``CHUNK`` batches, from
     # the start of each period's list and alternating periods, named and blind side by side. A run cut short then
     # holds whole pairs for a prefix of every period, and a smaller run later finds all its answers cached.
@@ -564,7 +571,8 @@ def plan_probe(llm: Any, period: str | int | Iterable[str | int] | None = "2026"
             if k < len(blocks[p]):
                 calls.extend(blocks[p][k])
     settings = {"periods": [p for p in samples if p != extra], "control_period": extra, "pairs": int(pairs),
-                "recall": int(recall), **st, "seed": int(seed), "max_prompt_tokens": budget,
+                "recall": int(recall), **st, "news_missing": news_missing or None, "seed": int(seed),
+                "max_prompt_tokens": budget,
                 "cutoff": None if cut is None else str(cutoff),
                 "cutoff_days": None if cut is None else [cut[0].isoformat(), cut[1].isoformat()]}
     return Plan(model, settings, samples, calls, cached, price_in, price_out, is_free(llm, base_url))
@@ -1414,6 +1422,11 @@ def render_report(s: dict[str, Any], lang: str = "en") -> str:
             if not part.get("after", {}).get("pairs"):
                 lines.append("- 截止日之后没有样本，没有对照。" if zh else
                              "- No points after the cutoff, so no control.")
+        lines.append("")
+    if st.get("news_missing"):
+        lines.append((f"{', '.join(st['news_missing'])} 没有标题数据，所以所有记录都不带标题来问。") if zh else
+                     (f"No headline data for {', '.join(st['news_missing'])}, so every record was asked without "
+                      "headlines."))
         lines.append("")
     if st.get("cutoff") is None:
         lines.append("没有给训练截止日，所以没有对照窗口：格式本身的影响和记忆分不开。" if zh else

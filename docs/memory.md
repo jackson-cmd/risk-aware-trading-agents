@@ -13,6 +13,7 @@ The look-ahead check proves that no future price or headline reaches the prompt.
 - [Through a batch runner or your own caller](#through-a-batch-runner-or-your-own-caller)
 - [What a run writes](#what-a-run-writes)
 - [A first run: gpt-5.6-luna and gpt-5.4-nano](#a-first-run-gpt-56-luna-and-gpt-54-nano)
+- [The leaderboard's models](#the-leaderboards-models)
 - [Limits](#limits)
 - [Related work](#related-work)
 
@@ -46,7 +47,7 @@ print(r.report())               # the report (r.report("zh") in Chinese)
 
 - the last 60 daily closes, oldest first;
 - RSI(14), the distance from EMA 50 and EMA 200, ATR as a share of the price, the distance from the 52-week high, relative volume, and the 21-day return next to SPY's;
-- up to three headlines published before that day's close, with how many hours before the close each appeared (from the period's headline file: the headlines are licensed and not distributed, so without your own copy the records carry none).
+- up to three headlines published before that day's close, with how many hours before the close each appeared (from the period's headline file: the headlines are licensed and not distributed, so without your own copy the records carry none). The conclusions on this page rest on news replayed at its publication time. Without headline data for a period, every record of the run is asked without headlines, so the periods stay comparable (the report and `settings.news_missing` say so).
 
 The **named** record gives the ticker, the company, the sector, the date and the prices as traded. The **blind** record gives an alias (S01), the sector and "day 0", rebases the prices so that the first close is 100, and masks the headlines the way blind trading mode does: the company's names and ticker, its best-known people ("the S01 chief") and products ("[product]"), and every date and year. Per-share dollar amounts in headlines are rebased like the prices, so "raises its price target to $264" keeps its distance from the price and stops naming the stock (the example below paraphrases the headline: the research headlines are licensed and not distributed):
 
@@ -150,6 +151,25 @@ Two OpenAI models, each on 2022 and 2026 with the default settings: 100 pairs an
 **gpt-5.4-nano** does not recall 2022 when asked, but its named 2022 forecasts are a little better than the blind ones: AUC +0.059 (permutation p = 0.04) and a Brier gap whose interval lies above 0. After its cutoff the gap is +0.007. The difference between the two windows, +0.052 [−0.064, +0.168], cannot tell memory from chance at 100 pairs per window; it would take about 500.
 
 Recall is the more sensitive probe of what a model knows; the paired gap is what a backtest cares about; and a model can show one without the other. Both blind AUCs on 2022 are above 0.5 (0.537 and 0.592), which may be skill, or the period showing through the sector and the headlines (see the limits).
+
+## The leaderboard's models
+
+Three models of the [LLM leaderboard](leaderboard.md) on all three periods, with the default settings (100 pairs and 50 recall windows per period, seed 0, temperature 0, five records a call), through a model gateway and a request queue. The cutoffs are the training-data cutoffs on Meta's and Anthropic's model pages: Llama 3.2 December 2023, Claude Haiku 4.5 July 2025, Claude Sonnet 4.6 January 2026, so 2020 and 2022 lie before all three and 2026 after them (after January for Sonnet 4.6). The two Claude models were asked only the direct-recall questions in this round; whether they use what they remember when they forecast is still open. The Claude models were told to reply with the JSON object only, since they otherwise wrote an analysis first and ran out of tokens.
+
+| | 2020 | 2022 | 2026 |
+|---|---|---|---|
+| Llama 3.2 3B: memory score (AUC gap) | +0.096 [−0.057, +0.256] | +0.075 [−0.084, +0.217] | −0.049 [−0.170, +0.085] (the control) |
+| Llama 3.2 3B: recall score | −0.05 [−0.37, +0.26] | +0.06 [−0.22, +0.33] | +0.01 [−0.30, +0.27] |
+| Claude Haiku 4.5: recall score | **+0.38 [+0.03, +0.66]** | +0.24 [−0.09, +0.54] | +0.19 [−0.10, +0.46] |
+| Claude Sonnet 4.6: recall score | **+0.60 [+0.35, +0.80]** | **+0.52 [+0.26, +0.72]** | −0.07 [−0.38, +0.22] |
+
+The recall score is the rank correlation between remembered and actual 20-day moves, after dividing both by the stock's usual move (0 without memory); bold marks an interval above 0.
+
+- **Llama 3.2 3B** shows no sign of recall in any year. Its forecasts on 2020 and 2022 are a little better named than blind (+0.10 and +0.08), but no more than the control allows at 100 pairs (before minus after: +0.145 [−0.064, +0.343] and +0.124 [−0.100, +0.320]), so both are inconclusive; 2026 is clean by construction. Like in the first test call, it answered blind records with lower probabilities than named ones (a mean of 0.21 to 0.27 against 0.31 to 0.35), the kind of shift the AUC leaves alone.
+- **Claude Sonnet 4.6** remembers 2020 and 2022: its guessed moves rank the actual ones (0.60 and 0.52), and it names the direction of 2020's moves 78% of the time against 68% for always guessing the common one. After its cutoff, in 2026, the correlation is −0.07.
+- **Claude Haiku 4.5** remembers less: 0.38 on 2020, with an interval just above 0, and intervals that include 0 on 2022 and 2026.
+
+The larger and newer the model, the more it remembers of a period, which is what the probe is there to flag: a model's backtest on 2020 or 2022 can rest on memory, and 2026 is the fair test for every model whose cutoff lies before it.
 
 ## Limits
 

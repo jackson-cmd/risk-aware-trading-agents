@@ -383,3 +383,17 @@ def test_cli_exports_requests_and_scores_imported_results(tmp_path):
     assert scored.exit_code == 0, scored.output
     assert "70 answers" in scored.output and "Verdict: contaminated" in scored.output
     assert json.loads((tmp_path / "rec" / "memory.json").read_text(encoding="utf-8"))["calls"]["made"] == 0
+
+
+def test_without_headline_data_every_record_is_asked_without_headlines(monkeypatch):
+    """The headline data does not ship with the package: where a period has none, no record shows headlines, and
+    the cache keys say so (an answer to a record with headlines is never reused for one without)."""
+    import riskaware.research.day as day
+
+    monkeypatch.setattr(M, "_VIEWS", {})
+    monkeypatch.setattr(day, "news_replay", lambda *a, **k: None)
+    plan = M.plan_probe("no-news-model", "2022", pairs=10, recall=0, cache=False)
+    assert plan.settings["news"] is False and plan.settings["news_missing"] == ["2022"]
+    assert not any("headlines" in c.user for c in plan.calls)
+    s = plan.samples["2022"][0]
+    assert M._key("named", s, plan.settings).endswith("|n0|b5")
