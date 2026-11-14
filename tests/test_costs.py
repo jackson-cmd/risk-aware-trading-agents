@@ -11,12 +11,21 @@ import pandas as pd
 import pytest
 
 from riskaware import indicators as ind
-from riskaware.backtest.engine import VOLUME_CAP, Backtester, realistic_cost_bps
+from riskaware.backtest import (
+    OpenFill,
+    fill_at_open,
+    market_before_open,
+    realistic_cost_bps,
+    volume_cap_shares,
+)
+from riskaware.backtest.engine import VOLUME_CAP, Backtester
 from riskaware.config import AppConfig, BacktestConfig
 from riskaware.data.prices import SyntheticPrices
 from riskaware.news import history
 from riskaware.research.experiment import Experiment, protocol, reproduce_command, run_experiment
 from riskaware.strategy import load_strategy
+from riskaware.strategy.base import SymbolData
+from riskaware.types import Side
 
 REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
 WINDOW = {"start": "2026-02-02", "end": "2026-04-30"}
@@ -86,6 +95,45 @@ def test_realistic_cost_rises_with_volatility_gap_and_order_size():
     assert cost(qty=40_000) - cost(qty=0) == pytest.approx(2 * (cost(qty=10_000) - cost(qty=0)))
 
 
+def test_fill_at_open_prices_both_sides_under_both_models():
+    fixed, real = BacktestConfig(), BacktestConfig(cost_model="realistic")
+    known = (101.0, 100.0, 0.02, 1_000_000)  # open, previous close, daily volatility, 20-day average volume
+    buy = fill_at_open("BUY", 10_000, *known, fixed)
+    assert buy == OpenFill(101.0 * (1 + 5.0 / 10_000), 5.0)
+    assert fill_at_open(Side.SELL, 10_000, *known, fixed) == OpenFill(101.0 * (1 - 5.0 / 10_000), 5.0)
+    b, s = fill_at_open(Side.BUY, 10_000, *known, real), fill_at_open("sell", 10_000, *known, real)
+    assert b.cost_bps == s.cost_bps == pytest.approx(35.0)  # a short sale pays like any sale, a cover like a buy
+    assert b.price == pytest.approx(101.0 * 1.0035) and s.price == pytest.approx(101.0 * 0.9965)
+    # with realistic costs a limit order never fills beyond its limit; cost_bps is what it really paid
+    capped = fill_at_open("BUY", 10_000, *known, real, limit=101.10)
+    assert capped.price == 101.10 and capped.cost_bps == pytest.approx((101.10 / 101.0 - 1) * 1e4)
+    assert fill_at_open("SELL", 10_000, *known, real, limit=100.95).price == 100.95
+    assert fill_at_open("BUY", 10_000, *known, real, limit=102.0) == b  # a limit that is not reached changes nothing
+    # the fixed model keeps its old behaviour and ignores the limit, so its numbers stay as they were
+    assert fill_at_open("BUY", 10_000, *known, fixed, limit=101.0) == buy
+    with pytest.raises(ValueError):
+        fill_at_open("HOLD", 1, *known, fixed)
+
+
+def test_volume_cap_keeps_at_least_one_share_and_ignores_unknown_volume():
+    assert volume_cap_shares(5_000, 100_000, 0.01) == 1_000
+    assert volume_cap_shares(500, 100_000, 0.01) == 500
+    assert volume_cap_shares(50, 80, 0.01) == 1  # a position can always be sold off, a share at a time
+    assert volume_cap_shares(5_000, float("nan"), 0.01) == 5_000
+    assert volume_cap_shares(5_000, 0.0, 0.01) == 5_000
+
+
+def test_market_before_open_reads_only_the_days_before():
+    frame = ind.compute(_prices().history(["AAA"], START, END)["AAA"])
+    sd, ts = SymbolData(frame), frame.index[300]
+    prev_close, vol, adv = market_before_open(sd, ts)
+    assert prev_close == frame["close"].iloc[299]
+    assert vol == pytest.approx(frame["vol20"].iloc[299] / math.sqrt(252))
+    assert adv == pytest.approx(frame["volume"].iloc[280:300].mean())
+    assert all(math.isnan(v) for v in market_before_open(sd, pd.Timestamp("1990-01-02")))
+    assert math.isnan(market_before_open(sd, frame.index[0])[1])
+
+
 def test_cost_settings_are_validated():
     assert BacktestConfig().cost_model == "fixed"
     with pytest.raises(ValueError):
@@ -132,12 +180,14 @@ def test_each_realistic_fill_pays_the_formula_on_what_was_known_at_the_open():
     res, bt = _run(cost_model="realistic")
     fills, ind_frames = _stock_fills(res, bt)
     at_open = fills[fills["cost_bps"] > 0]
-    assert len(at_open) > 50 and at_open["cost_bps"].min() >= 5.0 and at_open["cost_bps"].max() > 10.0
+    assert len(at_open) > 50 and at_open["cost_bps"].max() > 10.0
     for r in at_open.itertuples():
         f = ind_frames[r.symbol]
-        assert r.cost_bps == pytest.approx(_known_cost(f, r.date, r.qty, bt.cfg.backtest), rel=1e-12)
+        known = _known_cost(f, r.date, r.qty, bt.cfg.backtest)
         o = float(f.loc[r.date, "open"])
         assert r.price == pytest.approx(o * (1 + r.cost_bps / 1e4 if r.side == "BUY" else 1 - r.cost_bps / 1e4))
+        if r.cost_bps != pytest.approx(known, rel=1e-12):  # a limit order, filled at its limit (rounded to cents)
+            assert r.cost_bps < known and round(r.price, 2) == r.price
     assert res.costs["fills_at_open"] == len(at_open)
     assert res.costs["avg_bps"] == pytest.approx(at_open["cost_bps"].mean())
     assert any(n.startswith("Realistic costs:") for n in res.notes)

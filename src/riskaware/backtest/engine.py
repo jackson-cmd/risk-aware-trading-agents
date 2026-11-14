@@ -5,7 +5,7 @@ Timeline for each trading day t:
    inside the limit, at the limit if the day's range reaches it, otherwise they
    expire. A fill at the open pays the cost model's price (``backtest.cost_model``:
    fixed slippage, or realistic costs with the overnight gap, square-root impact
-   and a volume cap; see ``realistic_cost_bps``); commission is added.
+   and a volume cap; see ``fill_at_open``); commission is added.
 2. Cash earns the T-bill ETF return of day t (the cash reserve is assumed parked).
 3. The portfolio is marked to the close of t.
 4. The strategy sees data up to the close of t and returns signals; the risk
@@ -21,7 +21,7 @@ import math
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date, timedelta
-from typing import Any
+from typing import Any, NamedTuple
 
 import numpy as np
 import pandas as pd
@@ -67,6 +67,64 @@ def realistic_cost_bps(open_price: float, prev_close: float, daily_vol: float, a
     if qty > 0 and avg_volume > 0 and math.isfinite(avg_volume) and daily_vol > 0 and math.isfinite(daily_vol):
         bps += impact_coef * daily_vol * math.sqrt(qty / avg_volume) * 10_000
     return bps
+
+
+class OpenFill(NamedTuple):
+    """A fill at the open: the price per share paid (buy) or received (sell), and its cost in bps of the open."""
+
+    price: float
+    cost_bps: float
+
+
+def fill_at_open(side: Side | str, qty: float, open_price: float, prev_close: float, daily_vol: float,
+                 avg_volume: float, bt: BacktestConfig, limit: float | None = None) -> OpenFill:
+    """Price and cost of a fill of ``qty`` shares at the open under ``bt.cost_model``.
+
+    The cost always works against the trade: a BUY (also one that closes a short) pays the open plus the cost, a SELL
+    (also a short sale) receives the open minus it. ``prev_close``, ``daily_vol`` (daily, not annualized) and
+    ``avg_volume`` are what was known before the open, as ``market_before_open`` reads them; the fixed model ignores
+    them and charges ``bt.slippage_bps``. Cut ``qty`` to the volume cap first (``volume_cap_shares``). With realistic
+    costs a limit order never fills beyond its ``limit`` (``cost_bps`` is then what the fill really paid); the fixed
+    model ignores ``limit`` so that its numbers stay as they always were::
+
+        fill = fill_at_open("SELL", qty, open_, *market_before_open(symbol_data, day), cfg.backtest)
+        fill.price, fill.cost_bps
+    """
+    direction = str(getattr(side, "value", side)).upper()
+    if direction not in ("BUY", "SELL"):
+        raise ValueError(f"side must be BUY or SELL, not {side!r}")
+    if bt.cost_model != "realistic":
+        bps = bt.slippage_bps
+        return OpenFill(open_price * (1 + bps / 10_000) if direction == "BUY" else open_price * (1 - bps / 10_000), bps)
+    bps = realistic_cost_bps(open_price, prev_close, daily_vol, avg_volume, qty, bt.slippage_bps, bt.gap_cost,
+                             bt.impact_coef)
+    price = open_price * (1 + bps / 10_000) if direction == "BUY" else open_price * (1 - bps / 10_000)
+    if limit is not None and (price > limit if direction == "BUY" else price < limit):
+        price = limit
+        bps = abs(price / open_price - 1.0) * 10_000
+    return OpenFill(price, bps)
+
+
+def volume_cap_shares(qty: float, avg_volume: float, max_participation: float) -> float:
+    """The part of an order of ``qty`` shares that may fill: at most ``max_participation`` of the average volume,
+    rounded down to whole shares but at least one, so that a position can always be sold off. With no volume known,
+    all of it."""
+    if not (avg_volume > 0 and math.isfinite(avg_volume)):
+        return qty
+    most = max(1, math.floor(max_participation * avg_volume))
+    return most if qty > most else qty
+
+
+def market_before_open(sd: SymbolData, ts: pd.Timestamp) -> tuple[float, float, float]:
+    """What a fill at the open of ``ts`` may use: the previous close, the daily volatility of the 20 returns up to it
+    and the average volume of the 20 days before. ``vol20`` on ``ts`` already includes that day's close, so the row
+    before is read; ``vol_avg20`` is shifted by a day in the indicators. NaN for what is not known."""
+    i = sd.position_of(ts)
+    if i is None:
+        return math.nan, math.nan, math.nan
+    c = sd.cols
+    vol = float(sd.arr[i - 1, c["vol20"]]) / math.sqrt(ind.TRADING_DAYS) if i > 0 else math.nan
+    return float(sd.arr[i, c["prev_close"]]), vol, float(sd.arr[i, c["vol_avg20"]])
 
 
 def describe_costs(bt: BacktestConfig) -> str:
@@ -251,35 +309,23 @@ class Backtester:
         no_volume = 0  # realistic costs: fills without the volume or volatility of the days before
         n_days = len(days)
 
-        def known_at_open(sym: str, ts: pd.Timestamp) -> tuple[float, float, float]:
-            """Previous close, daily volatility and 20-day average volume, as known at the open of ts. vol20 on ts
-            includes ts's own close, so the row before is used; vol_avg20 is already shifted by a day."""
-            sd = sym_data[sym]
-            i = sd.position_of(ts)
-            c = sd.cols
-            vol = float(sd.arr[i - 1, c["vol20"]]) / math.sqrt(ind.TRADING_DAYS) if i > 0 else math.nan
-            return float(sd.arr[i, c["prev_close"]]), vol, float(sd.arr[i, c["vol_avg20"]])
+        unknown = (math.nan, math.nan, math.nan)
 
         def volume_cap(sym: str, ts: pd.Timestamp, qty: float) -> float:
             """Realistic costs: cut an order to max_participation of its 20-day average volume."""
             nonlocal no_volume
-            _, vol, adv = known_at_open(sym, ts)
+            _, vol, adv = market_before_open(sym_data[sym], ts)
             if not (adv > 0 and math.isfinite(adv) and vol > 0 and math.isfinite(vol)):
                 no_volume += 1
-            if not (adv > 0 and math.isfinite(adv)):
-                return qty
-            most = math.floor(bt.max_participation * adv)
-            if qty > most:
+            capped = volume_cap_shares(qty, adv, bt.max_participation)
+            if capped < qty:
                 rejections[VOLUME_CAP] = rejections.get(VOLUME_CAP, 0) + 1
-                return most
-            return qty
+            return capped
 
-        def cost_at_open(sym: str, ts: pd.Timestamp, o: float, qty: float) -> float:
-            """Basis points a fill of qty shares at the open pays on top of (buy) or below (sell) the open."""
-            if not realistic:
-                return bt.slippage_bps
-            prev_close, vol, adv = known_at_open(sym, ts)
-            return realistic_cost_bps(o, prev_close, vol, adv, qty, bt.slippage_bps, bt.gap_cost, bt.impact_coef)
+        def open_fill(side: Side, sym: str, ts: pd.Timestamp, o: float, qty: float, lim: float | None) -> OpenFill:
+            """Price and cost of a fill at the open; only realistic costs read the market before the open."""
+            known = market_before_open(sym_data[sym], ts) if realistic else unknown
+            return fill_at_open(side, qty, o, *known, bt, limit=lim)
 
         def last_close(sym: str, ts: pd.Timestamp) -> float | None:
             sd = sym_data.get(sym)
@@ -452,15 +498,13 @@ class Backtester:
                     else:
                         continue
                     qty = volume_cap(order.symbol, ts, order.qty) if realistic else order.qty
-                    bps = cost_at_open(order.symbol, ts, o, qty) if at_open else 0.0
-                    px = o * (1 + bps / 10_000) if at_open else lim
+                    px, bps = open_fill(Side.BUY, order.symbol, ts, o, qty, lim) if at_open else (lim, 0.0)
                     commission = max(bt.commission_min, bt.commission_per_share * qty) if qty else 0.0
                     if qty * px + commission > cash - collateral:
                         qty = math.floor((cash - collateral - bt.commission_min) / (px * (1 + 1e-9)))
                         commission = max(bt.commission_min, bt.commission_per_share * qty)
                         if realistic and at_open and qty > 0:  # the smaller order moves the price less
-                            bps = cost_at_open(order.symbol, ts, o, qty)
-                            px = o * (1 + bps / 10_000)
+                            px, bps = open_fill(Side.BUY, order.symbol, ts, o, qty, lim)
                     if qty <= 0:
                         continue
                     if realistic and at_open:
@@ -501,8 +545,7 @@ class Backtester:
                         qty = volume_cap(order.symbol, ts, qty)
                     if qty <= 0:
                         continue
-                    bps = cost_at_open(order.symbol, ts, o, qty) if at_open else 0.0
-                    px = o * (1 - bps / 10_000) if at_open else lim
+                    px, bps = open_fill(Side.SELL, order.symbol, ts, o, qty, lim) if at_open else (lim, 0.0)
                     if realistic and at_open:
                         open_bps.append(bps)
                     commission = max(bt.commission_min, bt.commission_per_share * qty)

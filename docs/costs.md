@@ -43,21 +43,23 @@ Research experiments always use these defaults, so two experiments run with `cos
 A fill at the open of day t pays, in basis points of the open (above it for a buy, below it for a sell):
 
 ```
-cost = slippage_bps                                5 bps
-     + gap_cost × |open(t) / close(t−1) − 1|       a tenth of the overnight gap
-     + impact_coef × σ × √(shares / ADV20)         square-root market impact
+cost (bps) = slippage_bps                                           5 bps
+           + 10,000 × gap_cost × |open(t) / close(t−1) − 1|         a tenth of the overnight gap
+           + 10,000 × impact_coef × σ × √(shares / ADV20)           square-root market impact
 ```
 
-σ is the daily volatility of the 20 daily returns up to the close of t−1 (the annualized `vol20` of day t−1 divided by √252). ADV20 is the average volume of the 20 trading days before t. An order for more than `max_participation` × ADV20 shares is cut to that size, the rest is not filled, and the backtest counts the order under `volume cap` with its other refusals. Commission is a separate setting (`commission_per_share`, zero by default).
+σ is the daily volatility of the 20 daily returns up to the close of t−1 (the annualized `vol20` of day t−1 divided by √252). ADV20 is the average volume of the 20 trading days before t. An order for more than `max_participation` × ADV20 shares is cut to that size (but never below one share, so that a position can always be sold off), the rest is not filled, and the backtest counts the order under `volume cap` with its other refusals. A limit order of the risk-aware execution never fills beyond its limit with realistic costs: when the open plus the cost would cross it, the order fills at its limit and `cost_bps` shows what it paid. The fixed model keeps its old behaviour, in which the 5 bps can cross a limit by up to 5 bps, so that its numbers stay exactly as they were. Commission is a separate setting (`commission_per_share`, zero by default).
 
 | Setting | Default | Why |
 |---|---|---|
 | `slippage_bps` | 5 bps | Half the bid-ask spread of a large-cap stock plus a little slippage; spreads are widest in the first minutes of trading, when these orders fill. It is also what a fixed run pays, so the two models differ only by the terms below. |
 | `gap_cost` | 0.1 | After a large overnight move the open is the least settled price of the day: the opening auction absorbs the night's orders and spreads stay wide until trading calms down. A market order at the open after a 3% gap pays 30 bps more than one after a quiet night, whichever way the gap went. This is a rule of thumb, not an estimate from data; set it to 0 to leave it out. |
-| `impact_coef` | 1.0 | The square-root law of market impact: across markets and years of order data, buying or selling Q shares moves the price by about Y × σ × √(Q / V), where V is the daily volume and Y is of order one ([Tóth et al., Physical Review X, 2011](https://doi.org/10.1103/PhysRevX.1.021006); [Bouchaud et al., *Trades, Quotes and Prices*, 2018](https://doi.org/10.1017/9781316659335)). The default takes Y = 1. |
+| `impact_coef` | 1.0 | The square-root law of market impact: across markets and years of order data, buying or selling Q shares moves the price by about Y × σ × √(Q / V) by the end of the order, where V is the daily volume and Y is of order one ([Tóth et al., Physical Review X, 2011](https://doi.org/10.1103/PhysRevX.1.021006); [Bouchaud et al., *Trades, Quotes and Prices*, 2018](https://doi.org/10.1017/9781316659335)). The average price paid along the way is lower, about two-thirds of that move if the price follows the square root as the order fills. The default takes Y = 1 and charges the whole move on every share: deliberately cautious, because these orders fill at one moment, the open, rather than through the day. |
 | `max_participation` | 1% | The square-root law describes orders worked through a trading day, while these orders fill at one moment, the open. Capping an order at 1% of a day's average volume keeps it in the range where the formula is still a fair guess. |
 
 For scale: a $10,000 order in a stock that trades $5 billion a day is 0.0002% of its volume; at 2% daily volatility the impact is 2% × √0.000002, about 0.3 bps. A small account pays through the gap: in the runs below the gap term averaged 8 to 11 bps per fill.
+
+In code, the cost of one fill is `riskaware.backtest.fill_at_open(side, shares, open, previous_close, daily_vol, avg_volume, backtest_config, limit=None)`, which returns the fill price and `cost_bps` under either model; `market_before_open(symbol_data, day)` reads the previous close, the daily volatility and the 20-day average volume from the indicators exactly as the backtester does, and `volume_cap_shares(shares, avg_volume, max_participation)` applies the cap. The direction is all the cost needs: a short sale pays like a sale and a cover like a buy.
 
 ## Nothing from after the open
 
@@ -168,9 +170,9 @@ Research experiments take any amount with `Experiment(cash=...)`.
 ## What it leaves out
 
 - The data is daily bars: there are no quotes and no intraday prices. The 5 bps and the tenth of the gap are rules of thumb, not estimates from this data, and the coefficients were set before the runs above, not tuned on them.
-- The square-root law describes orders worked through the day; one fill of up to 1% of a day's volume right at the open probably costs more than the formula says.
+- The square-root law describes orders worked through the day. How much more a single fill of up to 1% of a day's volume costs right at the open cannot be measured from this data; charging the whole move on every share is meant to cover it.
 - Impact is paid on the fill and fades; it does not move the prices that later fills or the mark to market see.
-- Limit orders that fill inside the day's range pay nothing on top of their limit in either model; with realistic costs only the volume cap applies to them.
+- Limit orders that fill inside the day's range pay nothing on top of their limit in either model; with realistic costs only the volume cap applies to them. The research kit's plain execution, used for every table above, sends market orders, so none of its fills are limit fills.
 - Orders are counted in total-return shares, which exceed the shares as traded by the dividends paid since (a few percent), so the impact term can be up to about 2% too high.
 - Trading is long only, so there are no borrowing costs; commission is a separate setting and zero by default.
 
