@@ -87,11 +87,11 @@ vix = market.raw("^VIX")["close"]
 
 import pandas as pd                # or read a file directly
 prices = pd.read_csv("src/riskaware/research/data/market_2020.csv.gz", parse_dates=["date"])</pre>
-<p>Without installing anything: the prices of all three periods and every leaderboard entry are on <a href="https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark">Hugging Face</a> as Parquet, with a data viewer and the original files.</p>
+<p>Without installing anything: the prices of all three periods are on <a href="https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark">Hugging Face</a> as Parquet, with a data viewer and the original files.</p>
 <pre>import pandas as pd             # needs pyarrow for Parquet
 base = "https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark/resolve/main/data/"
-prices = pd.read_parquet(base + "prices.parquet")        # 2026; prices_2022.parquet and prices_2020.parquet for the others
-board = pd.read_parquet(base + "leaderboard.parquet")    # one row per leaderboard entry</pre>
+prices = pd.read_parquet(base + "prices.parquet")        # 2026; prices_2022.parquet and prices_2020.parquet for the others</pre>
+<p>The leaderboard's results are in <a href="assets/data/leaderboard.json">leaderboard.json</a> and its entries in <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/tree/main/leaderboard/entries">leaderboard/entries</a>.</p>
 
 <h2>One day at a time</h2>
 <p>The point of the data is what was known on each day. <code>riskaware research day 2026-04-08</code> (or <code>market_day</code> over MCP) shows everything known at that close: the market regime, VIX and its term structure, fear and greed, sector breadth, the macro events of the next two weeks, and for each stock its returns, indicators and technical setups. Any day of the three test windows works; the command picks the period that holds it.</p>
