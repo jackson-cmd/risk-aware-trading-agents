@@ -2,9 +2,13 @@
 
 <div align="center">
 
-<img src="site/assets/banner.svg" alt="Risk-Aware Trading Agents · 风险感知交易智能体: AI trading agents for US stocks, with news backtests that cannot see the future" width="100%">
+<img src="site/assets/banner.svg" alt="Risk-Aware Trading Agents · 风险感知交易智能体: a benchmark and leaderboard for LLM trading agents with news replayed by the minute it was published, and AI trading agents for US stocks" width="100%">
 
-**AI trading agents for US stocks that check the macro calendar, the fear index and verified news before they buy.**
+## A benchmark for LLM trading agents, with news replayed by the minute it was published
+
+Most news backtests join headlines to prices by calendar date, so a headline published after the close is traded at that close. Here every headline arrives at the minute it was published and orders fill at the next open, through three frozen markets: the 2020 crash, the 2022 bear market and 2026. Llama, GPT, Claude and Gemini trade them blind and with names, three seeds each, scored apart before and after each model's training cutoff.
+
+**The same package is also a set of AI trading agents for US stocks that check the macro calendar, the fear index and verified news before they buy.**
 
 Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnings check · a 30% cash floor · cross-verified news · paper-trading agents ranked against SPY · news backtests that cannot see the future · a public leaderboard of LLM trading agents · frozen 2020, 2022 and 2026 markets for research · LLM agents over MCP · paper and live trading on 10 brokers.
 
