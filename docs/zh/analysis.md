@@ -8,6 +8,7 @@
 - [决策](#决策)
 - [因子归因](#因子归因)
 - [盈亏从哪里来](#盈亏从哪里来)
+- [做空和保证金](#做空和保证金)
 - [五种波段策略靠什么赚钱](#五种波段策略靠什么赚钱)
 - [怎么读这些数字](#怎么读这些数字)
 - [analysis.json 里有什么](#analysisjson-里有什么)
@@ -81,7 +82,7 @@ MCP 工具是 `experiment_analysis(run_id)`：跑完 `run_experiment` 或一次�
 
 ## 盈亏从哪里来
 
-每个仓位从第一次买入算到把它卖光的那一笔，中间的加仓和减仓都算在内；到最后还没卖的，按最后一天收盘价计价。一个仓位的盈亏是它收回的现金减去它占用的现金，佣金算在内。所有仓位加上闲置现金的国库券利息（每天收盘时的现金乘以当天 BIL 的收益，和回测付息的方式一样），正好等于这次运行的盈亏，精确到美元；记录解释不了的部分（比如期权）单列一行。
+每个仓位从开仓的那笔成交算到平仓的那笔成交，中间的加仓和减仓都算在内；到最后还没平的，按最后一天收盘价计价。一个仓位的盈亏是它收回的现金减去它占用的现金，佣金算在内。分析会按回测记账的方式，用成交逐日重建账户，所以所有仓位加上现金的国库券利息（每天按 BIL 的收益计息，和回测付息的方式一样），正好等于这次运行的盈亏，精确到分；记录解释不了的部分（比如期权）单列一行。
 
 然后按下面几种方式拆开盈亏：
 
@@ -92,6 +93,27 @@ MCP 工具是 `experiment_analysis(run_id)`：跑完 `run_experiment` 或一次�
 - 最赚和最亏的仓位，以及当初买入的理由；
 
 还有利润有多集中：最好的一个仓位、最好的两个仓位分别占所有仓位净盈亏和总盈利的比例，以及假如最好的那笔没赚钱，这次运行的收益是多少。表里的「Of return」是盈亏除以初始资金，也就是对收益贡献了多少个百分点。
+
+## 做空和保证金
+
+用 `--mode long_short` 或 `--mode margin`（见 [short-margin.md](short-margin.md)）跑出来的记录里有空头仓位：数量为负，卖空开仓，买回平仓。分析这样处理它们：
+
+- **决策分四种。** 买入和买回押的是股票会涨，记它相对 SPY 的超额收益；卖出和卖空押的是股票会跌，记躲开的超额。所以在一只股票跑输大盘之前卖空，和一次好的卖出一样得分。追加保证金或权益归零清仓造成的强制成交（tag 为 `margin_call`、`wiped_out`）单列为 `forced`，不计入 `all`，也不进决策 IC：它们是账户规则做的，不是智能体的决定。决策 IC 里买入和买回记 +1，卖出和卖空记 -1；持仓 IC 按带符号的权重排序。
+- **多头和空头分开列。** 一个空头从卖空算到买回，一笔穿过零的成交先平掉一边、再开出另一边。`by_direction` 给出多头和空头仓位各自的盈亏，每个拆分（持仓时长、行业、股票、触发原因）也都带 `long_pnl` 和 `short_pnl`。
+- **借券费和融资利息各占一行。** 它们不在 `trades.csv` 里：回测每天收盘时从账户里扣。分析按这份记录自己的保证金规则（`MarginRules.daily_costs`，加上这次运行的 `mode_params`）逐日重建账户：空头市值的借券费、借款的国库券利率加点差，以及现金和卖空所得赚的国库券利息。各行加起来正好等于这次运行的盈亏，精确到分，也和 `metrics.json["account"]` 一致（那里按初始资金的比例保留四位小数）。
+
+2022 年春天用两倍保证金做趋势跟随（`riskaware research run --strategy trend_ls --params '{"gross": 2.0}' --universe core --max-positions 9 --mode margin --period 2022 --start 2022-02-01 --end 2022-05-31 --no-news`，再对这份记录跑 `riskaware research analyze`）：
+
+| | 盈亏 |
+|---|---:|
+| 多头仓位（17 个） | -$29,990.52 |
+| 空头仓位（7 个） | +$3,157.52 |
+| 现金和卖空所得的利息 | +$26.23 |
+| 借券费 | -$46.88 |
+| 融资利息 | -$66.33 |
+| 合计（-26.9%） | -$26,919.97 |
+
+加了杠杆的多头 17 个仓位全部亏钱；空头赚了一点，但卖空的股票在之后 5 天里平均反而跑赢 SPY 0.95%（15 次卖空，t = -1.0）。四个月的融资和借券一共花了 113 美元。
 
 ## 五种波段策略靠什么赚钱
 
@@ -171,11 +193,11 @@ MCP 工具是 `experiment_analysis(run_id)`：跑完 `run_experiment` 或一次�
 
 | 键 | 内容 |
 |---|---|
-| `summary` | 平铺的主要数字：`decision_excess_5d` 和它的 `_t`（买入和卖出合起来）、`buy_excess_5d`、`sell_avoided_5d`、`decision_hit_rate_5d`、`decision_ic`、`holdings_ic`、`alpha_annual` 和 `alpha_t`、`capm_alpha_annual`、`beta_market`、`beta_size`、`beta_growth`、`beta_momentum`、`r2`、`exposure_return_annual`（年化平均超额收益里由暴露解释的部分，剩下的就是 `alpha_annual`）、`news_decision_share`（理由提到新闻的买卖占比）、`news_entry_pnl`、`best_trade_share`、`return_without_best_trade`、`concentrated` |
-| `decisions` | `buys`、`sells`、`all` 按周期（`1d`、`5d`、`20d`）：`n`、`mean`、`median`、`hit_rate`、`se`、`t`、`t_iid`（95% 区间是 `mean` ± 1.96 `se`）；5 日的 `by_trigger`；`counts`：按触发原因数的全部买卖 |
+| `summary` | 平铺的主要数字：`decision_excess_5d` 和它的 `_t`（所有决策合起来）、`buy_excess_5d`、`sell_avoided_5d`、`short_avoided_5d`、`cover_excess_5d`（各自带 `_t`）、`decision_hit_rate_5d`、`decision_ic`、`holdings_ic`、`alpha_annual` 和 `alpha_t`、`capm_alpha_annual`、`beta_market`、`beta_size`、`beta_growth`、`beta_momentum`、`r2`、`exposure_return_annual`（年化平均超额收益里由暴露解释的部分，剩下的就是 `alpha_annual`）、`news_decision_share`（理由提到新闻的决策占比）、`news_entry_pnl`、`long_contribution`、`short_contribution` 和 `fees_contribution`（盈亏除以初始资金；费用是借券费加融资利息）、`forced_fills`、`best_trade_share`、`return_without_best_trade`、`concentrated` |
+| `decisions` | `buys`、`sells`、`shorts`、`covers`、`forced` 和 `all`（所有决策，不含强制成交）按周期（`1d`、`5d`、`20d`）：`n`、`mean`、`median`、`hit_rate`、`se`、`t`、`t_iid`（95% 区间是 `mean` ± 1.96 `se`）；5 日的 `by_trigger`；`counts`：按触发原因和种类数的全部成交 |
 | `ic` | `decision` 和 `holdings`：`days`、`mean`、`std`、`ir`、`t`、`t_iid`、`positive_share` |
 | `factors` | `exposures`（beta 和 t）、`alpha_annual`、`alpha_t`、`r2`、`contributions_annual`、`factor_means_annual`、`excess_return_annual`、`capm` |
-| `pnl` | `reconciliation`（股票、国库券 ETF、现金利息、其他）、`by_holding_period`、`by_regime`、`by_trigger`（开仓、平仓）、`by_sector`、`by_stock`、`best_trades`、`worst_trades`、`concentration` |
+| `pnl` | `reconciliation`（`stocks`、`stocks_long`、`stocks_short`、`tbill_etfs`、`cash_interest`、`borrow_fees`、`margin_interest`、`other`，加起来等于 `total`；费用为负）、`account`（`mode` 和 `equity_error`：重建的账户和 equity.csv 之间的最大差距）、`by_direction`、`by_holding_period`、`by_regime`、`by_trigger`（开仓、平仓）、`by_sector`、`by_stock`（每行带 `long_pnl` 和 `short_pnl`）、`best_trades`、`worst_trades`（带 `direction`）、`concentration` |
 | `findings` | 用句子写的结论 |
 
 结构版本是 `riskaware.analysis/1`。代码在 `src/riskaware/research/analysis.py`；用合成数据核对已知答案的测试在 `tests/test_analysis.py`。生成的 `analysis.md` 和结论句子是英文的，和 `report.md` 一样。
