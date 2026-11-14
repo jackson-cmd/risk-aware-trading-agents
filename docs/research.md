@@ -43,7 +43,7 @@ What the news in 2020 and 2022 lacks: there are no SEC filings, and Benzinga cou
 
 ## The news archive behind it
 
-The bundles are cut from a local archive of about 3.2 million Benzinga headlines from 2011 to 2026, with their publication times: about 202,000 in 2020, 270,000 in 2022 and 250,000 in 2026 up to November. That is too big to ship, so each period keeps the headlines that name its 64 stocks. Together with the prices they are enough to backtest trading agents that read the news and to look for news factors (how often a stock is in the news, the tone of its headlines, unusual attention) with the same point-in-time rules. If you need more years or more stocks, open an issue and we will look at a separate download.
+The bundles are cut from a local archive of about 3.2 million Benzinga headlines from 2011 to 2026, with their publication times: about 202,000 in 2020, 270,000 in 2022 and 250,000 in 2026 up to November. That is too big to ship, so each period keeps the headlines that name its 64 stocks. Together with the prices they are enough to backtest trading agents that read the news and to look for news factors (how often a stock is in the news, the tone of its headlines, unusual attention) with the same point-in-time rules; [News factors](news-factors.md) tests ten of them and shows how much a calendar-date join inflates them. If you need more years or more stocks, open an issue and we will look at a separate download.
 
 ## How a day works
 
