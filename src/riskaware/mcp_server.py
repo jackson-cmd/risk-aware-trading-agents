@@ -420,6 +420,26 @@ def experiment_report(run_id: str) -> dict[str, Any]:
         return {"ok": False, "error": str(exc)}
 
 
+def experiment_analysis(run_id: str) -> dict[str, Any]:
+    """What a saved experiment or a finished trading session made its money on. Decisions: the excess return over
+    SPY 1, 5 and 20 trading days after every buy and sell (a sell counts the excess it avoided), with hit rates and
+    t-statistics that allow for same-day decisions and overlapping windows, and the rank IC of each decision day
+    against the next five days. Factors: daily returns regressed on the market, size, growth and momentum with
+    Newey-West t-statistics, the alpha left after them and what each exposure contributed. P&L: by holding period,
+    sector, market regime, news-triggered or not, and stock; the best and worst positions; how much of the profit
+    rests on one or two trades. Writes analysis.json, analysis.md and analysis.png into the record. run_id is a run
+    id or folder from list_experiments, or a trading session id."""
+    from .research.analysis import analyze_run, compact, is_record, resolve
+
+    try:
+        folder = resolve(run_id)
+        if not is_record(folder):
+            return {"ok": False, "error": f"{folder} is not a single record; pass one of the runs inside it"}
+        return {"ok": True, **compact(analyze_run(folder))}
+    except (FileNotFoundError, ValueError, KeyError) as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 def trading_session_start(start: str | None = None, end: str | None = None, universe: str | None = "core",
                           symbols: list[str] | None = None, news: bool = True, blind: bool = False,
                           decide_every: int = 5, max_positions: int = 5, cash: float = 100_000.0,
@@ -466,7 +486,7 @@ def trading_session_status(session_id: str) -> dict[str, Any]:
 TOOLS = [market_regime, scan, analyze_stock, stock_news, list_strategies, backtest, strategy_guide, backtest_code,
          agents_leaderboard, agent_detail, agent_decisions, agents_create, agents_run, research_guide, market_day,
          run_experiment, list_experiments, experiment_report, trading_session_start, trading_session_step,
-         trading_session_status]
+         trading_session_status, experiment_analysis]
 READ_ONLY = {"market_regime", "scan", "analyze_stock", "stock_news", "list_strategies", "backtest", "strategy_guide",
              "agents_leaderboard", "agent_detail", "agent_decisions", "research_guide", "market_day",
              "list_experiments", "experiment_report", "trading_session_status"}
