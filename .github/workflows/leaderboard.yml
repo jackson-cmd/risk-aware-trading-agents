@@ -1,0 +1,29 @@
+name: Leaderboard
+
+# A pull request that adds or changes an entry is replayed: the model's recorded replies go through the backtest
+# again (no model is called) and every number in the entry must come out the same. The website's tables must match
+# the entries.
+on:
+  pull_request:
+    paths: ["leaderboard/**", "src/riskaware/research/**", "scripts/build_leaderboard.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install -e .
+      - name: Replay every entry
+        run: riskaware research leaderboard --verify
+      - name: The website's tables match the entries
+        run: python scripts/build_leaderboard.py --check

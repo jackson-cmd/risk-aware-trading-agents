@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM 交易智能体基准与榜单：按发布时间回放新闻 · 风险感知交易智能体</title>
+<meta name="description" content="开源的 LLM 交易智能体基准：新闻按发布时间回放，自带 2020 年暴跌、2022 年熊市和 2026 年三个冻结的美股市场（65,863 条带时间的新闻），公开的模型榜单按训练截止日前后分开计分，还有 Prompt 榜。MIT 开源。">
+<meta name="keywords" content="LLM 交易智能体, 大模型炒股, AI 交易基准, 模型榜单, Prompt 榜, 新闻回测, 未来函数, 按时间点数据, 量化回测, 美股数据, 回测框架">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/">
+<meta property="og:title" content="风险感知交易智能体：按发布时间回放新闻的 LLM 交易基准">
+<meta property="og:description" content="三个冻结的美股市场、65,863 条带发布时间的新闻、按训练截止日前后分开计分的 LLM 交易员榜单、Prompt 榜，以及开源的风控优先交易智能体。">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"风险感知交易智能体（Risk-Aware Trading Agents）","description":"开源的 LLM 交易智能体基准：新闻按发布时间回放，自带 2020、2022、2026 三个冻结的美股市场和 65,863 条带发布时间的新闻，公开的模型榜单按训练截止日前后分开计分，Prompt 榜比较不同系统提示词；另有风控优先的美股交易智能体、MCP 服务和 10 家券商接口。","inLanguage":"zh-Hans","codeRepository":"https://github.com/jackson-cmd/risk-aware-trading-agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/","programmingLanguage":"Python","license":"https://opensource.org/licenses/MIT","keywords":["LLM 交易智能体基准","模型榜单","Prompt 榜","新闻回测","未来函数","按时间点数据"],"identifier":"https://doi.org/10.5281/zenodo.24202496"}</script>
+</head>
+<body>
+<header><div class="wrap wide">
+  <a class="brand" href="index.html">风险感知交易智能体</a>
+  <nav>
+    <a href="leaderboard.html">模型榜单</a>
+    <a href="news-backtesting.html">新闻回测</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+    <a href="../" hreflang="en" lang="en">English</a>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<h1>按发布时间回放新闻的 LLM 交易智能体基准</h1>
+<p class="lead">很多新闻回测按日历日期把新闻和价格对齐，收盘后才发布的新闻也被当成收盘时就知道。这里每条新闻都在它发布的那一分钟送到，订单在下一个交易日开盘成交，覆盖三个冻结的市场：2020 年暴跌、2022 年熊市和 2026 年。Llama、GPT、Claude、Gemini 在上面盲测和实名各交易三遍（三个种子），训练截止日前后的成绩分开计。</p>
+<div class="cta">
+  <a class="btn primary" href="leaderboard.html">看模型榜单</a>
+  <a class="btn" href="#start">快速开始</a>
+  <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md">中文文档</a>
+</div>
+
+<h2 id="unique">别处没有的三件事</h2>
+<div class="more">
+  <a href="news-backtesting.html">按发布时间回放新闻<span>安装包自带 2020、2022、2026 三年共 65,863 条带发布时间的新闻标题和 SEC 公告，切自约 320 万条的本地新闻库（2011–2026 年）。同一个信号，按日历日期对齐新闻每笔赚 32 bp，按发布时间对齐每笔亏 6.7 bp。</span></a>
+  <a href="leaderboard.html">LLM 交易员榜单<span>Llama 3.2、GPT-5.6 Luna、Claude、Gemini 在 2026 年、2022 年熊市和 2020 年暴跌里交易同样的 56 只股票，盲测和实名各三个种子。训练截止日之后的成绩参与排名，之前的单独列出，每条成绩都能重放核对。</span></a>
+  <a href="leaderboard.html#prompts">Prompt 榜<span>什么样的系统提示词能让 LLM 交易得更好：角色、风控规则、先写理由、侧重新闻或趋势、示例、输出格式。每处改动都在同样的时段和种子上测，和换种子本来就有的波动比。</span></a>
+</div>
+
+<h2 id="board">2026 年训练截止日之后，盲测</h2>
+<p>每个模型从它的训练截止日开始计分，旁边是同一段日子里 SPY 和 56 只股票等权持有的表现。完整榜单还有 2022、2020 年、实名成绩和每个模型靠什么赚钱。</p>
+<!-- board:teaser -->
+<div class="table-wrap"><table class="board"><thead><tr><th>模型</th><th class="num">计分起点</th><th class="num">收益</th><th class="num">SPY</th><th class="num">等权</th><th class="num">Sharpe</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-01-30</td><td class="num">+6.2%</td><td class="num">+10.7%</td><td class="num">+10.6%</td><td class="num">0.34</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-01-02</td><td class="num">+5.4%</td><td class="num">+12.1%</td><td class="num">+11.4%</td><td class="num">0.25</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-02-13</td><td class="num">+1.7%</td><td class="num">+12.3%</td><td class="num">+10.7%</td><td class="num">-0.15</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-06-30</td><td class="num">-0.6%</td><td class="num">+2.0%</td><td class="num">+5.7%</td><td class="num">-0.99</td></tr>
+</tbody></table></div>
+<!-- /board:teaser -->
+<p class="note"><a href="leaderboard.html">完整榜单 →</a></p>
+
+<h2 id="why">为什么要按发布时间回放</h2>
+<p>收盘后发布的财报和新闻，用日历日期去对齐，会被算进当天的收盘价，回测就提前知道了明天的消息。我们在<a href="news-backtesting.html">新闻回测指南</a>里用同一个信号做了对比：按日历日期对齐，每笔平均赚 32 bp；按发布时间对齐、次日开盘才成交，每笔平均亏 6.7 bp。研究工具箱里的每次实验和每次 LLM 交易运行，都只看得到收盘前已经发布的新闻，并且都会做防偷看检查：把切点之后的价格和新闻全换成随机的再跑一遍，切点之前的决策必须一模一样。</p>
+
+<h2 id="start">快速开始</h2>
+<pre>pip install risk-aware-trading-agents
+riskaware research data                                      # 三个时段的数据和 SHA-256 校验
+riskaware research bench --llm ollama:llama3.2:3b --task 2026-blind   # 用本地模型跑一个基准任务
+riskaware research leaderboard                               # 在仓库目录里看榜单</pre>
+<p>Python 3.10 及以上。本地模型通过 Ollama 运行；OpenAI 兼容接口、Anthropic，以及 Claude Code、Codex、Gemini 的命令行工具也都能用。<a href="leaderboard.html#submit">怎么把你的模型提交到榜单 →</a></p>
+
+<h2 id="more">还有什么</h2>
+<p>这个项目原本是一套风控优先的美股交易智能体：先看 FOMC、CPI、非农日历和 VIX 期限结构再决定买不买，现金加短期国债不低于 30%，支持回测、模拟盘、每天自动运行的智能体、MCP 服务和 10 家券商。这些内容在<a href="../?lang=zh">完整首页</a>和<a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md">中文文档</a>里。</p>
+
+<h2>指南</h2>
+<div class="more">
+  <a href="leaderboard.html">LLM 交易智能体榜单<span>干净和可能记得分开计分，每个模型靠什么赚钱</span></a>
+  <a href="news-backtesting.html">用新闻回测，不用未来函数<span>按发布时间回放新闻，以收盘为界，次日开盘成交</span></a>
+  <a href="news-factors.html">新闻标题能预测股价吗？十个新闻因子<span>2020、2022、2026 年按时间点检验，以及按日历日期对齐会把 IC 虚增多少</span></a>
+  <a href="llm-trading-agents.html">测试 LLM 交易智能体<span>在冻结的市场上一步一步交易，可以盲测</span></a>
+  <a href="point-in-time-market-data.html">按时间点记录的美股数据<span>价格、VIX 和新闻，附 SHA-256 哈希</span></a>
+</div>
+</main>
+
+<footer><div class="wrap wide">MIT 开源协议 · 不构成投资建议 · 请先用模拟盘 · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="../" hreflang="en">English</a></div></footer>
+</body>
+</html>

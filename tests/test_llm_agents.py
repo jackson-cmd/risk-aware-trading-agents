@@ -72,6 +72,9 @@ def test_request_body_for_reasoning_and_chat_models():
     assert sol["reasoning_effort"] == "low" and "temperature" not in sol
     local = OpenAICompatProvider(llm_config("ollama:qwen2.5:3b")).request_body(sys_, user, schema)
     assert "reasoning_effort" not in local and local["temperature"] == 0.2 and local["max_tokens"] == 1200
+    gateway = llm_config("compat:protected.llama3.2", base_url="https://gateway.example/openai", key_env="GW_KEY")
+    assert all(b["stream"] is False for b in (luna, sol, local, OpenAICompatProvider(gateway).request_body(sys_, user,
+                                                                                                         schema)))
     assert is_reasoning_model("o4-mini") and not is_reasoning_model("qwen2.5:3b")
 
 

@@ -53,3 +53,14 @@ def test_indexnow_key_file_matches_the_workflow():
     key = re.search(r"INDEXNOW_KEY: ([0-9a-f]{32})", (ROOT / ".github" / "workflows" / "pages.yml").read_text(
         encoding="utf-8")).group(1)
     assert (SITE / f"{key}.txt").read_text(encoding="utf-8").strip() == key
+
+
+def test_leaderboard_pages_match_the_entries():
+    """The leaderboard tables on the website and assets/data/leaderboard.json are built from leaderboard/; after
+    adding an entry, run python scripts/build_leaderboard.py."""
+    import subprocess
+    import sys
+
+    out = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_leaderboard.py"), "--check"],
+                         capture_output=True, text=True, timeout=120)
+    assert out.returncode == 0, out.stdout + out.stderr

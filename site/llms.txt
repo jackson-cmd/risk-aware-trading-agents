@@ -1,24 +1,28 @@
 # Risk-Aware Trading Agents
 
-> Open-source AI trading agents for US stocks (Python, MIT license). They check the macro calendar (FOMC, CPI, jobs report), the VIX term structure and cross-verified news before they buy. The project includes news backtests that cannot see the future, a frozen point-in-time copy of the 2026 market for research, paper-trading agents ranked against SPY, an MCP server for Claude and other LLM clients, and paper or live trading through 9 broker adapters. Nothing in it is investment advice.
+> An open-source benchmark for LLM trading agents with news replayed by publication time, and risk-aware AI trading agents for US stocks (Python, MIT license). Three frozen point-in-time markets ship with it (the 2020 crash, the 2022 bear market and 2026, with 65,863 timestamped headlines and filings); a public leaderboard scores LLMs blind and with names, apart before and after each model's training cutoff, and a prompt leaderboard compares system prompts. The agents check the macro calendar (FOMC, CPI, jobs report), the VIX term structure and cross-verified news before they buy; the project also has paper-trading agents ranked against SPY, an MCP server for Claude and other LLM clients, and paper or live trading through 9 broker adapters. Nothing in it is investment advice.
 
 - Install: `pip install risk-aware-trading-agents` (Python 3.10+), or run the dashboard with `docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard`.
 - MCP server: `uvx risk-aware-trading-agents mcp` (stdio, 21 tools). The tools are read-only or work on local paper accounts; none can send an order to a broker.
-- Research kit: daily prices from 2024-01-02 to 2026-11-11 for 64 large-cap stocks and 25 ETFs, the VIX term structure (VIX9D, VIX, VIX3M, VVIX) and 16,945 headlines and SEC 8-K filings with publication times, with SHA-256 hashes. Every experiment runs a look-ahead check.
+- Research kit: three frozen periods (2026 to date, the 2022 bear market, the 2020 crash), each with daily prices for 64 large-cap stocks and 25 ETFs from two years before, the VIX term structure, and 65,863 headlines and SEC 8-K filings with publication times in all, with SHA-256 hashes. Every experiment runs a look-ahead check. `riskaware research bench --llm ...` runs the leaderboard's six tasks with any model.
 - Brokers: Alpaca (tested on a paper account), Public, Tradier, Interactive Brokers, Charles Schwab, tastytrade, Futu/moomoo, Tiger and Longbridge, plus a built-in paper account.
 
 ## Guides
 
+- [LLM trading agent leaderboard (rta-bench-1)](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html): Llama 3.2, GPT-5.6 Luna, Claude Haiku 5.5 and Sonnet 4.6, and Gemini 3.5 Flash trade the 2026, 2022 and 2020 markets on news replayed by publication time, blind and named, three seeds each, scored apart before and after each training cutoff; how each model makes money; a prompt leaderboard; how to submit a model
 - [Backtest trading strategies with news, without look-ahead bias](https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html): point-in-time replay, a 16:00 cutoff, orders at the next open, and a check that the backtest never saw the future
+- [Do news headlines predict stock returns? Ten news factors tested point in time](https://jackson-cmd.github.io/risk-aware-trading-agents/news-factors.html): rank IC, quintiles, decay and price controls for ten headline factors in 2020, 2022 and 2026, and how much a calendar-date news join inflates them
 - [Free point-in-time US stock market data for 2026](https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html): prices, VIX and news with publication times for reproducible backtests
 - [Test LLM trading agents on a frozen market](https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html): trade 2026 one close at a time with Claude, GPT, Gemini or local models, with a blind mode against memorization
 
 ## Documentation
 
 - [README](https://github.com/jackson-cmd/risk-aware-trading-agents#readme): quick start, features, configuration, FAQ
+- [Leaderboard](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/leaderboard.md): the rta-bench-1 tasks and settings, training cutoffs, how entries are checked by replay, and how to submit one
 - [Research kit](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/research.md): the frozen 2026 market, experiments, the look-ahead check, LLM trading sessions
 - [Agents and the MCP server](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/agents.md): paper-trading agents and how to connect Claude, Codex, Gemini or Cursor
 - [News history](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/news-history.md): point-in-time news for backtests, bundled for 2026 and built on your machine for other years
+- [News factors](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/news-factors.md): `riskaware research factors`, the ten factors, the tests and the results
 - [Custom strategies](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/custom-strategies.md): write a strategy class and backtest it
 - [Strategy lab](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/strategy-lab.md): let an AI write a strategy from a description and test it safely
 - [Brokers](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/brokers.md): keys, gateways and paper accounts for each broker

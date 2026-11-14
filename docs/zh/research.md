@@ -165,6 +165,8 @@ r = run_policy(llm_policy("ollama:qwen2.5:3b"), Experiment(universe="core", max_
 
 **哪种 prompt 好。** `riskaware research prompts` 交易一组有版本号的 system prompt 变体，每个只改一处（角色、风险规则、先推理、示例、回复格式、每只股票的新闻条数、决策频率），并和同一时段、同一种子的基线比较：[prompts.md](prompts.md)。
 
+**榜单。** 想在固定设置下和别的模型比，就跑 rta-bench-1 的六个任务（`riskaware research bench --llm ...`）再提交条目；见 [leaderboard.md](leaderboard.md) 和网站上的[榜单](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html)。
+
 ## 五种波段策略，开和不开新闻
 
 五种常见的波段策略，按教科书的定义写成（`riskaware/strategy/swing.py`）：

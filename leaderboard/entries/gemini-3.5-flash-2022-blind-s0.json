@@ -1,0 +1,1594 @@
+{
+ "bench": "rta-bench-1",
+ "task": "2022-blind",
+ "seed": 0,
+ "model": {
+  "name": "gemini-3.5-flash",
+  "provider": "Google",
+  "access": "OpenAI-compatible gateway, reasoning_effort minimal",
+  "training_cutoff": "2025-01",
+  "open_weights": false,
+  "parameters": null,
+  "call": {
+   "provider": "google",
+   "model": "gemini-3.5-flash",
+   "reasoning_effort": "minimal",
+   "temperature": 0.2,
+   "max_tokens": 2000,
+   "system_prompt_sha256": "0aa00937be0942da26653df3a645bce43153b5ef86761e36b962bb8ee3e4a352"
+  }
+ },
+ "contamination": "may_remember",
+ "settings": {
+  "universe": "megacap",
+  "decide_every": 5,
+  "max_positions": 10,
+  "position_size": null,
+  "news": true,
+  "max_news": 3,
+  "execution": "plain",
+  "cash": 100000.0,
+  "slippage_bps": 5.0,
+  "commission_per_share": 0.0,
+  "costs": "realistic",
+  "mode": "long_only",
+  "period": "2022",
+  "blind": true,
+  "start": "2022-01-03",
+  "end": "2022-12-30"
+ },
+ "data": {
+  "version": "2022-12-30",
+  "prices_sha256": "6377384cd1902329bf69dcb85338335b15f0e9e4485a753ad005cd370c9238fc",
+  "news_sha256": "d5bf10935f3f2842f2f70e07be9faaa8f2e5b63e720c0825ff713e40e611a468"
+ },
+ "record": {
+  "run_id": "20261113-210840-llm-gemini-3-5-flash-2022-blind-2022-news-realistic",
+  "riskaware": {
+   "version": "0.7.2",
+   "git_commit": "ed141a51de4a"
+  },
+  "created_utc": "2026-11-14T03:08:54+00:00",
+  "files_sha256": {
+   "manifest.json": "cdfe980fd62680ce75390ad1db62d54b00c73f3dc87fb9d7c81abac19ed18442",
+   "metrics.json": "74e757d8ae934b033eed898f456daae3771983cee96c873b9c6e125cd72850d9",
+   "equity.csv": "45acfae0208f684b6c42f4bb629db87694c7533547c0891c3856262613a4239f",
+   "trades.csv": "8f6de294584b443be87fbb9bcdd7577e0f0481edbbfaea8d49b42e247d78695a",
+   "decisions.csv": "368647f53bcd06e97f7118680e5d57369be2a6496dd6db5d619a7ebb6c94d7d7",
+   "policy_log.json": "2eaec84523e9e2607e7ec6b2cac14f5215800693d2023c88a0487b766b2fa009"
+  },
+  "replies_sha256": "aea83fa17f939d7069fd56767e757203b0743609cdd44a4f7ca076743652dcce",
+  "observations_sha256": "a45c46752f51531df281d744f346d412e76cf336db58df46185224fe37c24a4c",
+  "costs_seen_by_model": "fixed",
+  "rescored_from": "20261113-204329-llm-gemini-3-5-flash-2022-blind-2022-news"
+ },
+ "look_ahead_check": "pass",
+ "metrics": {
+  "total_return": -0.011866,
+  "cagr": -0.012005,
+  "volatility": 0.092187,
+  "sharpe": -0.238101,
+  "sortino": -0.30028,
+  "max_drawdown": -0.08684,
+  "calmar": -0.138245,
+  "win_rate": 0.571429,
+  "profit_factor": 0.783417,
+  "round_trips": 42.0,
+  "avg_holding_days": 30.742924,
+  "turnover": 3.249685,
+  "avg_exposure": 0.463265,
+  "trades": 78.0,
+  "excess_vs_equal_weight": 0.111635,
+  "excess_vs_spy": 0.174598
+ },
+ "vs_spy": {
+  "beta": 0.202114,
+  "alpha_annual": 0.017002,
+  "excess_return_annual": 0.170773,
+  "information_ratio": 0.817234,
+  "t_stat_excess": 0.813984,
+  "sharpe_ci95_low": -2.143575,
+  "sharpe_ci95_high": 2.037815,
+  "p_sharpe_above_spy": 0.7835,
+  "days": 250.0
+ },
+ "anchors": {
+  "spy": {
+   "total_return": -0.186464,
+   "sharpe": -0.79525,
+   "max_drawdown": -0.244964
+  },
+  "equal_weight": {
+   "total_return": -0.123501,
+   "sharpe": -0.528791,
+   "max_drawdown": -0.230743
+  }
+ },
+ "after_cutoff": null,
+ "analysis": {
+  "run_id": "20261113-210840-llm-gemini-3-5-flash-2022-blind-2022-news-realistic",
+  "strategy": "llm:gemini-3.5-flash:2022-blind",
+  "kind": "policy",
+  "period": "2022",
+  "start": "2022-01-03",
+  "end": "2022-12-30",
+  "stocks": 56,
+  "news": true,
+  "total_return": -0.011866,
+  "spy_return": -0.186464,
+  "summary": {
+   "total_return": -0.011866,
+   "spy_return": -0.186464,
+   "decisions": 78,
+   "decision_excess_5d": 0.00844,
+   "decision_excess_5d_t": 2.670238,
+   "decision_hit_rate_5d": 0.602564,
+   "buy_excess_5d": 0.014198,
+   "buy_excess_5d_t": 2.154213,
+   "sell_avoided_5d": 0.003505,
+   "sell_avoided_5d_t": 0.634267,
+   "decision_ic": 0.042727,
+   "decision_ic_t": 1.872981,
+   "holdings_ic": 0.043733,
+   "holdings_ic_t": 1.606746,
+   "alpha_annual": -0.022907,
+   "alpha_t": -0.335609,
+   "capm_alpha_annual": 0.017002,
+   "capm_alpha_t": 0.215551,
+   "beta_market": 0.343645,
+   "beta_size": -0.04774,
+   "beta_growth": -0.336092,
+   "beta_momentum": 0.093024,
+   "r2": 0.454984,
+   "exposure_return_annual": 0.000957,
+   "news_decision_share": 0.358974,
+   "news_entry_pnl": 1271.353342,
+   "best_trade_share": null,
+   "return_without_best_trade": -0.036008,
+   "concentrated": false
+  },
+  "findings": [
+   "Buys: over the five trading days from the fill, the stocks it bought beat SPY by 1.42% on average (36 buys, 67% of them ahead of SPY; t = 2.2, significant at 5%).",
+   "Sells: over the five trading days from the fill, the stocks it sold lagged SPY by 0.35%, so selling avoided that (42 sells; t = 0.6, within noise).",
+   "Decision IC: on the 26 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.043 with the next five days' returns (IC IR 0.37, t = 1.9, within noise).",
+   "Holdings IC: the weights it held after each of 50 decision days had a mean rank IC of 0.044 with the next five days' returns (t = 1.6, within noise).",
+   "Factor exposures: market 0.34 (t 9.0), size -0.05 (t -0.9), growth -0.34 (t -3.7), momentum 0.09 (t 2.3); together they explain 45% of the daily variation (R²).",
+   "Of the -2.2% a year it earned over T-bills (arithmetic mean): market -6.6%, growth +5.9%, momentum +0.7%, size +0.1%; the alpha left is -2.3% a year (t = -0.3, within noise).",
+   "Verdict: the exposures account for +0.1% a year of it, and the -2.3% a year left over is not significant: one period of daily returns cannot tell it from luck.",
+   "P&L: -$1,197 in all, -$2,214 from 34 positions and +$1,017 of interest on idle cash.",
+   "By holding period: 61+ days made the most (+$6,238, 6 positions); 3-5 days the least (-$6,828, 8 positions).",
+   "By sector: Health Care made the most (+$4,721, 6 positions); Technology the least (-$3,513, 4 positions).",
+   "By stock: LLY made the most (+$2,403, 1 position); BKNG the least (-$1,824, 1 position).",
+   "By market regime of the previous close: risk-on 11 days -2.8% (SPY -5.1%); neutral 6 days -0.0% (SPY -3.3%); uncertain 162 days -6.6% (SPY -19.0%); risk-off 72 days +8.8% (SPY +9.5%).",
+   "News: 20 positions opened on news made +$1,271, the other 14 -$3,486; 6 positions closed on news made +$3,001; over the five days from the fill, news-triggered buys beat SPY by 0.89% (t 1.0).",
+   "Concentration: the positions lost -$2,214 in all; the best was LLY bought 2022-03-03 and sold 2022-08-03, +$2,403. Had the best position made nothing, the run would have returned -3.6% instead of -1.2%."
+  ],
+  "decisions": {
+   "horizons": [
+    1,
+    5,
+    20
+   ],
+   "buys": {
+    "1d": {
+     "n": 36,
+     "mean": 0.002965,
+     "median": 0.003499,
+     "hit_rate": 0.638889,
+     "se": 0.002361,
+     "t": 1.255744,
+     "t_iid": 1.147248
+    },
+    "5d": {
+     "n": 36,
+     "mean": 0.014198,
+     "median": 0.015406,
+     "hit_rate": 0.666667,
+     "se": 0.006591,
+     "t": 2.154213,
+     "t_iid": 2.130509
+    },
+    "20d": {
+     "n": 36,
+     "mean": 0.026307,
+     "median": 0.043385,
+     "hit_rate": 0.75,
+     "se": 0.011725,
+     "t": 2.243619,
+     "t_iid": 1.99067
+    }
+   },
+   "sells": {
+    "1d": {
+     "n": 42,
+     "mean": 0.000572,
+     "median": 0.001667,
+     "hit_rate": 0.571429,
+     "se": 0.002358,
+     "t": 0.242474,
+     "t_iid": 0.237958
+    },
+    "5d": {
+     "n": 42,
+     "mean": 0.003505,
+     "median": 0.000281,
+     "hit_rate": 0.547619,
+     "se": 0.005525,
+     "t": 0.634267,
+     "t_iid": 0.665422
+    },
+    "20d": {
+     "n": 42,
+     "mean": -0.002146,
+     "median": -0.011974,
+     "hit_rate": 0.380952,
+     "se": 0.010399,
+     "t": -0.20633,
+     "t_iid": -0.227989
+    }
+   },
+   "all": {
+    "1d": {
+     "n": 78,
+     "mean": 0.001676,
+     "median": 0.002077,
+     "hit_rate": 0.602564,
+     "se": 0.001044,
+     "t": 1.605534,
+     "t_iid": 0.955916
+    },
+    "5d": {
+     "n": 78,
+     "mean": 0.00844,
+     "median": 0.005186,
+     "hit_rate": 0.602564,
+     "se": 0.003161,
+     "t": 2.670238,
+     "t_iid": 2.009574
+    },
+    "20d": {
+     "n": 78,
+     "mean": 0.010986,
+     "median": 0.007229,
+     "hit_rate": 0.551282,
+     "se": 0.005912,
+     "t": 1.858178,
+     "t_iid": 1.366417
+    }
+   },
+   "by_trigger": {
+    "news": {
+     "buys": {
+      "n": 20,
+      "mean": 0.008868,
+      "median": 0.00787,
+      "hit_rate": 0.65,
+      "se": 0.009289,
+      "t": 0.954638,
+      "t_iid": 1.015607
+     },
+     "sells": {
+      "n": 8,
+      "mean": -0.001872,
+      "median": -0.006138,
+      "hit_rate": 0.5,
+      "se": 0.005966,
+      "t": -0.313849,
+      "t_iid": -0.317046
+     }
+    },
+    "other": {
+     "buys": {
+      "n": 16,
+      "mean": 0.02086,
+      "median": 0.025169,
+      "hit_rate": 0.6875,
+      "se": 0.010054,
+      "t": 2.074692,
+      "t_iid": 2.015628
+     },
+     "sells": {
+      "n": 34,
+      "mean": 0.00477,
+      "median": 0.000509,
+      "hit_rate": 0.558824,
+      "se": 0.006476,
+      "t": 0.736511,
+      "t_iid": 0.748796
+     }
+    }
+   },
+   "counts": {
+    "news": {
+     "buys": 20,
+     "sells": 8
+    },
+    "other": {
+     "buys": 16,
+     "sells": 34
+    }
+   }
+  },
+  "ic": {
+   "horizon_days": 5,
+   "universe": 56,
+   "decision_days": "the policy's steps (policy_log.json)",
+   "decision": {
+    "score": "+1 bought, -1 sold, 0 left alone, on each day it traded",
+    "days": 26,
+    "mean": 0.042727,
+    "std": 0.11632,
+    "ir": 0.367322,
+    "t": 1.872981,
+    "t_iid": 1.872981,
+    "positive_share": 0.576923
+   },
+   "holdings": {
+    "score": "the weights it held after each decision (0 for stocks not held)",
+    "days": 50,
+    "mean": 0.043733,
+    "std": 0.192463,
+    "ir": 0.227228,
+    "t": 1.606746,
+    "t_iid": 1.606746,
+    "positive_share": 0.62
+   }
+  },
+  "factors": {
+   "days": 250,
+   "factors": {
+    "market": "Market (SPY - BIL)",
+    "size": "Size (IWM - SPY)",
+    "growth": "Growth (QQQ - SPY)",
+    "momentum": "Momentum (top - bottom third)"
+   },
+   "lags": 4,
+   "alpha_annual": -0.022907,
+   "alpha_t": -0.335609,
+   "exposures": {
+    "market": {
+     "beta": 0.343645,
+     "t": 9.001804
+    },
+    "size": {
+     "beta": -0.04774,
+     "t": -0.876597
+    },
+    "growth": {
+     "beta": -0.336092,
+     "t": -3.722427
+    },
+    "momentum": {
+     "beta": 0.093024,
+     "t": 2.323591
+    }
+   },
+   "r2": 0.454984,
+   "adj_r2": 0.446086,
+   "resid_vol_annual": 0.068709,
+   "factor_means_annual": {
+    "market": -0.192723,
+    "size": -0.025913,
+    "growth": -0.176471,
+    "momentum": 0.071357
+   },
+   "contributions_annual": {
+    "market": -0.066228,
+    "size": 0.001237,
+    "growth": 0.05931,
+    "momentum": 0.006638,
+    "alpha": -0.022907
+   },
+   "excess_return_annual": -0.02195,
+   "capm": {
+    "beta": 0.202114,
+    "beta_t": 6.913501,
+    "alpha_annual": 0.017002,
+    "alpha_t": 0.215551,
+    "r2": 0.282726
+   }
+  },
+  "pnl": {
+   "total": -1197.436731,
+   "reconciliation": {
+    "stocks": -2214.342553,
+    "tbill_etfs": 0.0,
+    "cash_interest": 1016.905664,
+    "other": 0.000158
+   },
+   "positions": 34,
+   "by_holding_period": [
+    {
+     "group": "3-5 days",
+     "pnl": -6827.591269,
+     "contribution": -0.068276,
+     "share": 3.083349,
+     "trades": 8,
+     "win_rate": 0.0,
+     "avg_pnl": -853.448909,
+     "still_open": 0
+    },
+    {
+     "group": "6-10 days",
+     "pnl": -2128.73185,
+     "contribution": -0.021287,
+     "share": 0.961338,
+     "trades": 3,
+     "win_rate": 0.0,
+     "avg_pnl": -709.577283,
+     "still_open": 0
+    },
+    {
+     "group": "11-20 days",
+     "pnl": -405.113514,
+     "contribution": -0.004051,
+     "share": 0.18295,
+     "trades": 7,
+     "win_rate": 0.571429,
+     "avg_pnl": -57.873359,
+     "still_open": 0
+    },
+    {
+     "group": "21-60 days",
+     "pnl": 909.361954,
+     "contribution": 0.009094,
+     "share": -0.410669,
+     "trades": 10,
+     "win_rate": 0.5,
+     "avg_pnl": 90.936195,
+     "still_open": 1
+    },
+    {
+     "group": "61+ days",
+     "pnl": 6237.732126,
+     "contribution": 0.062377,
+     "share": -2.816968,
+     "trades": 6,
+     "win_rate": 1.0,
+     "avg_pnl": 1039.622021,
+     "still_open": 2
+    }
+   ],
+   "by_regime": [
+    {
+     "group": "RISK_ON",
+     "label": "risk-on",
+     "days": 11,
+     "share_of_days": 0.043825,
+     "pnl": -2799.32705,
+     "contribution": -0.027993,
+     "share": 2.337766,
+     "return": -0.027656,
+     "spy_return": -0.051243,
+     "avg_exposure": 0.798828
+    },
+    {
+     "group": "NEUTRAL",
+     "label": "neutral",
+     "days": 6,
+     "share_of_days": 0.023904,
+     "pnl": -52.640335,
+     "contribution": -0.000526,
+     "share": 0.043961,
+     "return": -0.000418,
+     "spy_return": -0.033377,
+     "avg_exposure": 0.249711
+    },
+    {
+     "group": "UNCERTAIN",
+     "label": "uncertain",
+     "days": 162,
+     "share_of_days": 0.645418,
+     "pnl": -6637.871466,
+     "contribution": -0.066379,
+     "share": 5.543401,
+     "return": -0.065989,
+     "spy_return": -0.190063,
+     "avg_exposure": 0.446494
+    },
+    {
+     "group": "RISK_OFF",
+     "label": "risk-off",
+     "days": 72,
+     "share_of_days": 0.286853,
+     "pnl": 8292.40212,
+     "contribution": 0.082924,
+     "share": -6.925128,
+     "return": 0.088372,
+     "spy_return": 0.09525,
+     "avg_exposure": 0.463468
+    }
+   ],
+   "by_trigger": {
+    "entry": [
+     {
+      "group": "news",
+      "pnl": 1271.353342,
+      "contribution": 0.012714,
+      "share": -0.574145,
+      "trades": 20,
+      "win_rate": 0.6,
+      "avg_pnl": 63.567667,
+      "still_open": 3
+     },
+     {
+      "group": "other",
+      "pnl": -3485.695895,
+      "contribution": -0.034857,
+      "share": 1.574145,
+      "trades": 14,
+      "win_rate": 0.214286,
+      "avg_pnl": -248.978278,
+      "still_open": 0
+     }
+    ],
+    "exit": [
+     {
+      "group": "news",
+      "pnl": 3000.734094,
+      "contribution": 0.030007,
+      "share": -1.355135,
+      "trades": 6,
+      "win_rate": 0.833333,
+      "avg_pnl": 500.122349,
+      "still_open": 0
+     },
+     {
+      "group": "other",
+      "pnl": -5767.053272,
+      "contribution": -0.057671,
+      "share": 2.604409,
+      "trades": 25,
+      "win_rate": 0.32,
+      "avg_pnl": -230.682131,
+      "still_open": 0
+     },
+     {
+      "group": "still open",
+      "pnl": 551.976625,
+      "contribution": 0.00552,
+      "share": -0.249273,
+      "trades": 3,
+      "win_rate": 0.666667,
+      "avg_pnl": 183.992208,
+      "still_open": 3
+     }
+    ]
+   },
+   "by_sector": [
+    {
+     "group": "Health Care",
+     "pnl": 4721.198849,
+     "contribution": 0.047212,
+     "share": -2.1321,
+     "trades": 6,
+     "win_rate": 1.0,
+     "avg_pnl": 786.866475,
+     "still_open": 0
+    },
+    {
+     "group": "Energy",
+     "pnl": 3290.425282,
+     "contribution": 0.032904,
+     "share": -1.48596,
+     "trades": 5,
+     "win_rate": 0.6,
+     "avg_pnl": 658.085056,
+     "still_open": 0
+    },
+    {
+     "group": "Consumer Staples",
+     "pnl": 423.610289,
+     "contribution": 0.004236,
+     "share": -0.191303,
+     "trades": 6,
+     "win_rate": 0.666667,
+     "avg_pnl": 70.601715,
+     "still_open": 2
+    },
+    {
+     "group": "Consumer Discretionary",
+     "pnl": -2451.685765,
+     "contribution": -0.024517,
+     "share": 1.107185,
+     "trades": 2,
+     "win_rate": 0.0,
+     "avg_pnl": -1225.842883,
+     "still_open": 0
+    },
+    {
+     "group": "Financials",
+     "pnl": -2510.515413,
+     "contribution": -0.025105,
+     "share": 1.133752,
+     "trades": 5,
+     "win_rate": 0.2,
+     "avg_pnl": -502.103083,
+     "still_open": 0
+    },
+    {
+     "group": "Technology",
+     "pnl": -3512.612954,
+     "contribution": -0.035126,
+     "share": 1.586301,
+     "trades": 4,
+     "win_rate": 0.0,
+     "avg_pnl": -878.153239,
+     "still_open": 0
+    }
+   ],
+   "by_stock": [
+    {
+     "group": "LLY",
+     "pnl": 2403.350675,
+     "contribution": 0.024034,
+     "share": -1.085356,
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_pnl": 2403.350675,
+     "still_open": 0
+    },
+    {
+     "group": "CVX",
+     "pnl": 2317.831587,
+     "contribution": 0.023178,
+     "share": -1.046736,
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_pnl": 2317.831587,
+     "still_open": 0
+    },
+    {
+     "group": "ABBV",
+     "pnl": 1007.98291,
+     "contribution": 0.01008,
+     "share": -0.455206,
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_pnl": 1007.98291,
+     "still_open": 0
+    },
+    {
+     "group": "GS",
+     "pnl": -1132.56038,
+     "contribution": -0.011326,
+     "share": 0.511466,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -1132.56038,
+     "still_open": 0
+    },
+    {
+     "group": "AMD",
+     "pnl": -1183.883712,
+     "contribution": -0.011839,
+     "share": 0.534643,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -1183.883712,
+     "still_open": 0
+    },
+    {
+     "group": "BKNG",
+     "pnl": -1824.115206,
+     "contribution": -0.018241,
+     "share": 0.823773,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -1824.115206,
+     "still_open": 0
+    }
+   ],
+   "best_trades": [
+    {
+     "symbol": "LLY",
+     "sector": "Health Care",
+     "entry": "2022-03-03",
+     "exit": "2022-08-03",
+     "holding_days": 105,
+     "pnl": 2403.350675,
+     "return": 0.250981,
+     "open": false,
+     "entry_reason": "Strong momentum, positive clinical trial news, and trading above key EMAs in a defensive sector (Health Care).",
+     "exit_reason": "Position has weakened, underperforming short-term EMAs and showing negative momentum."
+    },
+    {
+     "symbol": "CVX",
+     "sector": "Energy",
+     "entry": "2022-01-11",
+     "exit": "2022-06-21",
+     "holding_days": 110,
+     "pnl": 2317.831587,
+     "return": 0.236396,
+     "open": false,
+     "entry_reason": "Strong upward momentum in Energy sector, high RSI and positive vs_ema indicators.",
+     "exit_reason": "Energy sector experiencing sharp correction, locking in gains"
+    },
+    {
+     "symbol": "XOM",
+     "sector": "Energy",
+     "entry": "2022-01-11",
+     "exit": "2022-02-02",
+     "holding_days": 15,
+     "pnl": 1558.183647,
+     "return": 0.159062,
+     "open": false,
+     "entry_reason": "Strong upward momentum in Energy sector, high RSI and positive vs_ema indicators.",
+     "exit_reason": "Take profits on S48 after a strong earnings-driven runup and extremely overbought RSI levels (RSI14 > 83)."
+    }
+   ],
+   "worst_trades": [
+    {
+     "symbol": "BKNG",
+     "sector": "Consumer Discretionary",
+     "entry": "2022-02-16",
+     "exit": "2022-02-24",
+     "holding_days": 5,
+     "pnl": -1824.115206,
+     "return": -0.190476,
+     "open": false,
+     "entry_reason": "Strong relative strength, positive 1-day and 5-day returns, and trading well above its EMA20 and EMA50",
+     "exit_reason": "Risk-off regime and high risk score require trimming underperforming positions; S45 has a loss of over 6% in just 4 days."
+    },
+    {
+     "symbol": "AMD",
+     "sector": "Technology",
+     "entry": "2022-01-04",
+     "exit": "2022-01-11",
+     "holding_days": 5,
+     "pnl": -1183.883712,
+     "return": -0.118659,
+     "open": false,
+     "entry_reason": "Strong daily return and positive news flow regarding new product releases driving semiconductor sector momentum.",
+     "exit_reason": "Stop-loss triggered due to significant underperformance and loss of momentum (-12.6% gain)."
+    },
+    {
+     "symbol": "GS",
+     "sector": "Financials",
+     "entry": "2022-01-04",
+     "exit": "2022-01-19",
+     "holding_days": 10,
+     "pnl": -1132.56038,
+     "return": -0.11266,
+     "open": false,
+     "entry_reason": "Financial sector stock showing strong daily performance and positive price target upgrades.",
+     "exit_reason": "Worse-than-expected Q4 EPS results and high relative volume sell-off"
+    }
+   ],
+   "concentration": {
+    "trades": 34,
+    "best_trade": {
+     "symbol": "LLY",
+     "sector": "Health Care",
+     "entry": "2022-03-03",
+     "exit": "2022-08-03",
+     "holding_days": 105,
+     "pnl": 2403.350675,
+     "return": 0.250981,
+     "open": false,
+     "entry_reason": "Strong momentum, positive clinical trial news, and trading above key EMAs in a defensive sector (Health Care).",
+     "exit_reason": "Position has weakened, underperforming short-term EMAs and showing negative momentum."
+    },
+    "best_trade_share": null,
+    "top2_share": null,
+    "best_trade_share_of_gains": 0.227675,
+    "top2_share_of_gains": 0.447249,
+    "best_stock": "LLY",
+    "best_stock_share": null,
+    "return": -0.011974,
+    "return_without_best_trade": -0.036008,
+    "return_without_top2": -0.059186,
+    "concentrated": false
+   }
+  }
+ },
+ "memory": {
+  "score": 0.21229166666666666,
+  "ci95": [
+   0.10234197443181825,
+   0.31672936965397164
+  ],
+  "verdict": "contaminated",
+  "why": "named records help more before the cutoff than after it: AUC gap +0.212 before the cutoff and -0.050 after it (the control), difference +0.262, 95% CI [+0.107, +0.415]",
+  "beyond_control": 0.26217147435897437,
+  "beyond_control_ci95": [
+   0.10692519251739968,
+   0.41460789037310525
+  ],
+  "measured_on": null,
+  "probe": "riskaware.research.memory.memory_probe: 100 named/blind pairs and 50 recall questions per period, seed 0, temperature 0, with the model's cutoff; score = AUC gap named minus blind on the points before the cutoff"
+ },
+ "usage": {
+  "calls": 50,
+  "input_tokens": 736017,
+  "output_tokens": 7908,
+  "failed": 0,
+  "seconds": 716.6,
+  "list_price_usd": 1.1752
+ },
+ "steps": 50,
+ "submitted": "2026-11-13",
+ "submitter": "Risk-Aware Trading Agents maintainers",
+ "notes": null,
+ "replies": [
+  {
+   "orders": [
+    {
+     "symbol": "S30",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong upward momentum, trading near all-time highs, and positive news sentiment surrounding its $3 trillion market cap milestone."
+    },
+    {
+     "symbol": "S29",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong relative strength, positive analyst upgrade news, and low distance from 52-week highs."
+    },
+    {
+     "symbol": "S16",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong daily return and positive news flow regarding new product releases driving semiconductor sector momentum."
+    },
+    {
+     "symbol": "S36",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Defensive Consumer Staples stock with strong trend indicators, high RSI, and trading very close to its 52-week high."
+    },
+    {
+     "symbol": "S12",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Financial sector strength with positive analyst price target revisions and solid momentum."
+    },
+    {
+     "symbol": "S05",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Steady Health Care stock with positive momentum, low volatility, and trading above key EMAs."
+    },
+    {
+     "symbol": "S44",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Technology stock with strong medium-term momentum (ret_21d of 12.48%) experiencing a short-term pullback (RSI2 at 21.54)."
+    },
+    {
+     "symbol": "S49",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "High momentum technology stock trading well above its EMAs with a short-term pullback setup."
+    },
+    {
+     "symbol": "S42",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Consumer Staples stock with strong trend metrics, low distance to 52-week high, and healthy relative volume."
+    },
+    {
+     "symbol": "S03",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Financial sector stock showing strong daily performance and positive price target upgrades."
+    }
+   ],
+   "note": "Initiating 10 diversified long positions of 10% weight each in a RISK_ON regime, focusing on strong momentum, positive analyst sentiment, and high relative strength."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Stop-loss triggered due to significant underperformance and loss of momentum (-12.6% gain)."
+    },
+    {
+     "symbol": "S49",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Underperforming position with negative momentum (-6.3% gain)."
+    },
+    {
+     "symbol": "S30",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Underperforming position with negative momentum (-5.7% gain)."
+    },
+    {
+     "symbol": "S48",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong upward momentum in Energy sector, high RSI and positive vs_ema indicators."
+    },
+    {
+     "symbol": "S43",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong upward momentum in Energy sector, high RSI and positive vs_ema indicators."
+    },
+    {
+     "symbol": "S31",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Financial sector leader showing strong momentum and hitting all-time highs."
+    }
+   ],
+   "note": "Rebalancing portfolio by cutting underperforming technology positions and rotating capital into strong momentum sectors (Energy and Financials) under RISK_ON market regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S03",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Worse-than-expected Q4 EPS results and high relative volume sell-off"
+    },
+    {
+     "symbol": "S12",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Significant downward momentum and negative news sentiment"
+    }
+   ],
+   "note": "Selling underperforming positions S03 and S12 due to weak earnings and negative momentum, while holding other positions in an uncertain market regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S44",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Underperforming position with a loss of over 10% in a RISK_OFF market environment."
+    },
+    {
+     "symbol": "S29",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Underperforming position with a loss of over 7% in a RISK_OFF market environment."
+    },
+    {
+     "symbol": "S40",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong relative strength, positive earnings reaction, and potential defense sector tailwinds in a RISK_OFF environment."
+    }
+   ],
+   "note": "Trimming underperforming positions with significant losses (S44, S29) to manage risk under RISK_OFF regime, while adding S40 which shows strong relative strength and positive news sentiment."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S48",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Take profits on S48 after a strong earnings-driven runup and extremely overbought RSI levels (RSI14 > 83)."
+    }
+   ],
+   "note": "Taking profits on S48 to lock in gains and increase cash reserves in an uncertain market regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S05",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Negative news regarding temporary halt of COVID-19 vaccine production"
+    },
+    {
+     "symbol": "S17",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum, near 52-week high, and positive FDA approval news"
+    },
+    {
+     "symbol": "S20",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong upward trend, high RSI, and trading near 52-week highs with good relative volume"
+    },
+    {
+     "symbol": "S36",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain strong consumer staples position with positive analyst updates and earnings ahead"
+    },
+    {
+     "symbol": "S40",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain strong industrials position with high momentum and near 52-week high"
+    }
+   ],
+   "note": "Rebalancing portfolio to exit S05 on negative vaccine news and enter high-momentum stocks S17 and S20 while maintaining strong performers S36 and S40."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S42",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Underperforming position with weak momentum and low RSI2 indicating short-term weakness"
+    },
+    {
+     "symbol": "S20",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Position showing negative returns and underperforming relative to other financial sector options"
+    },
+    {
+     "symbol": "S19",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum, trading above key EMAs, and low off-52-week high distance"
+    },
+    {
+     "symbol": "S45",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong relative strength, positive 1-day and 5-day returns, and trading well above its EMA20 and EMA50"
+    }
+   ],
+   "note": "Rebalancing portfolio by cutting underperforming positions (S42, S20) and adding high-momentum, strong-trend stocks (S19, S45) in an uncertain market regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S45",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0,
+     "reason": "Risk-off regime and high risk score require trimming underperforming positions; S45 has a loss of over 6% in just 4 days."
+    },
+    {
+     "symbol": "S31",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0,
+     "reason": "Trimming underperforming position with a loss of 2.75% held for 29 days to raise cash in a risk-off environment."
+    }
+   ],
+   "note": "The market is in a RISK_OFF regime with a high risk score of 63.7 and VIX elevated at 31.02. We are selling our underperforming positions S45 and S31 to raise cash and protect capital, while holding onto our stronger performers (S17, S36, S40, S43) which show positive gains."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S43",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Trim S43 to default weight of 10% to lock in some of the 23.7% gain and manage risk in a RISK_OFF regime."
+    },
+    {
+     "symbol": "S40",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Trim S40 to default weight of 10% to lock in gains and manage risk."
+    },
+    {
+     "symbol": "S10",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum, positive clinical trial news, and trading above key EMAs in a defensive sector (Health Care)."
+    },
+    {
+     "symbol": "S48",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong energy sector tailwinds, positive guidance on shareholder returns, and solid technical trend."
+    }
+   ],
+   "note": "Trimming extended positions in S43 and S40 to lock in profits under RISK_OFF conditions, while adding high-relative-strength names S10 and S48 to utilize cash selectively."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S36",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Underperforming position with negative return and weak relative strength in a RISK_OFF regime."
+    },
+    {
+     "symbol": "S05",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Defensive Health Care stock with positive momentum, trading above key EMAs, and positive news sentiment."
+    },
+    {
+     "symbol": "S31",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong Financials stock showing upward momentum, trading above EMAs, and positive news catalyst."
+    }
+   ],
+   "note": "Reallocating capital from underperforming consumer staples (S36) to stronger defensive and momentum names (S05, S31) to navigate the RISK_OFF environment ahead of CPI data."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S48",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Underperforming position with negative short-term momentum and negative returns since purchase"
+    },
+    {
+     "symbol": "S31",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum, near 52-week highs, and positive relative volume"
+    },
+    {
+     "symbol": "S04",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong relative strength, trading above key EMAs, and positive news mentions"
+    }
+   ],
+   "note": "Rebalancing portfolio by cutting underperforming energy position S48 and adding to high-momentum names S31 and S04 while keeping cash reserves stable ahead of FOMC."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S10",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain target weight on strong performer with positive FDA approval news"
+    },
+    {
+     "symbol": "S17",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain target weight on strong healthcare performer"
+    },
+    {
+     "symbol": "S43",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain target weight on strong energy performer"
+    },
+    {
+     "symbol": "S51",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum and positive trend in Industrials sector"
+    }
+   ],
+   "note": "Rebalancing strong performers to target weights and adding S51 to utilize cash in a mixed market regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S51",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0,
+     "reason": "Position has negative return and is flagged as a sell by Investors Business Daily."
+    },
+    {
+     "symbol": "S32",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong momentum, near 52-week high, positive analyst price target raise, and recent acquisition announcement."
+    },
+    {
+     "symbol": "S35",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong momentum, high RSI, and positive clinical data news for lung cancer treatment."
+    }
+   ],
+   "note": "Replaced underperforming S51 with high-momentum healthcare stocks S32 and S35 under RISK_ON market conditions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S19",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Underperforming position with negative return and weak short-term momentum (RSI2 under 1, below EMA20 and EMA50)."
+    },
+    {
+     "symbol": "S34",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum in Consumer Staples sector, trading near 52-week highs with positive analyst news."
+    }
+   ],
+   "note": "Replaced underperforming S19 with S34 to maintain exposure to strong defensive momentum in Consumer Staples."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S17",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0,
+     "reason": "Sell S17 due to negative news regarding the R&D head leaving and potential succession uncertainty, combined with a sharp 1-day drop on high relative volume."
+    }
+   ],
+   "note": "Selling S17 to manage risk following negative executive departure news and high-volume price decline, while holding other positions in an uncertain market regime."
+  },
+  {
+   "orders": [],
+   "note": "The market regime remains UNCERTAIN with a risk score of 28.1 and VIX elevated at 22.68. Our existing portfolio of 9 positions is well-diversified and showing solid unrealized gains. Given the mixed SPY trend and market uncertainty, we will maintain our current positions and hold approximately 10% cash as a buffer."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S04",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Risk-off regime. Trimming positions with weaker relative momentum to raise cash and manage risk."
+    },
+    {
+     "symbol": "S31",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Risk-off regime. Selling underperforming financial position showing weak momentum."
+    },
+    {
+     "symbol": "S32",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Risk-off regime. Reducing exposure to preserve capital and increase cash buffer."
+    },
+    {
+     "symbol": "S34",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Risk-off regime. Selling position with marginal gains to increase cash share."
+    }
+   ],
+   "note": "With the market regime in RISK_OFF and VIX elevated near 30, we are reducing our exposure by selling several weaker or marginal positions (S04, S31, S32, S34) to raise cash and protect capital."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is RISK_OFF with a high risk score of 64.58 and VIX elevated at 31.2. Given the broad market weakness and down trend, we will hold our current positions (S05, S10, S35, S40, S43) which are showing positive gains, and maintain a high cash buffer of approximately 50% without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is RISK_OFF with a high risk score of 66.25 and VIX at 31.77. Our existing positions (S05, S10, S35, S40, S43) are holding up well with positive gains. Given the defensive posture required in this regime, we will hold our current positions and maintain our ~50% cash buffer without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is RISK_OFF with a high risk score of 64.53 and VIX at 29.35. Our current portfolio of 5 positions is well-diversified and showing solid gains overall. Given the highly defensive market environment, we will hold our current positions and maintain a high cash buffer of approximately 50% without initiating new buys."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S05",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Bankruptcy red flag in news headlines for S05"
+    },
+    {
+     "symbol": "S10",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain strong performer S10 near 52-week highs"
+    },
+    {
+     "symbol": "S43",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain strong energy sector performer S43"
+    },
+    {
+     "symbol": "S48",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum in energy sector, high RSI and trading above EMAs"
+    }
+   ],
+   "note": "Selling S05 due to bankruptcy red flag in news. Reallocating capital to strong momentum energy stock S48 while maintaining other top positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S24",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong relative strength, positive news sentiment, and trading above key moving averages in an uncertain market regime."
+    },
+    {
+     "symbol": "S27",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Solid uptrend, trading above 20, 50, and 200 EMAs with low volatility and high RSI strength."
+    }
+   ],
+   "note": "Maintaining existing positions which show positive gains and adding S24 and S27 to deploy cash into high-relative-strength stocks while keeping a healthy cash buffer in an uncertain market regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S24",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Market regime is UNCERTAIN with high risk score (52.89) and VIX elevated at 27.75. Reducing exposure by selling underperforming short-term positions."
+    },
+    {
+     "symbol": "S27",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Market regime is UNCERTAIN with high risk score (52.89) and VIX elevated at 27.75. Reducing exposure by selling underperforming short-term positions."
+    }
+   ],
+   "note": "Reducing portfolio risk and raising cash due to an uncertain market regime, high VIX, and negative short-term performance in recently added positions S24 and S27."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S48",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Severe momentum breakdown in energy sector and high risk-off regime"
+    },
+    {
+     "symbol": "S43",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Energy sector experiencing sharp correction, locking in gains"
+    }
+   ],
+   "note": "Market regime is RISK_OFF with high volatility (VIX 31.13). Exiting energy positions (S48 and S43) to preserve capital and increase cash reserves."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a high risk score of 57.03 and SPY trend down. Our existing positions (S10, S35, S40) are performing well and showing solid gains. Given the elevated risk environment and high VIX, we will hold our current positions and maintain a high cash buffer without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is RISK_OFF with a high risk score of 62.87 and VIX at 27.54. Our existing positions (S10, S35, S40) are performing well and showing positive gains. Given the defensive stance required in RISK_OFF, we will hold our current positions and maintain a high cash share of 69.13% without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a high risk score of 65.09 and VIX at 27.29. SPY trend is down, and CPI macro events are near. Our existing positions (S10, S35, S40) are performing well with positive gains. Given the high risk environment and upcoming CPI data, we will maintain our current positions and hold our cash share of 69% to preserve capital."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is uncertain with a risk score of 44.82 and SPY trend down. Our current positions (S10, S35, S40) are performing well with solid gains. We will hold our current positions and maintain a high cash buffer (69%) until market conditions stabilize."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S40",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Sell S40 due to worse-than-expected Q2 sales and supply chain/inflation warnings which caused a sharp drop and high relative volume."
+    }
+   ],
+   "note": "Selling S40 following its disappointing Q2 earnings report and negative guidance regarding supply chain and inflation issues. Holding S10 and S35 as they remain stable."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S10",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Position has weakened, underperforming short-term EMAs and showing negative momentum."
+    },
+    {
+     "symbol": "S35",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Position has broken below short-term EMAs with weak RSI indicators."
+    },
+    {
+     "symbol": "S42",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong relative strength, trading near 52-week highs, positive news regarding strategic investment and distribution agreements."
+    },
+    {
+     "symbol": "S48",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong energy sector performer, trading above all key EMAs with positive analyst price target revisions."
+    }
+   ],
+   "note": "Replaced underperforming health care positions S10 and S35 with high-relative-strength stocks S42 and S48, maintaining a defensive posture in an uncertain market regime."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a risk score of 45.75 and CPI macro events near. We will hold our current positions in S42 and S48 without making new trades to preserve cash and manage risk."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S34",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong momentum and high relative volume following better-than-expected Q2 earnings results."
+    },
+    {
+     "symbol": "S42",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Maintain default weight on strong performer trading near 52-week highs."
+    },
+    {
+     "symbol": "S48",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Maintain position despite short-term energy sector pullback."
+    }
+   ],
+   "note": "Adding S34 to the portfolio following its strong earnings report and high volume breakout, while maintaining existing positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S48",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1,
+     "reason": "Take profit on energy position S48 after strong runup and high RSI2 of 96.35, especially with news of SwingTrader removing full position."
+    }
+   ],
+   "note": "Taking profits on S48 due to extremely overbought short-term conditions (RSI2 > 96) and market regime uncertainty."
+  },
+  {
+   "orders": [],
+   "note": "Market regime is uncertain with a high VIX of 26.21 and a downward SPY trend. Holding current defensive positions in S34 and S42 while maintaining a high cash buffer."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a high risk score of 48.72 and VIX at 24.64. SPY trend is down. We will hold our current positions in S34 and S42, which are defensive consumer staples, and maintain a high cash share of 80.57% to protect capital during this period of market instability."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a high risk score of 52.56 and VIX at 26.16. Our existing positions S34 and S42 are currently showing small losses but are within acceptable risk parameters. Given the elevated market risk and high cash share, we will hold our current positions and refrain from making new purchases until market conditions stabilize."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a high risk score of 65.63 and VIX elevated at 27.99 ahead of the FOMC meeting. SPY trend is down and breadth is very weak (0.1818). In this environment, we will hold our current defensive positions (S34 and S42, both Consumer Staples) and maintain a high cash buffer of over 80% to protect capital."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is RISK_OFF with a high VIX of 30.18 and fear_greed at 28.27. In this environment, we will maintain our high cash position (81%) and hold our current defensive positions S34 and S42 without adding new risk."
+  },
+  {
+   "orders": [],
+   "note": "The market regime remains UNCERTAIN with a high VIX of 28.55 and a downward trend on SPY. We will maintain our current defensive posture, holding our existing positions in S34 and S42 without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is RISK_OFF with a high risk score of 73.85 and VIX elevated at 33.57. CPI data is also near. We will maintain our current defensive posture, holding our existing positions in S34 and S42 without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "The market regime remains RISK_OFF with a high risk score of 60.41 and SPY trend down. We will maintain our current defensive posture, holding our existing positions in S34 and S42 without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "Market regime is UNCERTAIN with a high VIX of 27.28 and SPY trend down. Holding current defensive positions in S34 and S42, which are both in positive territory, and maintaining a high cash share of 80% until market conditions stabilize."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a high risk score of 61.51 and VIX elevated at 25.86 ahead of the FOMC meeting. Maintaining our current defensive posture and holding our existing positions (S34 and S42) without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a high risk score of 57.06 and CPI data release approaching. VIX is elevated at 26.09. We will hold our current defensive positions in S34 and S42, which are both showing positive gains, and maintain a high cash share of approximately 80% to protect capital."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S34",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain core position in S34 with target weight of 10%"
+    },
+    {
+     "symbol": "S42",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Maintain core position in S42 with target weight of 10%"
+    }
+   ],
+   "note": "Market regime is UNCERTAIN with a risk score of 45.58 and SPY trend down. Holding existing defensive consumer staples positions (S34, S42) and keeping high cash reserves (approx 80%) to mitigate market risk."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S51",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong earnings beat, high relative volume, and robust price momentum above key EMAs."
+    }
+   ],
+   "note": "Adding S51 to the portfolio following its strong earnings report and positive price action, while maintaining existing positions in S34 and S42."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a risk score of 21.29 and NFP macro events near. Our current positions (S34, S42, S51) are performing well with positive gains. Given the uncertain regime and upcoming NFP data, we will hold our current positions and maintain a high cash share of approximately 69.5% to preserve capital and wait for clearer market direction."
+  },
+  {
+   "orders": [],
+   "note": "The market regime remains UNCERTAIN with a risk score of 44.62 and SPY trend down. Our existing positions (S34, S42, S51) are performing well with positive gains. Given the upcoming PPI macro event and uncertain market conditions, we will maintain our current portfolio allocation and hold our positions without adding new exposure."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a risk score of 42.89 and SPY trend down. VIX is elevated at 22.83. We will hold our current defensive positions (S34, S42, S51) and maintain a high cash share of approximately 70% without initiating new buys in this volatile environment."
+  },
+  {
+   "orders": [],
+   "note": "The market regime is UNCERTAIN with a risk score of 40.92 and SPY trend down. Our current positions (S34, S42, S51) are performing relatively well and are close to their target weights. Given the uncertain market environment, we will hold our current positions and maintain a high cash buffer without initiating new buys."
+  }
+ ]
+}

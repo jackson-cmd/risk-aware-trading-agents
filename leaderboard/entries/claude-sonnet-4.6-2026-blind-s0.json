@@ -1,0 +1,2341 @@
+{
+ "bench": "rta-bench-1",
+ "task": "2026-blind",
+ "seed": 0,
+ "model": {
+  "name": "claude-sonnet-4.6",
+  "provider": "Anthropic",
+  "access": "OpenAI-compatible gateway, extended thinking off",
+  "training_cutoff": "2026-01",
+  "open_weights": false,
+  "parameters": null,
+  "call": {
+   "provider": "anthropic",
+   "model": "claude-sonnet-4-6",
+   "thinking": "disabled",
+   "temperature": 0.2,
+   "max_tokens": 2000,
+   "system_prompt_sha256": "0aa00937be0942da26653df3a645bce43153b5ef86761e36b962bb8ee3e4a352"
+  }
+ },
+ "contamination": "partly",
+ "settings": {
+  "universe": "megacap",
+  "decide_every": 5,
+  "max_positions": 10,
+  "position_size": null,
+  "news": true,
+  "max_news": 3,
+  "execution": "plain",
+  "cash": 100000.0,
+  "slippage_bps": 5.0,
+  "commission_per_share": 0.0,
+  "costs": "realistic",
+  "mode": "long_only",
+  "period": "2026",
+  "blind": true,
+  "start": "2026-01-02",
+  "end": "2026-11-11"
+ },
+ "data": {
+  "version": "2026-11-11",
+  "prices_sha256": "35183f30262ad64966bd3b5fb75b908c9e604c394c85faf8be9527d034491b43",
+  "news_sha256": "8a499cacaf1491603b12031953f12e141c7035a759ef4d4aff904ab771dfefd9"
+ },
+ "record": {
+  "run_id": "20261113-210759-llm-claude-sonnet-4-6-2026-blind-2026-news-realistic",
+  "riskaware": {
+   "version": "0.7.2",
+   "git_commit": "ed141a51de4a"
+  },
+  "created_utc": "2026-11-14T03:08:10+00:00",
+  "files_sha256": {
+   "manifest.json": "71386182acd61e79f42a73a29b6912570c25a9c8340eccd56d52532b6db21ec6",
+   "metrics.json": "c3556e421cda2c31faf89402dd7ddac588a6eeb0513dc2dd0871c8d735fd37e7",
+   "equity.csv": "09063d944d7107b23f2b8473fc296e9a08ddd4fc6f6791ce3175622cb8e2141a",
+   "trades.csv": "3e1a34f4b8555d82d526904683d89c955938a15125cddb877915200b6ccb1b49",
+   "decisions.csv": "6629f25fa2ff10c282de9b2bad72ae800d16807979b1c1c74ac37d8c71ff33a3",
+   "policy_log.json": "10e2d327340bbf7677b7aeb18c85de5e6243038bd44ed982771bd9b31f421b01"
+  },
+  "replies_sha256": "528cae05568a927bc9b28a5ef98808bf9d1bce14f778ba10712f474d386daac2",
+  "observations_sha256": "3d9a7b83317e3a98af04983ebba436535ed75ac8b2615c1a153b94f0933ba28d",
+  "costs_seen_by_model": "fixed",
+  "rescored_from": "20261113-203036-llm-claude-sonnet-4-6-2026-blind-2026-news"
+ },
+ "look_ahead_check": "pass",
+ "metrics": {
+  "total_return": 0.080978,
+  "cagr": 0.095121,
+  "volatility": 0.150197,
+  "sharpe": 0.443112,
+  "sortino": 0.673845,
+  "max_drawdown": -0.090248,
+  "calmar": 1.053989,
+  "win_rate": 0.46,
+  "profit_factor": 1.03119,
+  "round_trips": 100.0,
+  "avg_holding_days": 28.776131,
+  "turnover": 7.123251,
+  "avg_exposure": 0.858106,
+  "trades": 172.0,
+  "excess_vs_equal_weight": -0.033268,
+  "excess_vs_spy": -0.039892
+ },
+ "vs_spy": {
+  "beta": 0.658498,
+  "alpha_annual": -0.004197,
+  "excess_return_annual": -0.04089,
+  "information_ratio": -0.318953,
+  "t_stat_excess": -0.295293,
+  "sharpe_ci95_low": -1.328821,
+  "sharpe_ci95_high": 2.11248,
+  "p_sharpe_above_spy": 0.4005,
+  "days": 216.0
+ },
+ "anchors": {
+  "spy": {
+   "total_return": 0.12087,
+   "sharpe": 0.76515,
+   "max_drawdown": -0.08885
+  },
+  "equal_weight": {
+   "total_return": 0.114246,
+   "sharpe": 0.848303,
+   "max_drawdown": -0.071956
+  }
+ },
+ "after_cutoff": {
+  "from": "2026-01-30",
+  "to": "2026-11-11",
+  "days": 197,
+  "total_return": 0.061605,
+  "sharpe": 0.343889,
+  "max_drawdown": -0.090248,
+  "volatility": 0.151784,
+  "spy_total_return": 0.106615,
+  "spy_sharpe": 0.725438,
+  "spy_max_drawdown": -0.088745,
+  "spy_volatility": 0.143545,
+  "equal_weight_total_return": 0.106305,
+  "equal_weight_sharpe": 0.862105,
+  "equal_weight_max_drawdown": -0.070685,
+  "equal_weight_volatility": 0.116244,
+  "excess_vs_spy": -0.04501,
+  "excess_vs_equal_weight": -0.0447
+ },
+ "analysis": {
+  "run_id": "20261113-210759-llm-claude-sonnet-4-6-2026-blind-2026-news-realistic",
+  "strategy": "llm:claude-sonnet-4.6:2026-blind",
+  "kind": "policy",
+  "period": "2026",
+  "start": "2026-01-02",
+  "end": "2026-11-11",
+  "stocks": 56,
+  "news": true,
+  "total_return": 0.080978,
+  "spy_return": 0.12087,
+  "summary": {
+   "total_return": 0.080978,
+   "spy_return": 0.12087,
+   "decisions": 170,
+   "decision_excess_5d": 0.000714,
+   "decision_excess_5d_t": 0.224041,
+   "decision_hit_rate_5d": 0.558824,
+   "buy_excess_5d": 0.002484,
+   "buy_excess_5d_t": 0.526614,
+   "sell_avoided_5d": -0.000586,
+   "sell_avoided_5d_t": -0.134679,
+   "decision_ic": 0.02252,
+   "decision_ic_t": 1.167828,
+   "holdings_ic": -0.022828,
+   "holdings_ic_t": -0.832104,
+   "alpha_annual": 0.018403,
+   "alpha_t": 0.155763,
+   "capm_alpha_annual": -0.004197,
+   "capm_alpha_t": -0.032286,
+   "beta_market": 0.593185,
+   "beta_size": 0.337245,
+   "beta_growth": -0.017005,
+   "beta_momentum": 0.113267,
+   "r2": 0.473616,
+   "exposure_return_annual": 0.048151,
+   "news_decision_share": 0.290698,
+   "news_entry_pnl": -6230.674462,
+   "best_trade_share": 0.866167,
+   "return_without_best_trade": 0.01517,
+   "concentrated": true
+  },
+  "findings": [
+   "Buys: over the five trading days from the fill, the stocks it bought beat SPY by 0.25% on average (72 buys, 58% of them ahead of SPY; t = 0.5, within noise).",
+   "Sells: over the five trading days from the fill, the stocks it sold beat SPY by 0.06%, so selling gave that up (98 sells; t = -0.1, within noise).",
+   "Decision IC: on the 43 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.023 with the next five days' returns (IC IR 0.18, t = 1.2, within noise).",
+   "Holdings IC: the weights it held after each of 43 decision days had a mean rank IC of -0.023 with the next five days' returns (t = -0.8, within noise).",
+   "Factor exposures: market 0.59 (t 8.4), size 0.34 (t 4.7), growth -0.02 (t -0.1), momentum 0.11 (t 2.7); together they explain 47% of the daily variation (R²).",
+   "Of the +6.7% a year it earned over T-bills (arithmetic mean): market +6.4%, momentum -2.6%, size +1.1%, growth -0.0%; the alpha left is +1.8% a year (t = 0.2, within noise).",
+   "Verdict: most of the return is factor exposure (+4.8% a year, market above all); the alpha left is not significant.",
+   "P&L: +$8,145 in all, +$7,652 from 67 positions and +$493 of interest on idle cash.",
+   "By holding period: 61+ days made the most (+$16,519, 11 positions); 3-5 days the least (-$6,474, 12 positions).",
+   "By sector: Health Care made the most (+$4,732, 10 positions); Communication Services the least (-$2,054, 5 positions).",
+   "By stock: CAT made the most (+$4,994, 1 position); ORCL the least (-$3,072, 2 positions).",
+   "By market regime of the previous close: risk-on 96 days +4.0% (SPY +2.0%); neutral 18 days -3.5% (SPY +4.5%); uncertain 97 days +7.6% (SPY +4.8%); risk-off 6 days +0.2% (SPY +0.3%).",
+   "News: 26 positions opened on news made -$6,231, the other 41 +$13,883; 13 positions closed on news made -$4,777; over the five days from the fill, news-triggered buys trailed SPY by 0.95% (t -1.0).",
+   "Concentration: the profit rests on the best two positions, which made 152% of the positions' net P&L and 42% of all their gains; the best was AMD bought 2026-04-09 and sold 2026-08-25, +$6,628. Had the best position made nothing, the run would have returned +1.5% instead of +8.1%."
+  ],
+  "decisions": {
+   "horizons": [
+    1,
+    5,
+    20
+   ],
+   "buys": {
+    "1d": {
+     "n": 72,
+     "mean": 0.001782,
+     "median": 0.000543,
+     "hit_rate": 0.513889,
+     "se": 0.002141,
+     "t": 0.832482,
+     "t_iid": 0.866069
+    },
+    "5d": {
+     "n": 72,
+     "mean": 0.002484,
+     "median": 0.004854,
+     "hit_rate": 0.583333,
+     "se": 0.004717,
+     "t": 0.526614,
+     "t_iid": 0.510697
+    },
+    "20d": {
+     "n": 67,
+     "mean": 0.005571,
+     "median": 0.007034,
+     "hit_rate": 0.507463,
+     "se": 0.013395,
+     "t": 0.415878,
+     "t_iid": 0.338218
+    }
+   },
+   "sells": {
+    "1d": {
+     "n": 100,
+     "mean": -0.00052,
+     "median": -0.000501,
+     "hit_rate": 0.48,
+     "se": 0.001672,
+     "t": -0.311186,
+     "t_iid": -0.3568
+    },
+    "5d": {
+     "n": 98,
+     "mean": -0.000586,
+     "median": 0.003644,
+     "hit_rate": 0.540816,
+     "se": 0.004354,
+     "t": -0.134679,
+     "t_iid": -0.128499
+    },
+    "20d": {
+     "n": 90,
+     "mean": 0.003387,
+     "median": 0.023768,
+     "hit_rate": 0.588889,
+     "se": 0.014207,
+     "t": 0.238386,
+     "t_iid": 0.2896
+    }
+   },
+   "all": {
+    "1d": {
+     "n": 172,
+     "mean": 0.000443,
+     "median": -0.000151,
+     "hit_rate": 0.494186,
+     "se": 0.00101,
+     "t": 0.43888,
+     "t_iid": 0.367056
+    },
+    "5d": {
+     "n": 170,
+     "mean": 0.000714,
+     "median": 0.004403,
+     "hit_rate": 0.558824,
+     "se": 0.003187,
+     "t": 0.224041,
+     "t_iid": 0.214152
+    },
+    "20d": {
+     "n": 157,
+     "mean": 0.004319,
+     "median": 0.016776,
+     "hit_rate": 0.55414,
+     "se": 0.007841,
+     "t": 0.550816,
+     "t_iid": 0.446121
+    }
+   },
+   "by_trigger": {
+    "news": {
+     "buys": {
+      "n": 29,
+      "mean": -0.009509,
+      "median": 0.003034,
+      "hit_rate": 0.551724,
+      "se": 0.009785,
+      "t": -0.971754,
+      "t_iid": -0.97182
+     },
+     "sells": {
+      "n": 21,
+      "mean": -0.003089,
+      "median": 0.004617,
+      "hit_rate": 0.52381,
+      "se": 0.010618,
+      "t": -0.290924,
+      "t_iid": -0.272026
+     }
+    },
+    "other": {
+     "buys": {
+      "n": 43,
+      "mean": 0.010572,
+      "median": 0.005055,
+      "hit_rate": 0.604651,
+      "se": 0.005207,
+      "t": 2.030507,
+      "t_iid": 2.36107
+     },
+     "sells": {
+      "n": 77,
+      "mean": 9.6e-05,
+      "median": 0.003239,
+      "hit_rate": 0.545455,
+      "se": 0.005082,
+      "t": 0.018909,
+      "t_iid": 0.019394
+     }
+    }
+   },
+   "counts": {
+    "news": {
+     "buys": 29,
+     "sells": 21
+    },
+    "other": {
+     "buys": 43,
+     "sells": 79
+    }
+   }
+  },
+  "ic": {
+   "horizon_days": 5,
+   "universe": 56,
+   "decision_days": "the policy's steps (policy_log.json)",
+   "decision": {
+    "score": "+1 bought, -1 sold, 0 left alone, on each day it traded",
+    "days": 43,
+    "mean": 0.02252,
+    "std": 0.126453,
+    "ir": 0.178092,
+    "t": 1.167828,
+    "t_iid": 1.167828,
+    "positive_share": 0.55814
+   },
+   "holdings": {
+    "score": "the weights it held after each decision (0 for stocks not held)",
+    "days": 43,
+    "mean": -0.022828,
+    "std": 0.179901,
+    "ir": -0.126895,
+    "t": -0.832104,
+    "t_iid": -0.832104,
+    "positive_share": 0.488372
+   }
+  },
+  "factors": {
+   "days": 216,
+   "factors": {
+    "market": "Market (SPY - BIL)",
+    "size": "Size (IWM - SPY)",
+    "growth": "Growth (QQQ - SPY)",
+    "momentum": "Momentum (top - bottom third)"
+   },
+   "lags": 4,
+   "alpha_annual": 0.018403,
+   "alpha_t": 0.155763,
+   "exposures": {
+    "market": {
+     "beta": 0.593185,
+     "t": 8.373663
+    },
+    "size": {
+     "beta": 0.337245,
+     "t": 4.661598
+    },
+    "growth": {
+     "beta": -0.017005,
+     "t": -0.128261
+    },
+    "momentum": {
+     "beta": 0.113267,
+     "t": 2.689693
+    }
+   },
+   "r2": 0.473616,
+   "adj_r2": 0.463638,
+   "resid_vol_annual": 0.110408,
+   "factor_means_annual": {
+    "market": 0.107444,
+    "size": 0.033241,
+    "growth": 0.024301,
+    "momentum": -0.232899
+   },
+   "contributions_annual": {
+    "market": 0.063734,
+    "size": 0.01121,
+    "growth": -0.000413,
+    "momentum": -0.02638,
+    "alpha": 0.018403
+   },
+   "excess_return_annual": 0.066554,
+   "capm": {
+    "beta": 0.658498,
+    "beta_t": 8.191267,
+    "alpha_annual": -0.004197,
+    "alpha_t": -0.032286,
+    "r2": 0.378705
+   }
+  },
+  "pnl": {
+   "total": 8145.127678,
+   "reconciliation": {
+    "stocks": 7652.277795,
+    "tbill_etfs": 0.0,
+    "cash_interest": 492.849824,
+    "other": 5.9e-05
+   },
+   "positions": 67,
+   "by_holding_period": [
+    {
+     "group": "3-5 days",
+     "pnl": -6474.000227,
+     "contribution": -0.06474,
+     "share": -0.846023,
+     "trades": 12,
+     "win_rate": 0.0,
+     "avg_pnl": -539.500019,
+     "still_open": 1
+    },
+    {
+     "group": "6-10 days",
+     "pnl": -2264.993289,
+     "contribution": -0.02265,
+     "share": -0.295989,
+     "trades": 5,
+     "win_rate": 0.2,
+     "avg_pnl": -452.998658,
+     "still_open": 0
+    },
+    {
+     "group": "11-20 days",
+     "pnl": -3601.108923,
+     "contribution": -0.036011,
+     "share": -0.470593,
+     "trades": 23,
+     "win_rate": 0.26087,
+     "avg_pnl": -156.569953,
+     "still_open": 4
+    },
+    {
+     "group": "21-60 days",
+     "pnl": 3472.980007,
+     "contribution": 0.03473,
+     "share": 0.453849,
+     "trades": 16,
+     "win_rate": 0.4375,
+     "avg_pnl": 217.06125,
+     "still_open": 3
+    },
+    {
+     "group": "61+ days",
+     "pnl": 16519.400227,
+     "contribution": 0.165194,
+     "share": 2.158756,
+     "trades": 11,
+     "win_rate": 0.727273,
+     "avg_pnl": 1501.763657,
+     "still_open": 2
+    }
+   ],
+   "by_regime": [
+    {
+     "group": "RISK_ON",
+     "label": "risk-on",
+     "days": 96,
+     "share_of_days": 0.442396,
+     "pnl": 4108.551353,
+     "contribution": 0.041086,
+     "share": 0.504418,
+     "return": 0.039952,
+     "spy_return": 0.020141,
+     "avg_exposure": 0.840328
+    },
+    {
+     "group": "NEUTRAL",
+     "label": "neutral",
+     "days": 18,
+     "share_of_days": 0.082949,
+     "pnl": -3682.384403,
+     "contribution": -0.036824,
+     "share": -0.452097,
+     "return": -0.034949,
+     "spy_return": 0.045347,
+     "avg_exposure": 0.770171
+    },
+    {
+     "group": "UNCERTAIN",
+     "label": "uncertain",
+     "days": 97,
+     "share_of_days": 0.447005,
+     "pnl": 7564.007059,
+     "contribution": 0.07564,
+     "share": 0.928654,
+     "return": 0.075888,
+     "spy_return": 0.047773,
+     "avg_exposure": 0.886944
+    },
+    {
+     "group": "RISK_OFF",
+     "label": "risk-off",
+     "days": 6,
+     "share_of_days": 0.02765,
+     "pnl": 154.953669,
+     "contribution": 0.00155,
+     "share": 0.019024,
+     "return": 0.001558,
+     "spy_return": 0.003154,
+     "avg_exposure": 0.819776
+    }
+   ],
+   "by_trigger": {
+    "entry": [
+     {
+      "group": "news",
+      "pnl": -6230.674462,
+      "contribution": -0.062307,
+      "share": -0.814225,
+      "trades": 26,
+      "win_rate": 0.269231,
+      "avg_pnl": -239.641325,
+      "still_open": 3
+     },
+     {
+      "group": "other",
+      "pnl": 13882.952257,
+      "contribution": 0.13883,
+      "share": 1.814225,
+      "trades": 41,
+      "win_rate": 0.365854,
+      "avg_pnl": 338.608592,
+      "still_open": 7
+     }
+    ],
+    "exit": [
+     {
+      "group": "news",
+      "pnl": -4776.559169,
+      "contribution": -0.047766,
+      "share": -0.624201,
+      "trades": 13,
+      "win_rate": 0.153846,
+      "avg_pnl": -367.427628,
+      "still_open": 0
+     },
+     {
+      "group": "other",
+      "pnl": 2752.341428,
+      "contribution": 0.027523,
+      "share": 0.359676,
+      "trades": 44,
+      "win_rate": 0.25,
+      "avg_pnl": 62.553214,
+      "still_open": 0
+     },
+     {
+      "group": "still open",
+      "pnl": 9676.495536,
+      "contribution": 0.096765,
+      "share": 1.264525,
+      "trades": 10,
+      "win_rate": 0.9,
+      "avg_pnl": 967.649554,
+      "still_open": 10
+     }
+    ]
+   },
+   "by_sector": [
+    {
+     "group": "Health Care",
+     "pnl": 4732.22641,
+     "contribution": 0.047322,
+     "share": 0.618408,
+     "trades": 10,
+     "win_rate": 0.7,
+     "avg_pnl": 473.222641,
+     "still_open": 3
+    },
+    {
+     "group": "Technology",
+     "pnl": 3487.012607,
+     "contribution": 0.03487,
+     "share": 0.455683,
+     "trades": 18,
+     "win_rate": 0.333333,
+     "avg_pnl": 193.722923,
+     "still_open": 1
+    },
+    {
+     "group": "Industrials",
+     "pnl": 1679.685114,
+     "contribution": 0.016797,
+     "share": 0.219501,
+     "trades": 13,
+     "win_rate": 0.153846,
+     "avg_pnl": 129.206547,
+     "still_open": 2
+    },
+    {
+     "group": "Real Estate",
+     "pnl": -177.173826,
+     "contribution": -0.001772,
+     "share": -0.023153,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -177.173826,
+     "still_open": 0
+    },
+    {
+     "group": "Consumer Discretionary",
+     "pnl": -1870.089799,
+     "contribution": -0.018701,
+     "share": -0.244383,
+     "trades": 6,
+     "win_rate": 0.166667,
+     "avg_pnl": -311.681633,
+     "still_open": 0
+    },
+    {
+     "group": "Communication Services",
+     "pnl": -2054.47229,
+     "contribution": -0.020545,
+     "share": -0.268479,
+     "trades": 5,
+     "win_rate": 0.0,
+     "avg_pnl": -410.894458,
+     "still_open": 0
+    }
+   ],
+   "by_stock": [
+    {
+     "group": "CAT",
+     "pnl": 4993.543877,
+     "contribution": 0.049935,
+     "share": 0.652557,
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_pnl": 4993.543877,
+     "still_open": 0
+    },
+    {
+     "group": "AMD",
+     "pnl": 4175.704102,
+     "contribution": 0.041757,
+     "share": 0.545681,
+     "trades": 3,
+     "win_rate": 0.333333,
+     "avg_pnl": 1391.901367,
+     "still_open": 0
+    },
+    {
+     "group": "CSCO",
+     "pnl": 2263.406675,
+     "contribution": 0.022634,
+     "share": 0.295782,
+     "trades": 3,
+     "win_rate": 0.333333,
+     "avg_pnl": 754.468892,
+     "still_open": 0
+    },
+    {
+     "group": "META",
+     "pnl": -968.416772,
+     "contribution": -0.009684,
+     "share": -0.126553,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -968.416772,
+     "still_open": 0
+    },
+    {
+     "group": "DE",
+     "pnl": -1019.61098,
+     "contribution": -0.010196,
+     "share": -0.133243,
+     "trades": 3,
+     "win_rate": 0.0,
+     "avg_pnl": -339.870327,
+     "still_open": 0
+    },
+    {
+     "group": "ORCL",
+     "pnl": -3072.26558,
+     "contribution": -0.030723,
+     "share": -0.401484,
+     "trades": 2,
+     "win_rate": 0.0,
+     "avg_pnl": -1536.13279,
+     "still_open": 0
+    }
+   ],
+   "best_trades": [
+    {
+     "symbol": "AMD",
+     "sector": "Technology",
+     "entry": "2026-04-09",
+     "exit": "2026-08-25",
+     "holding_days": 95,
+     "pnl": 6628.149172,
+     "return": 0.475963,
+     "open": false,
+     "entry_reason": "AI chip demand surge, +14% 21d, above all EMAs, strong sector tailwind",
+     "exit_reason": "Trend broken: ret_5d -9.7%, ret_21d -12.5%, RSI 42, below EMA20/50 despite +10% gain"
+    },
+    {
+     "symbol": "CAT",
+     "sector": "Industrials",
+     "entry": "2026-01-05",
+     "exit": "2026-08-25",
+     "holding_days": 160,
+     "pnl": 4993.543877,
+     "return": 0.474927,
+     "open": false,
+     "entry_reason": "Industrials +2.7% 21d, near 52w high, strong EMA stack, high rel_volume",
+     "exit_reason": "Locked +24% gain; momentum fully reversed (ret_5d -8%, ret_21d -8.7%, RSI 39.8, below EMA20/50)"
+    },
+    {
+     "symbol": "CSCO",
+     "sector": "Technology",
+     "entry": "2026-04-23",
+     "exit": "2026-07-07",
+     "holding_days": 50,
+     "pnl": 2671.750284,
+     "return": 0.264105,
+     "open": false,
+     "entry_reason": "Tech momentum: RSI 74.6, ret_21d +14.6%, vs_ema200 +21.4%, near 52w high",
+     "exit_reason": "21d return -9.6%, RSI 46 weakening trend despite 28% cumulative gain; momentum deteriorating"
+    }
+   ],
+   "worst_trades": [
+    {
+     "symbol": "ORCL",
+     "sector": "Technology",
+     "entry": "2026-06-05",
+     "exit": "2026-06-12",
+     "holding_days": 5,
+     "pnl": -2167.008048,
+     "return": -0.197455,
+     "open": false,
+     "entry_reason": "Strong tech/AI momentum +27.5% 21d, +16% 5d, above all EMAs, RSI 69 healthy, AI infrastructure theme with positive news",
+     "exit_reason": "Earnings shock with high FY27 capex guidance, stock down 8.5% today after prior -19.8% loss, confirmed 8-K, trend broken"
+    },
+    {
+     "symbol": "AMD",
+     "sector": "Technology",
+     "entry": "2026-09-23",
+     "exit": "2026-10-21",
+     "holding_days": 20,
+     "pnl": -1318.427486,
+     "return": -0.124675,
+     "open": false,
+     "entry_reason": "Exceptional momentum (+32% 21d), near 52w high, AI theme, strong technicals across all timeframes",
+     "exit_reason": "Down 14%, weak technicals: -7.3% vs EMA20, -11.7% 5d return, RSI 39.8, deteriorating trend"
+    },
+    {
+     "symbol": "AMD",
+     "sector": "Technology",
+     "entry": "2026-02-25",
+     "exit": "2026-03-04",
+     "holding_days": 5,
+     "pnl": -1134.017584,
+     "return": -0.107624,
+     "open": false,
+     "entry_reason": "Confirmed 8-K material agreement + AI partnership with S56, up 8.8% on 2x volume today; strong confirmed catalyst",
+     "exit_reason": "Down 11% in 4 days, deeply below all EMAs, -19% 21d, weakest position in uncertain market"
+    }
+   ],
+   "concentration": {
+    "trades": 67,
+    "best_trade": {
+     "symbol": "AMD",
+     "sector": "Technology",
+     "entry": "2026-04-09",
+     "exit": "2026-08-25",
+     "holding_days": 95,
+     "pnl": 6628.149172,
+     "return": 0.475963,
+     "open": false,
+     "entry_reason": "AI chip demand surge, +14% 21d, above all EMAs, strong sector tailwind",
+     "exit_reason": "Trend broken: ret_5d -9.7%, ret_21d -12.5%, RSI 42, below EMA20/50 despite +10% gain"
+    },
+    "best_trade_share": 0.866167,
+    "top2_share": 1.518723,
+    "best_trade_share_of_gains": 0.240747,
+    "top2_share_of_gains": 0.422122,
+    "best_stock": "CAT",
+    "best_stock_share": 0.652557,
+    "return": 0.081451,
+    "return_without_best_trade": 0.01517,
+    "return_without_top2": -0.034766,
+    "concentrated": true
+   }
+  }
+ },
+ "memory": null,
+ "usage": {
+  "calls": 44,
+  "input_tokens": 538998,
+  "output_tokens": 37690,
+  "failed": 0,
+  "seconds": 574.4,
+  "list_price_usd": 2.1823
+ },
+ "steps": 44,
+ "submitted": "2026-11-13",
+ "submitter": "Risk-Aware Trading Agents maintainers",
+ "notes": null,
+ "replies": [
+  {
+   "orders": [
+    {
+     "symbol": "S25",
+     "action": "buy",
+     "weight": 0.11,
+     "fraction": 0,
+     "reason": "Strong 21d momentum +11%, near 52w high, above all EMAs, RISK_ON regime"
+    },
+    {
+     "symbol": "S40",
+     "action": "buy",
+     "weight": 0.11,
+     "fraction": 0,
+     "reason": "Strong 21d momentum +10.9%, near 52w high, above all EMAs, Industrials strength"
+    },
+    {
+     "symbol": "S48",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Energy momentum +6.3%, near 52w high (-0.02%), strong EMA stack"
+    },
+    {
+     "symbol": "S35",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Health Care +6.3% 21d, near 52w high, above all EMAs, low ATR"
+    },
+    {
+     "symbol": "S20",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Financials +5.7% 21d, near 52w high, strong EMA alignment"
+    },
+    {
+     "symbol": "S12",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Financials +5.7% 21d, near 52w high, above all EMAs, low volatility"
+    },
+    {
+     "symbol": "S41",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Health Care uptrend, near 52w high, above all EMAs, positive 5d momentum"
+    },
+    {
+     "symbol": "S38",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Industrials +2.7% 21d, near 52w high, strong EMA stack, high rel_volume"
+    },
+    {
+     "symbol": "S22",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Real Estate near 52w high, above all EMAs, stable low-vol trend"
+    },
+    {
+     "symbol": "S34",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Consumer Staples defensive, above all EMAs, near 52w high, low volatility"
+    }
+   ],
+   "note": "Deploying ~100% into 10 positions in RISK_ON environment. Favoring stocks near 52w highs with strong 21d momentum and positive EMA alignment. Avoiding S50 (confirmed negative earnings), S54 (antitrust news), and downtrending names. Overweight Industrials/Health Care/Financials which show broad strength."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S20",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Small loss, Wolfe downgrade, mixed analyst signals, weakest Financials holding"
+    },
+    {
+     "symbol": "S25",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Small loss, no positive catalysts, replacing with stronger momentum names"
+    },
+    {
+     "symbol": "S48",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Negative news: falling oil prices denting profits, price target cut by Piper Sandler"
+    },
+    {
+     "symbol": "S06",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong +4.3% day, Barclays upgrade to Overweight, near 52w high, strong 5d/21d momentum"
+    },
+    {
+     "symbol": "S23",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong +4.2% day, housing policy catalyst, strong 5d/21d momentum, high relative volume"
+    },
+    {
+     "symbol": "S26",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Near 52w high, strong momentum, multiple analyst upgrades, positive news score 0.207, European regulatory relief"
+    }
+   ],
+   "note": "Rotating out three underperformers/negative-catalyst names (S20, S25, S48) into three high-momentum names with positive catalysts (S06, S23, S26). Market remains strongly risk-on; maintaining full equity deployment."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S06",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0.0,
+     "reason": "RSI2 99.81, RSI14 79.96, near 52w high - reduce overbought position"
+    },
+    {
+     "symbol": "S40",
+     "action": "target",
+     "weight": 0.08,
+     "fraction": 0.0,
+     "reason": "RSI2 99.13, RSI14 77.35, near 52w high - trim overbought winner"
+    },
+    {
+     "symbol": "S12",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0,
+     "reason": "Only loser in portfolio at -3.6%, weak 5d trend -5%, below EMA20"
+    },
+    {
+     "symbol": "S15",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong momentum ret_21d +10.7%, upgrade to Overweight, quantum IPO catalyst, RSI2 99 but strong trend"
+    },
+    {
+     "symbol": "S43",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Energy sector strength, ret_21d +13.3%, near 52w high, positive news flow, Jefferies Buy"
+    }
+   ],
+   "note": "Risk-on environment supports staying invested. Trimming two extremely overbought positions (RSI2 ~99), exiting S12 as the sole loser with weak trend, rotating into S15 (industrial/tech momentum with upgrade) and S43 (energy with strong trend). Portfolio remains near fully invested."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S22",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Worst performer at -1.81%, 14 days held, ret_5d -5.09%, below EMA20, weak RSI - no recovery catalyst"
+    },
+    {
+     "symbol": "S35",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Negative news: deal talks collapse headline, minimal gain after 14 days, RSI2 12.78 with downward momentum"
+    },
+    {
+     "symbol": "S44",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Analyst upgrade to Outperform today, +3.24% daily return, positive news score 0.124, above EMA20/50, strong momentum"
+    },
+    {
+     "symbol": "S29",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Steady uptrend, RSI 57, vs_ema20 +1.6%, low ATR 1.37%, near 52w high, Consumer Discretionary diversification"
+    }
+   ],
+   "note": "Rotating out two underperformers (S22 downtrend, S35 negative catalyst) into S44 (fresh analyst upgrade + momentum) and S29 (steady low-volatility uptrend). FOMC proximity keeps overall risk moderate; maintaining 10 positions at ~10% each."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S41",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Only losing position (-2.07%), weak RSI 39, below EMA20, held 19 days with no recovery"
+    },
+    {
+     "symbol": "S06",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Weakest gainer (+1.37% in 14 days), -3.2% last 5 days, underperforming in RISK_ON environment"
+    },
+    {
+     "symbol": "S37",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Exceptional momentum: +30.5% 21d, RSI 80, vs_ema50 +20.7%, near 52w high, strong trend continuation"
+    },
+    {
+     "symbol": "S42",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong Consumer Staples momentum: +8.1% 21d, RSI 72.5, near 52w high, high relative volume 1.74"
+    }
+   ],
+   "note": "Rotating out of laggard S41 and underperformer S06 into momentum leaders S37 and S42. Portfolio remains fully invested at 10 positions in RISK_ON regime. S37 is the strongest momentum stock in the universe."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S26",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Weakest position (-0.5%), negative news sentiment including Burry warning, RSI 46 with no momentum; free up capital for stronger opportunity"
+    },
+    {
+     "symbol": "S51",
+     "action": "buy",
+     "weight": 0.09,
+     "reason": "Strong Industrials momentum: RSI 80, rsi2 97, vs_ema20 +9.5%, ret_21d +17%, near 52w high; fits portfolio trend-following theme"
+    }
+   ],
+   "note": "Rotating out of S26 (laggard with negative news) into S51 (strong Industrials momentum). Elevated risk score and uncertain regime warrant no aggressive additions; maintaining existing winners. VIX backwardation (0.864) suggests caution - keeping position sizing conservative."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S44",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "5d return -11.4%, below EMA20, RSI2 at 27 with no recovery signal; weakest position in portfolio"
+    },
+    {
+     "symbol": "S19",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong industrials trend, +14% 21d, near 52w high, RSI healthy at 75, low ATR defensive in uncertain market"
+    }
+   ],
+   "note": "Market in fear/uncertain regime; maintaining mostly defensive posture. Exiting S44 on continued deterioration (-11.4% 5d). Adding S19 as quality industrials momentum play. Keeping strong winners S38, S15, S34. Portfolio remains near fully invested with diversified sector exposure."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S37",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Weakest position at -4.9%, down 3% today and 5.5% over 5d, RSI2=7 with broken momentum despite being held 14 days"
+    },
+    {
+     "symbol": "S16",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Confirmed 8-K material agreement + AI partnership with S56, up 8.8% on 2x volume today; strong confirmed catalyst"
+    }
+   ],
+   "note": "Rotating out of S37 (worst performer, deteriorating) into S16 (confirmed material AI partnership catalyst). Market remains uncertain but breadth is healthy; maintaining near-full equity exposure with diversified positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 11% in 4 days, deeply below all EMAs, -19% 21d, weakest position in uncertain market"
+    },
+    {
+     "symbol": "S23",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Small loss, weak trend, below EMAs, RSI 41, underperforming in Consumer Discretionary"
+    },
+    {
+     "symbol": "S11",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum +25% 5d, RSI 73, above EMAs, positive analyst coverage and news flow"
+    },
+    {
+     "symbol": "S43",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Energy sector strength, near 52w high, RSI 72, strong trend vs EMA200 +20%, geopolitical tailwinds"
+    }
+   ],
+   "note": "Trimming two underperformers (S16 loss-cut, S23 weak trend) and rotating into momentum leaders S11 and S43. Maintaining defensive posture given extreme fear reading and uncertain regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S19",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 3.7% in 14 days, rsi2=1.6 deeply oversold with no catalyst, weak 5d momentum -5.9%, trim ahead of CPI"
+    },
+    {
+     "symbol": "S51",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Citi lowered price target, negative news score, weak 5d return -4.3%, reduce exposure ahead of CPI uncertainty"
+    },
+    {
+     "symbol": "S11",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Wells Fargo reinstated Equal-Weight at $105 (near current $106.54), limited upside, only 4 days held with minimal gain"
+    }
+   ],
+   "note": "Trimming three positions ahead of CPI event in uncertain market (VIX 24.9, fear/greed 25). Reducing S19 on weak momentum, S51 on analyst downgrade, S11 on analyst price target ceiling. Keeping strong performers S38, S15, S34, S40, S29, S42, S43 intact. Raising cash slightly as defensive measure."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S43",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "RSI2=93.5 and RSI14=73 extremely overbought after strong 5-day run; near 52w high; take partial profit ahead of FOMC/PPI"
+    },
+    {
+     "symbol": "S51",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "8-K director/officer change (negative signal), -2.1% gain, below EMA20, weak momentum"
+    },
+    {
+     "symbol": "S19",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "-6.8% loss, weak 21d trend (-6.6%), below EMA20/50, RSI14=35 in downtrend"
+    },
+    {
+     "symbol": "S27",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Above all EMAs, near 52w high, positive momentum, Materials defensive in uncertain regime, low ATR"
+    },
+    {
+     "symbol": "S44",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Above EMAs, positive AI/NVDA partnership news, stable RSI, good trend with low ATR"
+    }
+   ],
+   "note": "Trimming overbought energy (S43) and weak/flagged positions (S51, S19); adding defensive Materials (S27) and AI-infrastructure Tech (S44). Maintaining cash buffer ahead of FOMC and PPI events in uncertain regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S19",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 7.8% in 24 days, weak technicals, RSI2 82 but vs_ema20 -2.6% and downtrend; cut loss in RISK_OFF"
+    },
+    {
+     "symbol": "S11",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 6.4% in 14 days, RSI2 22, vs_ema200 -8.4%, weak momentum; cut loss"
+    },
+    {
+     "symbol": "S43",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "RSI 81, RSI2 99.88 - extremely overbought after +10.3% gain; trim to lock in profits while keeping energy exposure"
+    },
+    {
+     "symbol": "S48",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Energy momentum strong, near 52w high, RSI2 98.6 but trend intact, positive news flow, complements S43"
+    },
+    {
+     "symbol": "S44",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Tech with positive trend, above EMA20/50/200, RSI 57 healthy, +4% 21d return - one of few tech names holding up"
+    }
+   ],
+   "note": "RISK_OFF regime: cutting two losing positions (S11, S19), trimming overbought S43, adding energy momentum (S48) and resilient tech (S44). Maintaining ~20% cash buffer given VIX 27 and fear/greed 31."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S44",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Source code theft news is a negative catalyst; -4.3% in 4 days, exit fully"
+    },
+    {
+     "symbol": "S51",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "34 days held, -3.7% gain, weak 21d momentum (-10.5%), underperforming in RISK_OFF"
+    },
+    {
+     "symbol": "S42",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "39 days held, near-zero gain, lowered price target from Deutsche Bank, stagnant"
+    },
+    {
+     "symbol": "S09",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Utilities defensive in RISK_OFF; strong trend vs_ema200 +13.4%, near 52w high, RSI healthy"
+    },
+    {
+     "symbol": "S05",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Health Care defensive; strong trend vs_ema200 +20%, near 52w high, analyst outperform reiterated"
+    },
+    {
+     "symbol": "S35",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Health Care; positive Phase 3 trial results, analyst outperform, strong trend vs_ema200 +19%"
+    }
+   ],
+   "note": "RISK_OFF regime: rotating out of underperformers (S44 security breach, S51/S42 stagnant) into defensive sectors (Utilities, Health Care) with strong trends. Maintaining cash buffer ~17% given elevated VIX."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S48",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Energy under pressure, -4.7% today, Iran ceasefire fragile, RSI2=10.78 oversold but trend broken, -4.7% loss after 9 days"
+    },
+    {
+     "symbol": "S29",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "49 days held, -1.2% gain, below EMA20 and EMA50, weak momentum, opportunity cost"
+    },
+    {
+     "symbol": "S51",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum +5.8% today, analyst upgrade, above all EMAs, strong 5d and 21d returns"
+    },
+    {
+     "symbol": "S16",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "AI chip demand surge, +14% 21d, above all EMAs, strong sector tailwind"
+    }
+   ],
+   "note": "Exiting weak/losing energy positions (S48 Iran risk, S29 stagnant). Rotating into strong momentum names S51 (industrial upgrade) and S16 (AI chip demand). Market regime uncertain but breadth solid; maintaining diversified 10-position portfolio."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S51",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 5.16% in 4 days, RSI2=6 but no catalyst, weak 5d momentum -5.36%, cutting loss"
+    },
+    {
+     "symbol": "S43",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Energy weakness, -4.14% 5d, -6.06% 21d, below EMA20, no near-term catalyst"
+    },
+    {
+     "symbol": "S47",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "AI partnership expansion driving +18.6% 5d surge, strong momentum, RISK_ON environment favors tech"
+    },
+    {
+     "symbol": "S49",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "AI chip partnership extended, +13.14% 5d, +22.35% 21d, strong uptrend vs EMA50/200"
+    }
+   ],
+   "note": "Rotating out of two losers (S51, S43) into high-momentum AI-driven tech names (S47, S49). Market is strongly RISK_ON with breadth=1.0; maintaining existing winners S38, S16, S34. S09/S35 are oversold but holding given no stop triggers yet."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S05",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "RSI2 at 1, ret_5d -5.3%, persistent Health Care weakness, cut loss"
+    },
+    {
+     "symbol": "S09",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Utilities underperform in RISK_ON, RSI 39.6, negative 5d return, below EMA20"
+    },
+    {
+     "symbol": "S15",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "RSI 37.5, ret_5d -5.3%, below both EMAs, deteriorating momentum"
+    },
+    {
+     "symbol": "S35",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "RSI 38.4, ret_5d -4.2%, below EMAs, Health Care sector weakness"
+    },
+    {
+     "symbol": "S40",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "RSI2 near 0, ret_5d -8.8%, earnings with lowered PT, deeply oversold trend"
+    },
+    {
+     "symbol": "S16",
+     "action": "target",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Trim overbought position: RSI 83.3, vs_ema20 +21.8%, lock in +30% gain"
+    },
+    {
+     "symbol": "S37",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum: RSI 77, ret_21d +25.3%, vs_ema200 +22.7%, near 52w high, high volume"
+    },
+    {
+     "symbol": "S44",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Tech momentum: RSI 74.6, ret_21d +14.6%, vs_ema200 +21.4%, near 52w high"
+    },
+    {
+     "symbol": "S32",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Health Care momentum: RSI 81.5, ret_21d +31.2%, confirmed earnings 8-K, analyst upgrades"
+    }
+   ],
+   "note": "RISK_ON environment: rotating out of laggards (Health Care weakness, Utilities, Industrials) into strong momentum names. Trimming S16 after extreme overbought run. Adding S37/S44 tech momentum and S32 on earnings strength."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S47",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 7.2% in 9 days, -12.6% over 5 days, RSI2 at 4.3 but trend broken; cut loss"
+    },
+    {
+     "symbol": "S32",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "RSI14=85, RSI2=99 extremely overbought after 41% run; trim to lock in gains"
+    },
+    {
+     "symbol": "S46",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Confirmed earnings beat (8-K), +8.45% today, news score 0.37, near 52w high, strong momentum"
+    },
+    {
+     "symbol": "S24",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Confirmed earnings beat, +6.1% today, analyst upgrade to Outperform, fiber expansion catalyst"
+    }
+   ],
+   "note": "Cutting S47 loss and trimming overbought S32; deploying into confirmed earnings winners S46 and S24. FOMC nearby so keeping ~17% cash buffer. Market breadth strong but regime uncertain."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Trim after +80% gain and +18.6% single-day surge; RSI 81, extremely overbought; lock in partial profits while keeping exposure"
+    },
+    {
+     "symbol": "S24",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Negative gain after 4 days, weak trend (below EMA20/50/200), RSI 45 with no catalyst; redeploy capital"
+    },
+    {
+     "symbol": "S55",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Confirmed earnings beat (8-K), +7.5% today on 2.9x volume, RSI 64 not yet overbought, positive guidance; strong post-earnings momentum setup"
+    }
+   ],
+   "note": "RISK_ON environment supports staying invested. Trimming S16 after extraordinary single-day move to manage concentration risk. Rotating out of weak S24 into S55 which has confirmed earnings catalyst. Core positions in S38, S37, S34, S49 remain intact given strong trends."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "Trim: 91% gain, RSI 76, vs_ema200 +96%, extremely extended; lock in partial profits while keeping exposure"
+    },
+    {
+     "symbol": "S55",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Underperforming: -3.9% in 4 days, weak momentum, rsi2 31, below trend; redeploy capital"
+    },
+    {
+     "symbol": "S30",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong tech momentum: RSI 76, rsi2 98, +15.6% 21d, near 52w high, positive product news (camera, Siri), CNBC mention"
+    }
+   ],
+   "note": "RISK_ON environment supports staying invested. Trimming S16 after massive 91% run to reduce concentration risk. Exiting S55 which is lagging. Adding S30 which shows strong momentum near 52w highs with positive catalysts. Portfolio remains ~90% invested across 9 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "Trim massive 92% winner; extremely extended vs EMA50 (+38%), RSI 69.6, sell warning headline; lock in partial gains"
+    },
+    {
+     "symbol": "S03",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Near 52w high, strong momentum (+5.7% today), IPO deal flow (OpenAI, SpaceX), RSI 63.8, Financials benefiting from RISK_ON"
+    },
+    {
+     "symbol": "S25",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong +5.2% day, defense contract wins (Air Force, aviation deals), RBC Outperform reiterated, positive momentum"
+    }
+   ],
+   "note": "Trimming S16 after extraordinary 92% gain and crowded-trade warning; deploying into S03 (IPO momentum, near highs) and S25 (defense contracts, strong day). Market remains RISK_ON with extreme greed - staying mostly invested but managing concentration risk in most extended positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0.0,
+     "reason": "Trim from 3.7% to 5% - already small but extremely extended (vs_ema50 +46%, RSI 77); news notes Cathie Wood dumping; lock in 122% gain partially"
+    },
+    {
+     "symbol": "S46",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 1.0,
+     "reason": "Position at -4% loss, ret_5d -5.4%, below EMA20, weakening trend; cut loss"
+    },
+    {
+     "symbol": "S34",
+     "action": "sell",
+     "weight": 0.0,
+     "fraction": 0.5,
+     "reason": "ret_5d -9.1%, RSI 33, below EMA20 and EMA50; deteriorating despite 99 days held; reduce exposure"
+    },
+    {
+     "symbol": "S10",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong momentum (+29% 21d, +10.6% 5d), confirmed earnings catalyst, new data presentation catalyst, RSI 75 but justified by fundamentals"
+    },
+    {
+     "symbol": "S47",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Strong momentum (+22.7% 21d, +8.3% 5d), RSI 66 not overbought, above all EMAs, tech sector strength"
+    }
+   ],
+   "note": "Risk-on environment supports momentum. Rotating out of S46 (loser) and trimming S34 (deteriorating). Adding S10 (healthcare momentum + catalyst) and S47 (tech momentum). S16 already small position; leaving mostly intact given strong trend but monitoring extended valuation."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S49",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Confirmed earnings miss (8-K), -12.6% today on 3.5x volume, negative news score; clear fundamental deterioration"
+    },
+    {
+     "symbol": "S34",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "104 days held, only +4.7% gain, below EMA20 and EMA50, weak 21d return -9.8%, poor momentum vs opportunity cost"
+    },
+    {
+     "symbol": "S35",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum +4.8% today, rel volume 1.8x, above all EMAs, near 52w high, RSI 59 not overbought, healthcare strength"
+    },
+    {
+     "symbol": "S47",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong tech/AI momentum +27.5% 21d, +16% 5d, above all EMAs, RSI 69 healthy, AI infrastructure theme with positive news"
+    }
+   ],
+   "note": "Rotating out of S49 (confirmed earnings miss) and S34 (long-held underperformer below EMAs) into S35 (healthcare momentum) and S47 (AI tech momentum). NFP tomorrow warrants no aggressive sizing changes. Portfolio remains fully invested in uptrend with extreme greed reading suggesting caution on new adds."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S47",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Earnings shock with high FY27 capex guidance, stock down 8.5% today after prior -19.8% loss, confirmed 8-K, trend broken"
+    },
+    {
+     "symbol": "S30",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Slight loss after 19 days, weak momentum, trim to free capital for better opportunities"
+    },
+    {
+     "symbol": "S15",
+     "action": "buy",
+     "weight": 0.1,
+     "reason": "Strong investor day: 4-6% organic growth target, 10%+ EPS growth, +6.4% today, good sector momentum"
+    },
+    {
+     "symbol": "S25",
+     "action": "buy",
+     "weight": 0.05,
+     "reason": "Strong momentum: ret_21d +11.9%, above EMA20/50/200, RSI healthy at 62, industrials strength"
+    }
+   ],
+   "note": "Exiting S47 on earnings capex shock and confirmed loss. Trimming S30 on underperformance. Adding S15 on strong investor day catalyst and S25 on momentum. Portfolio remains nearly fully invested with UNCERTAIN regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S38",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Trim overbought position: RSI2=97.7, +62.8% gain, near 52w high; lock in profits while maintaining exposure"
+    },
+    {
+     "symbol": "S30",
+     "action": "sell",
+     "fraction": 1.0,
+     "weight": 0,
+     "reason": "Smallest position, flat performance (-0.7%), free up capital for stronger momentum plays"
+    },
+    {
+     "symbol": "S25",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong Industrials momentum: +25.4% 21d, RSI2=97, vs_ema50=+13.4%, near 52w high; RISK_ON regime favors"
+    }
+   ],
+   "note": "RISK_ON with OPEX near; trimming overbought S38, rotating out of flat S30 into high-momentum S25. Maintaining core winners S37, S44, S03. Portfolio stays at 10 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S37",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 8.5% today, -11.6% 5d, RSI2=15.75, technical breakdown; trim half to reduce risk"
+    },
+    {
+     "symbol": "S10",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "RSI2=99.21, extremely overbought after +7% day; lock in partial gains near 52w high"
+    },
+    {
+     "symbol": "S05",
+     "action": "buy",
+     "weight": 0.1,
+     "reason": "Strong momentum (+4% today, +11.5% 5d), multiple positive drug approvals, near 52w high, RSI trending strong"
+    },
+    {
+     "symbol": "S40",
+     "action": "buy",
+     "weight": 0.07,
+     "reason": "$1.1B Navy missile contract win, positive price action, above EMAs, solid industrials momentum"
+    }
+   ],
+   "note": "Trimming overbought S10 and technically broken S37; deploying into S05 (health care momentum + FDA catalysts) and S40 (defense contract win). Market in fear zone but breadth decent; maintaining mostly defensive posture with 10 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S15",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Small loss after 14 days, weak 5d momentum -5%, no clear catalyst; freeing capital for stronger opportunities"
+    },
+    {
+     "symbol": "S44",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "21d return -9.6%, RSI 46 weakening trend despite 28% cumulative gain; momentum deteriorating"
+    },
+    {
+     "symbol": "S30",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Confirmed chip deal extension with S49 through 2031, strong 5d momentum +10.2%, near 52w high, positive AI narrative"
+    },
+    {
+     "symbol": "S50",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Robotaxi launch in Miami (3rd state), +6.7% today, strong 5d +10.6%, multiple positive catalysts"
+    }
+   ],
+   "note": "RISK_ON environment supports staying fully invested. Rotating out of S15 (weak momentum, small loss) and S44 (deteriorating 21d trend) into S30 (confirmed chip deal catalyst) and S50 (robotaxi expansion catalyst). Core holdings S16, S38, S32, S37 remain strong."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S50",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 5.4% in 4 days, negative 5d momentum, below both EMAs, weakest position; CPI risk ahead"
+    },
+    {
+     "symbol": "S38",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "Large 53.8% gain but below EMA20, 5d momentum -4%, trimming to lock in profits ahead of CPI"
+    },
+    {
+     "symbol": "S56",
+     "action": "buy",
+     "weight": 0.1,
+     "reason": "Strong momentum (ret_5d +9.4%, ret_21d +15.1%), positive AI news confirmed by multiple sources, reasonable RSI 62.8, above EMAs"
+    }
+   ],
+   "note": "Exiting S50 (weakest position, short-held loser), trimming S38 (large winner showing weakness below EMA20), adding S56 on strong AI-driven momentum. Maintaining defensive posture with CPI approaching; keeping cash buffer elevated."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S38",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.6,
+     "reason": "Significant deterioration: -9.4% over 21d, RSI 38, well below EMA20 (-7.2%), 134 days held with large gain to protect"
+    },
+    {
+     "symbol": "S37",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Weakening momentum: -4.9% 5d, -5.9% 21d, RSI 43, rsi2 at 8.2, below EMA20. Trim to reduce exposure"
+    },
+    {
+     "symbol": "S17",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong uptrend: +15.4% 21d, RSI 64, near 52w high (-2.9%), above all EMAs, Health Care sector strength"
+    },
+    {
+     "symbol": "S19",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong momentum: +14.8% 21d, RSI 68, near 52w high (-2.3%), above all EMAs, high relative volume 1.2x"
+    }
+   ],
+   "note": "RISK_ON regime with good breadth. Rotating out of deteriorating S38 (large gain but breaking down) and trimming weak S37. Adding to strong momentum names S17 and S19 which are near 52w highs with solid trends. Portfolio at 10 positions max so selling frees capacity for new entries."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S56",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.75,
+     "reason": "Down 9% in 9 days, RSI2 near 0, -8% 5d, below EMAs, earnings risk ahead - cut most of position"
+    },
+    {
+     "symbol": "S16",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 5% today, -7% 21d, RSI2=8.8, China CXMT competition news; protect large 70% gain"
+    },
+    {
+     "symbol": "S37",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 10% over 21d, RSI2=13, below both EMAs, momentum deteriorating"
+    }
+   ],
+   "note": "Reducing exposure in three weakening positions ahead of FOMC. S56 near-total exit on rapid loss and earnings risk; S16 partial trim to lock in 70% gain amid technical breakdown; S37 partial trim on sustained downtrend. Raising cash to ~35% given UNCERTAIN regime and FOMC catalyst risk."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Trim half ahead of earnings; lock in 66% gain, reduce binary event risk with 12% options-implied move"
+    },
+    {
+     "symbol": "S56",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 9.5% in 14 days, below all EMAs, weak technicals in risk-on market"
+    },
+    {
+     "symbol": "S37",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Tiny position, RSI 39, vs_ema20 -5.3%, downtrend; free up capital for better opportunities"
+    },
+    {
+     "symbol": "S30",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 3.8%, RSI 40, vs_ema20 -5.4%, negative 5d/21d returns; reduce exposure"
+    },
+    {
+     "symbol": "S07",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong post-earnings momentum, +22.7% 5d, near 52w high, $3T market cap milestone, massive order backlog"
+    },
+    {
+     "symbol": "S43",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Analyst upgrades post Q2 earnings beat, new commercial partnerships, positive news score, strong 21d return"
+    },
+    {
+     "symbol": "S20",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Financials strength, RSI 65, near 52w high, strong 21d return +6.4%, above all EMAs"
+    }
+   ],
+   "note": "Deploying excess cash (36%) in RISK_ON regime. Trimming S16 pre-earnings to lock gains, exiting weak positions S56/S37, reducing S30. Adding momentum leaders S07 and fundamentally improving S43/S20."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S30",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Jefferies downgrade to Underperform, multiple negative news sources, below EMA20, -2.2% loss position with deteriorating momentum"
+    },
+    {
+     "symbol": "S16",
+     "action": "target",
+     "weight": 0.04,
+     "fraction": 0,
+     "reason": "Massive +61.5% gain but -15.8% over 21d, RSI2=17.6, below EMA20/50, momentum clearly broken - lock in most gains"
+    },
+    {
+     "symbol": "S38",
+     "action": "target",
+     "weight": 0.04,
+     "fraction": 0,
+     "reason": "+38.6% gain but -11.9% over 21d, RSI2=18.2, below EMA20/50 - momentum fading, trim to protect gains"
+    },
+    {
+     "symbol": "S40",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum: +14.4% 21d, RSI 76.8, near 52w high, above all EMAs, positive defense/aerospace demand news"
+    },
+    {
+     "symbol": "S48",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Energy momentum: +15.1% 21d, RSI 65, above all EMAs, high relative volume 1.35x, strong trend"
+    },
+    {
+     "symbol": "S12",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Financials strength: +6.9% 21d, RSI 65, near 52w high, above all EMAs, low ATR - quality trend"
+    }
+   ],
+   "note": "RISK_ON environment supports adding momentum names. Exiting S30 on analyst downgrade, trimming S16/S38 to lock in large gains as momentum has reversed. Adding S40 (defense/industrials), S48 (energy momentum), S12 (financials trend). Portfolio remains fully invested with diversified sector exposure."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S38",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "RSI2=97.3, +34.9% gain after 154 days, extremely overbought; lock in profits"
+    },
+    {
+     "symbol": "S07",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 5.4% in 9 days, weak retail sales news, RSI2=4.2 but trend deteriorating in weak consumer environment"
+    },
+    {
+     "symbol": "S32",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "ret_21d=-7.2%, vs_ema20=-3.4%, RSI14=39 - downtrend despite earlier gain; reduce exposure"
+    },
+    {
+     "symbol": "S39",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Confirmed 8-K material agreement, strong AI momentum, RSI62.9, vs_ema20=+4.8%, positive news flow"
+    },
+    {
+     "symbol": "S19",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong industrials momentum, ret_1d=+2.1%, vs_ema50=+5%, RSI59.9, RISK_ON environment"
+    }
+   ],
+   "note": "Risk-on environment supports equity exposure. Trimming overbought/deteriorating positions (S38, S07, S32) and rotating into S39 (confirmed catalyst) and S19 (strong momentum). Maintaining core holdings in S35, S43, S25, S40."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S38",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Locked +24% gain; momentum fully reversed (ret_5d -8%, ret_21d -8.7%, RSI 39.8, below EMA20/50)"
+    },
+    {
+     "symbol": "S16",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Trend broken: ret_5d -9.7%, ret_21d -12.5%, RSI 42, below EMA20/50 despite +10% gain"
+    },
+    {
+     "symbol": "S39",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Pre-earnings risk (Q2 Aug 26), RSI near 0, -5.5% loss in 4 days, sector weakness"
+    },
+    {
+     "symbol": "S52",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum (RSI 73, ret_5d +6.7%, near 52w high), Trump buying catalyst, financials sector strength"
+    },
+    {
+     "symbol": "S41",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Health care momentum leader: RSI 74, ret_5d +7.4%, ret_21d +10.6%, near 52w high, above all EMAs"
+    }
+   ],
+   "note": "Risk-on environment supports staying invested. Rotating out of S38/S16 (momentum reversals) and reducing S39 (pre-earnings risk) into S52 (catalyst + momentum) and S41 (strong health care trend). Portfolio remains fully deployed with 10 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S25",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Persistent -6% loss over 49 days, RSI2 10.2, vs_ema20 -5%, no recovery catalyst; cut loss"
+    },
+    {
+     "symbol": "S40",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "-7% loss in 14 days, RSI2 6.7, industrial weakness, below EMA20; stop out"
+    },
+    {
+     "symbol": "S51",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Baird upgrade catalyst, +3.9% today, strong 21d momentum +10.5%, near 52w high, RISK_ON regime"
+    },
+    {
+     "symbol": "S10",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "RSI2 at 1.6 (extreme oversold), acquisition news positive catalyst, existing position at 6.5% - add to full weight"
+    }
+   ],
+   "note": "RISK_ON market with strong breadth. Cutting two underperforming industrial positions (S25, S40) to redeploy into stronger momentum (S51 upgrade) and oversold bounce candidate (S10 with M&A catalyst). Maintaining winners S35, S43, S03."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S10",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Persistent underperformer at -2% after 69 days, RSI2 near zero with continued downtrend, news questioning the decline; trim to reduce drag"
+    },
+    {
+     "symbol": "S33",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong momentum (+3.2% today, +4.3% 21d), confirmed 8-K filing, AI chip collaboration with S07, high relative volume 2.87x, RSI2=94 shows strong buying pressure"
+    },
+    {
+     "symbol": "S50",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Cybercab launch catalyst today (+4%), +12% 21d momentum, humanoid robot production scaling narrative, RSI2=62 not overbought"
+    }
+   ],
+   "note": "RISK_ON market with good breadth. Trimming S10 after 69 days of underperformance. Adding S33 on confirmed AI chip news and volume surge, and S50 on Cybercab launch catalyst. Portfolio stays near full deployment with 10 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S33",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "RSI 70.4, rsi2=91, up 7.4% in 4 days - overbought, trim ahead of FOMC"
+    },
+    {
+     "symbol": "S43",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "RSI 71, near 52w high, +15.5% gain - trim overbought energy position pre-FOMC"
+    },
+    {
+     "symbol": "S39",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Negative gain after 19 days, weak momentum, negative news sentiment - exit"
+    },
+    {
+     "symbol": "S52",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 4%, flat momentum, no catalyst - exit to raise cash pre-FOMC"
+    }
+   ],
+   "note": "Reducing risk ahead of FOMC: exiting weak/losing positions S39 and S52, trimming overbought S33 and S43. Raising cash from ~17% to ~35% given uncertain regime and fearful sentiment. Retaining strong trend positions S35, S41, S51, S43 (partial)."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S03",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "84 days held, -2.5% gain, RSI 37, below all EMAs, weak technicals with no catalyst"
+    },
+    {
+     "symbol": "S32",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "104 days held, below all EMAs, RSI 36, trimming to redeploy into stronger momentum"
+    },
+    {
+     "symbol": "S16",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Exceptional momentum (+32% 21d), near 52w high, AI theme, strong technicals across all timeframes"
+    },
+    {
+     "symbol": "S39",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum (+7.9% 5d, +6.7% 21d), above all EMAs, RSI 60, near 52w high, AI tailwind"
+    }
+   ],
+   "note": "Rotating out of weak long-held positions (S03 full exit, S32 partial) into high-momentum AI/tech names S16 and S39. Market neutral with low VIX and greed sentiment supports staying invested. Keeping strong performers S35, S41, S51, S33 intact."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S32",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "109 days held, only 1.4% weight, modest gain, underperforming recently; free up capital for better opportunities"
+    },
+    {
+     "symbol": "S37",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum: +8.9% 21d, RSI 63, above all EMAs, positive 5d trend; tech sector breakout candidate"
+    }
+   ],
+   "note": "Market neutral with moderate risk. Exiting small stale S32 position to deploy into S37 which shows strong cross-timeframe momentum. Keeping S35 (best performer), S41 (strong trend), S39/S16 (recent entries). Cash remains ~20% as buffer in neutral regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S37",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "RSI2=98.32, extremely overbought after strong 5d run; trim to reduce risk"
+    },
+    {
+     "symbol": "S39",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "RSI2=98.49, extremely overbought; trim while locking in gains"
+    },
+    {
+     "symbol": "S35",
+     "action": "target",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Down 5% over 5d and 21d, momentum deteriorating despite long hold"
+    },
+    {
+     "symbol": "S10",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Only 0.9% gain after 89 days held; capital better deployed elsewhere"
+    },
+    {
+     "symbol": "S49",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "$60B chip deal catalyst, strong 5d momentum +5.8%, positive AI narrative"
+    },
+    {
+     "symbol": "S40",
+     "action": "buy",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "RSI2=0.58 extreme oversold, mean reversion candidate with small position given risk"
+    }
+   ],
+   "note": "Trimming overbought momentum names (S37, S39) and stagnant/weakening positions (S10, S35). Adding S49 on chip deal catalyst and S40 as oversold mean reversion. Risk score elevated at 7.45 so keeping new positions modest."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S49",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Negative news sentiment (-0.14), CEO controversial AI comments hurting sentiment, -4.2% loss in 4 days, below EMAs"
+    },
+    {
+     "symbol": "S33",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Small gain but underperforming; below EMA20, weak 5d return, freeing capital for stronger opportunities"
+    },
+    {
+     "symbol": "S18",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum, near 52w high, positive news on China payments expansion, financials sector strength"
+    },
+    {
+     "symbol": "S52",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Near 52w high, strong 5d/21d returns, RSI 71 with momentum, financials sector tailwind"
+    }
+   ],
+   "note": "Exiting S49 on negative CEO sentiment and losses; trimming underperforming S33. Adding S18 and S52 on strong financial sector momentum near 52w highs. Maintaining cash ~22% ahead of CPI event. Portfolio at 10 positions max after trades."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S16",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 14%, weak technicals: -7.3% vs EMA20, -11.7% 5d return, RSI 39.8, deteriorating trend"
+    },
+    {
+     "symbol": "S39",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 5%, weak momentum: -5.3% 5d, -3.3% vs EMA20, RSI 40.9, concentration risk flagged"
+    },
+    {
+     "symbol": "S51",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 3.3% after 34 days, -7.5% 21d, -3.4% vs EMA20, RSI 40.5, no catalyst"
+    },
+    {
+     "symbol": "S40",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Confirmed earnings beat, record $340B backlog, engine aftermarket +21%, high relative volume"
+    },
+    {
+     "symbol": "S10",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum: +10% 5d, +10% 21d, +7% vs EMA20, RSI 69.8, near 52w high, positive news flow"
+    },
+    {
+     "symbol": "S17",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum: +6% 5d, +10% 21d, +5.7% vs EMA20, near 52w high, positive drug approvals"
+    },
+    {
+     "symbol": "S31",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong financials momentum: +3.7% 5d, +7.5% 21d, RSI 79, near 52w high, high relative volume"
+    }
+   ],
+   "note": "Cutting three underperformers (S16, S39, S51) with negative momentum. Adding to S40 on confirmed earnings beat. Initiating S10 and S17 on strong healthcare momentum. Adding S31 on financials strength. Market uncertain but SPY trend up; maintaining diversified exposure."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S37",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "RSI2 at 96.5, up 11% in 5 days - extremely overbought, trim to lock partial gains ahead of FOMC"
+    },
+    {
+     "symbol": "S35",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.25,
+     "reason": "Large unrealized gain (+18.75%) but momentum weakening (-4.4% over 5d and 21d), reduce exposure"
+    }
+   ],
+   "note": "Trimming two overbought/weakening positions ahead of FOMC. Market in fear territory (F&G=25) with uncertain regime. Raising cash slightly as buffer. Remaining positions are healthy with positive trends."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S31",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "RSI2 at 95.6, extremely overbought short-term; trim half to lock in gains and reduce risk in uncertain market"
+    },
+    {
+     "symbol": "S40",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "RSI2 at 96.4, extremely overbought short-term; trim half while trend intact"
+    },
+    {
+     "symbol": "S17",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Slight loss after 9 days, underperforming vs other holdings; free up capital for better opportunities"
+    },
+    {
+     "symbol": "S19",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Industrials, strong 21d momentum +9.5%, near 52w high, RSI2 42 (not overbought), solid trend vs EMA20/50/200"
+    }
+   ],
+   "note": "Trimming overbought positions (S31 RSI2=95.6, S40 RSI2=96.4) and exiting underperformer S17. Adding S19 as a quality momentum name with room to run. Maintaining defensive posture given extreme fear reading and uncertain regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "S31",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "RSI 78, near 52w high (-0.5%), overbought after strong run; lock in partial gains in uncertain market"
+    },
+    {
+     "symbol": "S43",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Energy weakening: -6.2% 5d, RSI 39.5, below EMA20; reduce exposure as momentum deteriorates"
+    }
+   ],
+   "note": "Trimming overbought S31 and weakening S43 to raise cash in uncertain/fear market (F&G=22). Holding core positions in Health Care (S10, S41, S35), Financials (S18, S52), and Industrials (S19, S40) which show solid fundamentals. Avoiding tech sector given S39 selloff and broader tech weakness."
+  }
+ ]
+}

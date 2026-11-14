@@ -5,20 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="ZbjaI8ZlxyAvXvUORFcO0WAIKTXZtYcmOX0ZknK5ZJ0">
 <meta name="msvalidate.01" content="38CA98D01ECA41B71334E56072B086B7">
-<title>Risk-Aware Trading Agents · AI stock trading agents and news backtesting without look-ahead · 风险感知交易智能体</title>
-<meta name="description" content="Open-source AI trading agents for US stocks with news backtesting that cannot see the future: a point-in-time 2026 dataset of prices, VIX and news, a look-ahead check on every run, LLM agents over MCP, FOMC/CPI/VIX-aware regimes, and paper/live trading on 10 brokers. 开源美股 AI 交易智能体：不用未来函数的新闻回测、按时间点记录的 2026 年数据、MCP 智能体、10 家券商。">
-<meta name="keywords" content="news backtesting, backtest with news, look-ahead bias, point-in-time data, historical news dataset, stock market dataset 2026, LLM trading agent, AI trading agents, trading agent benchmark, MCP server, swing trading, backtesting, risk management, FOMC, VIX, fear and greed, Alpaca, Interactive Brokers, Futu, moomoo, Tiger, Longbridge, Schwab, tastytrade, Tradier, Public, 新闻回测, 未来函数, 量化交易, 交易机器人, 美股, 抄底, 风控">
+<title>LLM trading agent benchmark and leaderboard with news replayed by publication time · Risk-Aware Trading Agents · 风险感知交易智能体</title>
+<meta name="description" content="Benchmark LLM trading agents on news replayed by publication time: three frozen US markets (the 2020 crash, the 2022 bear market, 2026) with 65,863 bundled headlines, a public model leaderboard scored before and after each training cutoff, and a prompt leaderboard. Open source, MIT. 开源 LLM 交易智能体基准：按发布时间回放新闻、模型榜单、Prompt 榜。">
+<meta name="keywords" content="LLM trading agent benchmark, LLM trading leaderboard, AI trading benchmark, financial LLM evaluation, prompt leaderboard, news replayed by publication time, news backtesting, backtest with news, look-ahead bias, point-in-time data, historical news dataset, stock market dataset 2026, LLM trading agent, AI trading agents, trading agent benchmark, MCP server, swing trading, backtesting, risk management, FOMC, VIX, fear and greed, Alpaca, Interactive Brokers, Futu, moomoo, Tiger, Longbridge, Schwab, tastytrade, Tradier, Public, 新闻回测, 未来函数, 量化交易, 交易机器人, 美股, 抄底, 风控">
 <link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/">
-<meta property="og:title" content="Risk-Aware Trading Agents: AI trading agents and news backtesting without look-ahead">
-<meta property="og:description" content="Macro-aware, risk-first AI trading agents for US stocks, a point-in-time 2026 dataset for news backtesting with a look-ahead check, LLM agents over MCP, and paper/live trading on 10 brokers.">
+<meta property="og:title" content="Risk-Aware Trading Agents: an LLM trading benchmark with news replayed by publication time">
+<meta property="og:description" content="Three frozen markets with 65,863 timestamped headlines, a leaderboard of LLM traders scored before and after their training cutoffs, a prompt leaderboard, and open-source risk-aware trading agents.">
 <meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/social-preview.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
 <meta property="og:image:alt" content="Risk-Aware Trading Agents: AI trading agents for US stocks and news backtesting without look-ahead">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"Risk-Aware Trading Agents","description":"Open-source AI trading agents for US stocks with news backtesting that cannot see the future: market regimes from FOMC, CPI and VIX, dip buying with earnings checks, cross-verified news, a point-in-time 2026 research dataset with a look-ahead check, LLM agents over MCP, and paper and live trading on 10 brokers.","codeRepository":"https://github.com/jackson-cmd/risk-aware-trading-agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/","programmingLanguage":"Python","license":"https://opensource.org/licenses/MIT","keywords":["AI trading agents","news backtesting","look-ahead bias","point-in-time data","LLM trading agents","MCP server","backtesting","swing trading","risk management","VIX","paper trading"],"identifier":"https://doi.org/10.5281/zenodo.24202496"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"Risk-Aware Trading Agents","description":"An open-source benchmark for LLM trading agents with news replayed by publication time (three frozen US markets: the 2020 crash, the 2022 bear market and 2026, with 65,863 timestamped headlines), a public model leaderboard scored before and after each training cutoff, a prompt leaderboard, and risk-aware AI trading agents for US stocks: market regimes from FOMC, CPI and VIX, dip buying with earnings checks, cross-verified news, a point-in-time 2026 research dataset with a look-ahead check, LLM agents over MCP, and paper and live trading on 10 brokers.","codeRepository":"https://github.com/jackson-cmd/risk-aware-trading-agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/","programmingLanguage":"Python","license":"https://opensource.org/licenses/MIT","keywords":["LLM trading agent benchmark","LLM trading leaderboard","prompt leaderboard","AI trading agents","news backtesting","look-ahead bias","point-in-time data","LLM trading agents","MCP server","backtesting","swing trading","risk management","VIX","paper trading"],"identifier":"https://doi.org/10.5281/zenodo.24202496"}</script>
 <style>
 :root{--bg:#ffffff;--fg:#1f2328;--muted:#59636e;--card:#f6f8fa;--line:#d1d9e0;--accent:#1f6feb;--green:#1a7f37;--amber:#9a6700;--red:#cf222e;--code:#0d1117;--code-fg:#e6edf3}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1117;--fg:#e6edf3;--muted:#9198a1;--card:#151b23;--line:#3d444d;--accent:#4493f8;--green:#3fb950;--amber:#d29922;--red:#f85149;--code:#010409}}
@@ -80,6 +83,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
 <header><div class="wrap">
   <a class="brand" href="#"><span lang="en">Risk-Aware Trading Agents</span><span lang="zh">风险感知交易智能体</span></a>
   <nav>
+    <a href="leaderboard.html"><span lang="en">Leaderboard</span><span lang="zh">榜单</span></a>
     <a class="hide-sm" href="#agents"><span lang="en">Agents</span><span lang="zh">智能体</span></a>
     <a class="hide-sm" href="#tour"><span lang="en">Screenshots</span><span lang="zh">截图</span></a>
     <a class="hide-sm" href="#how"><span lang="en">How it works</span><span lang="zh">原理</span></a>
@@ -93,11 +97,48 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
 
 <main>
 <div class="wrap hero">
-  <h1><span lang="en">AI trading agents that check the macro calendar and the fear index before they buy</span><span lang="zh">先看宏观日历和恐慌指数，再决定买不买的 AI 交易智能体</span></h1>
-  <p class="lead"><span lang="en">An open-source, long-only system for US stocks. It buys pullbacks to EMA 50/100/200 and quality dips that pass an earnings check, follows trends when the market is healthy, holds instead of panic-selling when it is not, and always keeps 30% in cash or T-bills. Backtest it, paper trade it, then connect one of 10 brokers.</span><span lang="zh">开源的美股做多系统。回踩 EMA 50/100/200 时买入，财报过关的好公司大跌时抄底；行情好时顺势持有，行情不明朗时只持有、不恐慌卖出；现金加短期国债始终不低于 30%。先回测，再模拟盘，然后接入 10 家券商中的任意一家。</span></p>
+  <h1><span lang="en">A benchmark for LLM trading agents, with news replayed by the minute it was published</span><span lang="zh">按发布时间回放新闻的 LLM 交易智能体基准</span></h1>
+  <p class="lead"><span lang="en">Most news backtests join headlines to prices by calendar date, so a headline published after the close is traded at that close. Here every headline arrives at the minute it was published and orders fill at the next open, through three frozen markets: the 2020 crash, the 2022 bear market and 2026. Llama, GPT, Claude and Gemini trade them blind and with names, three seeds each, scored apart before and after each model's training cutoff.</span><span lang="zh">很多新闻回测按日历日期把新闻和价格对齐，收盘后才发布的新闻也被当成收盘时就知道。这里每条新闻都在它发布的那一分钟送到，订单在下一个交易日开盘成交，覆盖三个冻结的市场：2020 年暴跌、2022 年熊市和 2026 年。Llama、GPT、Claude、Gemini 在上面盲测和实名各交易三遍（三个种子），训练截止日前后的成绩分开计。</span></p>
+  <div class="cta">
+    <a class="btn primary" href="leaderboard.html" lang="en">See the leaderboard</a><a class="btn primary" href="zh/leaderboard.html" lang="zh">看模型榜单</a>
+    <a class="btn" href="#start"><span lang="en">Get started</span><span lang="zh">开始使用</span></a>
+    <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents">★ GitHub</a>
+  </div>
+</div>
+
+<section id="unique"><div class="wrap">
+  <h2><span lang="en">Three things you will not find elsewhere</span><span lang="zh">别处没有的三件事</span></h2>
+  <div class="grid">
+    <a class="card" href="news-backtesting.html" lang="en"><h3>News replayed by publication time</h3><p>65,863 headlines and SEC filings with their publication times ship with the package for 2020, 2022 and 2026, cut from a local archive of about 3.2 million from 2011 to 2026. Joined by calendar date, our example signal makes +32 bp a trade; joined by publication time, it loses 6.7 bp.</p></a>
+    <a class="card" href="zh/news-backtesting.html" lang="zh"><h3>按发布时间回放新闻</h3><p>安装包自带 2020、2022、2026 三年共 65,863 条带发布时间的新闻标题和 SEC 公告，切自约 320 万条的本地新闻库（2011–2026 年）。同一个信号，按日历日期对齐新闻每笔赚 32 bp，按发布时间对齐每笔亏 6.7 bp。</p></a>
+    <a class="card" href="leaderboard.html" lang="en"><h3>A leaderboard of LLM traders</h3><p>Llama 3.2, GPT-5.6 Luna, Claude and Gemini trade the same 56 stocks through 2026, the 2022 bear market and the 2020 crash, blind and with names, three seeds each. Scores after each model's training cutoff are ranked, earlier ones listed apart, and every entry replays to the same numbers.</p></a>
+    <a class="card" href="zh/leaderboard.html" lang="zh"><h3>LLM 交易员榜单</h3><p>Llama 3.2、GPT-5.6 Luna、Claude、Gemini 在 2026 年、2022 年熊市和 2020 年暴跌里交易同样的 56 只股票，盲测和实名各三个种子。训练截止日之后的成绩参与排名，之前的单独列出，每条成绩都能重放核对。</p></a>
+    <a class="card" href="leaderboard.html#prompts" lang="en"><h3>A prompt leaderboard</h3><p>Which system prompt makes an LLM trade better: personas, risk rules, reasoning first, a focus on news or trend, examples, output formats. Each change is tested on the same periods and seeds, against the noise between seeds.</p></a>
+    <a class="card" href="zh/leaderboard.html#prompts" lang="zh"><h3>Prompt 榜</h3><p>什么样的系统提示词能让 LLM 交易得更好：角色、风控规则、先写理由、侧重新闻或趋势、示例、输出格式。每处改动都在同样的时段和种子上测，和换种子本来就有的波动比。</p></a>
+  </div>
+  <h3 style="margin-top:28px"><span lang="en">2026 after each model's training cutoff, blind</span><span lang="zh">2026 年训练截止日之后，盲测</span></h3>
+  <!-- board:teaser -->
+<div lang="en"><div class="table-wrap"><table class="board"><thead><tr><th>Model</th><th class="num">Scored from</th><th class="num">Return</th><th class="num">SPY</th><th class="num">Equal weight</th><th class="num">Sharpe</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">run 2026-11-14</span></td><td class="num">2026-01-30</td><td class="num">+6.2%</td><td class="num">+10.7%</td><td class="num">+10.6%</td><td class="num">0.34</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">run 2026-11-14</span></td><td class="num">2026-01-02</td><td class="num">+5.4%</td><td class="num">+12.1%</td><td class="num">+11.4%</td><td class="num">0.25</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">run 2026-11-14</span></td><td class="num">2026-02-13</td><td class="num">+1.7%</td><td class="num">+12.3%</td><td class="num">+10.7%</td><td class="num">-0.15</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">run 2026-11-14</span></td><td class="num">2026-06-30</td><td class="num">-0.6%</td><td class="num">+2.0%</td><td class="num">+5.7%</td><td class="num">-0.99</td></tr>
+</tbody></table></div></div>
+<div lang="zh"><div class="table-wrap"><table class="board"><thead><tr><th>模型</th><th class="num">计分起点</th><th class="num">收益</th><th class="num">SPY</th><th class="num">等权</th><th class="num">Sharpe</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-01-30</td><td class="num">+6.2%</td><td class="num">+10.7%</td><td class="num">+10.6%</td><td class="num">0.34</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-01-02</td><td class="num">+5.4%</td><td class="num">+12.1%</td><td class="num">+11.4%</td><td class="num">0.25</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-02-13</td><td class="num">+1.7%</td><td class="num">+12.3%</td><td class="num">+10.7%</td><td class="num">-0.15</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-06-30</td><td class="num">-0.6%</td><td class="num">+2.0%</td><td class="num">+5.7%</td><td class="num">-0.99</td></tr>
+</tbody></table></div></div>
+<!-- /board:teaser -->
+  <p class="note"><a href="leaderboard.html" lang="en">The whole leaderboard: 2022 and 2020, named runs, how each model makes money, the prompt board →</a><a href="zh/leaderboard.html" lang="zh">完整榜单：2022 和 2020 年、实名成绩、每个模型靠什么赚钱、Prompt 榜 →</a></p>
+</div></section>
+
+<section id="agents-intro"><div class="wrap">
+  <h2><span lang="en">AI trading agents that check the macro calendar and the fear index before they buy</span><span lang="zh">先看宏观日历和恐慌指数，再决定买不买的 AI 交易智能体</span></h2>
+  <p class="sub"><span lang="en">An open-source, long-only system for US stocks. It buys pullbacks to EMA 50/100/200 and quality dips that pass an earnings check, follows trends when the market is healthy, holds instead of panic-selling when it is not, and always keeps 30% in cash or T-bills. Backtest it, paper trade it, then connect one of 10 brokers.</span><span lang="zh">开源的美股做多系统。回踩 EMA 50/100/200 时买入，财报过关的好公司大跌时抄底；行情好时顺势持有，行情不明朗时只持有、不恐慌卖出；现金加短期国债始终不低于 30%。先回测，再模拟盘，然后接入 10 家券商中的任意一家。</span></p>
   <div class="cta">
     <a class="btn primary" href="#start"><span lang="en">Get started</span><span lang="zh">开始使用</span></a>
-    <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents">★ GitHub</a>
     <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md"><span lang="en">中文文档</span><span lang="zh">中文文档</span></a>
   </div>
   <div class="pills">
@@ -107,7 +148,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:14px;border-top:1px soli
     <span class="pill">2026 news in backtests</span><span class="pill">AI-written strategies</span>
     <span class="pill">Bull / bear LLM debate</span><span class="pill">MIT</span>
   </div>
-</div>
+</div></section>
 
 <section id="features"><div class="wrap">
   <h2><span lang="en">What it does</span><span lang="zh">它能做什么</span></h2>
@@ -267,6 +308,10 @@ class Rsi2Dip(Strategy):
   <div class="grid">
     <a class="card" href="news-backtesting.html" lang="en"><h3>Backtest with news, without look-ahead bias</h3><p>Point-in-time news replay, a 16:00 cutoff, orders at the next open, and a check that proves it.</p></a>
     <a class="card" href="zh/news-backtesting.html" lang="zh"><h3>用新闻回测，不用未来函数</h3><p>按发布时间回放新闻、以 16:00 收盘为界、次日开盘成交，并用防偷看检查证明。</p></a>
+    <a class="card" href="news-factors.html" lang="en"><h3>Do headlines predict returns? Ten news factors</h3><p>Point-in-time tests in 2020, 2022 and 2026, and how much a calendar-date join inflates the IC.</p></a>
+    <a class="card" href="zh/news-factors.html" lang="zh"><h3>新闻标题能预测股价吗？十个新闻因子</h3><p>2020、2022、2026 年按时间点检验，以及按日历日期对齐会把 IC 虚增多少。</p></a>
+    <a class="card" href="leaderboard.html" lang="en"><h3>LLM trading agent leaderboard</h3><p>Five models, six tasks, three seeds; clean and may-remember scores apart, and how each model makes money.</p></a>
+    <a class="card" href="zh/leaderboard.html" lang="zh"><h3>LLM 交易智能体榜单</h3><p>五个模型、六个任务、三个种子；干净和可能记得的成绩分开，每个模型靠什么赚钱。</p></a>
     <a class="card" href="point-in-time-market-data.html" lang="en"><h3>Point-in-time market data for 2026</h3><p>Daily prices since 2024, the VIX term structure, 16,945 headlines and SEC filings, with SHA-256 hashes.</p></a>
     <a class="card" href="zh/point-in-time-market-data.html" lang="zh"><h3>按时间点记录的 2026 年美股数据</h3><p>2024 年起的日线、VIX 期限结构、16,945 条标题和 SEC 公告，附 SHA-256 哈希。</p></a>
     <a class="card" href="llm-trading-agents.html" lang="en"><h3>Test LLM trading agents</h3><p>Let any model trade 2026 step by step on point-in-time data, blind if you like, from Python or over MCP.</p></a>
@@ -286,7 +331,7 @@ class Rsi2Dip(Strategy):
 <footer><div class="wrap">
   <span lang="en">MIT License · Not financial advice · Paper trade first.</span><span lang="zh">MIT 开源协议 · 不构成投资建议 · 请先用模拟盘。</span>
   · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
-  · <span lang="en"><a href="news-backtesting.html">News backtesting</a> · <a href="point-in-time-market-data.html">2026 market data</a> · <a href="llm-trading-agents.html">LLM trading agents</a></span><span lang="zh"><a href="zh/news-backtesting.html">新闻回测</a> · <a href="zh/point-in-time-market-data.html">2026 年数据</a> · <a href="zh/llm-trading-agents.html">LLM 交易智能体</a></span>
+  · <span lang="en"><a href="leaderboard.html">Leaderboard</a> · <a href="news-backtesting.html">News backtesting</a> · <a href="news-factors.html">News factors</a> · <a href="point-in-time-market-data.html">2026 market data</a> · <a href="llm-trading-agents.html">LLM trading agents</a></span><span lang="zh"><a href="zh/leaderboard.html">模型榜单</a> · <a href="zh/news-backtesting.html">新闻回测</a> · <a href="zh/news-factors.html">新闻因子</a> · <a href="zh/point-in-time-market-data.html">2026 年数据</a> · <a href="zh/llm-trading-agents.html">LLM 交易智能体</a></span>
 </div></footer>
 
 <script>

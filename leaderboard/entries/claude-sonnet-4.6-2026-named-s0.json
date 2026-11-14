@@ -1,0 +1,2428 @@
+{
+ "bench": "rta-bench-1",
+ "task": "2026-named",
+ "seed": 0,
+ "model": {
+  "name": "claude-sonnet-4.6",
+  "provider": "Anthropic",
+  "access": "OpenAI-compatible gateway, extended thinking off",
+  "training_cutoff": "2026-01",
+  "open_weights": false,
+  "parameters": null,
+  "call": {
+   "provider": "anthropic",
+   "model": "claude-sonnet-4-6",
+   "thinking": "disabled",
+   "temperature": 0.2,
+   "max_tokens": 2000,
+   "system_prompt_sha256": "0aa00937be0942da26653df3a645bce43153b5ef86761e36b962bb8ee3e4a352"
+  }
+ },
+ "contamination": "partly",
+ "settings": {
+  "universe": "megacap",
+  "decide_every": 5,
+  "max_positions": 10,
+  "position_size": null,
+  "news": true,
+  "max_news": 3,
+  "execution": "plain",
+  "cash": 100000.0,
+  "slippage_bps": 5.0,
+  "commission_per_share": 0.0,
+  "costs": "realistic",
+  "mode": "long_only",
+  "period": "2026",
+  "blind": false,
+  "start": "2026-01-02",
+  "end": "2026-11-11"
+ },
+ "data": {
+  "version": "2026-11-11",
+  "prices_sha256": "35183f30262ad64966bd3b5fb75b908c9e604c394c85faf8be9527d034491b43",
+  "news_sha256": "8a499cacaf1491603b12031953f12e141c7035a759ef4d4aff904ab771dfefd9"
+ },
+ "record": {
+  "run_id": "20261113-210812-llm-claude-sonnet-4-6-2026-named-2026-news-realistic",
+  "riskaware": {
+   "version": "0.7.2",
+   "git_commit": "ed141a51de4a"
+  },
+  "created_utc": "2026-11-14T03:08:19+00:00",
+  "files_sha256": {
+   "manifest.json": "561c1e4d91a8f1d3108b0f20f5b57ed1bc67cfd3a3b56ff8a5bf168867b029e1",
+   "metrics.json": "fef32323096e7e9377a0df032b46400fb78641e7114ed6de08e3cf594c9b18dc",
+   "equity.csv": "0e4e9d026b204cb0536f5a43f4a754076ca64b94ef32054d9234566825dad78a",
+   "trades.csv": "2218d9f1dd8d901f2fd16d5512c7dc18290ebf444e012d8635556eaa0295e33b",
+   "decisions.csv": "4503442dc9b12b4e9c057996d5558ec766c83431c31ed801783a187210e72375",
+   "policy_log.json": "602834155c9cf182f866a70ac507940135c79768746e884433feedffe9b426f1"
+  },
+  "replies_sha256": "d88a163b994ff196df315bcf8952c24cb348bae5d0d31ded33a76e1c7e4f2231",
+  "observations_sha256": "f97bd8b7a0bc5f1be16b940e65f5a91974030db925460695b5cb73846ea5deff",
+  "costs_seen_by_model": "fixed",
+  "rescored_from": "20261113-210650-llm-claude-sonnet-4-6-2026-named-2026-news"
+ },
+ "look_ahead_check": "pass",
+ "metrics": {
+  "total_return": 0.08532,
+  "cagr": 0.100255,
+  "volatility": 0.12476,
+  "sharpe": 0.542748,
+  "sortino": 0.869424,
+  "max_drawdown": -0.072699,
+  "calmar": 1.379051,
+  "win_rate": 0.58,
+  "profit_factor": 1.076264,
+  "round_trips": 100.0,
+  "avg_holding_days": 42.719808,
+  "turnover": 4.311977,
+  "avg_exposure": 0.750009,
+  "trades": 168.0,
+  "excess_vs_equal_weight": -0.028926,
+  "excess_vs_spy": -0.03555
+ },
+ "vs_spy": {
+  "beta": 0.681861,
+  "alpha_annual": -0.005549,
+  "excess_return_annual": -0.039731,
+  "information_ratio": -0.433001,
+  "t_stat_excess": -0.400881,
+  "sharpe_ci95_low": -1.242309,
+  "sharpe_ci95_high": 2.302201,
+  "p_sharpe_above_spy": 0.463,
+  "days": 216.0
+ },
+ "anchors": {
+  "spy": {
+   "total_return": 0.12087,
+   "sharpe": 0.76515,
+   "max_drawdown": -0.08885
+  },
+  "equal_weight": {
+   "total_return": 0.114246,
+   "sharpe": 0.848303,
+   "max_drawdown": -0.071956
+  }
+ },
+ "after_cutoff": {
+  "from": "2026-01-30",
+  "to": "2026-11-11",
+  "days": 197,
+  "total_return": 0.075279,
+  "sharpe": 0.513104,
+  "max_drawdown": -0.072699,
+  "volatility": 0.126829,
+  "spy_total_return": 0.106615,
+  "spy_sharpe": 0.725438,
+  "spy_max_drawdown": -0.088745,
+  "spy_volatility": 0.143545,
+  "equal_weight_total_return": 0.106305,
+  "equal_weight_sharpe": 0.862105,
+  "equal_weight_max_drawdown": -0.070685,
+  "equal_weight_volatility": 0.116244,
+  "excess_vs_spy": -0.031336,
+  "excess_vs_equal_weight": -0.031026
+ },
+ "analysis": {
+  "run_id": "20261113-210812-llm-claude-sonnet-4-6-2026-named-2026-news-realistic",
+  "strategy": "llm:claude-sonnet-4.6:2026-named",
+  "kind": "policy",
+  "period": "2026",
+  "start": "2026-01-02",
+  "end": "2026-11-11",
+  "stocks": 56,
+  "news": true,
+  "total_return": 0.08532,
+  "spy_return": 0.12087,
+  "summary": {
+   "total_return": 0.08532,
+   "spy_return": 0.12087,
+   "decisions": 165,
+   "decision_excess_5d": -0.001321,
+   "decision_excess_5d_t": -0.37099,
+   "decision_hit_rate_5d": 0.50303,
+   "buy_excess_5d": -0.004805,
+   "buy_excess_5d_t": -0.80491,
+   "sell_avoided_5d": 0.001121,
+   "sell_avoided_5d_t": 0.273711,
+   "decision_ic": 0.006649,
+   "decision_ic_t": 0.31338,
+   "holdings_ic": -0.018027,
+   "holdings_ic_t": -0.692922,
+   "alpha_annual": 0.014971,
+   "alpha_t": 0.172936,
+   "capm_alpha_annual": -0.005549,
+   "capm_alpha_t": -0.062013,
+   "beta_market": 0.700496,
+   "beta_size": 0.037292,
+   "beta_growth": -0.10798,
+   "beta_momentum": 0.090757,
+   "r2": 0.619227,
+   "exposure_return_annual": 0.052742,
+   "news_decision_share": 0.220238,
+   "news_entry_pnl": 2183.903714,
+   "best_trade_share": 0.537513,
+   "return_without_best_trade": 0.044161,
+   "concentrated": true
+  },
+  "findings": [
+   "Buys: over the five trading days from the fill, the stocks it bought trailed SPY by 0.48% on average (68 buys, 46% of them ahead of SPY; t = -0.8, within noise).",
+   "Sells: over the five trading days from the fill, the stocks it sold lagged SPY by 0.11%, so selling avoided that (97 sells; t = 0.3, within noise).",
+   "Decision IC: on the 43 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.007 with the next five days' returns (IC IR 0.05, t = 0.3, within noise).",
+   "Holdings IC: the weights it held after each of 43 decision days had a mean rank IC of -0.018 with the next five days' returns (t = -0.7, within noise).",
+   "Factor exposures: market 0.70 (t 10.9), size 0.04 (t 0.7), growth -0.11 (t -1.3), momentum 0.09 (t 3.4); together they explain 62% of the daily variation (R²).",
+   "Of the +6.8% a year it earned over T-bills (arithmetic mean): market +7.5%, momentum -2.1%, growth -0.3%, size +0.1%; the alpha left is +1.5% a year (t = 0.2, within noise).",
+   "Verdict: most of the return is factor exposure (+5.3% a year, market above all); the alpha left is not significant.",
+   "P&L: +$8,579 in all, +$7,746 from 39 positions and +$834 of interest on idle cash.",
+   "By holding period: 61+ days made the most (+$17,424, 15 positions); 21-60 days the least (-$3,574, 10 positions).",
+   "By sector: Technology made the most (+$4,422, 10 positions); Communication Services the least (-$2,395, 4 positions).",
+   "By stock: CSCO made the most (+$4,163, 1 position); NVDA the least (-$1,672, 2 positions).",
+   "By market regime of the previous close: risk-on 96 days -1.0% (SPY +2.0%); neutral 18 days +1.9% (SPY +4.5%); uncertain 97 days +7.3% (SPY +4.8%); risk-off 6 days +0.3% (SPY +0.3%).",
+   "News: 13 positions opened on news made +$2,184, the other 26 +$5,562; 1 positions closed on news made -$1,077; over the five days from the fill, news-triggered buys trailed SPY by 0.53% (t -0.4).",
+   "Concentration: the gains are spread out (the best two positions made 32% of them) but winners and losers nearly cancel, so the best two made 91% of the net P&L; the best was CSCO bought 2026-01-27 and sold 2026-07-21, +$4,163. Had the best position made nothing, the run would have returned +4.4% instead of +8.6%."
+  ],
+  "decisions": {
+   "horizons": [
+    1,
+    5,
+    20
+   ],
+   "buys": {
+    "1d": {
+     "n": 68,
+     "mean": -0.001179,
+     "median": -0.001059,
+     "hit_rate": 0.411765,
+     "se": 0.001374,
+     "t": -0.858286,
+     "t_iid": -0.735645
+    },
+    "5d": {
+     "n": 68,
+     "mean": -0.004805,
+     "median": -0.0072,
+     "hit_rate": 0.455882,
+     "se": 0.00597,
+     "t": -0.80491,
+     "t_iid": -0.822767
+    },
+    "20d": {
+     "n": 66,
+     "mean": -0.011619,
+     "median": -0.005674,
+     "hit_rate": 0.484848,
+     "se": 0.00886,
+     "t": -1.311415,
+     "t_iid": -1.045272
+    }
+   },
+   "sells": {
+    "1d": {
+     "n": 100,
+     "mean": -0.000403,
+     "median": -0.00156,
+     "hit_rate": 0.46,
+     "se": 0.001536,
+     "t": -0.262657,
+     "t_iid": -0.271275
+    },
+    "5d": {
+     "n": 97,
+     "mean": 0.001121,
+     "median": 0.002353,
+     "hit_rate": 0.536082,
+     "se": 0.004094,
+     "t": 0.273711,
+     "t_iid": 0.272855
+    },
+    "20d": {
+     "n": 91,
+     "mean": 0.001358,
+     "median": 0.009065,
+     "hit_rate": 0.527473,
+     "se": 0.014267,
+     "t": 0.095158,
+     "t_iid": 0.128176
+    }
+   },
+   "all": {
+    "1d": {
+     "n": 168,
+     "mean": -0.000717,
+     "median": -0.00153,
+     "hit_rate": 0.440476,
+     "se": 0.001022,
+     "t": -0.702158,
+     "t_iid": -0.655427
+    },
+    "5d": {
+     "n": 165,
+     "mean": -0.001321,
+     "median": 0.00079,
+     "hit_rate": 0.50303,
+     "se": 0.003562,
+     "t": -0.37099,
+     "t_iid": -0.387983
+    },
+    "20d": {
+     "n": 157,
+     "mean": -0.004098,
+     "median": 0.003633,
+     "hit_rate": 0.509554,
+     "se": 0.007648,
+     "t": -0.535755,
+     "t_iid": -0.53157
+    }
+   },
+   "by_trigger": {
+    "news": {
+     "buys": {
+      "n": 25,
+      "mean": -0.005283,
+      "median": -0.006234,
+      "hit_rate": 0.48,
+      "se": 0.01236,
+      "t": -0.427458,
+      "t_iid": -0.422297
+     },
+     "sells": {
+      "n": 12,
+      "mean": 0.002577,
+      "median": 0.012411,
+      "hit_rate": 0.666667,
+      "se": 0.017708,
+      "t": 0.145503,
+      "t_iid": 0.136808
+     }
+    },
+    "other": {
+     "buys": {
+      "n": 43,
+      "mean": -0.004527,
+      "median": -0.009127,
+      "hit_rate": 0.44186,
+      "se": 0.005719,
+      "t": -0.791563,
+      "t_iid": -0.775982
+     },
+     "sells": {
+      "n": 85,
+      "mean": 0.000915,
+      "median": 0.000984,
+      "hit_rate": 0.517647,
+      "se": 0.003804,
+      "t": 0.240573,
+      "t_iid": 0.232901
+     }
+    }
+   },
+   "counts": {
+    "news": {
+     "buys": 25,
+     "sells": 12
+    },
+    "other": {
+     "buys": 43,
+     "sells": 88
+    }
+   }
+  },
+  "ic": {
+   "horizon_days": 5,
+   "universe": 56,
+   "decision_days": "the policy's steps (policy_log.json)",
+   "decision": {
+    "score": "+1 bought, -1 sold, 0 left alone, on each day it traded",
+    "days": 43,
+    "mean": 0.006649,
+    "std": 0.139133,
+    "ir": 0.04779,
+    "t": 0.31338,
+    "t_iid": 0.31338,
+    "positive_share": 0.418605
+   },
+   "holdings": {
+    "score": "the weights it held after each decision (0 for stocks not held)",
+    "days": 43,
+    "mean": -0.018027,
+    "std": 0.170596,
+    "ir": -0.10567,
+    "t": -0.692922,
+    "t_iid": -0.692922,
+    "positive_share": 0.488372
+   }
+  },
+  "factors": {
+   "days": 216,
+   "factors": {
+    "market": "Market (SPY - BIL)",
+    "size": "Size (IWM - SPY)",
+    "growth": "Growth (QQQ - SPY)",
+    "momentum": "Momentum (top - bottom third)"
+   },
+   "lags": 4,
+   "alpha_annual": 0.014971,
+   "alpha_t": 0.172936,
+   "exposures": {
+    "market": {
+     "beta": 0.700496,
+     "t": 10.91064
+    },
+    "size": {
+     "beta": 0.037292,
+     "t": 0.719302
+    },
+    "growth": {
+     "beta": -0.10798,
+     "t": -1.304658
+    },
+    "momentum": {
+     "beta": 0.090757,
+     "t": 3.439325
+    }
+   },
+   "r2": 0.619227,
+   "adj_r2": 0.612009,
+   "resid_vol_annual": 0.077896,
+   "factor_means_annual": {
+    "market": 0.107444,
+    "size": 0.033241,
+    "growth": 0.024301,
+    "momentum": -0.232899
+   },
+   "contributions_annual": {
+    "market": 0.075264,
+    "size": 0.00124,
+    "growth": -0.002624,
+    "momentum": -0.021137,
+    "alpha": 0.014971
+   },
+   "excess_return_annual": 0.067713,
+   "capm": {
+    "beta": 0.681861,
+    "beta_t": 12.870682,
+    "alpha_annual": -0.005549,
+    "alpha_t": -0.062013,
+    "r2": 0.590101
+   }
+  },
+  "pnl": {
+   "total": 8579.476668,
+   "reconciliation": {
+    "stocks": 7745.6716,
+    "tbill_etfs": 0.0,
+    "cash_interest": 833.805027,
+    "other": 4.1e-05
+   },
+   "positions": 39,
+   "by_holding_period": [
+    {
+     "group": "3-5 days",
+     "pnl": -2872.825851,
+     "contribution": -0.028728,
+     "share": -0.370894,
+     "trades": 6,
+     "win_rate": 0.0,
+     "avg_pnl": -478.804308,
+     "still_open": 0
+    },
+    {
+     "group": "6-10 days",
+     "pnl": -2114.763727,
+     "contribution": -0.021148,
+     "share": -0.273025,
+     "trades": 3,
+     "win_rate": 0.0,
+     "avg_pnl": -704.921242,
+     "still_open": 0
+    },
+    {
+     "group": "11-20 days",
+     "pnl": -1117.064961,
+     "contribution": -0.011171,
+     "share": -0.144218,
+     "trades": 5,
+     "win_rate": 0.2,
+     "avg_pnl": -223.412992,
+     "still_open": 1
+    },
+    {
+     "group": "21-60 days",
+     "pnl": -3573.780341,
+     "contribution": -0.035738,
+     "share": -0.461391,
+     "trades": 10,
+     "win_rate": 0.3,
+     "avg_pnl": -357.378034,
+     "still_open": 3
+    },
+    {
+     "group": "61+ days",
+     "pnl": 17424.10648,
+     "contribution": 0.174241,
+     "share": 2.249528,
+     "trades": 15,
+     "win_rate": 0.8,
+     "avg_pnl": 1161.607099,
+     "still_open": 6
+    }
+   ],
+   "by_regime": [
+    {
+     "group": "RISK_ON",
+     "label": "risk-on",
+     "days": 96,
+     "share_of_days": 0.442396,
+     "pnl": -918.386329,
+     "contribution": -0.009184,
+     "share": -0.107045,
+     "return": -0.009611,
+     "spy_return": 0.020141,
+     "avg_exposure": 0.742421
+    },
+    {
+     "group": "NEUTRAL",
+     "label": "neutral",
+     "days": 18,
+     "share_of_days": 0.082949,
+     "pnl": 1971.401083,
+     "contribution": 0.019714,
+     "share": 0.229781,
+     "return": 0.018549,
+     "spy_return": 0.045347,
+     "avg_exposure": 0.76656
+    },
+    {
+     "group": "UNCERTAIN",
+     "label": "uncertain",
+     "days": 97,
+     "share_of_days": 0.447005,
+     "pnl": 7264.020711,
+     "contribution": 0.07264,
+     "share": 0.846674,
+     "return": 0.073493,
+     "spy_return": 0.047773,
+     "avg_exposure": 0.749608
+    },
+    {
+     "group": "RISK_OFF",
+     "label": "risk-off",
+     "days": 6,
+     "share_of_days": 0.02765,
+     "pnl": 262.441203,
+     "contribution": 0.002624,
+     "share": 0.030589,
+     "return": 0.002676,
+     "spy_return": 0.003154,
+     "avg_exposure": 0.726218
+    }
+   ],
+   "by_trigger": {
+    "entry": [
+     {
+      "group": "news",
+      "pnl": 2183.903714,
+      "contribution": 0.021839,
+      "share": 0.281951,
+      "trades": 13,
+      "win_rate": 0.307692,
+      "avg_pnl": 167.992593,
+      "still_open": 3
+     },
+     {
+      "group": "other",
+      "pnl": 5561.767886,
+      "contribution": 0.055618,
+      "share": 0.718049,
+      "trades": 26,
+      "win_rate": 0.461538,
+      "avg_pnl": 213.914149,
+      "still_open": 7
+     }
+    ],
+    "exit": [
+     {
+      "group": "news",
+      "pnl": -1076.553528,
+      "contribution": -0.010766,
+      "share": -0.138988,
+      "trades": 1,
+      "win_rate": 0.0,
+      "avg_pnl": -1076.553528,
+      "still_open": 0
+     },
+     {
+      "group": "other",
+      "pnl": -165.794285,
+      "contribution": -0.001658,
+      "share": -0.021405,
+      "trades": 28,
+      "win_rate": 0.285714,
+      "avg_pnl": -5.921224,
+      "still_open": 0
+     },
+     {
+      "group": "still open",
+      "pnl": 8988.019413,
+      "contribution": 0.08988,
+      "share": 1.160393,
+      "trades": 10,
+      "win_rate": 0.8,
+      "avg_pnl": 898.801941,
+      "still_open": 10
+     }
+    ]
+   },
+   "by_sector": [
+    {
+     "group": "Technology",
+     "pnl": 4422.225254,
+     "contribution": 0.044222,
+     "share": 0.570929,
+     "trades": 10,
+     "win_rate": 0.5,
+     "avg_pnl": 442.222525,
+     "still_open": 3
+    },
+    {
+     "group": "Health Care",
+     "pnl": 2071.080654,
+     "contribution": 0.020711,
+     "share": 0.267386,
+     "trades": 7,
+     "win_rate": 0.571429,
+     "avg_pnl": 295.868665,
+     "still_open": 3
+    },
+    {
+     "group": "Financials",
+     "pnl": 1574.556398,
+     "contribution": 0.015746,
+     "share": 0.203282,
+     "trades": 4,
+     "win_rate": 0.5,
+     "avg_pnl": 393.6391,
+     "still_open": 2
+    },
+    {
+     "group": "Consumer Staples",
+     "pnl": 423.619132,
+     "contribution": 0.004236,
+     "share": 0.054691,
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_pnl": 423.619132,
+     "still_open": 0
+    },
+    {
+     "group": "Consumer Discretionary",
+     "pnl": -262.605005,
+     "contribution": -0.002626,
+     "share": -0.033903,
+     "trades": 4,
+     "win_rate": 0.25,
+     "avg_pnl": -65.651251,
+     "still_open": 1
+    },
+    {
+     "group": "Communication Services",
+     "pnl": -2395.362737,
+     "contribution": -0.023954,
+     "share": -0.309252,
+     "trades": 4,
+     "win_rate": 0.0,
+     "avg_pnl": -598.840684,
+     "still_open": 1
+    }
+   ],
+   "by_stock": [
+    {
+     "group": "CSCO",
+     "pnl": 4163.395598,
+     "contribution": 0.041634,
+     "share": 0.537513,
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_pnl": 4163.395598,
+     "still_open": 0
+    },
+    {
+     "group": "MSFT",
+     "pnl": 2862.933678,
+     "contribution": 0.028629,
+     "share": 0.369617,
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_pnl": 2862.933678,
+     "still_open": 1
+    },
+    {
+     "group": "V",
+     "pnl": 1969.046828,
+     "contribution": 0.01969,
+     "share": 0.254213,
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_pnl": 1969.046828,
+     "still_open": 1
+    },
+    {
+     "group": "META",
+     "pnl": -1124.079051,
+     "contribution": -0.011241,
+     "share": -0.145124,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -1124.079051,
+     "still_open": 0
+    },
+    {
+     "group": "QCOM",
+     "pnl": -1444.697946,
+     "contribution": -0.014447,
+     "share": -0.186517,
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_pnl": -1444.697946,
+     "still_open": 0
+    },
+    {
+     "group": "NVDA",
+     "pnl": -1671.500737,
+     "contribution": -0.016715,
+     "share": -0.215798,
+     "trades": 2,
+     "win_rate": 0.0,
+     "avg_pnl": -835.750368,
+     "still_open": 1
+    }
+   ],
+   "best_trades": [
+    {
+     "symbol": "CSCO",
+     "sector": "Technology",
+     "entry": "2026-01-27",
+     "exit": "2026-07-21",
+     "holding_days": 120,
+     "pnl": 4163.395598,
+     "return": 0.285823,
+     "open": false,
+     "entry_reason": "Evercore upgrade to Outperform with $100 PT; RSI 58, above all EMAs, strong 1d/5d momentum",
+     "exit_reason": "Weak momentum: -7.2% 5d, -5.3% 21d, below EMAs, only +2.4% gain after 119 days"
+    },
+    {
+     "symbol": "MSFT",
+     "sector": "Technology",
+     "entry": "2026-07-21",
+     "exit": null,
+     "holding_days": 80,
+     "pnl": 2862.933678,
+     "return": 0.158518,
+     "open": true,
+     "entry_reason": "AMD partnership, AI momentum, +6.2% 21d, above EMAs, positive news flow",
+     "exit_reason": null
+    },
+    {
+     "symbol": "V",
+     "sector": "Financials",
+     "entry": "2026-07-14",
+     "exit": null,
+     "holding_days": 85,
+     "pnl": 1969.046828,
+     "return": 0.169038,
+     "open": true,
+     "entry_reason": "Strong momentum, near 52w high, RSI 66, above all EMAs, financials earnings season tailwind",
+     "exit_reason": null
+    }
+   ],
+   "worst_trades": [
+    {
+     "symbol": "AMZN",
+     "sector": "Consumer Discretionary",
+     "entry": "2026-01-12",
+     "exit": "2026-02-25",
+     "holding_days": 30,
+     "pnl": -1453.095158,
+     "return": -0.113508,
+     "open": false,
+     "entry_reason": "Strong momentum ret_5d +9.2%, ret_21d +8.5%, RSI 69, near 52w high, positive news flow including pharmacy expansion",
+     "exit_reason": "Down 12% after 29 days, below EMA20/50/200, weak trend in uncertain market"
+    },
+    {
+     "symbol": "QCOM",
+     "sector": "Technology",
+     "entry": "2026-06-22",
+     "exit": "2026-07-07",
+     "holding_days": 10,
+     "pnl": -1444.697946,
+     "return": -0.15483,
+     "open": false,
+     "entry_reason": "+6.17% today, +11.4% 5d, +16% 21d, positive news on Tenstorrent deal, RSI14=55 not overbought",
+     "exit_reason": "Down 16% in 9 days, -25% in 21d, well below EMAs, stop-loss"
+    },
+    {
+     "symbol": "NVDA",
+     "sector": "Technology",
+     "entry": "2026-05-07",
+     "exit": null,
+     "holding_days": 130,
+     "pnl": -1185.592285,
+     "return": -0.062084,
+     "open": true,
+     "entry_reason": "+5.8% today, near 52w high, strong AI demand, solid technicals, RSI 61 not overbought",
+     "exit_reason": null
+    }
+   ],
+   "concentration": {
+    "trades": 39,
+    "best_trade": {
+     "symbol": "CSCO",
+     "sector": "Technology",
+     "entry": "2026-01-27",
+     "exit": "2026-07-21",
+     "holding_days": 120,
+     "pnl": 4163.395598,
+     "return": 0.285823,
+     "open": false,
+     "entry_reason": "Evercore upgrade to Outperform with $100 PT; RSI 58, above all EMAs, strong 1d/5d momentum",
+     "exit_reason": "Weak momentum: -7.2% 5d, -5.3% 21d, below EMAs, only +2.4% gain after 119 days"
+    },
+    "best_trade_share": 0.537513,
+    "top2_share": 0.90713,
+    "best_trade_share_of_gains": 0.187702,
+    "top2_share_of_gains": 0.316774,
+    "best_stock": "CSCO",
+    "best_stock_share": 0.537513,
+    "return": 0.085795,
+    "return_without_best_trade": 0.044161,
+    "return_without_top2": 0.015531,
+    "concentrated": true
+   }
+  }
+ },
+ "memory": null,
+ "usage": {
+  "calls": 44,
+  "input_tokens": 539491,
+  "output_tokens": 37839,
+  "failed": 0,
+  "seconds": 627.5,
+  "list_price_usd": 2.1861
+ },
+ "steps": 44,
+ "submitted": "2026-11-13",
+ "submitter": "Risk-Aware Trading Agents maintainers",
+ "notes": null,
+ "replies": [
+  {
+   "orders": [
+    {
+     "symbol": "GS",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum: +12.2% 21d, RSI 65, near 52w high, above all EMAs, financials sector strength in RISK_ON regime"
+    },
+    {
+     "symbol": "GE",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong trend: +11% 21d, RSI 65, near 52w high, well above EMA200 (+20%), industrials momentum"
+    },
+    {
+     "symbol": "RTX",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum: +10.9% 21d, RSI 67, near 52w high, above all EMAs, defense/industrials strength"
+    },
+    {
+     "symbol": "MRK",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong trend: +6.3% 21d, RSI 68, near 52w high, well above EMA200 (+18.6%), healthcare defensive quality"
+    },
+    {
+     "symbol": "XOM",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Energy momentum: +6.3% 21d, RSI 65, near 52w high, above all EMAs, energy sector tailwind"
+    },
+    {
+     "symbol": "CVX",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Energy strength: +3.8% 21d, RSI 64, near 52w high, above all EMAs, pairs well with XOM energy exposure"
+    },
+    {
+     "symbol": "LLY",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Healthcare leader: +3.3% 21d, RSI 64, near 52w high, above EMA200 (+24.5%), GLP-1 secular growth"
+    },
+    {
+     "symbol": "TMO",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong trend: +2.2% 21d, RSI 62, near 52w high, above all EMAs, healthcare tools quality"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "AI leader: +4.1% 21d, RSI 56, above all EMAs, above EMA200 (+13.6%), RISK_ON favors semis"
+    },
+    {
+     "symbol": "WMT",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Steady trend: above all EMAs, RSI 54, near 52w high, defensive quality with growth characteristics"
+    }
+   ],
+   "note": "First deployment: fully invested across 10 positions in RISK_ON regime (VIX 14.5, fear/greed 73, breadth 82%). Selected stocks with strong 21d momentum, near 52w highs, above key EMAs, and diversified across Financials, Industrials, Energy, Healthcare, and Technology. Avoided TSLA (confirmed negative 8-K, delivery miss), MSFT (antitrust investigation), ADBE/INTU/NOW (deep downtrends below EMA200), and NFLX (RSI 29, -32% off high)."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "NVDA",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Weakest position at -3.6%, momentum negative on 5d and flat 21d despite RISK_ON; better opportunities available"
+    },
+    {
+     "symbol": "CVX",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down -2.2% in portfolio; energy sector facing headwinds with falling oil price warnings from XOM; rotating to stronger momentum"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum ret_5d +9.2%, ret_21d +8.5%, RSI 69, near 52w high, positive news flow including pharmacy expansion"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum ret_5d +4.3%, ret_21d +3.6%, near 52w high, positive analyst upgrades, escaped EU regulation headwinds"
+    }
+   ],
+   "note": "RISK_ON market with strong breadth. Rotating out of two underperformers (NVDA weak momentum, CVX energy headwinds) into AMZN and GOOGL which show strong price momentum and are near 52-week highs. Remaining 8 positions held as they show solid fundamentals and positive trends."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "RTX",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0.0,
+     "reason": "RSI2=99, RSI14=77, near 52w high after +7.75% gain; trim overbought position to free capital"
+    },
+    {
+     "symbol": "AVGO",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0.0,
+     "reason": "Wells Fargo upgrade to Overweight PT $430, confirmed 8-K filing, neutral RSI, above EMA200 with room to run"
+    }
+   ],
+   "note": "Risk-on environment supports staying invested. Trimming RTX after strong run (RSI2=99, near 52w high). Adding AVGO on analyst upgrade with confirmed filing. Portfolio remains fully deployed across 10 positions with diversified sector exposure."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "GE",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Cut -8.9% loss; weak 5d/21d returns, below EMAs, no near-term catalyst"
+    },
+    {
+     "symbol": "XOM",
+     "action": "target",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Trim overbought position: RSI 73, RSI2 89, +7.6% gain; lock in partial profit ahead of FOMC"
+    },
+    {
+     "symbol": "RTX",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Bring underweight position to full weight; +3.6% gain, strong trend, earnings preview upcoming"
+    },
+    {
+     "symbol": "CSCO",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Evercore upgrade to Outperform with $100 PT; RSI 58, above all EMAs, strong 1d/5d momentum"
+    },
+    {
+     "symbol": "META",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong 5d momentum +8.4%, Rothschild upgrade to Buy/$900 PT, RSI 60, above EMAs, earnings this week"
+    }
+   ],
+   "note": "Exiting GE on sustained loss and weak technicals; trimming overbought XOM; deploying into CSCO (strong upgrade) and META (momentum + upgrade); filling RTX to full weight. FOMC proximity keeps overall risk moderate."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "TMO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Weakest position: -2.1% gain, RSI 39, below EMA20 and EMA50, no near-term catalyst, underperforming peers"
+    },
+    {
+     "symbol": "CAT",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum: +20.9% 21d, near 52w high, RSI 70, JP Morgan overweight with $765 PT, industrials sector strength"
+    }
+   ],
+   "note": "Rotating out of TMO (health care laggard below key EMAs) into CAT (industrial momentum leader near 52w high). Rest of portfolio held: RISK_ON regime supports current winners WMT, XOM, MRK, RTX, GOOGL. AMZN and LLY kept despite small losses given positive catalysts and neutral-to-improving technicals."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "XOM",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "RSI 79, +20.7% gain, near 52w high, very overbought - trim to lock in gains"
+    },
+    {
+     "symbol": "CSCO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.3,
+     "reason": "RSI 75.67, +12.4% gain, vs_ema20 +9%, overbought - trim position"
+    },
+    {
+     "symbol": "CAT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.25,
+     "reason": "RSI 73.48, +6.8% gain, near 52w high, overbought - partial trim"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "target",
+     "weight": 0.11,
+     "fraction": 0,
+     "reason": "RSI 27.84, RSI2 1.1 - deeply oversold; add to position with proceeds from trims"
+    }
+   ],
+   "note": "Trimming overbought winners (XOM, CSCO, CAT) and adding to oversold AMZN. Risk score elevated at 7.5 with VIX backwardation - keeping overall exposure roughly flat. Holding LLY given positive news catalyst (acquisition + PT raise)."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "CAT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "RSI 70+ overbought, +10% gain in 9 days, trim to lock in profits in uncertain regime"
+    },
+    {
+     "symbol": "TMO",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "RSI 20.5, RSI2 1.1 - extreme oversold; high-quality healthcare name with mean-reversion potential"
+    }
+   ],
+   "note": "Trimming overbought CAT to raise cash slightly; adding TMO on extreme oversold signal. Holding AMZN and GOOGL as both show deeply oversold RSI with potential for bounce. Market in fear/uncertain regime - keeping overall exposure moderate."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AMZN",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 12% after 29 days, below EMA20/50/200, weak trend in uncertain market"
+    },
+    {
+     "symbol": "MRK",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "RSI2 at 99.47 extremely overbought, +15.75% gain, trim to lock in profits"
+    },
+    {
+     "symbol": "AMD",
+     "action": "buy",
+     "weight": 0.1,
+     "reason": "Confirmed 8-K AI partnership with Meta, +8.77% today, strong catalyst"
+    },
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.09,
+     "reason": "Above all EMAs, positive manufacturing news, strong 21d momentum +9.8%"
+    }
+   ],
+   "note": "Rotating out of weak AMZN position and trimming overbought MRK into AMD (confirmed AI catalyst) and AAPL (strong trend). Market uncertain but breadth strong; maintaining defensive tilt with WMT, XOM, RTX, CAT holdings."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AMD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 11% in 4 days, deeply below all EMAs, RSI 37.5, high ATR in uncertain market — cut loss"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 6.9% over 34 days, below EMA20/50, weak momentum — reduce exposure"
+    },
+    {
+     "symbol": "GS",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 5.2% over 39 days, below EMA20/50, financials under pressure in uncertain regime"
+    },
+    {
+     "symbol": "WMT",
+     "action": "target",
+     "weight": 0.12,
+     "fraction": 0,
+     "reason": "Strong trend, +13.3% gain, above all EMAs, defensive consumer staples in fearful market"
+    },
+    {
+     "symbol": "RTX",
+     "action": "target",
+     "weight": 0.12,
+     "fraction": 0,
+     "reason": "Defense hitting all-time highs, +8.4% gain, strong geopolitical tailwinds, above all EMAs"
+    }
+   ],
+   "note": "Trimming losers AMD (full), GOOGL and GS (half) in uncertain/fear market. Slightly increasing winners WMT and RTX which show strong trends and defensive characteristics. Keeping elevated cash given VIX 23.6 and extreme fear reading."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "GS",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 8.4%, financials sector weak broadly, below all key EMAs, uncertain macro ahead of CPI"
+    },
+    {
+     "symbol": "LLY",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "Down 6.2%, below EMA20/50, weak health care momentum, trim to reduce risk"
+    },
+    {
+     "symbol": "HON",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong technicals: above EMA20/50/200, near 52w high, RSI 56, defensive industrials"
+    },
+    {
+     "symbol": "JNJ",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Strong technicals: above all EMAs, near 52w high, RSI 59, defensive health care with strong trend"
+    }
+   ],
+   "note": "Trimming underperformers GS and LLY ahead of CPI; rotating into defensive names HON and JNJ with strong technical setups. Maintaining elevated cash (~30%) given uncertain regime, elevated VIX, and fear sentiment."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "LLY",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "HSBC downgrade to Reduce, analyst flags overhyped obesity drug expectations, -12.9% loss, high volume selloff today (-5.9%), strong negative momentum"
+    },
+    {
+     "symbol": "GS",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "-11.3% loss, below all EMAs, weak financials sector, small position not worth holding through FOMC uncertainty"
+    },
+    {
+     "symbol": "XOM",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Trim profit: +27.6% gain, RSI2 at 97 (extremely overbought), near 52w high; reduce but keep core position given energy strength"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Positive momentum, AWS AI growth narrative confirmed, above EMA20, neutral RSI, diversifies into consumer discretionary/tech"
+    }
+   ],
+   "note": "Cut LLY and GS as clear losers with negative catalysts. Trim XOM after exceptional run (RSI2=97). Add AMZN on AI/AWS strength. Maintain ~30% cash ahead of FOMC and PPI events in uncertain regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "GOOGL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Persistent -10.8% loss after 49 days, RSI 33.7, RSI2 5.3, below all EMAs, no catalyst"
+    },
+    {
+     "symbol": "HON",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "-7.6% loss after 9 days, RSI 34, RSI2 17, below EMAs, risk-off environment hurts industrials"
+    },
+    {
+     "symbol": "XOM",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Trim overbought position: RSI 74.5, RSI2 98.6, near 52w high, lock in +29.6% gain partially"
+    },
+    {
+     "symbol": "BRK-B",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Defensive value holding, RSI2 2.1 deeply oversold, risk-off safe haven, Buffett cash-rich"
+    },
+    {
+     "symbol": "MCD",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Defensive consumer staple-like, RSI 29.9, RSI2 0.98 extremely oversold, near 52w support"
+    }
+   ],
+   "note": "Risk-off regime: exiting weak tech (GOOGL) and underperforming industrial (HON), trimming overbought XOM, adding defensive oversold names BRK-B and MCD. Maintaining cash buffer ~25% given VIX 27 and fear/greed 31."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "XOM",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 1.0,
+     "reason": "Trim XOM: RSI 72 overbought, +33% gain, vs_ema200 +33%, far extended in risk-off regime; lock in profits while keeping small position"
+    },
+    {
+     "symbol": "JNJ",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0.0,
+     "reason": "Defensive health care near 52w high, above EMA200 +20%, RSI 61, positive news flow, suits risk-off environment"
+    }
+   ],
+   "note": "Risk-off regime with VIX 25. Trimming extended XOM position to lock in 33% gains while it's overbought. Adding defensive JNJ which is near 52w highs with strong trend. Holding WMT, MRK, MCD, BRK-B as defensive anchors. Cash position remains healthy at ~26%."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "MCD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Weak trend: -7% 21d, below EMA20/50, RSI14=40, no catalyst; reallocate to stronger momentum"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "buy",
+     "weight": 0.08,
+     "reason": "Strong momentum (+10% 5d, +4% 1d), above all EMAs, AI product launches, positive news flow, RSI14=62 not overbought"
+    }
+   ],
+   "note": "Exiting MCD on persistent weakness and poor trend structure. Adding GOOGL on strong multi-timeframe momentum and AI tailwinds. Market breadth is healthy at 0.82 and risk score is moderate; maintaining ~20% cash buffer given UNCERTAIN regime. Core holdings WMT, MRK, RTX, CAT, CSCO all performing well — holding."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "BRK-B",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Negative gain, below all EMAs, RSI 40, weakest momentum in portfolio; no near-term catalyst"
+    },
+    {
+     "symbol": "AVGO",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Strong AI chip momentum, Meta partnership confirmed, RSI 77 with broad uptrend, near 52w high, positive news flow"
+    }
+   ],
+   "note": "RISK_ON regime with full breadth. Rotating out of BRK-B (laggard, below EMAs, negative return) into AVGO (AI semiconductor momentum, confirmed partnership news). Keeping 10 positions at full deployment. AMD/ORCL overbought short-term (RSI2 near 100) so avoiding. Existing winners AMZN, WMT, MRK, CAT held."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "RTX",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Earnings disappointment, -8.8% 5d, RSI 28 in downtrend, negative news score, price below EMA20/50"
+    },
+    {
+     "symbol": "XOM",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Wolfe downgrade, below EMA20, negative news score, weak 21d return -7.2%"
+    },
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Strong momentum +8.6% 21d, RSI 62 not overbought, near 52w high, RISK_ON regime, positive trend"
+    }
+   ],
+   "note": "Reducing RTX and XOM on weak earnings/downgrade signals; deploying into AAPL which shows solid momentum with reasonable RSI in a strong market. Portfolio remains near full investment in RISK_ON regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "RTX",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Persistent -10% loss after 79 days, RSI 26, deeply oversold with no recovery catalyst visible; reduce exposure"
+    },
+    {
+     "symbol": "JNJ",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 7.5% after 19 days, below all EMAs, weak health care sector momentum; trim to redeploy"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "Earnings tonight after close; lock in 22.9% gain, reduce binary event risk on sell-the-news risk at ATH"
+    },
+    {
+     "symbol": "V",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Confirmed earnings beat (8-K), +8.3% today, raised outlook, RSI 72 with strong momentum; post-earnings follow-through expected"
+    },
+    {
+     "symbol": "SBUX",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Confirmed earnings beat (8-K), +8.5% today, strong volume (3.9x), near 52w high; momentum continuation play"
+    }
+   ],
+   "note": "Deploying excess cash (27%) into post-earnings winners V and SBUX with confirmed results. Trimming AMZN ahead of tonight's earnings to lock in 22.9% gain. Reducing RTX and JNJ losers. FOMC nearby keeps overall risk moderate. GOOGL held as-is given earnings tonight."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "JNJ",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 8.6%, RSI 37, below all EMAs, weak health care trend, no catalyst"
+    },
+    {
+     "symbol": "RTX",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 8.1%, RSI 37, significantly below EMAs, -10.7% 21d return, no recovery signal"
+    },
+    {
+     "symbol": "XOM",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Small position, -9.3% 21d, below EMAs, energy sector weak, better opportunities elsewhere"
+    },
+    {
+     "symbol": "DIS",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Confirmed earnings beat today, +7.5% on high volume (2.9x), raised buyback, accelerating growth guidance"
+    },
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Near 52w high (-0.3%), strong momentum +13.4% 21d, RSI 69, beat-and-raise earnings, RISK_ON environment"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "+5.8% today, near 52w high, strong AI demand, solid technicals, RSI 61 not overbought"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "target",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Strong +28.6% 21d gain, near 52w high, add to winner in RISK_ON regime"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong +30.3% 21d, near 52w high, AI tailwinds, maintain full weight"
+    }
+   ],
+   "note": "Deploying excess cash (35%) in RISK_ON environment. Exiting three losers (JNJ, RTX, XOM) with weak technicals and no catalysts. Adding DIS on confirmed earnings beat, AAPL and NVDA on strong momentum near 52w highs. Trimming cash toward ~10-15% while keeping diversification across 10 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "DIS",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Negative gain after 4 days, weak momentum (ret_5d -2.9%), 15% off 52w high, underperforming in RISK_ON environment"
+    },
+    {
+     "symbol": "CSCO",
+     "action": "target",
+     "weight": 0.06,
+     "fraction": 0,
+     "reason": "Extremely overbought: RSI 78.9, RSI2 98, up 11% in 5 days, near 52w high, earnings preview risk; trim to lock in +32.6% gain"
+    },
+    {
+     "symbol": "AMD",
+     "action": "buy",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong momentum (+74% 21d, +5.7% 5d), RSI2 neutral at 50, Mizuho raised PT to $515, AI chip tailwinds, near 52w high"
+    }
+   ],
+   "note": "RISK_ON regime with strong breadth supports staying invested. Rotating out of weak DIS, trimming overbought CSCO ahead of earnings, adding AMD on strong momentum and analyst upgrades. Portfolio remains near fully invested."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "CSCO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "Trim after +49% gain; RSI 77, vs_ema20 +12.5%, extremely extended; lock in profits"
+    },
+    {
+     "symbol": "AMD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "Crowded trade sell warning in news; vs_ema50 +38%, vs_ema200 +88.5%; reduce overextended position"
+    },
+    {
+     "symbol": "MRK",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Only +6.3% after 94 days; underperforming; RSI 48, slight downtrend; redeploy capital"
+    },
+    {
+     "symbol": "GE",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Strong defense contracts, RBC outperform, RSI 54, rsi2 89 pulling back from strength; solid momentum"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "rsi2 25 short-term oversold in uptrend; +21.8% gain, strong fundamentals; add on dip"
+    }
+   ],
+   "note": "Risk-on market but fear/greed at 82 signals elevated sentiment. Taking profits on most extended positions (CSCO, AMD) and exiting underperformer (MRK). Adding GE on defense momentum and topping up GOOGL on short-term pullback. NVDA held through earnings given positive momentum."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "RSI14=80, RSI2=96, near 52w high - trim overbought position"
+    },
+    {
+     "symbol": "AMD",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "vs_ema200=+107%, RSI14=77, massively extended - reduce risk"
+    },
+    {
+     "symbol": "WMT",
+     "action": "target",
+     "weight": 0.06,
+     "fraction": 0,
+     "reason": "ret_5d=-9.1%, ret_21d=-6.6%, RSI14=33, clear downtrend - reduce"
+    },
+    {
+     "symbol": "LLY",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "ret_21d=+29%, near 52w high, strong pharma momentum, positive news"
+    },
+    {
+     "symbol": "GS",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Near 52w high, RSI68, strong financials momentum, IPO pipeline news positive"
+    }
+   ],
+   "note": "Risk-on environment with strong breadth. Trimming overbought AAPL/AMD and deteriorating WMT to fund LLY (GLP-1 momentum) and GS (financials strength). Portfolio stays fully invested with 10 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AVGO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Earnings-driven -12.6% drop today, below EMA20, elevated ATR; trim risk while still in gain"
+    },
+    {
+     "symbol": "CSCO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "RSI 79.76 overbought, +69% gain, near 52w high; lock in profits"
+    },
+    {
+     "symbol": "WMT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Weak trend: -9.8% 21d, below EMA20 and EMA50, CEO flagging fuel stress"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "-7.4% 5d, -7.2% 21d, below EMA20; weakening momentum"
+    },
+    {
+     "symbol": "LLY",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Strong momentum: +14% 21d, RSI 68, near 52w high, above all EMAs, positive news flow on GLP-1 expansion"
+    },
+    {
+     "symbol": "GS",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong momentum: +19% 21d, RSI 75, near 52w high, financials sector strength"
+    }
+   ],
+   "note": "Trimming AVGO post-earnings selloff, overbought CSCO, and weakening WMT/AMZN. Adding LLY and GS on strong momentum. Maintaining ~25% cash ahead of NFP tomorrow given UNCERTAIN regime and extreme greed reading."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "CSCO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Trim 50% after +58.6% gain in 94 days; extended vs EMA200 +44%, lock in profits"
+    },
+    {
+     "symbol": "CAT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "Trim 40% after +29.5% gain in 89 days; 5d ret -4.6%, reduce concentration"
+    },
+    {
+     "symbol": "AVGO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Exit: -2.4% gain after 39 days, weak trend, below EMA20 -6.9%, 21d ret -8%"
+    },
+    {
+     "symbol": "HON",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong investor day: 4-6% organic growth, 60bps+ margin expansion, 10%+ EPS growth targets; +6.4% today on high volume"
+    },
+    {
+     "symbol": "LLY",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Strong momentum +17.5% 21d, FDA approval for EBGLYSS extended dosing, near 52w high, RSI 70 but justified by fundamentals"
+    }
+   ],
+   "note": "Rotating out of extended winners (CSCO, CAT partial) and weak AVGO into HON (investor day catalyst) and LLY (FDA momentum). Market uncertain but breadth good; maintaining ~35% cash buffer given VIX 19 and fear/greed 42."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "CAT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "RSI2=97.74, vs_ema20=+7.8%, +42% gain - extremely overbought, trim to lock in profits"
+    },
+    {
+     "symbol": "GE",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "RSI2=97.16, vs_ema20=+8.6%, +19.7% in 19 days - overbought, partial profit-take"
+    },
+    {
+     "symbol": "WMT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "RSI2=4.75, -12.7% 21d, -4.6% 5d - persistent downtrend, weakest holding"
+    },
+    {
+     "symbol": "CSCO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "+55.6% gain over 99 days, small position - harvest gains, redeploy to better momentum"
+    },
+    {
+     "symbol": "QCOM",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "+6.17% today, +11.4% 5d, +16% 21d, positive news on Tenstorrent deal, RSI14=55 not overbought"
+    },
+    {
+     "symbol": "TXN",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "+6.95% today, +8.7% 5d, vs_ema200=+42.6%, strong semiconductor momentum"
+    },
+    {
+     "symbol": "AVGO",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "+4.7% today, confirmed 8-K, AI pipeline growth, RSI14=51 neutral, strong trend"
+    },
+    {
+     "symbol": "GS",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "+18.6% 21d, vs_ema50=+11.4%, near 52w high, financials sector strength, IPO pipeline catalyst"
+    }
+   ],
+   "note": "RISK_ON with OPEX nearby. Trimming overbought CAT/GE (RSI2 near 100), exiting weak WMT and harvesting CSCO gains. Deploying cash into semiconductor momentum (QCOM, TXN, AVGO) and financials strength (GS). Reduces cash from 37% toward ~15%."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "QCOM",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.75,
+     "reason": "Down 15% in 4 days, -16% 5d, high ATR 9.3%, below EMA20 by 10%, cut losses quickly"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 7.5%, -8.6% 5d, RSI 37, below both EMAs, AI monopoly narrative fading"
+    },
+    {
+     "symbol": "AAPL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.6,
+     "reason": "Data breach at supplier, Vision Pro chief leaving for OpenAI, -8.7% 21d, below EMAs"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 2% gain, -14.4% 21d, below EMA50, capex concerns and insider sales"
+    },
+    {
+     "symbol": "GS",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Dividend raise to $5/share confirmed, RSI 46, oversold 5d (-7%), strong financials sector"
+    },
+    {
+     "symbol": "LLY",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Near 52w high, +7.1% today, EMA CHMP approval, strong pipeline momentum, RSI 72 justified by fundamentals"
+    }
+   ],
+   "note": "Fear/greed at 30, UNCERTAIN regime - staying defensive with 40%+ cash. Cutting clear losers (QCOM, NVDA partial) and weak technicals (AAPL, AMZN partial). Adding GS on dividend catalyst and LLY on continued pharma momentum. Keeping strong industrials (CAT, GE, HON) and AMD which remains above EMAs."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "QCOM",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 16% in 9 days, -25% in 21d, well below EMAs, stop-loss"
+    },
+    {
+     "symbol": "GE",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "RSI2=98 extremely overbought, trim large gain after 29 days"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "RSI2=91 overbought, reduce from overweight position"
+    },
+    {
+     "symbol": "AAPL",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "RSI2=97 overbought, build to modest weight on pullback"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Adding on dip, -6% gain, RSI2=41 oversold, roadmap intact per news"
+    },
+    {
+     "symbol": "CSCO",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "Tiny position with +49% gain, add to meaningful weight"
+    },
+    {
+     "symbol": "TSLA",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Robotaxi Miami launch, strong 5d momentum +10.5%, RISK_ON regime"
+    },
+    {
+     "symbol": "BAC",
+     "action": "buy",
+     "weight": 0.06,
+     "fraction": 0,
+     "reason": "Near 52w high, strong trend, financials outperforming, RSI healthy"
+    },
+    {
+     "symbol": "DE",
+     "action": "buy",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "Strong uptrend, +8% 21d, above all EMAs, industrials momentum"
+    }
+   ],
+   "note": "Deploying excess cash (54%) into high-conviction positions. Cutting QCOM loss, trimming overbought GE/GOOGL/AAPL. Adding NVDA on dip, building CSCO, initiating TSLA on robotaxi catalyst, BAC on financial strength, DE on industrial momentum. Target ~25% cash."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "HON",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 4.6% in 19 days, below EMA20/50/200, weak industrials momentum, no catalyst"
+    },
+    {
+     "symbol": "TSLA",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 5.4% in 4 days, below EMA20/50, high volatility, weak near-term technicals"
+    },
+    {
+     "symbol": "V",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Strong momentum, near 52w high, RSI 66, above all EMAs, financials earnings season tailwind"
+    },
+    {
+     "symbol": "META",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong 21d return +15%, AI investment news positive, above EMA20/50, positive news sentiment"
+    }
+   ],
+   "note": "Exiting two underperformers (HON, TSLA) with negative returns and weak technicals. Deploying freed capital into V and META which show strong momentum and positive catalysts. Maintaining ~40% cash ahead of CPI event. Portfolio at max 10 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "CAT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Strong gain +24.9% but 21d momentum -9.4%, below EMA20/50, RSI 38 - trim weakness"
+    },
+    {
+     "symbol": "CSCO",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Weak momentum: -7.2% 5d, -5.3% 21d, below EMAs, only +2.4% gain after 119 days"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Underweight at 2.7%, positive trend, add to full position"
+    },
+    {
+     "symbol": "META",
+     "action": "target",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "BlackRock $12B data center financing positive, ad machine strong, add to target"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "target",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "AI theme intact, flat but RISK_ON regime supports adding to position"
+    },
+    {
+     "symbol": "MSFT",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "AMD partnership, AI momentum, +6.2% 21d, above EMAs, positive news flow"
+    },
+    {
+     "symbol": "MA",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "RSI 65, +11.2% 21d, above all EMAs, near 52w high, strong fintech trend"
+    }
+   ],
+   "note": "Deploying excess cash (44%) in RISK_ON regime. Exiting weak CSCO, trimming CAT. Adding MSFT and MA as new positions. Scaling up AMZN, META, NVDA to target weights. Portfolio moves toward ~10-12% cash reserve."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "CAT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "26% gain but 21d momentum -17%, weakening trend; trim to lock in partial profit ahead of FOMC"
+    },
+    {
+     "symbol": "META",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "RSI2 near zero (0.78), -9% position loss but earnings imminent; deeply oversold, add to position"
+    },
+    {
+     "symbol": "AMZN",
+     "action": "target",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "RSI2 at 2.4, RSI14 37, earnings approaching; oversold bounce + catalyst setup"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "RSI2 6.7, RSI14 42, oversold after -5% day; strong AI demand news, add to position"
+    },
+    {
+     "symbol": "NOW",
+     "action": "buy",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "Strong earnings reaction +6.9%, ServiceNow beat driving momentum; initiate small position"
+    }
+   ],
+   "note": "Deploying some of the 35% cash into oversold mega-cap tech ahead of earnings catalysts (META, AMZN, MSFT reporting this week). Trimming CAT which has strong gains but deteriorating 21d momentum. Adding NOW on post-earnings momentum. FOMC nearby keeps overall risk measured."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "MSFT",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Extremely overbought: RSI 78, rsi2 99, +25% in 5d, vs_ema20 +18.8%. Trim from 10.5% to lock in gains."
+    },
+    {
+     "symbol": "AMZN",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Very extended: +22.75% in 5d, RSI 72, rsi2 97.87, vs_ema20 +15%. Trim from 10.4% to reduce risk."
+    },
+    {
+     "symbol": "AAPL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Weak momentum: -9.9% in 5d, RSI 40, vs_ema20 -5.4%, below EMA50. Reduce exposure."
+    },
+    {
+     "symbol": "BRK-B",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong trend: RSI 67, near 52w high, vs_ema20 +2.6%, vs_ema200 +4.9%. Defensive quality in risk-on market."
+    },
+    {
+     "symbol": "RTX",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong momentum: RSI 71, vs_ema50 +10.5%, vs_ema200 +18.3%, near 52w high. Industrials/defense strength."
+    }
+   ],
+   "note": "Trimming overbought MSFT and AMZN after massive 5-day runs. Reducing weak AAPL. Deploying excess cash into BRK-B and RTX which show strong trends without being overextended. Portfolio remains fully invested in RISK_ON regime."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "META",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Below all EMAs, -11% 21d, legal headwinds from social media lawsuits, reduce exposure"
+    },
+    {
+     "symbol": "AAPL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.6,
+     "reason": "Jefferies downgrade to Underperform, below EMA20, weak 21d momentum, trim"
+    },
+    {
+     "symbol": "CAT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Tiny position, below EMA20/50, -11.9% 21d, poor momentum; redeploy capital"
+    },
+    {
+     "symbol": "MSFT",
+     "action": "target",
+     "weight": 0.12,
+     "fraction": 0,
+     "reason": "Strong momentum +31% 21d, positive news on Maia chip and price target raise, add to winner"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "target",
+     "weight": 0.12,
+     "fraction": 0,
+     "reason": "$500B AI financing deal news, BofA top pick, above EMAs, add on dip"
+    },
+    {
+     "symbol": "LLY",
+     "action": "buy",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Near 52w high, strong momentum +9.9% 5d, health care diversification, risk-on"
+    },
+    {
+     "symbol": "RTX",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "RSI 76.77 strong trend, +14.4% 21d, near 52w high, defense demand tailwinds, IBD buy signal"
+    }
+   ],
+   "note": "Deploying excess cash (37%) in risk-on environment. Trimming weak META and downgraded AAPL, closing tiny CAT position. Adding to MSFT and NVDA on AI momentum, initiating LLY and RTX as new high-momentum positions. Portfolio moves toward fuller deployment with 10 positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AAPL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Tiny position, below EMAs, US-China chip concerns, underperforming peers - exit to redeploy capital"
+    },
+    {
+     "symbol": "META",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.6,
+     "reason": "Addictive products trial starting tomorrow, -11.5% loss, below all EMAs, institutional exits - reduce exposure"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "target",
+     "weight": 0.04,
+     "fraction": 0,
+     "reason": "Institutional selling (Viking, Ackman exiting), below EMAs, trim to smaller position"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "target",
+     "weight": 0.15,
+     "fraction": 0,
+     "reason": "Confirmed 8-K material agreement, strong momentum, near 52w high, AI demand robust - increase"
+    },
+    {
+     "symbol": "GE",
+     "action": "target",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "New Air Force contract win, +23.8% gain, strong uptrend, near 52w high - add"
+    },
+    {
+     "symbol": "MSFT",
+     "action": "target",
+     "weight": 0.13,
+     "fraction": 0,
+     "reason": "Ackman raising bet, strong 21d momentum +22%, above all EMAs - add on pullback"
+    }
+   ],
+   "note": "Deploying excess cash (30%) in risk-on environment. Exiting weak AAPL, reducing META ahead of trial, trimming GOOGL on institutional selling. Adding to NVDA (confirmed 8-K), GE (contract), MSFT (institutional buying). Target cash ~15%."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "META",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 13%, below all EMAs, litigation overhang, persistent weakness over 29 days"
+    },
+    {
+     "symbol": "AMD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 9.7% over 5 days, -12.5% over 21 days, below EMAs, RSI 42 and weakening"
+    },
+    {
+     "symbol": "GE",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 7.5% over 5 days, below EMAs, RSI 39, industrial sector weakness"
+    },
+    {
+     "symbol": "MSFT",
+     "action": "target",
+     "weight": 0.16,
+     "fraction": 0,
+     "reason": "Strong trend, +27.9% 21d, above all EMAs, RSI 64, increase conviction position"
+    },
+    {
+     "symbol": "TMO",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "RSI 74, +10.6% 21d, near 52w high, strong health care momentum, above all EMAs"
+    },
+    {
+     "symbol": "ABBV",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Near 52w high, RSI 64, strong 5d and 21d momentum, above all EMAs"
+    }
+   ],
+   "note": "Risk-on regime with 30% cash is too conservative. Exiting META (persistent loser) and trimming AMD/GE (weak technicals). Deploying into MSFT (increase), TMO and ABBV (strong momentum, near highs). Holding NVDA through earnings in 2 days given extremely oversold RSI2 and positive hyperscaler commentary."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "MSFT",
+     "action": "target",
+     "weight": 0.12,
+     "fraction": 0,
+     "reason": "Trim from 16.4% - extended at RSI 68.7, +13% gain, reduce concentration risk while keeping core position"
+    },
+    {
+     "symbol": "GE",
+     "action": "sell",
+     "fraction": 0.5,
+     "weight": 0,
+     "reason": "Weakening trend: -6.8% over 21 days, below EMA20 and EMA50, RSI2 10.2 but structural downtrend concerning"
+    },
+    {
+     "symbol": "TMO",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Add to oversold position: RSI2 8.4, strong vs EMA50/200, +16.6% vs EMA200, short-term dip in uptrend"
+    },
+    {
+     "symbol": "LLY",
+     "action": "target",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Add slightly to extremely oversold position: RSI2 1.6, acquisition news positive catalyst, strong long-term trend"
+    }
+   ],
+   "note": "RISK_ON market with strong breadth. Trimming extended MSFT and halving weak GE position. Adding to oversold TMO and LLY which show mean-reversion setups. Portfolio stays fully invested with ~20% cash being partially deployed into quality names at short-term lows."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AMD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.35,
+     "reason": "RSI2=96 extremely overbought after +5.9% today; trim to lock in gains while maintaining exposure"
+    },
+    {
+     "symbol": "TSLA",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Cybercab launch catalyst, +12% 21d momentum, RSI 55 not overbought, RISK_ON regime supports"
+    },
+    {
+     "symbol": "GE",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "Confirmed $11.75B CPP acquisition (8-K filed), strategic supply chain expansion; increase from small 1.9% position"
+    }
+   ],
+   "note": "RISK_ON regime with 23% cash — deploying selectively. Trimming overbought AMD, adding TSLA on Cybercab momentum, and building GE on confirmed acquisition catalyst. LLY and ABBV extremely oversold (RSI2 <5) — holding for potential mean reversion. Avoiding QCOM/ORCL pre-earnings despite momentum."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "GE",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Deeply broken trend: -16.65% in 21d, -8.3% in 5d, RSI 27 with no recovery signal, -6.37% portfolio loss. Cut losses before further deterioration."
+    },
+    {
+     "symbol": "AMZN",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Deteriorating trend: -5.42% 21d, below EMA20 and EMA50, RSI 41. Trim to reduce exposure ahead of FOMC."
+    },
+    {
+     "symbol": "CVX",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Strong energy momentum: +9.8% 21d, RSI 71, near 52w high, above all EMAs. Iran supply squeeze supporting oil prices. Diversifies portfolio into energy."
+    }
+   ],
+   "note": "Uncertain regime with FOMC approaching. Cutting GE (broken trend, -6.37% loss) and trimming AMZN (weakening technicals). Adding CVX for energy momentum. Maintaining ~20% cash buffer ahead of FOMC. Core holdings MSFT, NVDA, TMO, V, ABBV, LLY remain intact."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AMD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "RSI2=99, RSI14=74, +41.5% gain, +23.7% in 5 days - extremely overbought; trim to lock in profits while keeping core position"
+    },
+    {
+     "symbol": "CVX",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Down 5.9% in only 4 days, energy sector weak, RSI2=3.7 but trend is down; cut loss and redeploy"
+    },
+    {
+     "symbol": "AAPL",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong momentum (+9.8% 21d), near 52w high, new AI Mac narrative, RSI14=67 not yet extreme, sector leadership"
+    },
+    {
+     "symbol": "MRK",
+     "action": "buy",
+     "weight": 0.06,
+     "fraction": 0,
+     "reason": "FDA approvals (WINREVAIR, KEYTRUDA), strong momentum vs_ema200=+25%, RSI14=63.6, near 52w high"
+    }
+   ],
+   "note": "Neutral market with greed sentiment. Trimming overbought AMD, exiting weak CVX. Deploying freed cash into AAPL (AI momentum) and MRK (FDA catalysts). Portfolio remains fully diversified across 10 positions with reduced cash drag."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AMD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Trim 50% of large gain (+37.8%); unconfirmed all-stock acquisition dilution risk and 8-K unregistered equity sale signal"
+    },
+    {
+     "symbol": "AAPL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.3,
+     "reason": "Trim on continued weakness (-3.5% in 4 days), below EMA20, restructuring uncertainty"
+    },
+    {
+     "symbol": "TMO",
+     "action": "target",
+     "weight": 0.09,
+     "fraction": 0,
+     "reason": "Slightly overbought (RSI 73.8), near 52w high; trim to reduce concentration while keeping core position"
+    },
+    {
+     "symbol": "META",
+     "action": "buy",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Strong momentum (+27.9% 21d), above all EMAs, positive news flow, deploy some cash"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "target",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Underweight vs peers; positive news sentiment, above EMA200, add to bring closer to default weight"
+    }
+   ],
+   "note": "Neutral market regime; trimming overbought/at-risk positions (AMD dilution, AAPL weakness, TMO overbought) and deploying cash into momentum leader META and underweight GOOGL. Maintaining core MSFT/NVDA/LLY/V/ABBV positions."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AMD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Extreme overbought: RSI2 94, RSI14 72, +47% gain in 99 days; trim to lock in profits"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.15,
+     "reason": "RSI2 98, RSI14 67, short-term overbought after strong run; partial trim"
+    },
+    {
+     "symbol": "MSFT",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.15,
+     "reason": "RSI2 98, RSI14 68, extended vs EMA20 +4.3%; partial trim to manage concentration"
+    },
+    {
+     "symbol": "LLY",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.4,
+     "reason": "Underperforming at -5.5% after 39 days; trim to reduce drag"
+    },
+    {
+     "symbol": "AVGO",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Strong AI chip momentum, $60B deal news, RSI2 94 but strong trend; diversifies chip exposure beyond NVDA/AMD"
+    }
+   ],
+   "note": "Trimming overbought positions (AMD, NVDA, MSFT) and underperformer (LLY) to raise cash and reduce risk. Adding AVGO for AI chip diversification. Market neutral with elevated risk score warrants caution on overextended names."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "V",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Near 52w high, strong momentum (ret_5d +6.9%, ret_21d +5.5%), RSI 74 overbought but trend intact; trim slightly from 9.5% to 10% target to stay at default weight"
+    },
+    {
+     "symbol": "MSFT",
+     "action": "target",
+     "weight": 0.1,
+     "fraction": 0,
+     "reason": "Strong performer +21% gain, RSI 71 elevated; trim from 11% to default 10% to lock in some gains ahead of CPI"
+    },
+    {
+     "symbol": "META",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "Strong momentum ret_21d +14.7%, near 52w high, positive AI news flow, RSI 66 not yet overbought; initiate position"
+    },
+    {
+     "symbol": "LLY",
+     "action": "target",
+     "weight": 0.05,
+     "fraction": 0,
+     "reason": "Down -4.7% since entry, near EMA20, RSI 50 neutral; hold at current weight, positive UK regulatory approval news"
+    }
+   ],
+   "note": "Market regime UNCERTAIN with VIX 15.27 and moderate fear/greed at 51. CPI event approaching warrants caution. Portfolio is well-diversified across 10 positions. Key actions: trim MSFT slightly (overweight at 11%), add META given strong AI momentum and near-52w-high strength, maintain other core positions. Cash at ~30% provides buffer ahead of CPI. AMD small position (+37% gain) held as it continues AI infrastructure theme."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "AMD",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 1.0,
+     "reason": "Tiny 0.5% position, weak momentum (-13% 21d, RSI 40), not worth holding"
+    },
+    {
+     "symbol": "NVDA",
+     "action": "target",
+     "weight": 0.08,
+     "fraction": 0,
+     "reason": "Trim from 11.9% to 8%; weak momentum (-5.3% 5d, RSI 41), concentration risk flagged"
+    },
+    {
+     "symbol": "ABBV",
+     "action": "target",
+     "weight": 0.06,
+     "fraction": 0,
+     "reason": "Trim from 7.2% to 6%; RSI 72, overbought after +10% 21d run, lock in some gains"
+    },
+    {
+     "symbol": "V",
+     "action": "target",
+     "weight": 0.12,
+     "fraction": 0,
+     "reason": "Increase from 10% to 12%; strong momentum (+10% 21d), near 52w high, positive news on AI payments"
+    },
+    {
+     "symbol": "BRK-B",
+     "action": "buy",
+     "weight": 0.07,
+     "fraction": 0,
+     "reason": "New position; strong momentum (+7.5% 21d), near 52w high, defensive quality in uncertain regime"
+    }
+   ],
+   "note": "Uncertain regime with fear sentiment (F&G 29). Reducing weak-momentum positions (AMD exit, NVDA/ABBV trim) and redeploying into strong-momentum quality names (V increase, BRK-B new). Cash remains ~25% as buffer given earnings season volatility ahead (MSFT, GOOGL, AMZN, META all reporting soon)."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "GOOGL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Weak technicals: below EMA20/50/200, RSI 34, -21% off 52w high, -2.9% gain after 139 days. Earnings risk with bears having technical advantage. Trim half to reduce risk ahead of FOMC."
+    }
+   ],
+   "note": "Trimming GOOGL on weak technicals and earnings uncertainty. Holding all other positions through FOMC. Cash buffer at ~30% after trim is appropriate given UNCERTAIN regime, fear/greed at 25, and FOMC proximity. MSFT and V earnings imminent but both have strong gains and good technicals - holding."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "GOOGL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Persistent -15% loss after 144 days, deeply below all EMAs, RSI 22 in downtrend, off 52w high -31%. Trim to reduce drag."
+    },
+    {
+     "symbol": "BRK-B",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.3,
+     "reason": "RSI2 at 95.6 and RSI14 at 75 after quick 9-day run. Overbought short-term; trim to lock in gains and manage risk."
+    }
+   ],
+   "note": "Uncertain regime with extreme fear (F&G 19.67). Trimming GOOGL on persistent underperformance and BRK-B on extreme short-term overbought conditions. Raising cash slightly is prudent given risk score 39.5 and weak sentiment. Core winners (V, MSFT, TMO, LLY, ABBV) held."
+  },
+  {
+   "orders": [
+    {
+     "symbol": "NVDA",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.5,
+     "reason": "Down 18.5%, -5.5% today on 3x volume, RSI 24, congressional subpoena risk, 10Y yield at 5% crushes high-multiple growth; reduce exposure significantly"
+    },
+    {
+     "symbol": "GOOGL",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.6,
+     "reason": "Persistent underperformance at -12.9%, below all EMAs, RSI 32, -18.5% over 21 days; no catalyst visible, trim to minimal position"
+    },
+    {
+     "symbol": "BRK-B",
+     "action": "sell",
+     "weight": 0,
+     "fraction": 0.3,
+     "reason": "RSI 78, overbought after +8% in 14 days, near 52-week high; lock in partial gains given uncertain macro with 10Y at 5%"
+    }
+   ],
+   "note": "Hot CPI pushing 10Y yield to 5% is a significant headwind for equities, especially growth. Trimming losers (NVDA, GOOGL) and overbought positions (BRK-B) to raise cash. Holding quality compounders (V, TMO, LLY, MSFT, ABBV) which remain in uptrends. Fear & Greed at 22 suggests caution but not full de-risking."
+  }
+ ]
+}
