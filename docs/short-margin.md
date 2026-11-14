@@ -67,7 +67,7 @@ A strategy goes short with a signed `target_weight`: `Signal("NVDA", Action.SELL
 
 **Wiped out.** At or below zero equity everything is closed at the next open and nothing trades again; an LLM is not asked any more.
 
-**The record.** `metrics.json` and the summary get an `account` block (as shares of the starting cash): `pnl_long` and `pnl_short` (closed trades plus what is still open at the last close), `borrow_fees`, `margin_interest`, `cash_interest`, the average and highest gross exposure, the average long and short exposure, the margin calls with their days, and `wiped_out`. `equity.csv` adds `long`, `short` and `gross` by day (`exposure` is the net exposure, `cash_ratio` the free cash). `trades.csv` tags short sales `short` / `short_add`, covers `cover` / `cover_trim`, forced sales `margin_call` / `wiped_out`. The manifest names the mode and its rules, and the reproduce command includes `--mode`. The look-ahead checks run unchanged: the strategy check compares signals and orders, the LLM check compares observations.
+**The record.** `metrics.json` and the summary get an `account` block (as shares of the starting cash): `pnl_long` and `pnl_short` (closed trades plus what is still open at the last close), `borrow_fees`, `margin_interest`, `cash_interest`, the average and highest gross exposure, the average long and short exposure, the margin calls with their days, and `wiped_out`. `equity.csv` adds `long`, `short` and `gross` by day (`exposure` is the net exposure, `cash_ratio` the free cash). `trades.csv` tags short sales `short` / `short_add`, covers `cover` / `cover_trim`, forced sales `margin_call` / `wiped_out`. The manifest names the mode and its rules, and the reproduce command includes `--mode`. The look-ahead checks run unchanged: the strategy check compares signals and orders, the LLM check compares observations. `riskaware research analyze` ([analysis.md](analysis.md)) reads these records too, with the longs and the shorts apart and the fees and interest reconciled to the cent.
 
 ## What an LLM sees and can send
 
@@ -129,6 +129,34 @@ Averages over the 6 runs of each cell (3 models x 2 prompts):
 | 2020 | long_only | +17.9% | 1.03 | -14.3% |
 | 2020 | long_short | +3.5% | 0.31 | -14.9% |
 | 2020 | margin | +22.3% | 1.31 | -12.2% |
+
+### What the decisions show
+
+`riskaware research analyze` ([docs/analysis.md](analysis.md)) scores every order against SPY over the next 5 and 20 trading days (a short is credited with how much its stock trailed SPY) and splits each run's excess return into factor exposures and selection. It rebuilds every account day by day on its own, and its long and short P&L match the backtester's to within rounding. On the 54 runs:
+
+**The shorts were well chosen in 2022 and badly timed in 2020.** Pooled over the three models and both prompts, a stock shorted in 2022 trailed SPY by 1.1% over the next 5 trading days and by 2.4% over 20; one shorted in 2020 beat SPY by 2.2% and 11.4%, because the shorts went in after the crash and the stocks rallied; in 2026 there was no edge. The t-statistics pool the runs as if they were independent, but they trade the same days, so they overstate the evidence somewhat.
+
+| Period | Shorts | Next 5 days | t | Hit rate | Next 20 days | t |
+|---|---:|---:|---:|---:|---:|---:|
+| 2026 | 73 | +0.1% | +0.2 | 44% | -0.6% | -0.4 |
+| 2022 | 195 | +1.1% | +3.2 | 55% | +2.4% | +2.5 |
+| 2020 | 99 | -2.2% | -3.1 | 33% | -11.4% | -5.5 |
+
+By model (short sales that filled, so fewer than the orders sent), Gemini's 251 shorts avoided 0.4% over 5 days (t = 1.1), luna's 104 lost 0.6% (t = -1.2) and Haiku's 12 lost 2.1% (t = -2.1). No model's buys beat SPY: luna -0.4% (t = -2.2), Gemini -0.3%, Haiku +0.1%.
+
+**Shorting changed the exposure more than the selection.** Allowing shorts lowered the market beta in 2026 (0.73 to 0.43 in `long_short`) and in 2022 (0.22 to 0.02 and 0.06); in 2022 most of the short modes' gain came from that lower exposure. The selection part, the alpha left after the market, size, growth and momentum factors, stayed negative in every cell but `margin` in 2020. Means of the 6 runs of each cell:
+
+| Period | Mode | Market beta | From factor exposure | Selection (alpha) |
+|---|---|---:|---:|---:|
+| 2026 | long_only | 0.73 | +8.5%/yr | -12.2%/yr |
+| 2026 | long_short | 0.43 | +5.4%/yr | -11.5%/yr |
+| 2026 | margin | 0.73 | +8.1%/yr | -11.1%/yr |
+| 2022 | long_only | 0.22 | -11.4%/yr | -13.8%/yr |
+| 2022 | long_short | 0.02 | -2.2%/yr | -11.2%/yr |
+| 2022 | margin | 0.06 | -3.5%/yr | -9.4%/yr |
+| 2020 | long_only | 0.25 | +17.7%/yr | -0.2%/yr |
+| 2020 | long_short | 0.25 | +12.9%/yr | -8.8%/yr |
+| 2020 | margin | 0.23 | +14.5%/yr | +6.1%/yr |
 
 ### Every run
 
