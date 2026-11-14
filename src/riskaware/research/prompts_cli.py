@@ -70,7 +70,9 @@ def run_cmd(
     prompt_file: Optional[Path] = typer.Option(None, help="Your own system prompt (a text file), run as one more variant"),
     name: Optional[str] = typer.Option(None, help="Name of the --prompt-file variant (default: the file name)"),
     periods: str = typer.Option("2026,2022,2020", help="Comma-separated bundled periods"),
-    seeds: int = typer.Option(3, help="Seeds 0..n-1 (each fixes the blind aliases and the sampling seed)"),
+    seeds: int = typer.Option(4, help="Seeds 0..n-1 (each fixes the blind aliases and the sampling seed); with 13 "
+                                      "variants, 3 periods x 4 seeds is the smallest grid that can pass the Holm "
+                                      "correction"),
     seed_list: Optional[str] = typer.Option(None, help="Exact seeds instead, e.g. 0,1,2"),
     universe: str = typer.Option("core"),
     symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols instead of a universe"),

@@ -89,10 +89,11 @@ The metrics are the Sharpe ratio (the primary metric), total return, maximum dra
 the exposure to stocks, turnover and orders per step (behaviour), the format error rate and the invalid order rate
 (reliability), and the tokens per step (cost). SPY and the equal-weight universe are reported for every period.
 
-How much evidence is possible: three periods times three seeds give nine pairs per variant. The smallest two-sided
-sign-flip p-value nine pairs can produce is 2/512, about 0.004, and Holm multiplies the smallest p-value by the number
-of variants. With thirteen variants, a difference survives only when it points the same way in all nine pairs. That is
-deliberate: a prompt effect that only appears in some periods or some seeds is not one to rely on.
+How much evidence is possible: the smallest two-sided sign-flip p-value that n pairs can produce is 2/2ⁿ, and Holm
+multiplies the smallest p-value by the number of variants. With thirteen variants, nine pairs (three periods, three
+seeds) can never pass: 13 × 2/512 is 0.051. That is why the default is four seeds: twelve pairs per variant, where a
+difference that points the same way in eleven or twelve of them can pass. The report says so when a lab is too small
+to show anything. A prompt effect that only appears in some periods or some seeds is not one to rely on.
 
 ## Run it yourself
 

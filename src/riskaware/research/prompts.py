@@ -405,7 +405,7 @@ class LabSettings:
 
     llm: str
     periods: list[str] = field(default_factory=lambda: ["2026", "2022", "2020"])
-    seeds: list[int] = field(default_factory=lambda: [0, 1, 2])
+    seeds: list[int] = field(default_factory=lambda: [0, 1, 2, 3])
     universe: str | None = "core"
     symbols: list[str] | None = None
     max_positions: int = 5
@@ -763,6 +763,15 @@ def compare(rows: list[dict[str, Any]], metric: str, baseline: str = BASELINE,
     return out
 
 
+def reachable(pairs: int, variants: int, alpha: float = 0.05) -> dict[str, Any]:
+    """Can the design show anything? The smallest exact sign-flip p-value of ``pairs`` pairs is 2 / 2**pairs, and
+    Holm multiplies the smallest p-value by the number of variants. Thirteen variants need at least ten pairs."""
+    best = min(1.0, variants * 2.0 / 2**pairs) if pairs else 1.0
+    need = next((n for n in range(1, 64) if variants * 2.0 / 2**n < alpha), None)
+    return {"pairs": pairs, "variants": variants, "smallest_p_holm": best, "can_pass": best < alpha,
+            "pairs_needed": need}
+
+
 def seed_spread(rows: list[dict[str, Any]], metric: str, variant: str = BASELINE) -> dict[str, Any]:
     """How much two seeds of the same prompt differ: the noise floor any variant has to beat."""
     by: dict[str, list[float]] = {}
@@ -834,6 +843,8 @@ def report(lab: str | Path, site: str | Path | None = None, analysis: bool = Tru
                          **summary[n],
                          "vs_baseline": {m: c[n] for m, c in comparisons.items() if n in c}} for n in order],
            "noise": {m: seed_spread(rows, m) for m in ("sharpe", "total_return", "max_drawdown")},
+           "power": reachable(min((c["pairs"] for c in comparisons["sharpe"].values()), default=0),
+                              len(comparisons["sharpe"])),
            "benchmarks": benchmarks(rows), "cost": cost, "runs": rows}
     if analysis:
         out["decisions"] = decision_metrics(rows)
@@ -933,6 +944,11 @@ def render(r: dict[str, Any]) -> str:
                      f"{_f2(b['spy']['sharpe'])} | {_pct(b['equal_weight']['total_return'])} | "
                      f"{_f2(b['equal_weight']['sharpe'])} |")
     lines.append("")
+    pw = r.get("power") or {}
+    if pw and not pw.get("can_pass"):
+        lines += [f"**Too few pairs to show anything:** with {pw['pairs']} pairs per variant and {pw['variants']} "
+                  f"variants the smallest possible Holm-corrected p-value is {_pv(pw['smallest_p_holm'])}, so every "
+                  f"verdict is `noise` by construction. {pw['pairs_needed']} pairs (periods x seeds) are needed.", ""]
     nz = r["noise"]["sharpe"]
     lines += ["## Noise floor", "",
               f"Two seeds of the baseline prompt differ in Sharpe by {_f2(nz['mean_abs_gap'])} on average "
