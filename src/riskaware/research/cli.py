@@ -639,3 +639,8 @@ def memory_cmd(
     console.print(Markdown(res.report(lang())))
     if res.folder:
         console.print(f"{L('Record', '记录')}: {res.folder}", soft_wrap=True)
+
+
+from .prompts_cli import app as prompts_app  # noqa: E402 - the sub-command's module imports nothing heavy
+
+app.add_typer(prompts_app, name="prompts")

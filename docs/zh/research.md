@@ -163,6 +163,8 @@ r = run_policy(llm_policy("ollama:qwen2.5:3b"), Experiment(universe="core", max_
 
 **改动新闻。** `extra_news` 可以给一次实验加几条标题，比如看策略或模型对一条从没发生过的新闻怎么反应。记录的 manifest 会列出这些标题。
 
+**哪种 prompt 好。** `riskaware research prompts` 交易一组有版本号的 system prompt 变体，每个只改一处（角色、风险规则、先推理、示例、回复格式、每只股票的新闻条数、决策频率），并和同一时段、同一种子的基线比较：[prompts.md](prompts.md)。
+
 ## 五种波段策略，开和不开新闻
 
 五种常见的波段策略，按教科书的定义写成（`riskaware/strategy/swing.py`）：

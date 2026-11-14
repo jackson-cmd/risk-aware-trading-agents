@@ -553,11 +553,12 @@ def observation_check(exp: Experiment, replies: list[Any], decide_every: int, bl
 
 def run_policy(policy: Callable[[dict], Any], exp: Experiment | None = None, decide_every: int = 1,
                blind: bool = False, max_news: int = 3, label: str = "policy", save: bool = True,
-               check: bool = True) -> ExperimentResult:
+               check: bool = True, out_dir: str | Path | None = None) -> ExperimentResult:
     """Trade the experiment's period with ``policy`` and save the record, with the policy's orders by step.
 
     ``check`` runs the look-ahead check of the observations (see ``observation_check``): it replays the recorded
-    replies, so the model is called once per step and no more."""
+    replies, so the model is called once per step and no more. ``out_dir`` is the record's folder (default
+    ``~/.riskaware/research/runs/<run id>``)."""
     exp = exp or Experiment(universe="core", max_positions=5)
     exp.leak_check = False  # the strategy check would re-ask the model; observation_check replays it instead
     exp.label = exp.label or label
@@ -575,7 +576,7 @@ def run_policy(policy: Callable[[dict], Any], exp: Experiment | None = None, dec
     if check:
         result.leak = observation_check(exp, run.replies, decide_every, blind, max_news)
     if save:
-        save_run(result, RUNS_DIR / result.run_id, run)
+        save_run(result, Path(out_dir).expanduser() if out_dir else RUNS_DIR / result.run_id, run)
         (Path(result.folder) / "policy_log.json").write_text(
             json.dumps({"decide_every": decide_every, "blind": blind, "max_news": max_news, "steps": run.transcript,
                         "replies": run.replies, "observations_sha256": run.observed}, indent=1,
