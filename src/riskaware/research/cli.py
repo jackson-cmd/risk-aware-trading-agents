@@ -488,10 +488,8 @@ def factors_cmd(
                         "The scores so far are cached; run the command again to go on.",
                         "已打的分已缓存；再运行一次这个命令就接着打。"))
         scores = scorer.scores
-        have = sum(1 for s, h in pairs if nf.headline_key(s, h) in scores)
-        llm_info = {"model": llm_model, "scored": have, "headlines": len(pairs),
-                    "coverage": have / len(pairs) if pairs else 0.0, "prompt_version": nf.PROMPT_VERSION,
-                    "cache": str(scorer.path)}
+        llm_info = scorer.manifest(pairs)
+        have = llm_info["scored"]
         if not have:
             console.print(L("[yellow]No headline has an LLM score yet; the LLM factor is left out.[/]",
                             "[yellow]还没有标题有 LLM 分数，这次不算 LLM 因子。[/]"))
