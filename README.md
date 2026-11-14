@@ -6,9 +6,9 @@
 
 **AI trading agents for US stocks that check the macro calendar, the fear index and verified news before they buy.**
 
-Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnings check · a 30% cash floor · cross-verified news · paper-trading agents ranked against SPY · news backtests that cannot see the future · frozen 2020, 2022 and 2026 markets for research · LLM agents over MCP · paper and live trading on 10 brokers.
+Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnings check · a 30% cash floor · cross-verified news · paper-trading agents ranked against SPY · news backtests that cannot see the future · a public leaderboard of LLM trading agents · frozen 2020, 2022 and 2026 markets for research · LLM agents over MCP · paper and live trading on 10 brokers.
 
-[🌐 Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [中文说明 → README_zh.md](README_zh.md) · [🚀 Quick start](#-quick-start) · [🆕 What's new](#-whats-new) · [🔬 Research kit](#-research-kit) · [🔗 MCP](#-mcp-server) · [📸 Screenshots](#-screenshots) · [Changelog](CHANGELOG.md)
+[🌐 Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [🏆 LLM leaderboard](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html) · [中文说明 → README_zh.md](README_zh.md) · [🚀 Quick start](#-quick-start) · [🆕 What's new](#-whats-new) · [🔬 Research kit](#-research-kit) · [🔗 MCP](#-mcp-server) · [📸 Screenshots](#-screenshots) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.7.2-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
@@ -59,19 +59,19 @@ For the daily paper-trading scheduler as well, put `riskaware.yaml` (from `riska
 
 - You trade **US stocks over days to weeks** and want rules you can read: buy quality names on pullbacks, keep cash, and never sell in a panic.
 - You want **backtests that cannot cheat**: news replayed as it was published, orders at the next open, and a look-ahead check on every research run.
-- You **study LLM trading agents** and need data and a setup that others can repeat: three frozen markets (the 2020 crash, the 2022 bear market, 2026), a blind mode, and a saved record of every run.
+- You **study LLM trading agents** and need data and a setup that others can repeat: three frozen markets (the 2020 crash, the 2022 bear market, 2026), a blind mode, a saved record of every run, and a [public leaderboard](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html) you can submit to.
 - You use **Claude, Codex or Gemini** and want them to test a strategy you describe in words, on your own plan, with no API key.
 - You want to **paper trade first**: several strategies side by side on simulated money, ranked against SPY every trading day.
 - You read **English or Chinese**: the CLI, the dashboard, the reports and the docs come in both.
 
-<sub>If you were looking for an AI trading bot for US stocks, a backtester with historical news and no look-ahead bias, a point-in-time dataset of prices, VIX and headlines for 2020, 2022 and 2026, a benchmark for LLM trading agents, an MCP server for trading research, or paper-trading agents for Alpaca and other brokers: it is all here, open source.</sub>
+<sub>If you were looking for an AI trading bot for US stocks, a backtester with historical news and no look-ahead bias, a point-in-time dataset of prices, VIX and headlines for 2020, 2022 and 2026, a benchmark and leaderboard for LLM trading agents, an MCP server for trading research, or paper-trading agents for Alpaca and other brokers: it is all here, open source.</sub>
 
 ---
 
 ## Contents
 
 - [🚀 Quick start](#-quick-start) · [Is it for you?](#is-it-for-you) · [🆕 What's new](#-whats-new) · [💡 The idea](#-the-idea) · [Four ways to use it](#four-ways-to-use-it)
-- [✨ Feature tour](#-feature-tour): [How it works](#-how-it-works) · [Cross-verified news](#-cross-verified-news) · [Paper-trading agents](#-paper-trading-agents) · [MCP server](#-mcp-server) · [Strategy lab](#-strategy-lab) · [Research kit](#-research-kit) · [Backtest](#-backtest) · [Strategy library](#-strategy-library) · [Write your own strategy](#-write-your-own-strategy)
+- [✨ Feature tour](#-feature-tour): [How it works](#-how-it-works) · [Cross-verified news](#-cross-verified-news) · [Paper-trading agents](#-paper-trading-agents) · [MCP server](#-mcp-server) · [Strategy lab](#-strategy-lab) · [LLM leaderboard](#-llm-trading-agent-leaderboard) · [Research kit](#-research-kit) · [Backtest](#-backtest) · [Strategy library](#-strategy-library) · [Write your own strategy](#-write-your-own-strategy)
 - [📸 Screenshots](#-screenshots) · [🔌 Brokers](#-brokers) · [🔒 Safety](#-safety) · [🔧 Configuration](#-configuration) · [🧰 Under the hood](#-under-the-hood): [CLI](#-cli) · [Project layout](#-project-layout)
 - [❓ FAQ](#-faq) · [🧭 Roadmap](#-roadmap) · [🤝 Contributing](#-contributing) · [📝 Citation](#-citation) · [❗ Disclaimer](#-disclaimer) · [📜 License](#-license)
 
@@ -230,6 +230,10 @@ Describe a strategy in plain words and let the AI build it. Over MCP, Claude, Co
 > Write a strategy that buys two-day pullbacks in uptrends when the recent news is positive, and sells after 10 days or at +8%. Backtest it on the tech list for 2026 with news.
 
 `save_as` keeps a strategy that works: it then shows up on the dashboard and can run as a paper agent. For code from anywhere else, `riskaware lab my_strategy.py --preset tech` does the same checks and backtest. More in [docs/strategy-lab.md](docs/strategy-lab.md).
+
+### 🏆 LLM trading agent leaderboard
+
+[**rta-bench-1**](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html) ranks LLMs as trading agents on the same game: the 56 large caps, after every fifth close, through 2026 to date, the 2022 bear market and the 2020 crash, each played blind and with real names, on news replayed by the minute it was published and with realistic fill costs. A model's training cutoff decides which scores count: periods after the cutoff are ranked, periods it may remember are listed apart. For each model the board shows how it made its money (market and style exposure against stock picking, sectors, holding periods, trades set off by news) and a memory score, next to the five rule strategies, SPY and the equal-weight list. An entry is one JSON file with the model's replies, so anyone can replay it without calling the model; to add a model, run `riskaware research submit` and open a pull request. More in [docs/leaderboard.md](docs/leaderboard.md).
 
 ### 🔬 Research kit
 
