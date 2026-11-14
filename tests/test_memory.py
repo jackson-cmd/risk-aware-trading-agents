@@ -120,11 +120,11 @@ def test_an_omniscient_model_shows_memory(tmp_path):
     r = s["recall"]["all"]
     assert r["direction_accuracy"] == 1.0 and r["rank_correlation"] > 0.99 and r["verdict"] == "recalls"
     # the record holds the summary, one row per point, and both reports
-    saved = json.loads((tmp_path / "run" / "memory.json").read_text())
+    saved = json.loads((tmp_path / "run" / "memory.json").read_text(encoding="utf-8"))
     assert saved["verdict"] == "contaminated" and saved["data"]["2022"]["prices_sha256"]
     assert len(pd.read_csv(tmp_path / "run" / "answers.csv")) == 40
-    assert "Verdict: contaminated" in (tmp_path / "run" / "report.md").read_text()
-    assert "有记忆" in (tmp_path / "run" / "report_zh.md").read_text()
+    assert "Verdict: contaminated" in (tmp_path / "run" / "report.md").read_text(encoding="utf-8")
+    assert "有记忆" in (tmp_path / "run" / "report_zh.md").read_text(encoding="utf-8")
 
 
 def test_a_model_that_reads_only_the_data_shows_none(tmp_path):
@@ -324,21 +324,21 @@ def test_cli_runs_a_probe_and_writes_the_record(monkeypatch, tmp_path):
                                    "12", "--recall", "6", "--no-news", "--out", str(tmp_path / "rec")])
     assert out.exit_code == 0, out.output
     assert "Verdict: inconclusive" in out.output and "only 12 pairs" in out.output
-    saved = json.loads((tmp_path / "rec" / "memory.json").read_text())
+    saved = json.loads((tmp_path / "rec" / "memory.json").read_text(encoding="utf-8"))
     assert saved["model"] == "ollama:cli-fake" and saved["calls"]["made"] > 0 and saved["calls"]["cost_usd"] == 0.0
-    assert set(json.loads((tmp_path / "rec" / "example_prompts.json").read_text())) == {"named", "blind", "recall"}
+    assert set(json.loads((tmp_path / "rec" / "example_prompts.json").read_text(encoding="utf-8"))) == {"named", "blind", "recall"}
 
 
 def test_a_batch_runner_can_ask_instead(tmp_path):
     """Export the calls as requests, answer them elsewhere, import the results and score without calling."""
     plan = M.plan_probe("queue-model", "2022", pairs=40, recall=20, news=False, cache_dir=tmp_path / "cache")
     n = M.export_requests(plan, tmp_path / "reqs.jsonl")
-    reqs = [json.loads(line) for line in (tmp_path / "reqs.jsonl").read_text().splitlines()]
+    reqs = [json.loads(line) for line in (tmp_path / "reqs.jsonl").read_text(encoding="utf-8").splitlines()]
     assert n == len(reqs) == len(plan.calls) and len({r["key"] for r in reqs}) == n
     assert all(r["system"].endswith(json.dumps(M.ANSWER_SCHEMA if r["meta"]["kind"] == "paired" else M.RECALL_SCHEMA))
                for r in reqs)
     oracle = Omniscient("oracle")
-    with open(tmp_path / "results.jsonl", "w") as fh:
+    with open(tmp_path / "results.jsonl", "w", encoding="utf-8") as fh:
         for r in reqs:
             reply = oracle.complete_json(r["system"], r["prompt"], None)
             fh.write(json.dumps({"key": r["key"], "text": "```json\n" + json.dumps(reply) + "\n```",
@@ -373,13 +373,13 @@ def test_cli_exports_requests_and_scores_imported_results(tmp_path):
             "--no-news"]
     out = CliRunner().invoke(app, [*args, "--export-requests", str(tmp_path / "reqs.jsonl")])
     assert out.exit_code == 0, out.output
-    reqs = [json.loads(line) for line in (tmp_path / "reqs.jsonl").read_text().splitlines()]
+    reqs = [json.loads(line) for line in (tmp_path / "reqs.jsonl").read_text(encoding="utf-8").splitlines()]
     oracle = Omniscient("oracle")
     (tmp_path / "res.jsonl").write_text("".join(
         json.dumps({"key": r["key"], "text": json.dumps(oracle.complete_json(r["system"], r["prompt"], None)),
-                    "meta": r["meta"]}) + "\n" for r in reqs))
+                    "meta": r["meta"]}) + "\n" for r in reqs), encoding="utf-8")
     scored = CliRunner().invoke(app, [*args, "--import-results", str(tmp_path / "res.jsonl"), "--out",
                                       str(tmp_path / "rec")])
     assert scored.exit_code == 0, scored.output
     assert "70 answers" in scored.output and "Verdict: contaminated" in scored.output
-    assert json.loads((tmp_path / "rec" / "memory.json").read_text())["calls"]["made"] == 0
+    assert json.loads((tmp_path / "rec" / "memory.json").read_text(encoding="utf-8"))["calls"]["made"] == 0
