@@ -130,15 +130,15 @@ riskaware research submit RUN_ID --model gpt-5.6-luna --cutoff 2026-02 --provide
 | 模型 | 厂商 | 调用方式 | 训练截止日 | 截止日的来源 |
 |---|---|---|---|---|
 | `llama3.2` | Meta | 一个 OpenAI 兼容网关，后面是 Ollama 的 `llama3.2`（3B），每个请求带 `num_ctx` 16384 | 2023-12 | Llama 3.2 模型卡："The pretraining data has a cutoff of December 2023" |
-| `gpt-5.6-luna` | OpenAI | OpenAI API，`reasoning_effort` none，JSON 模式 | 2026-02-16 | OpenAI 模型页："Feb 16, 2026 knowledge cutoff" |
+| `gpt-5.6-luna` | OpenAI | 一个 OpenAI 兼容网关，`reasoning_effort` none，JSON 模式 | 2026-02-16 | OpenAI 模型页："Feb 16, 2026 knowledge cutoff" |
 | `claude-haiku-4.5` | Anthropic | 一个 OpenAI 兼容网关，关闭思考 | 2025-07 | Anthropic 模型页：训练数据截止 2025 年 7 月（可靠知识截止 2025 年 2 月） |
 | `claude-haiku-5.5` | Anthropic | Anthropic API，关闭思考；只有种子 0 的三个盲测任务 | 2026-06 | Anthropic 模型页：训练数据截止 2026 年 6 月 |
 | `claude-sonnet-4.6` | Anthropic | 一个 OpenAI 兼容网关，关闭扩展思考 | 2026-01 | Anthropic 模型页：训练数据截止 2026 年 1 月（可靠知识截止 2025 年 8 月） |
 | `gemini-3.5-flash` | Google | 一个 OpenAI 兼容网关，`reasoning_effort` minimal | 2025-01 | Box 模型列表里 Gemini 3.5 Flash 的模型卡：知识截止 2025 年 1 月；Google 自己的模型卡指向 Gemini 3 Flash，没写日期 |
 
-所以 2026 年对 Llama、Haiku 4.5 和 Gemini 是干净的，对 Sonnet 4.6（从 1 月 30 日起计分）、Luna（从 2 月 13 日起）和 Haiku 5.5（从 6 月 30 日起）是部分干净的，2022 和 2020 年六个模型都可能记得。Luna 六个任务三个种子都齐了。Llama、Haiku 4.5 和 Gemini 六个任务都有种子 0；Llama 和 Gemini 的种子 1、2 随运行完成补上，Haiku 4.5 只有一个种子，因为请求队列限制了一个项目调用 Claude 的次数。Sonnet 4.6 有六个任务里的四个、一个种子，Haiku 5.5 只有一个种子的三个盲测任务。榜单在每个模型名下写明它的运行日期。
+所以 2026 年对 Llama、Haiku 4.5 和 Gemini 是干净的，对 Sonnet 4.6（从 1 月 30 日起计分）、Luna（从 2 月 13 日起）和 Haiku 5.5（从 6 月 30 日起）是部分干净的，2022 和 2020 年六个模型都可能记得。Luna、Gemini 和 Llama 六个任务三个种子都齐了。Haiku 4.5 六个任务只有种子 0，因为请求队列限制了一个项目调用 Claude 的次数。Sonnet 4.6 有六个任务里的四个、一个种子，Haiku 5.5 只有一个种子的三个盲测任务。榜单在每个模型名下写明它的运行日期。
 
-最早一批盲测（2026 年 11 月 13 日，在包里把新闻标题中的日期和美元金额也遮住之前）在部分标题里仍能读到日期或目标价，之后的运行读不到。每个条目都记着运行时包的版本和提交。
+最早一批盲测（2026 年 11 月 13 日，在包里把新闻标题中的日期和美元金额也遮住之前）在部分标题里仍能读到日期或目标价，之后的运行读不到。这一批里，榜单上只剩 Sonnet 4.6 和 Haiku 5.5 的盲测：Luna 和 Gemini 已经重跑，两者的所有任务和种子都在包的同一个提交（6cb7146）上运行；Llama 和 Haiku 4.5 的运行都在这次改动之后。每个条目都记着运行时包的版本和提交。
 
 跑的时候踩到两个坑。Ollama 除非请求里要求，否则上下文只有 2,048 或 4,096 token，更长的 prompt 会被从开头截掉，而且不报错：通过网关，`llama3.2` 对一个 9,400 token 的观察值只报了 2,050 个 prompt token，回复也只是照抄一条股票记录；设了 `num_ctx` 之后就全读进去了。`bench_policy("ollama:...")` 对本地服务会设好它。另外，OpenAI 兼容网关在请求里不写 `"stream": false` 时可能按流式返回，现在包里的 provider 会写上。
 

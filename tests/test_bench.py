@@ -232,7 +232,7 @@ def test_shipped_entries_are_well_formed():
 def test_entries_publish_the_orders_only():
     replies = [{"orders": [{"symbol": "S01", "action": "buy", "weight": 0.2, "fraction": 0, "reason": "a headline",
                             "thought": "more words"}], "note": "free text"},
-               None, {"orders": []}]
+               None, {"orders": [], "note:": "}assistant"}]  # a key a small model wrote wrong is text too
     clean = bench.public_replies(replies)
     assert clean == [{"orders": [{"symbol": "S01", "action": "buy", "weight": 0.2, "fraction": 0}]}, None,
                      {"orders": []}]
