@@ -119,7 +119,7 @@ riskaware research factors --llm             # add a sentiment factor scored by 
 <h3>Can I run the news factor test myself?</h3>
 <p>Yes. The prices and headlines ship with the package, so <code>riskaware research factors</code> needs no download and no API key.</p>
 <h3>Can a language model score the headlines?</h3>
-<p>Yes. <code>--llm</code> scores each headline with a local model through Ollama for free, or with a paid API after showing the token estimate, and adds an LLM sentiment factor to the same tests. A model trained after 2020 or 2022 may know what happened next, so its scores for those years are not blind; llama3.2's training data ends in 2023.</p>
+<p>Yes. <code>--llm</code> scores each headline with a local model through Ollama for free, or with a paid API after showing the token estimate, and adds an LLM sentiment factor to the same tests; <code>--llm-export</code> and <code>--llm-import</code> run the scoring through any batch API instead. A model trained after 2020 or 2022 may know what happened next, so its scores for those years are not blind; llama3.2's training data ends in 2023.</p>
 
 <h2>More guides</h2>
 <div class="more">

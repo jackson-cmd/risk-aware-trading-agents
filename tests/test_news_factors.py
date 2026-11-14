@@ -308,6 +308,57 @@ def test_headline_scores_are_cached_and_recovered_from_miscounts(tmp_path):
     assert not nf.HeadlineScorer("openai:gpt-5.6-luna", cache_dir=tmp_path).local
 
 
+def test_batch_requests_and_their_results_fill_the_cache(tmp_path):
+    """Score through any batch API or queue: export the requests, run them elsewhere, import the replies."""
+    pairs = [("AAPL", f"Apple headline {i}") for i in range(5)] + [("TSLA", "Tesla goes bankrupt")]
+    sc = nf.HeadlineScorer("openai:gpt-5.6-luna", cache_dir=tmp_path)
+    reqs = sc.requests(pairs, batch=4)
+    assert [len(r["meta"]["keys"]) for r in reqs] == [4, 2] and len({r["key"] for r in reqs}) == 2
+    assert "JSON" in reqs[0]["system"] and reqs[0]["prompt"].startswith("4 headlines; return exactly 4 numbers.")
+    assert reqs[1]["meta"]["v"] == nf.PROMPT_VERSION and reqs[1]["max_tokens"] >= 2 * 16
+    rows = [{"key": reqs[0]["key"], "text": json.dumps({"scores": [0.5, -0.2, 2, "x"]}), "meta": reqs[0]["meta"]},
+            {"key": reqs[1]["key"], "text": '```json\n{"scores": [1]}\n```', "meta": reqs[1]["meta"]},
+            {"key": "old", "text": '{"scores": [1]}', "meta": {"keys": ["k"], "v": nf.PROMPT_VERSION - 1}}]
+    assert sc.import_results(rows, pairs) == {"rows": 3, "scored": 3, "skipped": 2}
+    assert sc.scores[nf.headline_key("AAPL", "Apple headline 2")] == 1.0  # clipped
+    assert len(sc.missing(pairs)) == 3  # the "x", and the batch that came back one score short
+    again = nf.HeadlineScorer("openai:gpt-5.6-luna", cache_dir=tmp_path)
+    assert again.scores == sc.scores and [len(r["meta"]["keys"]) for r in again.requests(pairs, batch=4)] == [3]
+    cached = [json.loads(line) for line in again.path.read_text(encoding="utf-8").splitlines()]
+    assert {r["symbol"] for r in cached} == {"AAPL"} and all(r["v"] == nf.PROMPT_VERSION for r in cached)
+
+
+def test_the_cli_exports_requests_and_imports_results(monkeypatch, tmp_path):
+    from typer.testing import CliRunner
+
+    from riskaware.cli import app
+
+    real = nf.run_study
+    seen = {}
+
+    def small(periods, **kw):
+        seen["llm"] = kw.get("llm_scores")
+        return real(periods, stocks=STOCKS, report=False, **{k: v for k, v in kw.items() if k not in ("stocks", "report")})
+
+    monkeypatch.setattr(nf, "run_study", small)
+    monkeypatch.setattr(nf, "SCORES_DIR", tmp_path / "scores")
+    out = tmp_path / "reqs.jsonl"
+    res = CliRunner().invoke(app, ["research", "factors", "--period", "2026", "--llm-model", "openai:gpt-5.6-luna",
+                                   "--llm-export", str(out)])
+    assert res.exit_code == 0, res.output
+    reqs = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
+    assert len(reqs) == math.ceil(len(nf.headlines_to_score(["2026"])) / 40) and "llm" not in seen  # no study run
+    results = tmp_path / "results.jsonl"
+    results.write_text("".join(json.dumps({"key": r["key"], "meta": r["meta"],
+                                           "text": json.dumps({"scores": [0.25] * len(r["meta"]["keys"])})}) + "\n"
+                               for r in reqs[:3]), encoding="utf-8")
+    res = CliRunner().invoke(app, ["research", "factors", "--period", "2026", "--llm-model", "openai:gpt-5.6-luna",
+                                   "--llm-import", str(results), "--out", str(tmp_path / "f")])
+    assert res.exit_code == 0, res.output
+    assert len(seen["llm"]) == 120  # three batches of 40, no model called for the rest
+    assert json.loads((tmp_path / "f" / "factors.json").read_text(encoding="utf-8"))["llm"]["scored"] == 120
+
+
 def test_llm_scores_become_a_factor():
     recs = [r for r in _records() if r["symbol"] in STOCKS[:12]]
     scores = {nf.headline_key(r["symbol"], r["headline"]): (1.0 if "beat" in r["headline"].lower() else -0.2)

@@ -404,7 +404,14 @@ def factors_cmd(
     llm: bool = typer.Option(False, "--llm", help="Add an LLM sentiment factor (scores cached in "
                                                   "~/.riskaware/research/headline_scores)"),
     llm_model: str = typer.Option("ollama:llama3.2:3b", help="provider:model for --llm; local Ollama costs nothing"),
-    llm_limit: Optional[int] = typer.Option(None, help="Score at most this many new headlines in this run"),
+    llm_limit: Optional[int] = typer.Option(None, help="Score at most this many new headlines in this run "
+                                                       "(0: use cached scores only)"),
+    llm_export: Optional[Path] = typer.Option(None, help="Write batch requests (JSON Lines) for the headlines "
+                                                         "without a score, for a batch API or queue, and stop"),
+    llm_import: Optional[list[Path]] = typer.Option(None, help="Cache the scores from a batch run's results "
+                                                               "(JSON Lines with text and meta) and use them; "
+                                                               "repeatable; implies --llm --llm-limit 0"),
+    llm_batch: int = typer.Option(40, help="Headlines per batch request with --llm-export"),
     yes: bool = typer.Option(False, "--yes", "-y", help="Score uncached headlines without asking"),
     charts: Optional[str] = typer.Option(None, help="Chart and report languages, e.g. en,zh (default: --lang)"),
     out: Optional[Path] = typer.Option(None, help="Folder (default ~/.riskaware/research/factors/<time>)"),
@@ -422,13 +429,36 @@ def factors_cmd(
         raise typer.Exit(2) from exc
     scores = None
     llm_info = None
-    if llm:
+    if llm_import:  # scores from a batch run: use them, and call no model unless --llm-limit says so
+        llm = True
+        llm_limit = 0 if llm_limit is None else llm_limit
+    if llm or llm_export:
         try:
             scorer = nf.HeadlineScorer(llm_model)
         except ValueError as exc:
             console.print(f"[red]{escape(str(exc))}[/]")
             raise typer.Exit(2) from exc
         pairs = nf.headlines_to_score(periods)
+        for path in llm_import or []:
+            rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            c = scorer.import_results(rows, pairs)
+            console.print(L(f"{path.name}: {c['scored']:,} scores cached from {c['rows']:,} replies "
+                            f"({c['skipped']:,} replies skipped: wrong number of scores or another prompt version)",
+                            f"{path.name}：从 {c['rows']:,} 条回复缓存了 {c['scored']:,} 个分数（跳过 {c['skipped']:,} 条："
+                            f"分数个数不对或提示词版本不同）"))
+        if llm_export:
+            reqs = scorer.requests(pairs, batch=llm_batch)
+            llm_export.parent.mkdir(parents=True, exist_ok=True)
+            llm_export.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in reqs), encoding="utf-8")
+            est = nf.HeadlineScorer(llm_model, cache_dir=scorer.dir, batch=llm_batch).estimate(scorer.missing(pairs))
+            console.print(L(f"{len(reqs):,} requests for {len(scorer.missing(pairs)):,} headlines in {llm_export}: "
+                            f"about {est['input_tokens']:,} input and {est['output_tokens']:,} output tokens. Run "
+                            f"them, then --llm-import the results.",
+                            f"{llm_export} 里有 {len(reqs):,} 个请求、{len(scorer.missing(pairs)):,} 条标题：约 "
+                            f"{est['input_tokens']:,} 个输入 token、{est['output_tokens']:,} 个输出 token。跑完后用 "
+                            f"--llm-import 导入结果。"), soft_wrap=True)
+            return
+    if llm:
         todo = scorer.missing(pairs)[: llm_limit if llm_limit is not None else None]
         if todo:
             est = scorer.estimate(todo)

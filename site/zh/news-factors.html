@@ -119,7 +119,7 @@ riskaware research factors --llm             # 加一个由本地 LLM 打分的�
 <h3>我能自己跑这个新闻因子检验吗？</h3>
 <p>能。价格和新闻标题都在安装包里，所以 <code>riskaware research factors</code> 不用下载，也不用 API key。</p>
 <h3>能用语言模型给标题打分吗？</h3>
-<p>能。<code>--llm</code> 用本地 Ollama 模型免费给每条标题打分，或者在显示 token 估计后调用付费 API，并把 LLM 情绪因子加进同样的检验。2020 或 2022 年之后训练的模型可能知道后来发生了什么，所以它对那两年的打分不是盲的；llama3.2 的训练数据截至 2023 年。</p>
+<p>能。<code>--llm</code> 用本地 Ollama 模型免费给每条标题打分，或者在显示 token 估计后调用付费 API，并把 LLM 情绪因子加进同样的检验；也可以用 <code>--llm-export</code> 和 <code>--llm-import</code> 交给任何批量接口去打分。2020 或 2022 年之后训练的模型可能知道后来发生了什么，所以它对那两年的打分不是盲的；llama3.2 的训练数据截至 2023 年。</p>
 
 <h2>更多指南</h2>
 <div class="more">
