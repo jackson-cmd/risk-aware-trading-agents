@@ -62,7 +62,12 @@ METRICS = ("sharpe", "total_return", "max_drawdown", "excess_vs_spy", "excess_vs
 PRIMARY = "sharpe"
 HIGHER_IS_BETTER = {"sharpe": True, "total_return": True, "max_drawdown": True, "excess_vs_spy": True,
                     "excess_vs_equal_weight": True, "volatility": False, "format_error_rate": False,
-                    "invalid_order_rate": False}
+                    "invalid_order_rate": False, "hit_rate_5d": True, "decision_excess_5d": True,
+                    "buy_excess_5d": True, "sell_avoided_5d": True, "decision_ic": True, "holdings_ic": True}
+DECISION_METRICS = {  # from research/analysis.py (analyze_run's summary), when that module is installed
+    "hit_rate_5d": "decision_hit_rate_5d", "decision_excess_5d": "decision_excess_5d",
+    "buy_excess_5d": "buy_excess_5d", "sell_avoided_5d": "sell_avoided_5d", "decision_ic": "decision_ic",
+    "holdings_ic": "holdings_ic", "decisions": "decisions"}
 
 REASONED_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -376,10 +381,13 @@ class VariantPolicy:
     way (a rate limit, a timeout, a server error) is tried again after a pause, up to ``retries`` times, so that an
     outage does not show up as a decision to hold."""
 
-    def __init__(self, variant: Variant, provider: Any, retries: int = 4, backoff: float = 10.0):
+    def __init__(self, variant: Variant, provider: Any, retries: int = 4, backoff: float = 10.0,
+                 recorded: list[dict[str, Any]] | None = None, on_step: Callable[[dict], None] | None = None):
         self.variant, self.provider = variant, provider
         self.retries, self.backoff = retries, backoff
         self.calls: list[dict[str, Any]] = []
+        self.recorded = list(recorded or [])  # steps of an earlier, interrupted try: replayed, not asked again
+        self.on_step = on_step
 
     def _ask(self, user: str) -> tuple[Any, str | None]:
         try:
@@ -389,7 +397,17 @@ class VariantPolicy:
         return reply, getattr(self.provider, "last_error", None) if reply is None else None
 
     def __call__(self, obs: dict) -> dict:
+        from .agent import _digest
+
         user = USER_PREFIX + json.dumps(obs, separators=(",", ":"), default=str)
+        digest = _digest(obs)
+        i = len(self.calls)
+        if i < len(self.recorded):
+            old = self.recorded[i]
+            if old.get("step") == obs.get("step") and old.get("observation_sha256") == digest:
+                self.calls.append({**old["call"], "replayed": True})
+                return old["reply"]
+            del self.recorded[i:]  # the observation changed: nothing after this point can be replayed
         t0 = time.time()
         tries = 0
         while True:
@@ -409,13 +427,23 @@ class VariantPolicy:
             if raw:
                 rec["raw"] = str(raw)[:1500]
         self.calls.append(rec)
-        if isinstance(reply, dict) and status == "ok":
-            return reply
-        return {"orders": [], "note": f"no usable reply ({status}): {(error or '')[:120]}"}
+        out = reply if isinstance(reply, dict) and status == "ok" else {
+            "orders": [], "note": f"no usable reply ({status}): {(error or '')[:120]}"}
+        if self.on_step is not None:
+            self.on_step({"step": obs.get("step"), "day": obs.get("day"), "observation_sha256": digest,
+                          "reply": out, "call": rec})
+        return out
 
 
 TRANSPORT_HINTS = ("HTTP", "Timeout", "ConnectionError", "ConnectTimeout", "ReadTimeout", "SSLError", "RemoteDisconnected",
-                   "RequestException", "TimeoutExpired", "not logged in", "rate limit")
+                   "RequestException", "TimeoutExpired", "not logged in", "rate limit", "RateLimit", "APITimeout",
+                   "APIConnection", "InternalServer", "ServiceUnavailable", "Error code: 429", "Error code: 5",
+                   "overloaded", "temporarily")
+
+
+class LabStopped(BaseException):
+    """Raised by a provider to end the lab at once (a spent quota or budget): it is not a reply to hold on. Runs
+    already saved stay; the interrupted one continues from its recorded steps next time."""
 
 
 def classify(reply: Any, error: str | None) -> str:
@@ -467,6 +495,22 @@ def _done(folder: Path) -> bool:
     return (folder / "manifest.json").is_file() and (folder / "calls.jsonl").is_file()
 
 
+def steps_path(lab: Path, variant: str, period: str, seed: int) -> Path:
+    """Every answered step of one run, kept outside the run folder so that a run cut short can be replayed."""
+    return Path(lab) / "steps" / variant / f"{period}-s{seed}.jsonl"
+
+
+def _read_lines(path: Path) -> list[dict[str, Any]]:
+    out = []
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                out.append(json.loads(line))
+            except json.JSONDecodeError:  # a line cut by a kill: the step is asked again
+                break
+    return out
+
+
 def run_one(variant: Variant, period: str, seed: int, settings: LabSettings, lab: str | Path,
             provider: Any | None = None, check: bool = True) -> dict[str, Any]:
     """Trade one period with one variant and one seed; save the record under ``lab/runs/<variant>/<period>-s<seed>``.
@@ -479,14 +523,26 @@ def run_one(variant: Variant, period: str, seed: int, settings: LabSettings, lab
     if _done(folder):
         return {"variant": variant.name, "period": str(period), "seed": int(seed), "folder": str(folder),
                 "skipped": True}
-    if folder.exists():  # an interrupted run: start it again
+    if folder.exists():  # an interrupted run: start it again (its recorded steps are replayed)
         shutil.rmtree(folder)
     folder.parent.mkdir(parents=True, exist_ok=True)
+    steps_file = steps_path(lab, variant.name, str(period), int(seed))
+    recorded = _read_lines(steps_file)
+    lock = threading.Lock()
+
+    def on_step(row: dict) -> None:
+        with lock:
+            steps_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(steps_file, "a", encoding="utf-8") as fh:
+                fh.write(json.dumps(row, default=str) + "\n")
+            with open(lab / "progress.jsonl", "a", encoding="utf-8") as fh:  # one line per model call: progress
+                fh.write(json.dumps({"variant": variant.name, "period": str(period), "seed": int(seed),
+                                     "step": row["step"], "status": row["call"]["status"]}) + "\n")
     prov = provider if provider is not None else make_provider_for(settings.llm, settings.temperature,
                                                                    settings.base_url, settings.max_tokens,
                                                                    settings.key_env)
     tune(prov, variant, int(seed) if settings.api_seed else None)
-    policy = VariantPolicy(variant, prov)
+    policy = VariantPolicy(variant, prov, recorded=recorded, on_step=on_step)
     exp = Experiment(period=get_period(period).name, universe=None if settings.symbols else settings.universe,
                      symbols=settings.symbols, news=settings.news, max_positions=settings.max_positions,
                      start=settings.start, end=settings.end, seed=int(seed), label=f"prompt-{variant.name}")
@@ -660,7 +716,7 @@ def import_run(folder: str | Path, lab: str | Path, variant: Variant, seed: int,
     with open(dst / "calls.jsonl", "w", encoding="utf-8") as fh:
         for i, st in enumerate(steps):
             note_ = str(st.get("note") or "")
-            status = "format" if note_.startswith("no usable reply") else "ok"
+            status = classify(None, note_) if note_.startswith("no usable reply") else "ok"
             tin, tout = ((q + (1 if i < r else 0)) for q, r in share) if share else (None, None)
             fh.write(json.dumps({"step": st.get("step"), "day": st.get("day"), "status": status, "seconds": None,
                                  "prompt_tokens": tin, "completion_tokens": tout, "imported": True}) + "\n")
@@ -680,5 +736,5 @@ def variants_table() -> list[dict[str, Any]]:
     return [v.describe() for v in VARIANTS.values()]
 
 
-__all__ = ["VARIANTS", "Variant", "LabSettings", "BASELINE", "get_variant", "select", "from_file", "tune",
+__all__ = ["VARIANTS", "Variant", "LabSettings", "BASELINE", "LabStopped", "get_variant", "select", "from_file", "tune",
            "VariantPolicy", "OllamaChat", "run_one", "run_lab", "import_run", "estimate", "variants_table"]

@@ -14,7 +14,7 @@ from typing import Any
 import numpy as np
 
 from .periods import get_period
-from .prompts import BASELINE, HIGHER_IS_BETTER, METRICS, PRIMARY, _done, _now
+from .prompts import BASELINE, DECISION_METRICS, HIGHER_IS_BETTER, METRICS, PRIMARY, _done, _now
 
 
 # ----------------------------------------------------------------------------------- reading the records
@@ -296,7 +296,7 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
                      "variant_sha256": rs[0]["variant_sha256"],
                      "metrics": {m: {"mean": _mean(r.get(m) for r in rs),
                                      "by_period": {p: _mean(r.get(m) for r in rs if r["period"] == p)
-                                                   for p in periods}} for m in METRICS},
+                                                   for p in periods}} for m in (*METRICS, *DECISION_METRICS)},
                      "steps": sum(r["steps"] for r in rs), "transport_errors": sum(r["transport_errors"] for r in rs),
                      "prompt_tokens": sum(r["prompt_tokens"] for r in rs),
                      "completion_tokens": sum(r["completion_tokens"] for r in rs),
@@ -325,13 +325,16 @@ def report(lab: str | Path, site: str | Path | None = None, analysis: bool = Tru
     rows = collect(lab)
     if not rows:
         raise ValueError(f"no finished runs in {lab}")
+    decisions = add_decision_metrics(rows) if analysis else False
     settings = meta["settings"]
     known = {v["name"]: v for v in meta["variants"]}
     order = [n for n in known if any(r["variant"] == n for r in rows)]
     summary = summarize(rows)
     comparisons = {m: compare(rows, m) for m in ("sharpe", "total_return", "max_drawdown", "excess_vs_spy",
                                                   "volatility", "turnover", "avg_exposure", "orders_per_step",
-                                                  "format_error_rate", "invalid_order_rate")}
+                                                  "format_error_rate", "invalid_order_rate",
+                                                  *(("hit_rate_5d", "decision_excess_5d", "decision_ic",
+                                                     "holdings_ic") if decisions else ()))}
     tokens_in = sum(r["prompt_tokens"] for r in rows)
     tokens_out = sum(r["completion_tokens"] for r in rows)
     pi, po = settings.get("price_in"), settings.get("price_out")
@@ -353,8 +356,7 @@ def report(lab: str | Path, site: str | Path | None = None, analysis: bool = Tru
         out["attribution"] = attribute(rows)
     except Exception as exc:  # noqa: BLE001 - an old record without the columns it needs: report without it
         out["attribution"] = {"error": f"{type(exc).__name__}: {exc}"}
-    if analysis:
-        out["decisions"] = decision_metrics(rows)
+    out["decision_metrics"] = decisions
     (lab / "prompts.json").write_text(json.dumps(out, indent=1, default=_json) + "\n", encoding="utf-8")
     (lab / "prompts.md").write_text(render(out), encoding="utf-8")
     try:
@@ -366,23 +368,49 @@ def report(lab: str | Path, site: str | Path | None = None, analysis: bool = Tru
     return out
 
 
-def decision_metrics(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """Decision-level hit rate and IC per variant from research/analysis.py, when that module is installed."""
+def _analysis() -> tuple[Any, str] | None:
+    """research/analysis.py's ``analyze_run`` and the SHA-256 of its source, or None before that module exists."""
     try:
         from . import analysis  # type: ignore[attr-defined]
     except ImportError:
         return None
-    fn = getattr(analysis, "decision_metrics", None) or getattr(analysis, "analyze_run", None)
+    fn = getattr(analysis, "analyze_run", None)
     if fn is None:
         return None
-    out: dict[str, Any] = {}
+    import hashlib
+
+    src = Path(analysis.__file__).read_bytes() if getattr(analysis, "__file__", None) else b""
+    return fn, hashlib.sha256(src).hexdigest()
+
+
+def add_decision_metrics(rows: list[dict[str, Any]]) -> bool:
+    """Decision-level metrics for every run (``analysis.analyze_run``: the 5-day hit rate and excess of the decisions,
+    the decision and holdings IC), cached in ``decision_metrics.json`` next to each record and recomputed when the
+    analysis code changes. Returns False when the analysis module is not installed."""
+    found = _analysis()
+    if found is None:
+        return False
+    fn, sha = found
     for r in rows:
-        try:
-            res = fn(r["folder"])
-        except Exception as exc:  # noqa: BLE001 - one unreadable run must not stop the report
-            res = {"error": str(exc)[:200]}
-        out.setdefault(r["variant"], []).append({"period": r["period"], "seed": r["seed"], **(res or {})})
-    return out
+        cache = Path(r["folder"]) / "decision_metrics.json"
+        got = None
+        if cache.is_file():
+            old = json.loads(cache.read_text(encoding="utf-8"))
+            got = old.get("summary") if old.get("analysis_sha256") == sha else None
+        if got is None:
+            try:
+                res = fn(r["folder"], save=False, chart=False)
+                summ = res.get("summary", {}) if isinstance(res, dict) else {}
+                got = {k: _num(summ.get(v)) for k, v in DECISION_METRICS.items()}
+                got.update({f"{k}_t": _num(summ.get(f"{v}_t")) for k, v in DECISION_METRICS.items()
+                            if f"{v}_t" in summ})
+            except Exception as exc:  # noqa: BLE001 - one record it cannot read must not stop the report
+                got = {"error": f"{type(exc).__name__}: {exc}"[:200]}
+            cache.write_text(json.dumps({"analysis_sha256": sha, "summary": got}, indent=1) + "\n", encoding="utf-8")
+        for k in DECISION_METRICS:
+            r[k] = got.get(k)
+        r["decision_t"] = {k: got.get(f"{k}_t") for k in DECISION_METRICS if got.get(f"{k}_t") is not None}
+    return True
 
 
 def _json(v: Any) -> Any:
@@ -401,6 +429,11 @@ def _pct(v: Any, sign: bool = True) -> str:
 def _f2(v: Any, sign: bool = False) -> str:
     f = _num(v)
     return "n/a" if f is None else (f"{f:+.2f}" if sign else f"{f:.2f}")
+
+
+def _f0(v: Any) -> str:
+    f = _num(v)
+    return "n/a" if f is None else f"{f:.0f}"
 
 
 def _pv(v: Any) -> str:
@@ -444,6 +477,22 @@ def render(r: dict[str, Any]) -> str:
             cells.append(_f2(sh) + (f" ({_f2(c['by_period'].get(p), True)})" if c and p in c["by_period"] else ""))
         lines.append(f"| `{v['name']}` | " + " | ".join(cells) + " |")
     lines.append("")
+    if r.get("decision_metrics"):
+        lines += ["## Decisions", "",
+                  "From research/analysis.py: each buy scores the stock's return over SPY from the next open to five "
+                  "trading days later, each sell the return it avoided; the IC is the rank correlation of the "
+                  "decisions (or the holdings) with those returns across the stocks.", "",
+                  "| Variant | Decisions | Hit rate (5d) | Excess (5d) | Δ excess vs baseline | Decision IC | "
+                  "Holdings IC | Δ holdings IC |", "|---|---:|---:|---:|---:|---:|---:|---:|"]
+        for v in r["variants"]:
+            m, c = v["metrics"], v["vs_baseline"]
+            de, hi = c.get("decision_excess_5d"), c.get("holdings_ic")
+            lines.append(f"| `{v['name']}` | {_f0(m['decisions']['mean'])} | {_pct(m['hit_rate_5d']['mean'], False)} | "
+                         f"{_pct(m['decision_excess_5d']['mean'])} | "
+                         + (f"{_pct(de['diff'])} (p {_pv(de['p_holm'])})" if de else "—")
+                         + f" | {_f2(m['decision_ic']['mean'], True)} | {_f2(m['holdings_ic']['mean'], True)} | "
+                         + (f"{_f2(hi['diff'], True)} (p {_pv(hi['p_holm'])})" if hi else "—") + " |")
+        lines.append("")
     at = r.get("attribution") or {}
     if at and "error" not in at:
         lines += ["## Where the return difference comes from", "",
@@ -527,9 +576,10 @@ def draw(r: dict[str, Any], path: Path) -> None:
 
 # ----------------------------------------------------------------------------------- the website's data
 SITE_METRICS = ("sharpe", "total_return", "max_drawdown", "excess_vs_spy", "avg_exposure", "turnover",
-                "format_error_rate", "invalid_order_rate")
+                "format_error_rate", "invalid_order_rate", "hit_rate_5d", "decision_excess_5d", "decision_ic",
+                "holdings_ic")
 SITE_COMPARE = ("sharpe", "total_return", "max_drawdown", "avg_exposure", "turnover", "format_error_rate",
-                "invalid_order_rate")
+                "invalid_order_rate", "hit_rate_5d", "decision_excess_5d", "decision_ic", "holdings_ic")
 METHOD = {
     "en": "Each variant changes one factor of the baseline prompt. Paired differences (same model, period and seed), "
           "mean over periods, 95% bootstrap interval, exact sign-flip p-value, Holm correction across the variants; "
