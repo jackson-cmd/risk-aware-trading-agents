@@ -216,6 +216,9 @@ def test_decisions_and_ic_on_a_synthetic_record(tmp_path, market):
         assert d["all"][f"{h}d"]["mean"] == pytest.approx(np.mean(buys + sells))
         assert d["all"][f"{h}d"]["hit_rate"] == pytest.approx(np.mean(np.array(buys + sells) > 0))
     assert res["decisions"]["by_trigger"]["news"]["buys"]["n"] == 1
+    assert res["decisions"]["counts"] == {"news": {"buys": 1, "sells": 1}, "other": {"buys": 2, "sells": 2}}
+    assert res["summary"]["news_decision_share"] == pytest.approx(2 / 6)
+    assert res["summary"]["news_entry_pnl"] == pytest.approx(1000.0)
 
     # decision IC: on each fill day, +1 bought / -1 sold / 0 left alone against the next five days
     want = []
@@ -258,6 +261,7 @@ def test_factor_regression_recovers_the_exposures(tmp_path, market):
     assert f["alpha_t"] > 3 and f["r2"] > 0.95
     c = f["contributions_annual"]
     assert sum(c.values()) == pytest.approx(f["excess_return_annual"])  # the parts add up
+    assert res["summary"]["exposure_return_annual"] + f["alpha_annual"] == pytest.approx(f["excess_return_annual"])
     assert f["capm"]["r2"] < f["r2"]  # the market alone explains less
     assert res["decisions"]["all"]["1d"]["n"] == 0 and res["pnl"]["positions"] == 0
     assert any("Verdict" in x for x in res["findings"])

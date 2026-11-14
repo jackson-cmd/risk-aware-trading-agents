@@ -382,8 +382,11 @@ def decision_rows(rec: Record, px: _Prices, market: FrozenMarket) -> pd.DataFram
 
 
 def decision_stats(rows: pd.DataFrame) -> dict[str, Any]:
-    out: dict[str, Any] = {"horizons": list(HORIZONS), "buys": {}, "sells": {}, "all": {}, "by_trigger": {}}
+    out: dict[str, Any] = {"horizons": list(HORIZONS), "buys": {}, "sells": {}, "all": {}, "by_trigger": {},
+                           "counts": {}}
     buys = rows["side"] == "BUY"
+    for trig, g in rows.groupby("trigger"):  # every decision, whether or not a window fits after it
+        out["counts"][str(trig)] = {"buys": int((g["side"] == "BUY").sum()), "sells": int((g["side"] != "BUY").sum())}
     for h in HORIZONS:
         key = f"signed_{h}d"
         for name, mask in (("buys", buys), ("sells", ~buys), ("all", pd.Series(True, index=rows.index))):
@@ -729,6 +732,11 @@ def summary(res: dict[str, Any]) -> dict[str, Any]:
     d, ic, f, c = res["decisions"], res["ic"], res["factors"], res["pnl"]["concentration"]
     a5, b5, s5 = d["all"]["5d"], d["buys"]["5d"], d["sells"]["5d"]
     ex = f.get("exposures") or {}
+    counts = d.get("counts") or {}
+    n_all = sum(v["buys"] + v["sells"] for v in counts.values())
+    news = counts.get("news") or {}
+    entry = {r["group"]: r for r in res["pnl"]["by_trigger"]["entry"]}
+    contrib = f.get("contributions_annual") or {}
     return {
         "total_return": res["total_return"], "spy_return": res["spy_return"],
         "decisions": a5["n"] if a5["n"] else d["all"]["1d"]["n"],
@@ -742,6 +750,10 @@ def summary(res: dict[str, Any]) -> dict[str, Any]:
         "capm_alpha_t": (f.get("capm") or {}).get("alpha_t"),
         **{f"beta_{k}": (ex.get(k) or {}).get("beta") for k in FACTORS},
         "r2": f.get("r2"),
+        # the part of the mean excess return a year that the four exposures explain; the rest is alpha_annual
+        "exposure_return_annual": sum(contrib[k] for k in FACTORS) if contrib else None,
+        "news_decision_share": (news.get("buys", 0) + news.get("sells", 0)) / n_all if n_all else None,
+        "news_entry_pnl": entry["news"]["pnl"] if "news" in entry else (0.0 if entry else None),
         "best_trade_share": c.get("best_trade_share"), "return_without_best_trade": c.get("return_without_best_trade"),
         "concentrated": c.get("concentrated"),
     }

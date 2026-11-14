@@ -171,8 +171,8 @@ MCP 工具是 `experiment_analysis(run_id)`：跑完 `run_experiment` 或一次�
 
 | 键 | 内容 |
 |---|---|
-| `summary` | 平铺的主要数字：`decision_excess_5d` 和它的 `_t`（买入和卖出合起来）、`buy_excess_5d`、`sell_avoided_5d`、`decision_hit_rate_5d`、`decision_ic`、`holdings_ic`、`alpha_annual` 和 `alpha_t`、`capm_alpha_annual`、`beta_market`、`beta_size`、`beta_growth`、`beta_momentum`、`r2`、`best_trade_share`、`return_without_best_trade`、`concentrated` |
-| `decisions` | `buys`、`sells`、`all` 按周期（`1d`、`5d`、`20d`）：`n`、`mean`、`median`、`hit_rate`、`se`、`t`、`t_iid`；5 日的 `by_trigger` |
+| `summary` | 平铺的主要数字：`decision_excess_5d` 和它的 `_t`（买入和卖出合起来）、`buy_excess_5d`、`sell_avoided_5d`、`decision_hit_rate_5d`、`decision_ic`、`holdings_ic`、`alpha_annual` 和 `alpha_t`、`capm_alpha_annual`、`beta_market`、`beta_size`、`beta_growth`、`beta_momentum`、`r2`、`exposure_return_annual`（年化平均超额收益里由暴露解释的部分，剩下的就是 `alpha_annual`）、`news_decision_share`（理由提到新闻的买卖占比）、`news_entry_pnl`、`best_trade_share`、`return_without_best_trade`、`concentrated` |
+| `decisions` | `buys`、`sells`、`all` 按周期（`1d`、`5d`、`20d`）：`n`、`mean`、`median`、`hit_rate`、`se`、`t`、`t_iid`（95% 区间是 `mean` ± 1.96 `se`）；5 日的 `by_trigger`；`counts`：按触发原因数的全部买卖 |
 | `ic` | `decision` 和 `holdings`：`days`、`mean`、`std`、`ir`、`t`、`t_iid`、`positive_share` |
 | `factors` | `exposures`（beta 和 t）、`alpha_annual`、`alpha_t`、`r2`、`contributions_annual`、`factor_means_annual`、`excess_return_annual`、`capm` |
 | `pnl` | `reconciliation`（股票、国库券 ETF、现金利息、其他）、`by_holding_period`、`by_regime`、`by_trigger`（开仓、平仓）、`by_sector`、`by_stock`、`best_trades`、`worst_trades`、`concentration` |

@@ -171,8 +171,8 @@ For a leaderboard of strategies or LLM agents this means: rank on the decision s
 
 | Key | What |
 |---|---|
-| `summary` | The headline numbers, flat: `decision_excess_5d` and its `_t` (buys and sells together), `buy_excess_5d`, `sell_avoided_5d`, `decision_hit_rate_5d`, `decision_ic`, `holdings_ic`, `alpha_annual` and `alpha_t`, `capm_alpha_annual`, `beta_market`, `beta_size`, `beta_growth`, `beta_momentum`, `r2`, `best_trade_share`, `return_without_best_trade`, `concentrated` |
-| `decisions` | `buys`, `sells` and `all` by horizon (`1d`, `5d`, `20d`): `n`, `mean`, `median`, `hit_rate`, `se`, `t`, `t_iid`; `by_trigger` for five days |
+| `summary` | The headline numbers, flat: `decision_excess_5d` and its `_t` (buys and sells together), `buy_excess_5d`, `sell_avoided_5d`, `decision_hit_rate_5d`, `decision_ic`, `holdings_ic`, `alpha_annual` and `alpha_t`, `capm_alpha_annual`, `beta_market`, `beta_size`, `beta_growth`, `beta_momentum`, `r2`, `exposure_return_annual` (the part of the mean excess return a year that the exposures explain; `alpha_annual` is the rest), `news_decision_share` (the share of buys and sells whose reason names news), `news_entry_pnl`, `best_trade_share`, `return_without_best_trade`, `concentrated` |
+| `decisions` | `buys`, `sells` and `all` by horizon (`1d`, `5d`, `20d`): `n`, `mean`, `median`, `hit_rate`, `se`, `t`, `t_iid` (a 95% interval is `mean` ± 1.96 `se`); `by_trigger` for five days; `counts`: every buy and sell by trigger |
 | `ic` | `decision` and `holdings`: `days`, `mean`, `std`, `ir`, `t`, `t_iid`, `positive_share` |
 | `factors` | `exposures` (beta and t), `alpha_annual`, `alpha_t`, `r2`, `contributions_annual`, `factor_means_annual`, `excess_return_annual`, `capm` |
 | `pnl` | `reconciliation` (stocks, T-bill ETFs, cash interest, other), `by_holding_period`, `by_regime`, `by_trigger` (entry, exit), `by_sector`, `by_stock`, `best_trades`, `worst_trades`, `concentration` |
