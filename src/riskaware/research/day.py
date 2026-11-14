@@ -33,13 +33,14 @@ from ..agents.macro import MacroAgent, to_regime
 from ..agents.technical import TechnicalAgent
 from ..config import AppConfig
 from ..data.events import EventCalendar
+from ..news.files import missing_message
 from ..news.history import NewsArchive, PointInTimeNews, decision_time, load_bundle
 from ..universe import MACRO_SYMBOLS, is_etf, sector_of
 from .data import DATA_DIR, FrozenMarket, bundled_market
 from .periods import get_period
 
 NY = ZoneInfo("America/New_York")
-NO_LOCAL_NEWS = DATA_DIR / "_no_local_news"  # never exists: research reads the bundled news only
+NO_LOCAL_NEWS = DATA_DIR / "_no_local_news"  # never exists: research reads the period's headline file only
 VOL_SYMBOLS = ["^VIX9D", "^VIX", "^VIX3M", "^VVIX"]
 INDICATOR_KEYS = [
     "ema20", "ema50", "ema100", "ema200", "sma20", "rsi2", "rsi14", "macd", "macd_signal", "macd_hist", "atr14",
@@ -94,6 +95,9 @@ class MarketView:
         self.stocks = [s for s in syms if not s.startswith("^") and not is_etf(s) and s not in {"GLD", "USO", "UUP",
                                                                                               "IBIT"}]
         self.news = news_replay(self.cfg, self.stocks, extra_news, period=self.period) if news else None
+        per = get_period(self.period)
+        #: Why there are no headlines although news is on (the headline files are not distributed), else None.
+        self.news_missing = missing_message(per.news) if news and not per.has_news else None
         self._earnings = earnings_releases(extra_news, period=self.period)
         self._tech = TechnicalAgent(breakouts_enabled=True)
 
@@ -242,6 +246,8 @@ class MarketView:
         }
         if note:
             out["note"] = note
+        if news and self.news_missing:
+            out["news_note"] = f"the period's headline file is missing: {self.news_missing}"
         if unknown:
             out["unknown_symbols"] = unknown
         return out
@@ -249,7 +255,8 @@ class MarketView:
 
 def news_replay(cfg: AppConfig, symbols: list[str], extra_news: list[dict] | None = None,
                 period: str | None = None) -> PointInTimeNews | None:
-    """Point-in-time news from a period's bundled file only (never a local archive), plus ``extra_news`` if given."""
+    """Point-in-time news from a period's headline file only (never a local archive), plus ``extra_news`` if given.
+    None when there is nothing to show (no copy of the headline file and no ``extra_news``)."""
     archive = NewsArchive(NO_LOCAL_NEWS, bundled=True, bundle_path=get_period(period).news_path)
     if extra_news:
         archive = _WithExtra(archive, extra_news)
@@ -258,7 +265,7 @@ def news_replay(cfg: AppConfig, symbols: list[str], extra_news: list[dict] | Non
 
 
 class _WithExtra(NewsArchive):
-    """The bundled news plus records added for one experiment (counterfactual or injected headlines)."""
+    """A period's headline file plus records added for one experiment (counterfactual or injected headlines)."""
 
     def __init__(self, base: NewsArchive, extra: list[dict]):
         super().__init__(base.root, bundled=base.bundled, bundle_paths=base.bundle_paths)
@@ -280,7 +287,8 @@ class _WithExtra(NewsArchive):
 
 
 def earnings_releases(extra_news: list[dict] | None = None, period: str | None = None) -> dict[str, list[datetime]]:
-    """Times of 8-K filings with Item 2.02 (results of operations) per stock, from a period's bundled SEC records."""
+    """Times of 8-K filings with Item 2.02 (results of operations) per stock, from the SEC records of a period's
+    headline file (empty without a copy of it)."""
     out: dict[str, list[datetime]] = {}
     recs = [r for v in load_bundle(get_period(period).news_path).values() for r in v]
     for r in [*recs, *(extra_news or [])]:

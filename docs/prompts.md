@@ -8,6 +8,8 @@ one thing from the package's own prompt. Every variant trades the same frozen pe
 news replayed by publication time and several seeds. Each variant is compared with the baseline run on the same
 period and seed, and the report says which differences are larger than the gap between two seeds of the same prompt.
 
+The runs with news here read the research headline files (headline titles; for 2026 also SEC 8-K filings). They are licensed and not distributed, so the numbers are published and the headlines are not; with your own copy in `~/.riskaware/data/news`, or headline files built under the same rules ([news-history](news-history.md#the-research-headline-files-not-distributed)), the same commands run.
+
 ## Results so far
 
 The first batch is a pilot: the baseline and two rule prompts (`risk_rules` and `trend_news`, below) on three models

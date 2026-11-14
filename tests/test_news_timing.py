@@ -6,9 +6,12 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+from .conftest import needs_news
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
+@needs_news
 def test_the_guide_numbers_still_hold():
     spec = importlib.util.spec_from_file_location("news_timing", ROOT / "examples" / "news_timing.py")
     mod = importlib.util.module_from_spec(spec)
@@ -18,7 +21,7 @@ def test_the_guide_numbers_still_hold():
     assert result["bps per trade"] == {"calendar date": 32.0, "publication time": -6.7}
     assert result["bps per trade by publication"]["calendar date"][True] == 103.0
     assert result["after the close"] == 178
-    assert round(result["moved to another day"]["benzinga"], 2) == 0.18
+    assert round(result["moved to another day"]["headlines"], 2) == 0.18
     assert round(result["moved to another day"]["sec"], 2) == 0.63
     for guide in ("site/news-backtesting.html", "site/zh/news-backtesting.html"):
         text = (ROOT / guide).read_text(encoding="utf-8")

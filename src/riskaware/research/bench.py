@@ -47,6 +47,7 @@ from typing import Any
 
 import pandas as pd
 
+from ..news.files import missing_message
 from ..universe import preset_symbols
 from .agent import ORDER_SCHEMA, SYSTEM_PROMPT, _Replay, run_policy
 from .data import bundled_market, dataset_info
@@ -243,11 +244,23 @@ def _ollama_caller(model: str, base_url: str | None, temperature: float, max_tok
     return ask
 
 
+def need_news(period: str) -> None:
+    """Stop before anything runs when the benchmark settings use news and the period's headline file is missing."""
+    per = get_period(period)
+    if SETTINGS["news"] and not per.has_news:
+        raise FileNotFoundError(f"{BENCH_VERSION} replays the {per.name} headlines and no copy of {per.news} was "
+                                f"found: {missing_message(per.news)}")
+
+
 def run_task(policy: Callable[[dict], Any], task: str | Task, label: str = "policy", save: bool = True,
              check: bool = True, seed: int = 0) -> ExperimentResult:
     """Trade one task with ``policy`` under the benchmark settings and save the record (plus ``bench.json``, and
-    ``usage.json`` when the policy counts its tokens)."""
+    ``usage.json`` when the policy counts its tokens). The task shows the period's headlines, so a policy that reads
+    the observations needs your copy of the headline file (``FileNotFoundError`` before any call when there is
+    none). A replay of recorded replies does not: its orders are fixed, so its numbers are the same without it."""
     t = get_task(task)
+    if not isinstance(policy, _Replay):
+        need_news(t.period)
     t0 = time.time()
     res = run_policy(policy, experiment(t, label=label, seed=seed), decide_every=SETTINGS["decide_every"],
                      blind=t.blind, max_news=SETTINGS["max_news"], label=label, save=save, check=check)
@@ -263,6 +276,27 @@ def run_task(policy: Callable[[dict], Any], task: str | Task, label: str = "poli
 
 
 # ----------------------------------------------------------------------------------- checking a record
+#: What an entry publishes of each order: the action only. The model's reason for an order, and the note of each
+#: reply, are free text that can echo the headlines it read, and the headlines are licensed.
+ORDER_FIELDS = ("symbol", "action", "weight", "fraction")
+
+
+def public_replies(replies: list[Any]) -> list[Any]:
+    """The replies as an entry publishes them: each order without its reason, each reply without its note. The
+    orders, and so every replayed number, stay the same."""
+    out: list[Any] = []
+    for r in replies:
+        if not isinstance(r, dict):
+            out.append(r)
+            continue
+        kept = {k: v for k, v in r.items() if k != "note"}
+        if isinstance(kept.get("orders"), list):
+            kept["orders"] = [{k: o[k] for k in ORDER_FIELDS if k in o} if isinstance(o, dict) else o
+                              for o in kept["orders"]]
+        out.append(kept)
+    return out
+
+
 def _sha(obj: Any) -> str:
     data = obj if isinstance(obj, (bytes, str)) else json.dumps(obj, sort_keys=True, separators=(",", ":"),
                                                                   default=str)
@@ -311,8 +345,12 @@ def check_record(folder: str | Path) -> tuple[Task | None, list[str]]:
     ds, now = man.get("dataset") or {}, dataset_info(period)
     if (ds.get("prices") or {}).get("sha256") != now["prices"]["sha256"]:
         problems.append("the price file differs from the bundled one (SHA-256)")
-    if (ds.get("news") or {}).get("sha256") != now["news"]["sha256"]:
-        problems.append("the news file differs from the bundled one (SHA-256)")
+    run_news = (ds.get("news") or {}).get("sha256")
+    if run_news is None:
+        problems.append(f"the run saw no headlines: no copy of {now['news']['file']} was found (the headlines are "
+                        "licensed and are not distributed with the package; see docs/news-history.md)")
+    elif run_news != now["news"]["manifest_sha256"]:
+        problems.append("the news file differs from the period's headline file (SHA-256 in the manifest)")
     leak = man.get("leak_check") or {}
     if leak.get("verdict") != "pass":
         problems.append(f"the look-ahead check of the observations is {leak.get('verdict')!r}, not 'pass'")
@@ -487,7 +525,7 @@ def make_entry(folder: str | Path, model: str, cutoff: str, provider: str | None
         "record": {"run_id": man.get("run_id"), "riskaware": man.get("riskaware"), "created_utc": man.get("created_utc"),
                    "files_sha256": {n: hashlib.sha256((folder / n).read_bytes()).hexdigest()
                                     for n in RECORD_FILES if (folder / n).is_file()},
-                   "replies_sha256": _sha(log["replies"]),
+                   "replies_sha256": _sha(public_replies(log["replies"])),
                    "observations_sha256": _sha(log.get("observations_sha256") or []),
                    "costs_seen_by_model": meta.get("costs_seen_by_model", SETTINGS.get("costs")),
                    "rescored_from": meta.get("rescored_from")},
@@ -505,7 +543,7 @@ def make_entry(folder: str | Path, model: str, cutoff: str, provider: str | None
         "submitted": date.today().isoformat(),
         "submitter": submitter,
         "notes": notes,
-        "replies": log["replies"],
+        "replies": public_replies(log["replies"]),
     }
     m = entry["metrics"]
     if m.get("total_return") is not None and entry["anchors"]["equal_weight"].get("total_return") is not None:
@@ -551,8 +589,11 @@ def check_entry(entry: dict) -> list[str]:
     now = dataset_info(task.period)
     if entry["data"].get("prices_sha256") != now["prices"]["sha256"]:
         problems.append("data.prices_sha256 is not the bundled price file")
-    if entry["data"].get("news_sha256") != now["news"]["sha256"]:
-        problems.append("data.news_sha256 is not the bundled news file")
+    if entry["data"].get("news_sha256") != now["news"]["manifest_sha256"]:
+        problems.append("data.news_sha256 is not the period's headline file (SHA-256 in the manifest)")
+    if public_replies(entry["replies"]) != entry["replies"]:
+        problems.append("the replies carry the model's text (an order's reason or a reply's note); an entry publishes "
+                        "the orders only (scripts/strip_entry_text.py)")
     if _sha(entry["replies"]) != entry["record"].get("replies_sha256"):
         problems.append("the replies do not match record.replies_sha256")
     if entry.get("look_ahead_check") != "pass":
@@ -624,6 +665,8 @@ def anchor_rows(periods: tuple[str, ...] = BENCH_PERIODS, leak_check: bool = Tru
     from .strategies import RESEARCH_STRATEGIES
 
     rows: list[dict[str, Any]] = []
+    for period in periods:
+        need_news(period)
     for period in periods:
         last = None
         for name in RESEARCH_STRATEGIES:
@@ -780,4 +823,4 @@ def board(entries: list[dict], anchors: list[dict] | None = None) -> dict[str, A
 __all__ = ["BENCH_PERIODS", "BENCH_VERSION", "MODES", "SEEDS", "SETTINGS", "TASKS", "BenchError", "Task", "anchor_rows",
            "analyze", "bench_policy", "board", "check_entry", "check_record", "contamination", "costs_supported",
            "cutoff_day", "describe", "experiment", "get_task", "load_entries", "make_entry", "replay", "rescore",
-           "run_task", "verify_entry", "window", "window_metrics", "write_entry"]
+           "need_news", "public_replies", "run_task", "verify_entry", "window", "window_metrics", "write_entry"]

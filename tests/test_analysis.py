@@ -19,7 +19,9 @@ from riskaware.research.experiment import Experiment, run_experiment
 from riskaware.strategy.base import Strategy
 from riskaware.types import Action, Signal
 
-REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
+from .conftest import needs_news, news_file
+
+REAL_NEWS = news_file("news_2026.jsonl.gz")
 STOCKS = ["AAA", "BBB", "CCC", "DDD", "EEE", "FFF"]
 
 
@@ -294,6 +296,7 @@ def real_run(tmp_path_factory):
     return folder
 
 
+@needs_news
 def test_real_record_adds_up(real_run):
     res = A.analyze_run(real_run)
     for name in A.FILES:
@@ -318,6 +321,7 @@ def test_real_record_adds_up(real_run):
     json.dumps(A.compact(res))  # the MCP answer is plain JSON
 
 
+@needs_news
 def test_cli_and_mcp(real_run):
     from typer.testing import CliRunner
 

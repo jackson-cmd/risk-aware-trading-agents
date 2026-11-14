@@ -66,6 +66,8 @@ riskaware research bench --llm compat:deepseek-chat --base-url https://api.deeps
 riskaware research bench --llm claude-cli                             # your Claude subscription
 ```
 
+A run needs the headline files the board was made with: the 2020, 2022 and 2026 headlines are licensed and are not distributed, so put your copy in `~/.riskaware/data/news` (or the folder named by `RISKAWARE_NEWS_DIR`). Without it `riskaware research bench` stops before it calls a model. A run on headline files of your own is a run on other data: it works the same way, and `submit` refuses it because the SHA-256 differs from the manifest's.
+
 Each run prints its result, the tokens it used and the command to submit it. Local models go to Ollama's native chat API with a 16,384-token context: Ollama's OpenAI-compatible endpoint keeps the server's default context (4,096 tokens on Ollama 0.11) and silently drops the start of a longer prompt, and one megacap observation is about 10,000 tokens.
 
 From Python, any function from an observation to orders is a policy:
@@ -86,7 +88,7 @@ riskaware research submit RUN_ID --model gpt-5.6-luna --cutoff 2026-02 --provide
 
 `submit` checks the run against the benchmark and writes `leaderboard/entries/<model>-<task>-s<seed>.json`. It refuses a run with other settings, other data or a failed look-ahead check, and lists every difference. A run made before the realistic fill costs existed is replayed under them first: the model's orders stay the same, their fills pay the benchmark's costs. Options: `--access` (how the model was called), `--parameters` (its size), `--submitter`, `--notes`, `--memory` (a JSON file with the model's memory-probe result).
 
-Then open a pull request that adds the file. Continuous integration replays every entry and rebuilds the website's tables; a maintainer merges it and the board updates on the next deploy. Run `riskaware research leaderboard` in a checkout to see the board in the terminal, `--verify` to replay every entry yourself.
+Then open a pull request that adds the file. Continuous integration replays every entry and rebuilds the website's tables; a maintainer merges it and the board updates on the next deploy. Run `riskaware research leaderboard` in a checkout to see the board in the terminal, `--verify` to replay every entry yourself (no headline file needed: the replies are fixed).
 
 ## What an entry holds
 
@@ -96,20 +98,20 @@ Then open a pull request that adds the file. Continuous integration replays ever
 | `model` | name, provider, how it was called (`access`, `call`: temperature, token limit, reasoning setting), `training_cutoff`, `open_weights`, `parameters` |
 | `contamination` | `clean`, `partly` or `may_remember`, from the cutoff and the window |
 | `settings`, `data` | the benchmark settings as run, and the SHA-256 of the price and news files |
-| `record` | the run id, package version and commit, the SHA-256 of every file of the record (manifest, metrics, equity, trades, decisions, policy log), of the replies and of the observations; the fill costs the model's portfolio showed; the run it was replayed from, if any |
+| `record` | the run id, package version and commit, the SHA-256 of every file of the record (manifest, metrics, equity, trades, decisions, policy log), of the published replies and of the observations; the fill costs the model's portfolio showed; the run it was replayed from, if any |
 | `look_ahead_check` | the verdict of the observation check (must be `pass`) |
 | `metrics`, `vs_spy`, `anchors` | return, Sharpe, Sortino, drawdown, turnover, exposure, holding days, trades; beta, alpha, information ratio, t-statistic and the bootstrap interval of the Sharpe ratio; SPY and the equal-weight list over the same window |
 | `after_cutoff` | the same over the days after the cutoff, for `clean` and `partly` windows |
 | `analysis` | the [run analysis](analysis.md) of the record: the summary (exposure and alpha, decision excess over SPY, hit rate, IC, news-triggered share), its findings, the decision and IC statistics, the factor regression and the profit and loss by holding period, sector, regime, trigger and stock (top and bottom three) |
 | `memory` | the memory-probe result, if given |
 | `usage` | calls, input and output tokens, unusable replies, seconds, list-price cost |
-| `replies` | every reply of the model, in order |
+| `replies` | every reply of the model, in order, with its orders only (symbol, action, weight, fraction): the model's reason for each order and the note of each reply are left out, because they can echo the licensed headlines it read |
 
 ## How entries are checked
 
 Two levels, both without calling the model:
 
-1. **Form** (`bench.check_entry`, in every test run): the settings are the benchmark's, the data hashes are the bundled files', the replies match their hash, the look-ahead check passed, and the contamination label follows from the cutoff.
+1. **Form** (`bench.check_entry`, in every test run): the settings are the benchmark's, the price hash is the bundled file's and the news hash is the one in the period's manifest, the replies carry orders only and match their hash, the look-ahead check passed, and the contamination label follows from the cutoff.
 2. **Replay** (`bench.verify_entry`, `riskaware research leaderboard --verify`, and the leaderboard workflow on every pull request that touches `leaderboard/`): the replies go through the backtest again, step by step, and return, Sharpe, drawdown, round trips and turnover must come out the same.
 
 The look-ahead check of a run replays its replies on copies of the market whose prices and headlines after three cut days are random: the observations up to each cut must be identical, which proves that nothing from the future reached the prompt. Whether the model remembers the period is a separate question, answered by the cutoff split, the named-minus-blind gap and the memory probe.
@@ -144,6 +146,6 @@ Two traps the runs ran into. Ollama keeps a 2,048- or 4,096-token context unless
 
 - **Three seeds per task.** Sampling makes two runs of the same model differ. The board shows the mean over the seeds and their range; read differences smaller than the range as noise.
 - **Survivorship.** The 56 stocks are today's large caps. Buying and holding all of them in 2020 returned +40%, more than anyone could have expected at the time; compare models with each other and with the rules, not only with the equal-weight list.
-- **Blind is not airtight.** Blind mode hides tickers and company names, but a headline can still carry a date ("Top WallStreetBets Mentions for Monday May 9, 2022") or a dollar price target that gives the price level away, and a sector, a price path and an unusual headline together may give a stock away.
+- **Blind is not airtight.** Blind mode hides tickers and company names, but a headline can still carry a date (a daily recap titled with the weekday and the date) or a dollar price target that gives the price level away, and a sector, a price path and an unusual headline together may give a stock away.
 - **Ten to twelve months per period.** Short samples; the Sharpe interval in each entry says how short.
-- **One feed of news.** Benzinga titles, plus SEC 8-K filings in 2026.
+- **One feed of news.** Headline titles from one licensed feed, plus SEC 8-K filings in 2026.

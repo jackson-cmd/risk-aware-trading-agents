@@ -66,6 +66,8 @@ riskaware research bench --llm compat:deepseek-chat --base-url https://api.deeps
 riskaware research bench --llm claude-cli                             # 用你的 Claude 订阅
 ```
 
+跑模型需要榜单用的那几个新闻文件：2020、2022 和 2026 年的标题有许可限制，不随包分发，请把你的副本放进 `~/.riskaware/data/news`（或 `RISKAWARE_NEWS_DIR` 指定的文件夹）。没有的话 `riskaware research bench` 会在调用模型之前停下。用你自己的新闻文件跑，就是换了一份数据：照样能跑，但 SHA-256 和 manifest 对不上，`submit` 不会收。
+
 每次运行跑完会打印结果、用了多少 token，以及提交用的命令。本地模型走 Ollama 的原生聊天接口，上下文开到 16,384 token：Ollama 的 OpenAI 兼容接口沿用服务端默认上下文（Ollama 0.11 是 4,096 token），更长的 prompt 开头会被悄悄截掉，而 megacap 的一个观察值约 1 万 token。
 
 在 Python 里，任何「观察值 → 订单」的函数都是一个策略：
@@ -86,7 +88,7 @@ riskaware research submit RUN_ID --model gpt-5.6-luna --cutoff 2026-02 --provide
 
 `submit` 先按基准核对这次运行，再写出 `leaderboard/entries/<model>-<task>-s<seed>.json`。设置不同、数据不同或防偷看检查没过的运行会被拒绝，并列出每一处不同。在 realistic 成交成本出现之前跑的运行，会先在这个成本下重放一遍：模型的订单不变，成交按基准的成本算。可选参数：`--access`（怎么调用的模型）、`--parameters`（模型大小）、`--submitter`、`--notes`、`--memory`（模型记忆探针结果的 JSON 文件）。
 
-然后开一个只加这个文件的 PR。CI 会重放每个条目并重新生成网站上的表格；维护者合并后，下一次部署时榜单就更新了。在仓库目录里运行 `riskaware research leaderboard` 可以在终端里看榜单，加 `--verify` 自己重放每个条目。
+然后开一个只加这个文件的 PR。CI 会重放每个条目并重新生成网站上的表格；维护者合并后，下一次部署时榜单就更新了。在仓库目录里运行 `riskaware research leaderboard` 可以在终端里看榜单，加 `--verify` 自己重放每个条目（不需要新闻文件：回复是固定的）。
 
 ## 条目里有什么
 
@@ -96,20 +98,20 @@ riskaware research submit RUN_ID --model gpt-5.6-luna --cutoff 2026-02 --provide
 | `model` | 名字、厂商、怎么调用的（`access`，`call`：温度、token 上限、推理设置）、`training_cutoff`、`open_weights`、`parameters` |
 | `contamination` | `clean`、`partly` 或 `may_remember`，由截止日和窗口推出 |
 | `settings`、`data` | 实际运行时的基准设置，以及价格和新闻文件的 SHA-256 |
-| `record` | 运行编号、包的版本和提交、记录里每个文件（manifest、metrics、equity、trades、decisions、policy log）的 SHA-256、回复和观察值的 SHA-256；模型当时看到的持仓用的是哪种成交成本；如果是重放出来的，原来的运行编号 |
+| `record` | 运行编号、包的版本和提交、记录里每个文件（manifest、metrics、equity、trades、decisions、policy log）的 SHA-256、公开的回复和观察值的 SHA-256；模型当时看到的持仓用的是哪种成交成本；如果是重放出来的，原来的运行编号 |
 | `look_ahead_check` | 观察值防偷看检查的结论（必须是 `pass`） |
 | `metrics`、`vs_spy`、`anchors` | 收益、Sharpe、Sortino、回撤、换手、持仓比例、持有天数、交易次数；beta、alpha、信息比率、t 统计量和 Sharpe 的 bootstrap 区间；同一窗口里 SPY 和等权组合的表现 |
 | `after_cutoff` | 同样的指标，只算截止日之后的日子，`clean` 和 `partly` 窗口才有 |
 | `analysis` | 这次运行的[运行分析](analysis.md)：摘要（暴露和 alpha、决策后相对 SPY 的超额、命中率、IC、新闻触发的比例）、结论、决策和 IC 的统计、因子回归，以及按持有期、行业、市场状态、触发原因和个股拆开的盈亏（各取前三和后三） |
 | `memory` | 记忆探针的结果（如果提供了） |
 | `usage` | 调用次数、输入输出 token、无法使用的回复、耗时、按标价的花费 |
-| `replies` | 模型的全部回复，按顺序 |
+| `replies` | 模型的全部回复，按顺序，只保留订单（代码、动作、权重、比例）：每笔订单的理由和每次回复的说明都去掉了，因为它们可能复述模型读到的、有许可限制的新闻标题 |
 
 ## 怎么核对条目
 
 两层，都不调用模型：
 
-1. **格式**（`bench.check_entry`，每次跑测试都会做）：设置是基准的设置，数据哈希是自带文件的哈希，回复和它的哈希对得上，防偷看检查通过，`contamination` 标签和截止日一致。
+1. **格式**（`bench.check_entry`，每次跑测试都会做）：设置是基准的设置，价格哈希是自带文件的哈希、新闻哈希是该时段 manifest 里记的那个，回复里只有订单并且和它的哈希对得上，防偷看检查通过，`contamination` 标签和截止日一致。
 2. **重放**（`bench.verify_entry`、`riskaware research leaderboard --verify`，以及每个改动 `leaderboard/` 的 PR 都会跑的 leaderboard 工作流）：把回复一步一步重新放进回测，收益、Sharpe、回撤、平仓次数和换手必须一致。
 
 一次运行的防偷看检查，会把它的回复放到另外几份市场副本上重放：这些副本在三个切点之后的价格和新闻全是随机的。每个切点之前的观察值必须完全相同，这就证明了没有任何未来的信息进入 prompt。模型是否记得这个时段是另一个问题，要靠截止日划分、实名减盲测的差距和记忆探针来回答。
@@ -144,6 +146,6 @@ riskaware research submit RUN_ID --model gpt-5.6-luna --cutoff 2026-02 --provide
 
 - **每个任务跑三个种子。**同一个模型跑两次，采样会让结果不同。榜单显示各个种子的平均和范围；比范围小的差别当成噪声。
 - **幸存者偏差。**这 56 只是今天的大盘股。2020 年把它们全部买入持有能赚 40%，远超当时任何人的预期；模型之间、模型和规则策略之间比，不要只和等权组合比。
-- **盲测不是密不透风。**盲测藏起了代码和公司名，但新闻标题里仍可能带着日期（"Top WallStreetBets Mentions for Monday May 9, 2022"），或者带着能看出价位的美元目标价；行业、价格走势和一条特别的新闻合在一起，也可能让模型认出某只股票。
+- **盲测不是密不透风。**盲测藏起了代码和公司名，但新闻标题里仍可能带着日期（比如标题里写着星期几和日期的每日汇总），或者带着能看出价位的美元目标价；行业、价格走势和一条特别的新闻合在一起，也可能让模型认出某只股票。
 - **每个时段只有十到十二个月。**样本短；每个条目里 Sharpe 的区间说明了有多短。
-- **新闻只有一个来源。**Benzinga 标题，2026 年另有 SEC 8-K 公告。
+- **新闻只有一个来源。**一个有许可的标题来源，2026 年另有 SEC 8-K 公告。

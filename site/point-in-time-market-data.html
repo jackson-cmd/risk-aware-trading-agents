@@ -43,9 +43,9 @@
 <h2 id="periods">Three periods</h2>
 <div class="table-wrap"><table>
   <tr><th>Period</th><th>Test window</th><th>Prices from</th><th>News replayed in the benchmark</th><th>The market</th></tr>
-  <tr><td>2026</td><td>2026-01-02 to 2026-11-11</td><td>2024-01-02 (719 trading days)</td><td>16,945 items: 16,249 Benzinga headlines and 696 SEC 8-K filings</td><td>SPY +12.1%, with a −8.9% drawdown in March</td></tr>
-  <tr><td>2022</td><td>2022-01-03 to 2022-12-30</td><td>2020-01-02 (756 trading days)</td><td>29,300 Benzinga headlines</td><td>SPY −18.2% and the Nasdaq 100 −32.6%: eight Fed hikes, CPI above 9% in June</td></tr>
-  <tr><td>2020</td><td>2020-01-02 to 2020-12-31</td><td>2018-01-02 (756 trading days)</td><td>19,618 Benzinga headlines</td><td>SPY −34% in 23 trading days with VIX closing at 82.7, then +18.3% for the year</td></tr>
+  <tr><td>2026</td><td>2026-01-02 to 2026-11-11</td><td>2024-01-02 (719 trading days)</td><td>16,945 items: 16,249 headlines and 696 SEC 8-K filings</td><td>SPY +12.1%, with a −8.9% drawdown in March</td></tr>
+  <tr><td>2022</td><td>2022-01-03 to 2022-12-30</td><td>2020-01-02 (756 trading days)</td><td>29,300 headlines</td><td>SPY −18.2% and the Nasdaq 100 −32.6%: eight Fed hikes, CPI above 9% in June</td></tr>
+  <tr><td>2020</td><td>2020-01-02 to 2020-12-31</td><td>2018-01-02 (756 trading days)</td><td>19,618 headlines</td><td>SPY −34% in 23 trading days with VIX closing at 82.7, then +18.3% for the year</td></tr>
 </table></div>
 <p>The two years before each test window are there so that slow indicators such as the 200-day EMA and the 52-week high are fully warmed up on its first trading day. The three markets differ on purpose: a strategy or an LLM that only did well in one kind of market says little.</p>
 
@@ -59,7 +59,7 @@
   <tr><td>Calendar</td><td>FOMC decisions, CPI, PPI and jobs reports, as scheduled in advance</td></tr>
 </table></div>
 <p>A few symbols begin later than their file because they started trading later: XLC in June 2018, CRWD in June 2019, SGOV in June 2020 and IBIT in January 2024.</p>
-<p>The news is not part of the data. The leaderboard replays Benzinga headlines (titles only) for the 64 stocks, and in 2026 also SEC 8-K filings with the time SEC accepted them, each from the first close after it was published. Its results are based on that news; the headline data has license restrictions and is not distributed with the package.</p>
+<p>The news is not part of the data. The leaderboard replays licensed headlines (titles only) for the 64 stocks, and in 2026 also SEC 8-K filings with the time SEC accepted them, each from the first close after it was published. Its results are based on that news; the headline data has license restrictions and is not distributed with the package.</p>
 
 <h2>Files and columns</h2>
 <p>Each period is a price file and a manifest in <code>src/riskaware/research/data/</code>; the manifest lists the dates, the symbols and the SHA-256 of the file.</p>

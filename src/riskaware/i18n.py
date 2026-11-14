@@ -185,9 +185,15 @@ M: dict[str, tuple[str, str]] = {
                 "这个收盘前的回看窗口里没有新闻。"),
     "nh.private": ("What you download or import stays on this machine (news.archive_dir), outside the repository.",
                    "你下载或导入的新闻只存在本机（news.archive_dir），不在仓库里。"),
-    "nh.bundle": ("Bundled with the package: {items} headlines for {symbols} stocks, {first} to {last} ({feeds})",
-                  "安装包自带：{symbols} 只股票的 {items} 条标题，{first} 至 {last}（{feeds}）"),
-    "nh.bundled": ("Bundled", "自带"),
+    "nh.bundle": ("Research headline files (your copy, not distributed with the package): {items} headlines for "
+                  "{symbols} stocks, {first} to {last} ({feeds})",
+                  "研究用新闻文件（你自己的副本，不随包分发）：{symbols} 只股票的 {items} 条标题，{first} 至 {last}（{feeds}）"),
+    "nh.no_bundle": ("No research headline files: they are licensed and are not distributed with the package. Put "
+                     "your copy in ~/.riskaware/data/news (or RISKAWARE_NEWS_DIR), or build your own: "
+                     "docs/news-history.md",
+                     "没有研究用新闻文件：标题有许可限制，不随包分发。把你自己的副本放进 ~/.riskaware/data/news"
+                     "（或 RISKAWARE_NEWS_DIR），或者自己建一份：docs/zh/news-history.md"),
+    "nh.bundled": ("From files", "来自新闻文件"),
     "bt.news_off": ("No news for these symbols; this backtest runs without news.",
                     "这些股票没有新闻数据，这次回测不用新闻。"),
     "analyze.title": ("Analysis", "分析"),

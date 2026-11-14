@@ -24,11 +24,15 @@ def guide() -> dict[str, Any]:
         "what": (
             "Frozen copies of the US stock market in three different years, for experiments that others can repeat: "
             "2026 to date (the default), 2022 (the rate-hike bear market) and 2020 (the COVID crash). Each period has "
-            "daily bars from two years before it (to warm up slow indicators such as EMA200), the VIX term "
-            "structure, and that year's news (Benzinga headlines, titles only; 2026 also SEC 8-K filings). It ships "
-            "with the package, so an experiment never touches the network and gives the same numbers on any "
-            "machine; each record carries the SHA-256 of the data. Pass period='2022' (or '2020') to "
-            "run_experiment and trading_session_start; market_day picks the period from the day."),
+            "daily bars from two years before it (to warm up slow indicators such as EMA200) and the VIX term "
+            "structure. The prices ship with the package, so an experiment never touches the network and gives the "
+            "same numbers on any machine; each record carries the SHA-256 of the data. Each period was also built "
+            "with that year's news (licensed headlines, titles only; 2026 also SEC 8-K filings): the headlines are "
+            "licensed and are not distributed, the manifest keeps each file's SHA-256, and news only appears when "
+            "this machine has its own copy (in ~/.riskaware/data/news or RISKAWARE_NEWS_DIR; check with "
+            "riskaware research data). Without it, runs with news on see no headlines and their notes say so. "
+            "Pass period='2022' (or '2020') to run_experiment and trading_session_start; market_day picks the "
+            "period from the day."),
         "periods": periods,
         "default_period": DEFAULT_PERIOD,
         "data": {

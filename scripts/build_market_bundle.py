@@ -5,7 +5,7 @@
 
 Daily bars from Yahoo Finance (yfinance, ``auto_adjust=False``) for:
 
-* the 64 stocks of the built-in watchlists (core, megacap, tech, defensive), the same stocks as the bundled news;
+* the 64 stocks of the built-in watchlists (core, megacap, tech, defensive), the same stocks as the headline files;
 * the index, sector and bond ETFs the agents use (SPY, QQQ, the 11 sector ETFs, BIL, SGOV, IEF, TLT, HYG, ...);
 * the VIX term structure and its volatility: ^VIX9D, ^VIX, ^VIX3M, ^VVIX;
 * a few cross-asset ETFs that close with the stock market: GLD (gold), USO (oil), UUP (dollar), IBIT (bitcoin).
@@ -19,7 +19,9 @@ on its first day. A symbol that did not trade yet (IBIT before 2024) is left out
 manifest.
 
 The output is sorted and written with a fixed gzip timestamp; manifest.json next to it records the period, the
-symbols and the SHA-256 of this file and of the bundled news file. Prices on Yahoo change when a dividend is paid
+symbols and the SHA-256 of this file and of the period's headline file (read from your copy, see
+src/riskaware/news/files.py; without a copy the SHA-256 already in the manifest is kept, since the headlines are
+licensed and are not distributed). Prices on Yahoo change when a dividend is paid
 or data is corrected, so a later rebuild of the same period can differ slightly: the point of shipping the file
 is that every experiment runs on exactly the same numbers.
 """
@@ -38,11 +40,11 @@ from pathlib import Path
 
 import pandas as pd
 
+from riskaware.news.files import find_news_file
 from riskaware.research.periods import get_period
 from riskaware.universe import PRESETS, SECTOR_MAP, is_etf
 
 OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "riskaware" / "research" / "data"
-NEWS_DIR = Path(__file__).resolve().parent.parent / "src" / "riskaware" / "news" / "data"
 WATCHLISTS = ("core", "megacap", "tech", "defensive")
 VOLATILITY = ["^VIX9D", "^VIX", "^VIX3M", "^VVIX"]
 CROSS_ASSET = {"GLD": "gold", "USO": "oil", "UUP": "US dollar", "IBIT": "bitcoin"}
@@ -141,7 +143,10 @@ def main() -> None:
         gz.write(buf.getvalue().encode("utf-8"))
 
     first_trading = min(d for d in spy_days if d >= per.start.isoformat())
-    news_file = NEWS_DIR / per.news
+    news_file = find_news_file(per.news)
+    old = out_dir / per.manifest
+    kept = (json.loads(old.read_text(encoding="utf-8"))["files"].get(per.news, {}).get("sha256")
+            if old.is_file() else None)
     manifest = {
         "name": f"riskaware market {end.year}",
         "version": end.isoformat(),
@@ -150,7 +155,7 @@ def main() -> None:
                    "trading_days": len(spy_days)},
         "files": {
             path.name: {"sha256": sha256(path), "rows": int(len(table)), "columns": COLUMNS},
-            per.news: {"sha256": sha256(news_file) if news_file.is_file() else None,
+            per.news: {"sha256": sha256(news_file) if news_file else kept,
                        "path": f"riskaware/news/data/{per.news}"},
         },
         "symbols": groups,

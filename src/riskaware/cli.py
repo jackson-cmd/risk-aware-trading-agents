@@ -663,7 +663,7 @@ def lab_cmd(
     preset: str = typer.Option("megacap", help="Universe preset when no --symbols"),
     start: str = typer.Option("2026-01-02", help="YYYY-MM-DD"),
     end: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default today)"),
-    news: bool = typer.Option(True, "--news/--no-news", help="Replay the news archive (2026 ships with the package)"),
+    news: bool = typer.Option(True, "--news/--no-news", help="Replay the news archive (yours, plus the research headline files if you have a copy)"),
     profile: str = typer.Option("balanced", help="Risk profile"),
     check_only: bool = typer.Option(False, "--check-only", help="Only check the code; do not run it"),
     save: Optional[str] = typer.Option(None, help="Keep the strategy under this name in ~/.riskaware/strategies/ai"),
@@ -1349,6 +1349,8 @@ def news_history_status() -> None:
     stats = archive.stats()
     if not stats:
         console.print(T("nh.empty"))
+        if archive.bundled:
+            console.print("[dim]" + T("nh.no_bundle") + "[/]")
         return
     tbl = Table(title=f"{T('nh.title')} · {archive.root}")
     for k in ("col.symbol", "nh.items", "nh.bundled", "nh.first", "nh.last", "nh.feeds"):
@@ -1363,6 +1365,8 @@ def news_history_status() -> None:
         console.print("[dim]" + T("nh.bundle", items=info["items"], symbols=info["symbols"],
                                   first=info["first"].date().isoformat(), last=info["last"].date().isoformat(),
                                   feeds=", ".join(f"{k} {v}" for k, v in sorted(info["feeds"].items()))) + "[/]")
+    elif archive.bundled:
+        console.print("[dim]" + T("nh.no_bundle") + "[/]")
 
 
 @news_app.command("show")

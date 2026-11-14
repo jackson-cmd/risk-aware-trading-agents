@@ -2,6 +2,12 @@
 
 [中文](docs/zh/CHANGELOG.md)
 
+## Unreleased
+
+- **The research headlines are no longer distributed.** The headline files of the 2020, 2022 and 2026 periods are licensed, so they are gone from the package, the repository and the Hugging Face dataset; every result and number made with them stays published, and each period's manifest keeps their SHA-256. The code reads your own copy from `RISKAWARE_NEWS_DIR` or `~/.riskaware/data/news` (and from the package folder of an older install). `riskaware research data` reports a missing headline file as not distributed instead of changed, and an experiment with news on but no headline file says so in its notes and manifest. To replay news, build an archive under the same rules from the free SEC 8-K filings, a news API key of your own or any CSV (`riskaware news-history`). A benchmark run stops before it calls a model when the files are missing; replaying leaderboard entries needs none.
+- Leaderboard entries keep every order of each model but no longer carry the text reason given for an order; `record.replies_sha256` is recomputed, and every entry still replays to the same numbers.
+- Releases are no longer archived on Zenodo. Cite the repository for now, and the benchmark paper once it is out.
+
 ## 0.7.2 (2026-11-13)
 
 - **On the official MCP Registry** as `io.github.jackson-cmd/risk-aware-trading-agents`: after the upload to PyPI, each release publishes `server.json` there, so MCP clients and directories that read the registry can find and install the server.
@@ -46,7 +52,7 @@
 
 ## 0.6.0 (2026-11-12)
 
-- 2026 news ships with the package: 16,945 items for the 64 stocks of the built-in lists, January 1 to November 11, 2026 (16,249 Benzinga headlines with only the title, time and ticker, and 696 SEC 8-K filings), in `riskaware/news/data/news_2026.jsonl.gz` (0.7 MB). Backtests with `--news` read it together with your own archive; `news.bundled: false` leaves it out. A headline counts for a stock only when Benzinga tagged the stock and the headline names the company or its ticker; automated price recaps are left out. `scripts/build_news_bundle.py` rebuilds the file.
+- 2026 news ships with the package: 16,945 items for the 64 stocks of the built-in lists, January 1 to November 11, 2026 (16,249 headlines with only the title, time and ticker, and 696 SEC 8-K filings), in `riskaware/news/data/news_2026.jsonl.gz` (0.7 MB). Backtests with `--news` read it together with your own archive; `news.bundled: false` leaves it out. A headline counts for a stock only when Benzinga tagged the stock and the headline names the company or its ticker; automated price recaps are left out. `scripts/build_news_bundle.py` rebuilds the file.
 - Strategy lab: the MCP tools `strategy_guide` and `backtest_code` let Claude, Codex or Gemini write a strategy as code from a plain-words request and backtest it. The code is checked first (no dates or stock tickers in the code, imports from a short list, no files, network, `eval`, `getattr` or private attributes) and runs in a separate process with no API keys, a time limit, a CPU limit where available, and an audit hook that refuses network, subprocesses and file access while strategy code runs. Errors come back with the line in the strategy. `save_as` keeps a strategy in `~/.riskaware/strategies/ai/`; it then appears in `list_strategies`, on the dashboard and for `agents_create`. `riskaware lab FILE` does the same from the command line.
 - No look-ahead: a backtest day sees only news published strictly before its close, and the close is 13:00 on early-close days; a date without a time counts as the end of that day; times without a zone are read as New York time (the CSV import default was UTC); items dated in the future are dropped. Indicator rows now hold a copy of that day's values and `ctx.history()` returns a copy, so a strategy can no longer reach later prices through the arrays behind them. New tests cover each rule, and a test recomputes the indicators on data cut at each day to show they use no later data.
 - The dashboard's Backtest page has a **Replay news** switch, and saved AI strategies appear in its strategy lists and in the create-agent form.

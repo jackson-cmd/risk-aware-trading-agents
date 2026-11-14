@@ -1,10 +1,16 @@
 """Example: how much a news backtest gains by reading headlines before they were published.
 
-Run it with the data that ships with the package (no download, no API key):
+It needs your own copy of the 2026 headline file, news_2026.jsonl.gz. The headlines are licensed, so the file is
+not distributed with the package: put your copy in ~/.riskaware/data/news (or in the folder named by
+RISKAWARE_NEWS_DIR), or build a headline file of your own under the same rules (docs/news-history.md). The prices
+ship with the package. Then:
 
     python examples/news_timing.py
 
-One simple headline rule is backtested twice on the 2026 Benzinga headlines. A headline scores +1 when it says
+The numbers on the website came from the original file; the manifest keeps its SHA-256, so `riskaware research
+data` tells you whether your copy is the same one.
+
+One simple headline rule is backtested twice on the 2026 headlines. A headline scores +1 when it says
 a company beat estimates or raised its outlook and -1 when it missed or cut, and the trade holds for one day in
 that direction.
 
@@ -23,10 +29,13 @@ from __future__ import annotations
 
 import gzip
 import json
+import sys
 from importlib.resources import files
 
 import numpy as np
 import pandas as pd
+
+from riskaware.news.files import find_news_file, missing_message
 
 UP = r"\b(?:beats?|tops|raises (?:fy|full-year|annual|guidance|outlook|forecast)|above estimates)\b"
 DOWN = (r"\b(?:miss(?:es)?|lowers (?:fy|guidance|outlook|forecast)|cuts (?:guidance|outlook|forecast)"
@@ -38,8 +47,11 @@ def load() -> tuple[pd.DataFrame, pd.DataFrame]:
     package = files("riskaware")
     with (package / "research" / "data" / "market_2026.csv.gz").open("rb") as raw:
         prices = pd.read_csv(raw, compression="gzip", parse_dates=["date"])
-    with (package / "news" / "data" / "news_2026.jsonl.gz").open("rb") as raw:
-        news = pd.DataFrame(json.loads(line) for line in gzip.open(raw, "rt", encoding="utf-8"))
+    path = find_news_file("news_2026.jsonl.gz")
+    if path is None:
+        sys.exit(f"examples/news_timing.py: {missing_message('news_2026.jsonl.gz')}")
+    with gzip.open(path, "rt", encoding="utf-8") as fh:
+        news = pd.DataFrame(json.loads(line) for line in fh)
     news["ts"] = pd.to_datetime(news["ts"], utc=True)
     return prices, news
 
@@ -63,7 +75,7 @@ def compare(prices: pd.DataFrame, news: pd.DataFrame) -> dict:
                        calendar_day=local.dt.tz_localize(None).dt.normalize(),
                        after_close=local.dt.hour >= 16)
 
-    heads = news[news["feed"] == "benzinga"].copy()
+    heads = news[news["feed"] != "sec"].copy()                      # headlines, not SEC filings
     heads["score"] = (heads["headline"].str.contains(UP, case=False).astype(int)
                       - heads["headline"].str.contains(DOWN, case=False).astype(int))
     heads = heads[heads["score"] != 0]
@@ -91,14 +103,14 @@ def compare(prices: pd.DataFrame, news: pd.DataFrame) -> dict:
         "bps per trade": (trades.mean() * 1e4).round(1).to_dict(),
         "hit rate": ((trades > 0).sum() / trades.count()).round(3).to_dict(),
         "bps per trade by publication": (heads.groupby("after_close")[joins].mean() * 1e4).round(1).to_dict(),
-        "moved to another day": (news["calendar_day"] != news["usable_day"]).groupby(news["feed"]).mean().round(3)
-        .to_dict(),
+        "moved to another day": (news["calendar_day"] != news["usable_day"])
+        .groupby(news["feed"].where(news["feed"] == "sec", "headlines")).mean().round(3).to_dict(),
     }
 
 
 def main() -> None:
     result = compare(*load())
-    print(f"{result['headlines']} scored Benzinga headlines in 2026, {result['after the close']} of them published "
+    print(f"{result['headlines']} scored headlines in 2026, {result['after the close']} of them published "
           "after the 16:00 close\n")
     print(f"{'join':<18}{'trades':>8}{'mean per trade':>17}{'hit rate':>10}")
     for join in ("calendar date", "publication time"):
@@ -108,7 +120,7 @@ def main() -> None:
     print(f"\nHeadlines published after the close: {by_time['calendar date'][True]:+.1f} bp per trade joined by "
           f"calendar date, {by_time['publication time'][True]:+.1f} bp joined by publication time.")
     moved = result["moved to another day"]
-    print(f"Respecting the timestamp moves {moved['benzinga']:.0%} of the Benzinga headlines and {moved['sec']:.0%} "
+    print(f"Respecting the timestamp moves {moved['headlines']:.0%} of the headlines and {moved['sec']:.0%} "
           "of the SEC 8-K filings to a later trading day.")
 
 

@@ -4,6 +4,8 @@
 
 Frozen copies of the US stock market in three very different years ship with the package: 2026 to date (a rising market), 2022 (the rate-hike bear market) and 2020 (the COVID crash and rebound). A strategy, an LLM agent or a paper's experiment can be run again by anyone and give the same numbers, and it can be tested on a market that went up, one that went down and one that crashed. You can ask what was known at any day's close, run a strategy with orders at the next open, check that it never saw the future, and keep a record that says exactly which data and code produced each number. Claude (or any MCP client) can do all of it for you: describe a strategy in words, and it writes the code, runs the experiment and reads you the report.
 
+The prices ship with the package. The news behind the published results does not: the headlines are licensed, so they are not distributed ([below](#the-news-archive-behind-it)).
+
 - [What ships](#what-ships)
 - [The news archive behind it](#the-news-archive-behind-it)
 - [How a day works](#how-a-day-works)
@@ -19,31 +21,33 @@ Frozen copies of the US stock market in three very different years ship with the
 
 Three periods. Each is a test window plus the two years before it, which warm up slow indicators such as EMA200 and the 52-week high, so the first day of every window sees the same indicators it would have seen live.
 
-| Period | Test window | What happened | Data from | News in the window (64 stocks) |
+| Period | Test window | What happened | Data from | Headlines behind the results (64 stocks; not distributed) |
 |---|---|---|---|---|
-| `2026` (default) | 2026-01-02 to 2026-11-11, 217 trading days | A rising market: SPY +12.1%, with a -8.9% drawdown in March | 2024-01-02 | 16,945 items: Benzinga headlines and SEC 8-K filings |
-| `2022` | 2022-01-03 to 2022-12-30, 251 trading days | The rate-hike bear market: SPY -18.2%, the Nasdaq 100 -32.6%; eight Fed hikes, CPI above 9%; META, NVDA, TSLA and AMZN down by half or more | 2020-01-02 | 29,300 Benzinga headlines |
-| `2020` | 2020-01-02 to 2020-12-31, 253 trading days | The COVID crash and rebound: SPY -34% in 23 trading days, VIX at 82.7, then a new high by August and +18.3% for the year | 2018-01-02 | 19,618 Benzinga headlines |
+| `2026` (default) | 2026-01-02 to 2026-11-11, 217 trading days | A rising market: SPY +12.1%, with a -8.9% drawdown in March | 2024-01-02 | 16,945 items: headlines and SEC 8-K filings |
+| `2022` | 2022-01-03 to 2022-12-30, 251 trading days | The rate-hike bear market: SPY -18.2%, the Nasdaq 100 -32.6%; eight Fed hikes, CPI above 9%; META, NVDA, TSLA and AMZN down by half or more | 2020-01-02 | 29,300 headlines |
+| `2020` | 2020-01-02 to 2020-12-31, 253 trading days | The COVID crash and rebound: SPY -34% in 23 trading days, VIX at 82.7, then a new high by August and +18.3% for the year | 2018-01-02 | 19,618 headlines |
 
 | | |
 |---|---|
 | Prices | Daily bars for the 64 stocks of the built-in watchlists, 25 index, sector and bond ETFs, the VIX term structure (VIX9D, VIX, VIX3M) and VVIX, and the cross-asset ETFs GLD, USO and UUP (and IBIT, which started trading in 2024, in the 2026 period). A stock that was not trading yet is missing from a period's data (CrowdStrike before June 2019). |
-| News | Headlines published in the test window that name one of the 64 stocks, titles only, with their publication time; for 2026 also SEC 8-K filings with the time SEC accepted them. The 2020 and 2022 exports had lost their ticker tags, so a headline belongs to every stock whose company name or ticker it contains, the rule live trading uses to decide whether a story is about a company (Meta's old ticker FB counts too). |
+| News (not distributed) | Headlines published in the test window that name one of the 64 stocks, titles only, with their publication time; for 2026 also SEC 8-K filings with the time SEC accepted them. They are licensed: the manifests keep the SHA-256 of each headline file, and experiments read your own copy if you have one. The 2020 and 2022 exports had lost their ticker tags, so a headline belongs to every stock whose company name or ticker it contains, the rule live trading uses to decide whether a story is about a company (Meta's old ticker FB counts too). |
 | Calendar | FOMC decisions, CPI, PPI and jobs reports, as scheduled in advance, from 2018 on. |
 | Indicators | Computed on the fly from the prices: EMA 20/50/100/200, RSI 2 and 14, MACD, ATR, ADX, Bollinger bands, Donchian channels, 52-week high and drawdown, momentum, relative strength and beta against SPY, realized volatility, relative volume, and the technical agent's setups. |
 | Market readings | The regime (risk-on, neutral, uncertain, risk-off) and what it rests on: SPY's trend, VIX and its term structure, fear & greed computed from market data, sector breadth, credit stress, macro events. |
 
-The 2026 files are also on [Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026) (Parquet with a data viewer, plus the original files byte for byte), for use without installing the package.
+The prices of the three periods are also on [Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) (Parquet with a data viewer, plus the original files byte for byte), for use without installing the package; the headlines are not.
 
-`riskaware research data` prints the contents of each period and checks every file against the SHA-256 in its manifest (`src/riskaware/research/data/manifest.json` for 2026, `manifest_2022.json`, `manifest_2020.json`). The prices come from Yahoo Finance (`scripts/build_market_bundle.py --period 2022` rebuilds a period). A new period is a new set of files, never a change to an old one, so every published number keeps pointing at the same bytes. Each row keeps the price as traded (split-adjusted), the dividend and split of that day, and the factor that turns it into a total-return price; backtests and indicators use total-return prices.
+`riskaware research data` prints the contents of each period and checks every file against the SHA-256 in its manifest (`src/riskaware/research/data/manifest.json` for 2026, `manifest_2022.json`, `manifest_2020.json`); a headline file is checked when you have a copy and reported as not distributed when you do not. The prices come from Yahoo Finance (`scripts/build_market_bundle.py --period 2022` rebuilds a period). A new period is a new set of files, never a change to an old one, so every published number keeps pointing at the same bytes. Each row keeps the price as traded (split-adjusted), the dividend and split of that day, and the factor that turns it into a total-return price; backtests and indicators use total-return prices.
 
 Two things are left out on purpose. Futures, the dollar index and bitcoin itself settle after 16:00 New York time, so their "close" would arrive after a decision taken at the stock close. Fundamentals and analyst data are not point-in-time from any free source, so they are not in the data.
 
-What the news in 2020 and 2022 lacks: there are no SEC filings, and Benzinga counts as one source, so almost every story stays single-source. Rules that wait for a confirmed story, or for a company's own 8-K, rarely fire in those years; compare news strategies across periods with that in mind.
+What the news in 2020 and 2022 lacks: there are no SEC filings, and the one headline feed counts as one source, so almost every story stays single-source. Rules that wait for a confirmed story, or for a company's own 8-K, rarely fire in those years; compare news strategies across periods with that in mind.
 
 ## The news archive behind it
 
-The bundles are cut from a local archive of about 3.2 million Benzinga headlines from 2011 to 2026, with their publication times: about 202,000 in 2020, 270,000 in 2022 and 250,000 in 2026 up to November. That is too big to ship, so each period keeps the headlines that name its 64 stocks. Together with the prices they are enough to backtest trading agents that read the news and to look for news factors (how often a stock is in the news, the tone of its headlines, unusual attention) with the same point-in-time rules; [News factors](news-factors.md) tests ten of them and shows how much a calendar-date join inflates them. If you need more years or more stocks, open an issue and we will look at a separate download.
+Each period's headline file keeps the headlines, with their publication times, that name its 64 stocks. Together with the prices they were enough to backtest trading agents that read the news and to look for news factors (how often a stock is in the news, the tone of its headlines, unusual attention) with the same point-in-time rules; [News factors](news-factors.md) tests ten of them and shows how much a calendar-date join inflates them.
+
+The headlines are licensed, so neither the archive nor the files are distributed; the conclusions and numbers are. Each period's manifest keeps the SHA-256 of its headline file, so whoever has a copy can check that it is the same data. The code looks for a copy in the folder named by `RISKAWARE_NEWS_DIR`, then in `~/.riskaware/data/news/`. Without one, an experiment with news on runs without headlines and says so in its notes and manifest. To replay news yourself, build an archive under the same rules from the free SEC 8-K filings, a news API key of your own or any CSV, and cut a period's file from it ([news-history](news-history.md#the-research-headline-files-not-distributed)); the numbers will differ from the published ones, the rules will not.
 
 ## How a day works
 
@@ -73,9 +77,11 @@ Scheduled: CPI inflation 2026-04-10, PPI producer prices 2026-04-14
  Stock   Close     1d     5d     21d  RSI14  vs EMA50  vs EMA200  Setups           News
  NVDA   182.08  +2.2%  +4.4%   -0.3%     55     +0.9%      +4.7%  EMA100 support   0.02
  TSLA   343.25  -1.0%  -7.7%  -13.9%     34    -12.8%     -12.5%                  -0.20
-  NVDA 2026-04-06 05:58 unconfirmed Understanding NVIDIA's Position In Semiconductors & Semiconductor Equipment Industry Compared To Competitors
-  TSLA 2026-04-08 11:59 unconfirmed Tesla's Inventory Nightmare Could Trigger 60% Slump For TSLA, JPMorgan Analyst Warns
+  NVDA 2026-04-06 05:58 unconfirmed (an industry piece comparing Nvidia with its chip peers)
+  TSLA 2026-04-08 11:59 unconfirmed (a bank analyst warns that Tesla's inventory could send the stock much lower)
 ```
+
+The two headlines are paraphrased here: the research headlines are licensed and not distributed. Without a copy of the 2026 headline file the News column is empty and a line under the table says why.
 
 Without `--symbols` it lists all 64 stocks; `--json` prints everything. The day picks the period (`riskaware research day 2022-06-13` reads the 2022 data). In Python, `MarketView(period="2026").snapshot("2026-04-08", symbols=[...])` returns the same as a dictionary; over MCP the tool is `market_day`. A weekend or holiday shows the close before it.
 
@@ -218,7 +224,7 @@ Reproduce it with `riskaware research baselines`; the numbers come out the same 
 
 ### The same strategies in 2022 and 2020
 
-The same settings on the other two periods (`riskaware research baselines --period 2022`, `--period 2020`). In 2022 there are no SEC filings, so the news filter only sees single-source Benzinga headlines.
+The same settings on the other two periods (`riskaware research baselines --period 2022`, `--period 2020`). In 2022 there are no SEC filings, so the news filter only sees single-source headlines.
 
 2022-01-03 to 2022-12-30, the rate-hike bear market:
 

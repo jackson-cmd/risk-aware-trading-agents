@@ -576,9 +576,11 @@ def guide() -> dict[str, Any]:
     from .news.history import load_bundle
 
     bundle = load_bundle()
-    news_note = (f"Bundled news: {sum(len(v) for v in bundle.values())} headlines and SEC 8-K filings for "
-                 f"{len(bundle)} stocks of the built-in watchlists, January to November 2026."
-                 if bundle else "No news ships with this install; news comes from the local archive.")
+    news_note = (f"News: your copy of the 2026 headline file, {sum(len(v) for v in bundle.values())} headlines and "
+                 f"SEC 8-K filings for {len(bundle)} stocks of the built-in watchlists, January to November 2026."
+                 if bundle else "News: no headline file here. The research headlines are licensed and are not "
+                 "distributed with the package, so news comes only from your local archive (riskaware news-history) "
+                 "or a headline file of your own in ~/.riskaware/data/news.")
     return {
         "how_it_works": (
             "Write one Python class that subclasses Strategy and defines on_bar(self, ctx). Each trading day, "

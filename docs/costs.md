@@ -81,6 +81,8 @@ Every input is known before the order fills:
 
 The [five swing strategies](research.md#five-swing-strategies-with-and-without-news) with the same settings as in the research kit: the 56 megacap stocks, plain execution with at most 10 equal positions, orders at the next open, $100,000. Cost is the average a fill at the open paid with realistic costs, in bps; with fixed costs every one paid 5.
 
+The runs with news here read the research headline files (headline titles; for 2026 also SEC 8-K filings). They are licensed and not distributed, so the numbers are published and the headlines are not; with your own copy in `~/.riskaware/data/news`, or headline files built under the same rules ([news-history](news-history.md#the-research-headline-files-not-distributed)), the same commands run.
+
 #### 2026
 
 | Strategy | News | Return, fixed | Return, realistic | Sharpe, fixed | Sharpe, realistic | Cost (bps) |

@@ -1,15 +1,20 @@
-"""Build the headline file of a bundled period: src/riskaware/news/data/news_<year>.jsonl.gz.
+"""Build the headline file of a research period: ~/.riskaware/data/news/news_<year>.jsonl.gz by default.
 
-    python scripts/build_news_bundle.py --archive DIR --start 2026-01-01 --end 2026-11-11
-    python scripts/build_news_bundle.py --parquet benzinga_news_2022.parquet --start 2022-01-01 --end 2022-12-30 \
-        --out src/riskaware/news/data/news_2022.jsonl.gz
+    python scripts/build_news_bundle.py --archive DIR --feed FEED --source-name NAME --start 2026-01-01 --end 2026-11-11
+    python scripts/build_news_bundle.py --parquet headlines_2022.parquet --feed FEED --source-name NAME \
+        --start 2022-01-01 --end 2022-12-30 --out ~/.riskaware/data/news/news_2022.jsonl.gz
+
+The headlines are licensed, so the file stays on your own disk: it is not distributed with the package, git ignores
+it and the package build leaves it out (see src/riskaware/news/files.py for where the code looks for it). A file
+built from the same source items under these rules matches the SHA-256 in the period's manifest.
 
 DIR is a local news archive (see ``riskaware news-history``) that already holds the source items, for example
 filled with ``RISKAWARE_CONFIG=build.yaml riskaware news-history build --source sec ...`` plus an import of
-headlines. ``--parquet`` reads a Benzinga export instead (columns title, tickers, published_at; the body and teaser
-are not read). For the stocks of the built-in watchlists the file keeps:
+headlines. ``--parquet`` reads a parquet export of a headline feed instead (columns title, tickers, published_at; the
+body and teaser are not read). ``--feed`` is the headline feed's name in the archive, and it and ``--source-name``
+are written into every headline row, so the same names as in the original file are needed to get the same bytes. For the stocks of the built-in watchlists the file keeps:
 
-* headlines from the ``benzinga`` feed: the title, the publication time and the ticker. No article text,
+* headlines from the feed named by ``--feed``: the title, the publication time and the ticker. No article text,
   teaser, link or sentiment. A headline is kept for a ticker only when it names the company or the ticker,
   the rule live trading uses to drop off-topic stories. Automated data recaps (what an investment would be
   worth today, dividend calculators, options-flow, short-interest and P/E summaries, TV pick lists) are
@@ -50,7 +55,8 @@ def clean_title(text: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(html.unescape(text or ""))).strip()
 
 
-def bundle_records(archive: NewsArchive, symbols: list[str], start: date, end: date) -> list[dict]:
+def bundle_records(archive: NewsArchive, symbols: list[str], start: date, end: date, feed_name: str,
+                   source_name: str) -> list[dict]:
     out: dict[tuple, dict] = {}
     for sym in symbols:
         names = company_names(sym, fetch=False)
@@ -60,11 +66,11 @@ def bundle_records(archive: NewsArchive, symbols: list[str], start: date, end: d
             if day is None or not start <= day <= end:
                 continue
             feed = rec.get("feed")
-            if feed == "benzinga":
+            if feed == feed_name:
                 title = clean_title(rec.get("headline", ""))
                 if not title or len(title) > MAX_TITLE or RECAP.search(title) or not mentions(title, sym, names):
                     continue
-                row = {"ts": ts, "symbol": sym, "headline": title, "source": "Benzinga", "feed": "benzinga"}
+                row = {"ts": ts, "symbol": sym, "headline": title, "source": source_name, "feed": feed_name}
             elif feed == "sec":
                 row = {"ts": ts, "symbol": sym, "headline": rec["headline"], "source": "SEC EDGAR", "feed": "sec",
                        "url": rec.get("url", ""), "summary": rec.get("summary", "")}
@@ -78,8 +84,9 @@ def bundle_records(archive: NewsArchive, symbols: list[str], start: date, end: d
 FORMER_TICKERS = {"META": ["FB"]}
 
 
-def parquet_records(path: str, symbols: list[str], start: date, end: date) -> list[dict]:
-    """Benzinga headlines from a parquet export, with the same filters as ``bundle_records``.
+def parquet_records(path: str, symbols: list[str], start: date, end: date, feed_name: str,
+                    source_name: str) -> list[dict]:
+    """Headlines from a parquet export of a headline feed, with the same filters as ``bundle_records``.
 
     Rows tagged with tickers are kept for the tagged stocks the title names. Exports that lost their ticker tags
     (most of 2022) are matched by the title alone: a headline goes to every stock whose company name or ticker it
@@ -113,8 +120,8 @@ def parquet_records(path: str, symbols: list[str], start: date, end: date) -> li
             if not mentions(clean, sym, names[sym]) and not any(
                     mentions(clean, old, []) for old in FORMER_TICKERS.get(sym, [])):
                 continue
-            row = {"ts": stamp, "symbol": sym, "headline": clean, "source": "Benzinga", "feed": "benzinga"}
-            out.setdefault(("benzinga", sym, clean, stamp), row)
+            row = {"ts": stamp, "symbol": sym, "headline": clean, "source": source_name, "feed": feed_name}
+            out.setdefault((feed_name, sym, clean, stamp), row)
     return sorted(out.values(), key=lambda r: (r["ts"], r["symbol"], r["feed"], r["headline"]))
 
 
@@ -129,19 +136,21 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     src = ap.add_mutually_exclusive_group(required=True)
     src.add_argument("--archive", help="local news archive with the source items")
-    src.add_argument("--parquet", help="a Benzinga parquet export (title, tickers, published_at)")
+    src.add_argument("--parquet", help="a parquet export of a headline feed (title, tickers, published_at)")
+    ap.add_argument("--feed", required=True, help="the headline feed's name in the archive (written into each row)")
+    ap.add_argument("--source-name", required=True, help="the publisher name written into each headline row")
     ap.add_argument("--start", default="2026-01-01")
     ap.add_argument("--end", required=True, help="last day to include, YYYY-MM-DD")
     ap.add_argument("--symbols", help="comma-separated (default: the stocks of the built-in watchlists)")
-    ap.add_argument("--out", default=str(BUNDLE_PATH))
+    ap.add_argument("--out", default=str(BUNDLE_PATH), help="output file (default: where the 2026 file is read from)")
     a = ap.parse_args()
     symbols = [s.strip().upper() for s in a.symbols.split(",")] if a.symbols else default_symbols()
     start, end = date.fromisoformat(a.start), date.fromisoformat(a.end)
     if a.parquet:
-        rows = parquet_records(a.parquet, symbols, start, end)
+        rows = parquet_records(a.parquet, symbols, start, end, a.feed, a.source_name)
     else:
-        rows = bundle_records(NewsArchive(a.archive, bundled=False), symbols, start, end)
-    write(rows, Path(a.out))
+        rows = bundle_records(NewsArchive(a.archive, bundled=False), symbols, start, end, a.feed, a.source_name)
+    write(rows, Path(a.out).expanduser())
     feeds = Counter(r["feed"] for r in rows)
     per = Counter(r["symbol"] for r in rows)
     print(f"{len(rows)} items for {len(per)} of {len(symbols)} symbols ({dict(feeds)}), "

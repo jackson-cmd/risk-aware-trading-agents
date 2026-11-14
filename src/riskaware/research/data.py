@@ -5,6 +5,10 @@ same numbers on any machine and on any later day. Each period has a manifest (``
 ``data/manifest_2022.json`` for 2022) that says what its files hold and gives their SHA-256; every experiment copies
 that into its own manifest. ``scripts/build_market_bundle.py`` rebuilds the files.
 
+The manifest also gives the SHA-256 of the period's headline file. That file is licensed and is not distributed with
+the package: ``dataset_info`` and ``verify`` check your own copy when you have one (``riskaware.news.files`` says
+where it is looked for) and report the file as not distributed when you do not.
+
 The file keeps prices as traded (adjusted for splits) plus the factor ``adj`` that turns them into total-return
 prices. Backtests and indicators use the total-return prices, like the rest of the package; ``raw()`` gives the
 prices as traded.
@@ -22,6 +26,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from ..news.files import find_news_file, missing_message, where
 from .periods import DEFAULT_PERIOD, PERIODS, get_period
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
@@ -216,8 +221,33 @@ def bundled_market(period: str | None = None) -> FrozenMarket:
 
 
 def news_path(period: str | None = None) -> Path:
-    """The headline file of a period."""
+    """A period's headline file: your copy, or the place to put it (the headlines are not distributed)."""
     return get_period(period).news_path
+
+
+@functools.lru_cache(maxsize=8)
+def _sha256_cached(path: str, mtime: float, size: int) -> str:
+    return _sha256(Path(path))
+
+
+def news_status(period: str | None = None) -> dict:
+    """The period's headline file: the SHA-256 in the manifest, and whether you have a copy that matches it.
+
+    ``status`` is ``"ok"`` (your copy matches), ``"changed"`` (your copy differs) or ``"not distributed"`` (no copy
+    was found: the headlines are licensed and do not ship with the package). ``sha256`` is the SHA-256 of the copy
+    that would be read (None without one); ``found_in`` names the folder without the local path."""
+    p = get_period(period)
+    want = manifest(p.name)["files"].get(p.news, {}).get("sha256")
+    path = find_news_file(p.news)
+    if path is None:
+        return {"file": p.news, "sha256": None, "manifest_sha256": want, "matches_manifest": None,
+                "available": False, "distributed": False, "status": "not distributed", "found_in": None,
+                "note": missing_message(p.news)}
+    st = path.stat()
+    now = _sha256_cached(str(path), st.st_mtime, st.st_size)
+    return {"file": p.news, "sha256": now, "manifest_sha256": want, "matches_manifest": now == want,
+            "available": True, "distributed": False, "status": "ok" if now == want else "changed",
+            "found_in": where(path)}
 
 
 def dataset_info(period: str | None = None) -> dict:
@@ -225,28 +255,30 @@ def dataset_info(period: str | None = None) -> dict:
     p = get_period(period)
     m = manifest(p.name)
     path = market_path(p.name)
-    news = m["files"].get(p.news, {})
-    news_now = _sha256(p.news_path) if p.news_path.is_file() else None
     return {
         "name": m["name"], "version": m["version"], "period": m["period"], "test_window": p.describe(),
         "prices": {"file": path.name, "sha256": m["files"][path.name]["sha256"], "rows": m["files"][path.name]["rows"],
                    "source": m["source"]},
-        "news": {"file": p.news, "sha256": news_now, "matches_manifest": news_now == news.get("sha256")},
+        "news": news_status(p.name),
     }
 
 
 def verify(period: str | None = None) -> dict:
-    """Check the bundled files against the SHA-256 in their manifest (every available period by default)."""
-    out = {}
+    """Check the data files against the SHA-256 in their manifest (every available period by default).
+
+    True: the file matches; False: it differs or a price file is missing; None: the period's headline file was not
+    found (not distributed with the package; a copy of your own is checked when you have one)."""
+    out: dict[str, bool | None] = {}
     for name in [get_period(period).name] if period else available_periods():
         p = get_period(name)
         for fname, meta in manifest(name)["files"].items():
-            path = DATA_DIR / fname if (DATA_DIR / fname).is_file() else None
-            if path is None and fname == p.news:
-                path = p.news_path
-            out[fname] = bool(path and path.is_file() and _sha256(path) == meta.get("sha256"))
+            if fname == p.news:
+                out[fname] = news_status(name)["matches_manifest"]
+                continue
+            path = DATA_DIR / fname
+            out[fname] = bool(path.is_file() and _sha256(path) == meta.get("sha256"))
     return out
 
 
 __all__ = ["DEFAULT_PERIOD", "FrozenMarket", "available_periods", "bundled_market", "dataset_info", "manifest",
-           "market_path", "news_path", "verify"]
+           "market_path", "news_path", "news_status", "verify"]

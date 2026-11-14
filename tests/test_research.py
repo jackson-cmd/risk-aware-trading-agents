@@ -20,9 +20,9 @@ from riskaware.research.experiment import Experiment, run_experiment
 from riskaware.strategy.base import PortfolioView, PositionView, Strategy
 from riskaware.types import Action, Regime, Signal
 
-from .conftest import make_ctx
+from .conftest import HAS_NEWS, make_ctx, needs_news, news_file
 
-REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
+REAL_NEWS = news_file("news_2026.jsonl.gz")
 WINDOW = {"start": "2026-02-02", "end": "2026-04-30"}
 
 
@@ -40,7 +40,9 @@ def view() -> MarketView:
 # ----------------------------------------------------------------------------------- data
 def test_bundle_matches_its_manifest():
     m = manifest()
-    assert all(verify().values())
+    checks = verify("2026")
+    assert checks["market_2026.csv.gz"] is True
+    assert checks["news_2026.jsonl.gz"] is (True if HAS_NEWS else None)  # not distributed: only a copy is checked
     mk = bundled_market()
     assert mk.first_day == date.fromisoformat(m["period"]["first"]) and mk.last_day.isoformat() == m["version"]
     assert mk.experiment_start == date(2026, 1, 2)
@@ -94,6 +96,7 @@ def test_indicators_on_a_day_equal_those_of_data_cut_at_that_day(view):
             assert cut[k] == pytest.approx(full[k], rel=1e-9, abs=1e-12), k
 
 
+@needs_news
 def test_news_on_a_day_is_published_before_its_close(view):
     snap = view.snapshot("2026-03-20", symbols=["TSLA", "AAPL"], headlines=10)
     for s in ("TSLA", "AAPL"):

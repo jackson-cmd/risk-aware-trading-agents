@@ -46,22 +46,22 @@ print(r.report())               # the report (r.report("zh") in Chinese)
 
 - the last 60 daily closes, oldest first;
 - RSI(14), the distance from EMA 50 and EMA 200, ATR as a share of the price, the distance from the 52-week high, relative volume, and the 21-day return next to SPY's;
-- up to three headlines published before that day's close, with how many hours before the close each appeared.
+- up to three headlines published before that day's close, with how many hours before the close each appeared (from the period's headline file: the headlines are licensed and not distributed, so without your own copy the records carry none).
 
-The **named** record gives the ticker, the company, the sector, the date and the prices as traded. The **blind** record gives an alias (S01), the sector and "day 0", rebases the prices so that the first close is 100, and masks the headlines the way blind trading mode does: the company's names and ticker, its best-known people ("the S01 chief") and products ("[product]"), and every date and year. Per-share dollar amounts in headlines are rebased like the prices, so "Raises Price Target to $264" keeps its distance from the price and stops naming the stock:
+The **named** record gives the ticker, the company, the sector, the date and the prices as traded. The **blind** record gives an alias (S01), the sector and "day 0", rebases the prices so that the first close is 100, and masks the headlines the way blind trading mode does: the company's names and ticker, its best-known people ("the S01 chief") and products ("[product]"), and every date and year. Per-share dollar amounts in headlines are rebased like the prices, so "raises its price target to $264" keeps its distance from the price and stops naming the stock (the example below paraphrases the headline: the research headlines are licensed and not distributed):
 
 ```
 [a1] LLY (Eli Lilly, Health Care), close of 2022-04-13
 closes (oldest first): 245.1 243.1 243.1 240.4 239.5 ... 308.4 311.7 309.0 308.1 302.7
 RSI14 66 | vs EMA50 +9.2% | vs EMA200 +21.3% | ATR 2.2% of the price | from the 52-week high -3.6% | ...
 headlines:
-- 33h before the close: "Goldman Sachs Maintains Neutral on Eli Lilly, Raises Price Target to $264"
+- 33h before the close: "A broker keeps its Neutral rating on Eli Lilly and raises its price target to $264"
 
 [a1] S01 (Health Care), close of day 0
 closes (oldest first, the first = 100): 100.0 99.2 99.2 98.1 97.7 ... 125.9 127.2 126.1 125.7 123.5
 RSI14 66 | vs EMA50 +9.2% | vs EMA200 +21.3% | ATR 2.2% of the price | from the 52-week high -3.6% | ...
 headlines:
-- 33h before the close: "Goldman Sachs Maintains Neutral on S01, Raises Price Target to $107.7"
+- 33h before the close: "A broker keeps its Neutral rating on S01 and raises its price target to $107.7"
 ```
 
 Both times the model gives the probability that the stock's total return over the next 20 trading days beats SPY's. The two answers are scored against what happened: accuracy, Brier score, log loss and AUC. The two records differ only in who and when, so a model that does better when it is told is using what it remembers. Named and blind records never share a call: in one prompt the model could match a blind record to its named twin. The system prompt is the same for both and describes both forms.

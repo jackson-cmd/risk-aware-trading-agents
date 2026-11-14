@@ -23,9 +23,9 @@ rta-bench-1 is a benchmark for LLM trading agents with news. It has six tasks: t
 
 Each period has daily bars from two years before its test window for 64 large-cap US stocks and 25 ETFs (split-adjusted prices, dividends, splits and a total-return factor), the VIX term structure (VIX9D, VIX, VIX3M) and VVIX, and the macro calendar (FOMC, CPI, PPI, jobs reports). The benchmark replays the period's news with its publication time, a headline counting from the first close after it was published; the results are based on that news, and the headline data has license restrictions and is not distributed with the package.
 
-- 2026: prices from 2024-01-02 (719 trading days, 69,738 rows); 16,945 news items: 16,249 Benzinga headlines (titles only) and 696 SEC 8-K filings with SEC's acceptance time.
-- 2022: prices from 2020-01-02 (756 trading days, 72,466 rows); 29,300 Benzinga headlines.
-- 2020: prices from 2018-01-02 (756 trading days, 71,490 rows); 19,618 Benzinga headlines.
+- 2026: prices from 2024-01-02 (719 trading days, 69,738 rows); 16,945 news items: 16,249 headlines (titles only) and 696 SEC 8-K filings with SEC's acceptance time.
+- 2022: prices from 2020-01-02 (756 trading days, 72,466 rows); 29,300 headlines.
+- 2020: prices from 2018-01-02 (756 trading days, 71,490 rows); 19,618 headlines.
 
 The price files are in the package (`src/riskaware/research/data/market_YYYY.csv.gz`) with a manifest of SHA-256 hashes per period; `bundled_market("2022")` loads a period in Python. The prices of the three periods and every leaderboard entry are also on Hugging Face as Parquet: https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark. Prices come from Yahoo Finance daily bars and are adjusted for every split up to November 2026. The stock lists are today's large caps (survivorship bias), so compare with the equal-weight portfolio, not only with SPY.
 
