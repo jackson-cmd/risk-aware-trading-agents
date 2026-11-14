@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM trading agent benchmarks compared: StockBench, CLQT, LiveTradeBench, AI-Trader, InvestorBench, FinSABER, BlindTrade, Agent Market Arena · Risk-Aware Trading Agents</title>
+<meta name="description" content="How rta-bench-1, a benchmark for LLM trading agents with news replayed by publication time, compares with StockBench, CLQT, LiveTradeBench, AI-Trader, InvestorBench, FinSABER, BlindTrade and Agent Market Arena: news timing, frozen periods, blind and named runs, scores split at the training cutoff, and replayable submissions.">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-benchmarks.html">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html">
+<meta property="og:title" content="LLM trading agent benchmarks compared">
+<meta property="og:description" content="rta-bench-1 next to StockBench, CLQT, LiveTradeBench, AI-Trader, InvestorBench, FinSABER, BlindTrade and Agent Market Arena: what the agent may know, whether a result can be run again, and whether the model could remember the test period.">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM trading agent benchmarks compared","description":"rta-bench-1, a benchmark for LLM trading agents with news replayed by publication time, compared with StockBench, CLQT, LiveTradeBench, AI-Trader, InvestorBench, FinSABER, BlindTrade and Agent Market Arena.","inLanguage":"en","datePublished":"2026-11-14","dateModified":"2026-11-14","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["LLM trading agent benchmark","LLM trading leaderboard","news backtesting without look-ahead bias","data contamination","financial LLM evaluation"],"mentions":[{"@type":"ScholarlyArticle","name":"StockBench: Can LLM Agents Trade Stocks Profitably In Real-world Markets?","url":"https://arxiv.org/abs/2510.02209"},{"@type":"ScholarlyArticle","name":"CLQT: A Closed-Loop, Cost-Aware, Strategy-Consistent Benchmark for Diagnostic Evaluation of LLM Portfolio-Management Agents","url":"https://arxiv.org/abs/2606.29771"},{"@type":"ScholarlyArticle","name":"LiveTradeBench: Seeking Real-World Alpha with Large Language Models","url":"https://arxiv.org/abs/2511.03628"},{"@type":"ScholarlyArticle","name":"AI-Trader: Benchmarking Autonomous Agents in Real-Time Financial Markets","url":"https://arxiv.org/abs/2512.10971"},{"@type":"ScholarlyArticle","name":"InvestorBench: A Benchmark for Financial Decision-Making Tasks with LLM-based Agent","url":"https://arxiv.org/abs/2412.18174"},{"@type":"ScholarlyArticle","name":"Can LLM-based Financial Investing Strategies Outperform the Market in Long Run?","url":"https://arxiv.org/abs/2505.07078"},{"@type":"ScholarlyArticle","name":"Can Blindfolded LLMs Still Trade? An Anonymization-First Framework for Portfolio Optimization","url":"https://arxiv.org/abs/2603.17692"},{"@type":"ScholarlyArticle","name":"When Agents Trade: Live Multi-Market Trading Benchmark for LLM Agents","url":"https://arxiv.org/abs/2510.11695"}],"isPartOf":{"@type":"WebSite","name":"Risk-Aware Trading Agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/"},{"@type":"ListItem","position":2,"name":"Leaderboard","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html"},{"@type":"ListItem","position":3,"name":"Benchmarks compared","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html"}]}</script>
+</head>
+<body>
+<header><div class="wrap wide">
+  <a class="brand" href="./">Risk-Aware Trading Agents</a>
+  <nav>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="news-backtesting.html">News backtesting</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+    <a href="zh/llm-trading-benchmarks.html" hreflang="zh-Hans" lang="zh-Hans">中文</a>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<p class="crumbs"><a href="./">Home</a> › <a href="leaderboard.html">Leaderboard</a> › Benchmarks compared</p>
+<h1>LLM trading agent benchmarks compared</h1>
+<p class="lead">Several benchmarks now ask whether LLM agents can trade. They differ in what the agent may know when it decides, whether a result can be run again, and whether the model could simply remember the test period. This page sets rta-bench-1, the benchmark behind our <a href="leaderboard.html">LLM trading leaderboard</a>, next to eight others on those points.</p>
+<p class="note">Every row except ours is taken from the paper's arXiv abstract page, read on 13 November 2026. "Not described" means the abstract page does not say; the full paper may. Corrections are welcome as an issue or a pull request.</p>
+
+<h2 id="table">The comparison</h2>
+<div class="table-wrap"><table class="board compare">
+<thead><tr><th>Benchmark</th><th>News at the minute it was published</th><th>Frozen periods</th><th>Blind and named</th><th>Scored apart at the training cutoff</th><th>One-file submission that replays</th></tr></thead>
+<tbody>
+<tr><td class="wrap"><b>rta-bench-1</b> (this project)<br><span class="muted small">Replay of 56 US large caps</span></td><td class="wrap">Yes: Benzinga headlines, plus SEC 8-K filings in 2026, arrive at the minute they were published; decisions after the close, fills at the next open</td><td class="wrap">3: 2026 to date, the 2022 bear market, the 2020 crash</td><td class="wrap">Both, for every model, plus a memory probe</td><td class="wrap">Yes: scores after each model's cutoff are ranked, earlier ones listed apart</td><td class="wrap">Yes: one JSON entry holds every reply of the model, and CI replays it to the same numbers</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2510.02209"><b>StockBench</b></a><br><span class="muted small">Multi-month stock trading environments</span></td><td class="wrap">News is among the daily signals; timing not described</td><td class="wrap">Not described</td><td class="wrap">Not described</td><td class="wrap">Not described; the benchmark is called contamination-free</td><td class="wrap">Not described; released as open source</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2606.29771"><b>CLQT</b></a><br><span class="muted small">Year-long backtest plus four weeks of live paper trading</span></td><td class="wrap">Not described</td><td class="wrap">One year-long backtest, plus the live track</td><td class="wrap">Not described</td><td class="wrap">The live track runs on post-cutoff data; point-in-time access through a "TimeGate"</td><td class="wrap">Not described</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2511.03628"><b>LiveTradeBench</b></a><br><span class="muted small">Live: US stocks and Polymarket, 21 LLMs over 50 days</span></td><td class="wrap">Streamed live</td><td class="wrap">None: live</td><td class="wrap">Not described</td><td class="wrap">Live data only</td><td class="wrap">Not described</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2512.10971"><b>AI-Trader</b></a><br><span class="muted small">Live: US stocks, China A-shares and crypto</span></td><td class="wrap">Agents search for information themselves</td><td class="wrap">None: live</td><td class="wrap">Not described</td><td class="wrap">Live data only; called data-uncontaminated</td><td class="wrap">Not described; code and evaluation data on GitHub</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2412.18174"><b>InvestorBench</b></a><br><span class="muted small">Stocks, crypto and ETFs; 13 LLM backbones</span></td><td class="wrap">Not described</td><td class="wrap">Not described</td><td class="wrap">Not described</td><td class="wrap">Not described</td><td class="wrap">Not described; open-source multi-modal datasets</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2505.07078"><b>FinSABER</b></a><br><span class="muted small">Backtests over two decades and more than 100 symbols</span></td><td class="wrap">Not described</td><td class="wrap">Historical: two decades</td><td class="wrap">Not described</td><td class="wrap">Not described; targets survivorship and data-snooping bias</td><td class="wrap">Not described</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2603.17692"><b>BlindTrade</b></a><br><span class="muted small">Historical backtest with anonymized names</span></td><td class="wrap">Not described</td><td class="wrap">Historical: 2025 up to 1 August, extended over 2024–2025</td><td class="wrap">Blind: tickers and company names anonymized, with negative controls</td><td class="wrap">Not described</td><td class="wrap">Not described</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2510.11695"><b>Agent Market Arena</b></a><br><span class="muted small">Live and continuous: crypto and stocks</span></td><td class="wrap">Expert-checked news, live</td><td class="wrap">None: live</td><td class="wrap">Not described</td><td class="wrap">Live data only</td><td class="wrap">Not described</td></tr>
+</tbody></table></div>
+
+<h2 id="difference">Where rta-bench-1 differs</h2>
+<ul>
+  <li><b>News by the minute, in a replay.</b> Live benchmarks avoid look-ahead by trading the present, but a model released next year cannot trade those days without having read about them. rta-bench-1 replays history instead: each headline arrives at the minute it was published, and every run passes a look-ahead check of what the model was shown. Many news backtests join headlines to prices by calendar date; in <a href="news-backtesting.html">our example</a> that turns a signal that loses 6.7 bp a trade into one that makes 32 bp.</li>
+  <li><b>Three different markets.</b> A rising 2026, the 2022 rate-hike bear market and the 2020 crash, so a model that only does well when everything rises shows as such.</li>
+  <li><b>Memory is measured, not assumed away.</b> The same model trades each period blind and with names. Scores after its training cutoff are ranked, and earlier ones are listed apart, next to a memory probe. Hiding the names shows what a model does without them; running it both ways shows how much the names were worth.</li>
+  <li><b>A result is a file.</b> An entry holds every reply of the model, so continuous integration replays it through the backtest and the numbers must match. Submitting a model is a pull request that adds one JSON file.</li>
+  <li><b>Free and offline.</b> <code>pip install risk-aware-trading-agents</code> brings the prices, the 65,863 headlines and filings, and the backtester. The 2026 data is also on <a href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">Hugging Face</a>, and every release is archived with a <a href="https://doi.org/10.5281/zenodo.24202496">Zenodo DOI</a>.</li>
+</ul>
+<p>Live arenas answer a question frozen periods cannot: how a model trades today, on news nobody has seen. Frozen periods answer the others: whether a result can be repeated, compared and checked. The two kinds of benchmark complement each other.</p>
+
+<h2>More</h2>
+<div class="more">
+  <a href="leaderboard.html">LLM trading leaderboard<span>The models on rta-bench-1, clean and may-remember scores apart</span></a>
+  <a href="news-backtesting.html">News backtesting without look-ahead bias<span>Why a calendar-date join inflates results</span></a>
+  <a href="point-in-time-market-data.html">Point-in-time financial news dataset<span>2020, 2022 and 2026, with SHA-256 hashes</span></a>
+</div>
+</main>
+
+<footer><div class="wrap wide">MIT License · Not financial advice · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="zh/llm-trading-benchmarks.html" hreflang="zh-Hans">中文</a></div></footer>
+</body>
+</html>

@@ -3,20 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free point-in-time US stock market data for 2026: prices, VIX and news · Risk-Aware Trading Agents</title>
-<meta name="description" content="A free, point-in-time dataset of the 2026 US stock market for reproducible backtests: daily prices for 64 large caps and 25 ETFs since 2024, the VIX term structure, 16,945 headlines and SEC 8-K filings with publication times, and SHA-256 hashes.">
+<title>Point-in-time financial news dataset and US stock market data for 2020, 2022 and 2026 · Risk-Aware Trading Agents</title>
+<meta name="description" content="A free point-in-time dataset of three US stock markets for reproducible backtests and LLM trading agents: the 2020 COVID crash, the 2022 bear market and 2026. Daily prices for 64 large caps and 25 ETFs, the VIX term structure, and 65,863 headlines and SEC 8-K filings with publication times, with SHA-256 hashes.">
 <link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html">
 <link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html">
 <link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html">
 <link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html">
-<meta property="og:title" content="Free point-in-time US stock market data for 2026: prices, VIX and news">
-<meta property="og:description" content="Daily prices since 2024, the VIX term structure and 16,945 headlines and SEC filings for 2026, frozen with SHA-256 hashes for reproducible backtests.">
+<meta property="og:title" content="Point-in-time US stock market and news data for 2020, 2022 and 2026">
+<meta property="og:description" content="Daily prices, the VIX term structure and 65,863 headlines and SEC filings with publication times for the 2020 crash, the 2022 bear market and 2026, frozen with SHA-256 hashes for reproducible backtests.">
 <meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/dashboard_en.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/guide.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Point-in-time US stock market 2026: daily prices, VIX term structure and news","description":"A frozen, point-in-time copy of the 2026 US stock market for reproducible backtests and LLM trading agent experiments: daily bars from 2024-01-02 to 2026-11-11 for 64 large-cap stocks and 25 ETFs (prices as traded, dividends, splits and a total-return factor), the VIX term structure (VIX9D, VIX, VIX3M) and VVIX, and 16,945 news items for 2026: Benzinga headlines (titles only) and SEC 8-K filings, each with its publication time. Ships with the open-source Risk-Aware Trading Agents package with SHA-256 hashes.","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html","sameAs":["https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/research.md","https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026"],"keywords":["stock market data","historical news data","news backtesting","point-in-time data","look-ahead bias","VIX","SEC 8-K filings","Benzinga headlines","LLM trading agents"],"temporalCoverage":"2024-01-02/2026-11-11","isAccessibleForFree":true,"inLanguage":"en","creator":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"variableMeasured":["open","high","low","close","volume","dividend","split","total-return factor","headline","publication time"],"distribution":[{"@type":"DataDownload","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2026.csv.gz"},{"@type":"DataDownload","encodingFormat":"application/x-ndjson","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/news/data/news_2026.jsonl.gz"},{"@type":"DataDownload","encodingFormat":"application/vnd.apache.parquet","contentUrl":"https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/prices.parquet"},{"@type":"DataDownload","encodingFormat":"application/vnd.apache.parquet","contentUrl":"https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/news.parquet"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Point-in-time US stock market and news data: 2020, 2022 and 2026","alternateName":"Point-in-time financial news dataset","description":"A frozen, point-in-time copy of three US stock markets for reproducible backtests and LLM trading agent benchmarks: the 2020 COVID crash and rebound, the 2022 rate-hike bear market, and 2026 to 11 November. Each period has daily bars from two years before its test window for 64 large-cap stocks and 25 ETFs (prices split-adjusted, dividends, splits and a total-return factor), the VIX term structure (VIX9D, VIX, VIX3M) and VVIX, and the period's news with its publication time: 65,863 items in all, Benzinga headlines (titles only) in every period and SEC 8-K filings in 2026. It ships with the open-source Risk-Aware Trading Agents package with SHA-256 hashes and is the data behind the rta-bench-1 LLM trading leaderboard.","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html","identifier":"https://doi.org/10.5281/zenodo.24202496","sameAs":["https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/research.md","https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026"],"keywords":["point-in-time financial news dataset","point-in-time data","stock market data","historical news data","news backtesting without look-ahead bias","look-ahead bias","VIX","SEC 8-K filings","Benzinga headlines","COVID crash","2022 bear market","LLM trading agent benchmark"],"license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"inLanguage":"en","temporalCoverage":["2018-01-02/2022-12-30","2024-01-02/2026-11-11"],"creator":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"variableMeasured":["open","high","low","close","volume","dividend","split","total-return factor","headline","publication time"],"distribution":[{"@type":"DataDownload","name":"Prices, 2026 period","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2026.csv.gz"},{"@type":"DataDownload","name":"Prices, 2022 period","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2022.csv.gz"},{"@type":"DataDownload","name":"Prices, 2020 period","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2020.csv.gz"},{"@type":"DataDownload","name":"News, 2026","encodingFormat":"application/x-ndjson","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/news/data/news_2026.jsonl.gz"},{"@type":"DataDownload","name":"News, 2022","encodingFormat":"application/x-ndjson","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/news/data/news_2022.jsonl.gz"},{"@type":"DataDownload","name":"News, 2020","encodingFormat":"application/x-ndjson","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/news/data/news_2020.jsonl.gz"},{"@type":"DataDownload","name":"Prices, 2026 period (Parquet on Hugging Face)","encodingFormat":"application/vnd.apache.parquet","contentUrl":"https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/prices.parquet"},{"@type":"DataDownload","name":"News, 2026 (Parquet on Hugging Face)","encodingFormat":"application/vnd.apache.parquet","contentUrl":"https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/news.parquet"},{"@type":"DataDownload","name":"Every release with its data (Zenodo)","encodingFormat":"application/zip","contentUrl":"https://doi.org/10.5281/zenodo.24202496"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/"},{"@type":"ListItem","position":2,"name":"Point-in-time market and news data","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html"}]}</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -31,55 +32,71 @@
 
 <main class="wrap">
 <p class="crumbs"><a href="./">Home</a> › Guides</p>
-<h1>Point-in-time US stock market data for 2026: prices, VIX and news</h1>
-<p class="lead">A frozen copy of the 2026 US stock market ships with the open-source Risk-Aware Trading Agents package: daily prices, the VIX term structure and the year's news, each value as it was known at that day's close. Every backtest and every LLM trading agent run on it gives the same numbers on any machine, and the files carry SHA-256 hashes that a paper can cite.</p>
+<h1>Point-in-time US stock market and news data for 2020, 2022 and 2026</h1>
+<p class="lead">Three frozen US stock markets ship with the open-source Risk-Aware Trading Agents package: the 2020 COVID crash, the 2022 bear market and 2026. Each has daily prices, the VIX term structure and the period's news with the minute it was published, every value as it was known at that day's close. Every backtest and every LLM trading agent run on it gives the same numbers on any machine, and the files carry SHA-256 hashes that a paper can cite. It is the data behind the <a href="leaderboard.html">LLM trading leaderboard</a>.</p>
 <div class="cta">
   <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents/tree/main/src/riskaware/research/data">The data files</a>
+  <a class="btn" href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">2026 on Hugging Face</a>
   <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/research.md">Research kit docs</a>
-  <a class="btn" href="news-backtesting.html">News backtesting</a>
 </div>
 
-<h2>What is inside</h2>
+<h2 id="periods">Three periods</h2>
+<div class="table-wrap"><table>
+  <tr><th>Period</th><th>Test window</th><th>Prices from</th><th>News</th><th>The market</th></tr>
+  <tr><td>2026</td><td>2026-01-02 to 2026-11-11</td><td>2024-01-02 (719 trading days)</td><td>16,945 items: 16,249 Benzinga headlines and 696 SEC 8-K filings</td><td>SPY +12.1%, with a −8.9% drawdown in March</td></tr>
+  <tr><td>2022</td><td>2022-01-03 to 2022-12-30</td><td>2020-01-02 (756 trading days)</td><td>29,300 Benzinga headlines</td><td>SPY −18.2% and the Nasdaq 100 −32.6%: eight Fed hikes, CPI above 9% in June</td></tr>
+  <tr><td>2020</td><td>2020-01-02 to 2020-12-31</td><td>2018-01-02 (756 trading days)</td><td>19,618 Benzinga headlines</td><td>SPY −34% in 23 trading days with VIX closing at 82.7, then +18.3% for the year</td></tr>
+</table></div>
+<p>The two years before each test window are there so that slow indicators such as the 200-day EMA and the 52-week high are fully warmed up on its first trading day. The three markets differ on purpose: a strategy or an LLM that only did well in one kind of market says little.</p>
+
+<h2>What is inside each period</h2>
 <div class="table-wrap"><table>
   <tr><th>Part</th><th>Contents</th></tr>
-  <tr><td>Stocks</td><td>Daily bars from 2024-01-02 to 2026-11-11 (719 trading days) for 64 large-cap US stocks: the megacap, tech and defensive watchlists</td></tr>
+  <tr><td>Stocks</td><td>Daily bars for 64 large-cap US stocks: the megacap, tech and defensive watchlists</td></tr>
   <tr><td>ETFs</td><td>25 index, sector and bond ETFs: SPY, QQQ, IWM, DIA, VTI, RSP, the 11 sector SPDRs, BIL, SGOV, SHV, SHY, IEF, TLT, HYG, LQD</td></tr>
   <tr><td>Volatility</td><td>VIX9D, VIX and VIX3M (the VIX term structure) and VVIX</td></tr>
-  <tr><td>Cross-asset</td><td>GLD (gold), USO (oil), UUP (US dollar), IBIT (bitcoin): ETFs that close with the stock market</td></tr>
-  <tr><td>News</td><td>16,945 items for the 64 stocks in 2026: Benzinga headlines (titles only, no article text) and SEC 8-K filings with the time SEC accepted them</td></tr>
+  <tr><td>Cross-asset</td><td>GLD (gold), USO (oil), UUP (US dollar), and IBIT (bitcoin) in 2026: ETFs that close with the stock market</td></tr>
+  <tr><td>News</td><td>Benzinga headlines for the 64 stocks (titles only, no article text), and in 2026 also SEC 8-K filings with the time SEC accepted them</td></tr>
   <tr><td>Calendar</td><td>FOMC decisions, CPI, PPI and jobs reports, as scheduled in advance</td></tr>
 </table></div>
-<p>2026 is the test year. 2024 and 2025 are there so that slow indicators such as the 200-day EMA and the 52-week high are fully warmed up on the first trading day of 2026.</p>
+<p>A few symbols begin later than their file because they started trading later: XLC in June 2018, CRWD in June 2019, SGOV in June 2020 and IBIT in January 2024.</p>
 
 <h2>Files and columns</h2>
-<p><code>src/riskaware/research/data/market_2026.csv.gz</code> (1.4 MB, 69,738 rows):</p>
+<p>Each period is a price file in <code>src/riskaware/research/data/</code>, a news file in <code>src/riskaware/news/data/</code> and a manifest that lists its dates, its symbols and the SHA-256 of both files.</p>
+<div class="table-wrap"><table>
+  <tr><th>Period</th><th>Prices</th><th>News</th><th>Manifest</th></tr>
+  <tr><td>2026</td><td><code>market_2026.csv.gz</code> (1.4 MB, 69,738 rows)</td><td><code>news_2026.jsonl.gz</code> (0.7 MB)</td><td><code>manifest.json</code></td></tr>
+  <tr><td>2022</td><td><code>market_2022.csv.gz</code> (1.5 MB, 72,466 rows)</td><td><code>news_2022.jsonl.gz</code> (1.0 MB)</td><td><code>manifest_2022.json</code></td></tr>
+  <tr><td>2020</td><td><code>market_2020.csv.gz</code> (1.4 MB, 71,490 rows)</td><td><code>news_2020.jsonl.gz</code> (0.8 MB)</td><td><code>manifest_2020.json</code></td></tr>
+</table></div>
 <pre>date,symbol,open,high,low,close,volume,adj,dividend,split
 2026-04-08,NVDA,...</pre>
 <ul>
-  <li><code>open</code> to <code>close</code>: prices as traded, adjusted for splits only;</li>
+  <li><code>open</code> to <code>close</code>: prices adjusted for splits only;</li>
   <li><code>adj</code>: the factor that turns them into total-return prices (adjusted close divided by close);</li>
   <li><code>dividend</code>, <code>split</code>: the cash dividend and the split ratio of that day.</li>
 </ul>
-<p><code>src/riskaware/news/data/news_2026.jsonl.gz</code>: one JSON object per line with <code>ts</code> (publication time, UTC), <code>symbol</code>, <code>headline</code>, <code>source</code> and <code>feed</code>; SEC filings also carry the form items (for example <code>items:2.02,9.01</code> for an earnings release) and the sec.gov link. <code>manifest.json</code> lists the period, the symbols and the SHA-256 of both files.</p>
+<p>The news files have one JSON object per line with <code>ts</code> (publication time, UTC), <code>symbol</code>, <code>headline</code>, <code>source</code> and <code>feed</code>; SEC filings also carry the form items (for example <code>items:2.02,9.01</code> for an earnings release) and the sec.gov link.</p>
 
 <h2>Load it</h2>
 <pre>from riskaware.research.data import bundled_market
 
-market = bundled_market()
-aapl = market.frame("AAPL")        # total-return OHLCV, 2024-01-02 to 2026-11-11
-traded = market.raw("AAPL")        # prices as traded, dividends, splits, adj factor
+market = bundled_market("2022")    # "2026" (the default), "2022" or "2020"
+aapl = market.frame("AAPL")        # total-return OHLCV, 2020-01-02 to 2022-12-30
+traded = market.raw("AAPL")        # split-adjusted prices, dividends, splits, adj factor
 vix = market.raw("^VIX")["close"]
 
-import pandas as pd                # or read the file directly
-df = pd.read_csv("src/riskaware/research/data/market_2026.csv.gz", parse_dates=["date"])</pre>
-<p>Without installing anything: the same data is on <a href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">Hugging Face</a> as Parquet, with a data viewer and the original files.</p>
+import pandas as pd                # or read the files directly
+prices = pd.read_csv("src/riskaware/research/data/market_2020.csv.gz", parse_dates=["date"])
+news = pd.read_json("src/riskaware/news/data/news_2020.jsonl.gz", lines=True)</pre>
+<p>Without installing anything: the 2026 period is on <a href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">Hugging Face</a> as Parquet, with a data viewer and the original files.</p>
 <pre>import pandas as pd             # needs pyarrow for Parquet
 base = "https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/"
 prices = pd.read_parquet(base + "prices.parquet")   # 69,738 rows
 news = pd.read_parquet(base + "news.parquet")       # 16,945 rows</pre>
 
 <h2>One day at a time</h2>
-<p>The point of the data is what was known on each day. <code>riskaware research day 2026-04-08</code> (or <code>market_day</code> over MCP) shows everything known at that close: the market regime, VIX and its term structure, fear and greed, sector breadth, the macro events of the next two weeks, and for each stock its returns, indicators, technical setups and the news published before 16:00 New York time.</p>
+<p>The point of the data is what was known on each day. <code>riskaware research day 2026-04-08</code> (or <code>market_day</code> over MCP) shows everything known at that close: the market regime, VIX and its term structure, fear and greed, sector breadth, the macro events of the next two weeks, and for each stock its returns, indicators, technical setups and the news published before 16:00 New York time. Any day of the three test windows works; the command picks the period that holds it.</p>
 <pre>2026-04-08 (Wednesday)  decided after the close (16:00 New York); orders fill at the next open, 2026-04-09
 Regime: UNCERTAIN (Uncertain: hold, no selling, buy only at strong support)
 VIX 21.04  VIX9D 19.16  VIX3M 22.68  VVIX 111.07  term structure contango  fear &amp; greed 54.47
@@ -94,20 +111,20 @@ Scheduled: CPI inflation 2026-04-10, PPI producer prices 2026-04-14</pre>
 </ul>
 
 <h2>Cite it</h2>
-<p>Cite the data version (<code>2026-11-11</code>) and the SHA-256 of the two files from <code>manifest.json</code>. The repository's <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/CITATION.cff">CITATION.cff</a> gives the software citation (DOI <a href="https://doi.org/10.5281/zenodo.24202496">10.5281/zenodo.24202496</a>, archived on Zenodo with every release), and every experiment's own manifest records the package version and commit.</p>
+<p>Cite the period's data version (<code>2026-11-11</code>, <code>2022-12-30</code> or <code>2020-12-31</code>) and the SHA-256 of its two files from its manifest. The repository's <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/CITATION.cff">CITATION.cff</a> gives the software citation (DOI <a href="https://doi.org/10.5281/zenodo.24202496">10.5281/zenodo.24202496</a>, archived on Zenodo with every release), and every experiment's own manifest records the package version and commit.</p>
 
 <h2>Sources and limits</h2>
 <ul>
-  <li>Prices come from Yahoo Finance daily bars; <code>scripts/build_market_bundle.py</code> rebuilds the file. Adjustments are as of the last day of the data.</li>
-  <li>The stock lists are today's large caps, chosen with hindsight (survivorship bias): compare strategies with each other and with the equal-weight universe, not only with SPY.</li>
-  <li>The news is one headline feed plus SEC filings, so most stories have a single source.</li>
+  <li>Prices come from Yahoo Finance daily bars; <code>scripts/build_market_bundle.py</code> rebuilds the files. They are adjusted for every split up to the day a file was built (November 2026), so a stock that split later shows smaller prices than were quoted at the time: NVDA's 2020 prices are divided by 40 for its 2021 and 2024 splits. Returns are not affected.</li>
+  <li>The stock lists are today's large caps, chosen with hindsight and used for 2020 and 2022 too (survivorship bias): compare strategies with each other and with the equal-weight universe, not only with SPY.</li>
+  <li>The news is one headline feed, plus SEC filings in 2026, so most stories have a single source. The headlines are cut from a local archive of about 3.2 million Benzinga headlines from 2011 to 2026.</li>
 </ul>
 
 <h2>More guides</h2>
 <div class="more">
-  <a href="news-backtesting.html">Backtest with news, without look-ahead<span>Point-in-time replay and the look-ahead check</span></a>
-  <a href="llm-trading-agents.html">Test LLM trading agents<span>Step by step, blind, over MCP</span></a>
-  <a href="./">Risk-Aware Trading Agents<span>The agents, brokers and dashboard</span></a>
+  <a href="news-backtesting.html">News backtesting without look-ahead bias<span>Point-in-time replay and the look-ahead check</span></a>
+  <a href="leaderboard.html">LLM trading leaderboard<span>LLMs trading the three periods, blind and named</span></a>
+  <a href="llm-trading-benchmarks.html">LLM trading benchmarks compared<span>How rta-bench-1 differs from eight others</span></a>
 </div>
 </main>
 
