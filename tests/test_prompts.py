@@ -106,7 +106,7 @@ def test_tune_sends_the_seed_and_the_reply_format():
 
 def test_a_custom_prompt_file_is_one_more_variant(tmp_path):
     f = tmp_path / "my prompt.txt"
-    f.write_text("You trade carefully. Reply with JSON.\n")
+    f.write_text("You trade carefully. Reply with JSON.\n", encoding="utf-8")
     v = P.from_file(f)
     assert v.name == "my_prompt" and v.factor == "custom" and v.text == "You trade carefully. Reply with JSON."
     with pytest.raises(ValueError):
@@ -126,13 +126,13 @@ def test_lab_with_a_fake_model_runs_records_and_reports(tmp_path):
 
     lab = P.run_lab(chosen, st, tmp_path / "lab", workers=3, provider_factory=factory, check=False)
     folder = P.run_folder(lab, "risk_rules", "2026", 0)
-    man = json.loads((folder / "manifest.json").read_text())
+    man = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
     assert man["prompt"]["prompt_sha256"] == P.VARIANTS["risk_rules"].prompt_sha256
     assert man["prompt"]["variant_sha256"] == P.VARIANTS["risk_rules"].sha256
     assert man["llm"]["seed"] == 0 and man["experiment"]["seed"] == 0
-    assert (folder / "prompt.txt").read_text().strip() == P.VARIANTS["risk_rules"].text
+    assert (folder / "prompt.txt").read_text(encoding="utf-8").strip() == P.VARIANTS["risk_rules"].text
     assert "--variants risk_rules" in man["reproduce"]
-    calls = [json.loads(x) for x in (folder / "calls.jsonl").read_text().splitlines()]
+    calls = [json.loads(x) for x in (folder / "calls.jsonl").read_text(encoding="utf-8").splitlines()]
     assert [c["status"] for c in calls].count("format") == 1 and calls[1]["raw"] == "I would buy S01."
     row = R.read_run(folder)
     assert row["format_errors"] == 1 and row["invalid_orders"] == row["orders"] > 0  # one typo per good reply
@@ -144,8 +144,8 @@ def test_lab_with_a_fake_model_runs_records_and_reports(tmp_path):
     assert c["pairs"] == 2 and c["verdict"] == "noise" and c["p_holm"] >= c["p"]
     for f in ("prompts.json", "prompts.md", "prompts.png"):
         assert (lab / f).is_file()
-    assert "Δ Sharpe vs baseline" in (lab / "prompts.md").read_text()
-    site = json.loads((tmp_path / "site" / "prompts.json").read_text())
+    assert "Δ Sharpe vs baseline" in (lab / "prompts.md").read_text(encoding="utf-8")
+    site = json.loads((tmp_path / "site" / "prompts.json").read_text(encoding="utf-8"))
     assert site["format"] == "rta-prompt-board-1" and site["baseline"] == "baseline" and site["across_models"] is None
     b = site["boards"][0]
     assert b["model"] == "fake:model" and b["variants"][0]["name"] == "baseline" and b["variants"][0]["vs_baseline"] is None
@@ -154,12 +154,12 @@ def test_lab_with_a_fake_model_runs_records_and_reports(tmp_path):
 
     at = r["attribution"]["risk_rules"]
     assert at["pairs"] == 2 and abs(at["total"] - at["exposure"] - at["selection"] - at["residual"]) < 1e-9
-    assert "Where the return difference comes from" in (lab / "prompts.md").read_text()
+    assert "Where the return difference comes from" in (lab / "prompts.md").read_text(encoding="utf-8")
 
     # a run made elsewhere joins a lab as one more seed, copied, with the prompt's hashes
     other = P.start_lab(tmp_path / "other", chosen, P.LabSettings(**{**st.to_dict(), "seeds": [5]}))
     dst = P.import_run(folder, other, P.VARIANTS["risk_rules"], 5, note="from the first lab")
-    m2 = json.loads((dst / "manifest.json").read_text())
+    m2 = json.loads((dst / "manifest.json").read_text(encoding="utf-8"))
     assert m2["imported_from"]["folder"] == str(folder) and m2["prompt"]["name"] == "risk_rules"
     assert R.read_run(dst)["seed"] == 5 and (folder / "manifest.json").is_file()
     with pytest.raises(ValueError):  # the record's settings do not match the variant
@@ -200,15 +200,15 @@ def test_a_lab_stopped_by_a_quota_resumes_by_replaying_its_steps(tmp_path):
     Quota.left = 5
     with pytest.raises(P.LabStopped):
         P.run_lab(chosen, st, tmp_path / "lab", workers=1, provider_factory=lambda v, s: Quota(s), check=False)
-    assert not R.collect(tmp_path / "lab") and len((tmp_path / "lab" / "progress.jsonl").read_text().splitlines()) == 5
+    assert not R.collect(tmp_path / "lab") and len((tmp_path / "lab" / "progress.jsonl").read_text(encoding="utf-8").splitlines()) == 5
     Quota.left = 1000
     P.run_lab(chosen, st, tmp_path / "lab", workers=1, provider_factory=lambda v, s: Quota(s), check=False)
     rows = R.collect(tmp_path / "lab")
     assert len(rows) == 2 and all(r["format_errors"] == 0 for r in rows)
     calls = [json.loads(x) for x in (P.run_folder(tmp_path / "lab", "baseline", "2026", 0) / "calls.jsonl")
-             .read_text().splitlines()]
+             .read_text(encoding="utf-8").splitlines()]
     assert sum(1 for c in calls if c.get("replayed")) == 5
-    assert len((tmp_path / "lab" / "progress.jsonl").read_text().splitlines()) == sum(r["steps"] for r in rows)
+    assert len((tmp_path / "lab" / "progress.jsonl").read_text(encoding="utf-8").splitlines()) == sum(r["steps"] for r in rows)
     # the same lab again with a model that would answer differently: nothing is asked, the records stay
     assert 1000 - Quota.left == sum(r["steps"] for r in rows) - 5
 
@@ -217,7 +217,7 @@ def test_a_policy_run_passes_the_look_ahead_check(tmp_path):
     st = P.LabSettings(llm="fake:model", periods=["2026"], seeds=[0], universe="core", max_positions=3, **WINDOW)
     out = P.run_one(P.VARIANTS["news_6"], "2026", 0, st, tmp_path, provider=FakeModel(0), check=True)
     assert out["leak_check"] == "pass"
-    log = json.loads((Path(out["folder"]) / "policy_log.json").read_text())
+    log = json.loads((Path(out["folder"]) / "policy_log.json").read_text(encoding="utf-8"))
     assert log["max_news"] == 6 and log["blind"] is True
 
 
