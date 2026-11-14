@@ -6,7 +6,7 @@
 
 ## 目前的结果
 
-第一批是 pilot：基线和两个规则 prompt（下面的 `risk_rules` 和 `trend_news`），三个模型（`gpt-5.6-luna`、`claude-haiku-5-5`、`gemini-3.1-flash-lite`），三个时段，盲测，`core` 股票池，每 5 个交易日决策一次，一个种子：共 27 次运行，花费 $0.26。每个 prompt 和同一模型、同一时段的基线配对，共九对。第四个模型、TAMU 网关上的 `llama3.2` 没有算进来：网关会把它的长 prompt 截断（一个 11,000 token 的 prompt 只读进了 2,050 个），没法确认它看到了完整的观察。
+第一批是 pilot：基线和两个规则 prompt（下面的 `risk_rules` 和 `trend_news`），三个模型（`gpt-5.6-luna`、`claude-haiku-5-5`、`gemini-3.1-flash-lite`），三个时段，盲测，`core` 股票池，每 5 个交易日决策一次，一个种子：共 27 次运行，花费 $0.26。每个 prompt 和同一模型、同一时段的基线配对，共九对。第四个模型、学校的 LLM 网关上的 `llama3.2` 没有算进来：网关会把它的长 prompt 截断（一个 11,000 token 的 prompt 只读进了 2,050 个），没法确认它看到了完整的观察。
 
 | 和基线比 | `risk_rules` | `trend_news` |
 |---|---:|---:|
