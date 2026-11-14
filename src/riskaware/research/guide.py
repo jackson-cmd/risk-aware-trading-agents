@@ -70,6 +70,10 @@ def guide() -> dict[str, Any]:
                                "only, market orders at the next open with 5 bps slippage, sells before buys",
             "risk_aware": "the package's risk manager on top: a cash floor, regime limits, tranches, position and "
                           "sector caps (part of the risk-aware strategy; use it to test that overlay)",
+            "costs": "costs='fixed' (default) pays 5 bps on every fill at the open. costs='realistic' pays 5 bps plus "
+                     "10% of the overnight gap plus square-root market impact (daily volatility x sqrt(shares / "
+                     "20-day average volume)), and fills each order for at most 1% of its 20-day average volume; "
+                     "the volatility and volume are those of the days before the fill",
         },
         "baselines": {name: cls.description for name, cls in RESEARCH_STRATEGIES.items()},
         "baseline_params": {name: cls.default_params for name, cls in RESEARCH_STRATEGIES.items()},

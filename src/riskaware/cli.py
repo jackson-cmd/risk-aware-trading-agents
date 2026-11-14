@@ -565,6 +565,9 @@ def backtest(
     open_report: bool = typer.Option(False, "--open", help="Open the HTML report"),
     news: Optional[bool] = typer.Option(None, "--news/--no-news",
                                         help="Replay the local news archive (default: backtest.news in the config)"),
+    costs: Optional[str] = typer.Option(None, "--costs", help="fixed (slippage only) or realistic (also part of the "
+                                        "overnight gap, square-root market impact and a 1% volume cap; docs/costs.md)"
+                                        "; default: backtest.cost_model in the config"),
 ) -> None:
     """Backtest one or more strategies with the same risk engine. / 回测与策略对比"""
     from rich.progress import Progress
@@ -577,6 +580,11 @@ def backtest(
     from .utils import DiskCache
 
     c = cfg()
+    if costs is not None:
+        if costs not in ("fixed", "realistic"):
+            console.print("[red]--costs must be fixed or realistic[/]")
+            raise typer.Exit(2)
+        c.backtest.cost_model = costs
     if preset:
         c.universe.preset = preset
         c.universe.symbols = []

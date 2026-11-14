@@ -59,6 +59,8 @@ def _num(v: Any, nd: int = 2) -> str:
 
 
 PERIOD_HELP = "Bundled period: 2026 (default), 2022 (rate-hike bear market) or 2020 (COVID crash)"
+COSTS_HELP = ("fixed (default: the slippage on every fill at the open) or realistic (also part of the overnight gap "
+              "and square-root market impact; each order at most 1% of the 20-day volume; docs/costs.md)")
 
 
 @app.command("data")
@@ -190,6 +192,12 @@ def _print_summary(s: dict[str, Any]) -> None:
     t.add_row(L("Win rate", "胜率"), _pct(m.get("win_rate"), sign=False), "", "")
     t.add_row(L("Avg holding (days)", "平均持有天数"), _num(m.get("avg_holding_days"), 1), "", "")
     console.print(t)
+    c = s.get("costs") or {}
+    if c.get("model") == "realistic" and c.get("avg_bps") is not None:
+        console.print(L(f"Realistic costs: {_num(c['avg_bps'], 1)} bps per fill at the open on average (highest "
+                        f"{_num(c.get('max_bps'), 1)}), {c.get('volume_cap_cuts', 0)} orders cut by the volume cap",
+                        f"真实成本：开盘成交平均每笔 {_num(c['avg_bps'], 1)} bps（最高 {_num(c.get('max_bps'), 1)}），"
+                        f"{c.get('volume_cap_cuts', 0)} 笔订单被成交量上限砍掉一部分"))
     v = s.get("vs_spy") or {}
     if v:
         console.print(f"beta {_num(v.get('beta'))}, alpha {_pct(v.get('alpha_annual'))}/yr, t {_num(v.get('t_stat_excess'))}, "
@@ -225,25 +233,28 @@ def run_cmd(
     split: Optional[str] = typer.Option(None, help="First day of the out-of-sample part, e.g. 2026-07-01"),
     leak_check: bool = typer.Option(True, "--leak-check/--no-leak-check"),
     slippage_bps: float = typer.Option(5.0),
+    costs: str = typer.Option("fixed", help=COSTS_HELP),
     label: Optional[str] = typer.Option(None),
     out: Optional[Path] = typer.Option(None, help="Record folder (default ~/.riskaware/research/runs/<id>)"),
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     """Run a strategy on a frozen period and save a record. / 在冻结的某个时段上做一次实验"""
-    from .experiment import Experiment, run_experiment
+    from .experiment import COST_MODELS, Experiment, run_experiment
     from .periods import get_period
 
     syms = [s.strip().upper() for s in symbols.split(",")] if symbols else None
     p = json.loads(params) if params else {}
     try:
         per = get_period(period)
+        if costs not in COST_MODELS:
+            raise ValueError(f"--costs must be one of {', '.join(COST_MODELS)}")
     except ValueError as exc:
         console.print(f"[red]{escape(str(exc))}[/]")
         raise typer.Exit(2) from exc
     settings = dict(params=p, period=per.name, start=start, end=end, universe=None if syms else universe, symbols=syms,
                     news=news,
                     execution=execution, profile=profile, max_positions=max_positions, position_size=position_size,
-                    split=split, leak_check=leak_check, slippage_bps=slippage_bps, label=label)
+                    split=split, leak_check=leak_check, slippage_bps=slippage_bps, label=label, costs=costs)
     t0 = time.time()
     if code is not None:
         from ..lab import backtest_code
@@ -277,17 +288,22 @@ def baselines_cmd(
     max_positions: int = typer.Option(10),
     split: Optional[str] = typer.Option(None, help="Out-of-sample start (default: 1 July of the period's year)"),
     leak_check: bool = typer.Option(True, "--leak-check/--no-leak-check"),
+    costs: str = typer.Option("fixed", help=COSTS_HELP),
     out: Optional[Path] = typer.Option(None),
 ) -> None:
     """The five swing strategies, with and without news, side by side. / 五种波段策略，开和不开新闻对比"""
     from .compare import run_baselines
+    from .experiment import COST_MODELS
     from .periods import get_period
 
     per = get_period(period)
+    if costs not in COST_MODELS:
+        console.print(f"[red]--costs must be one of {', '.join(COST_MODELS)}[/]")
+        raise typer.Exit(2)
     with console.status("...") as st:
         table, folder = run_baselines(start=start, end=end, universe=universe, max_positions=max_positions,
                                       split=split or per.split.isoformat(), leak_check=leak_check, out_dir=out,
-                                      progress=lambda msg: st.update(msg), period=per.name)
+                                      progress=lambda msg: st.update(msg), period=per.name, costs=costs)
     console.print((folder / "baselines.md").read_text(encoding="utf-8"))
     console.print(f"{L('Folder', '文件夹')}: {folder}", soft_wrap=True)
 
