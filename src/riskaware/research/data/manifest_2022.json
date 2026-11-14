@@ -1,0 +1,153 @@
+{
+  "name": "riskaware market 2022",
+  "version": "2022-12-30",
+  "built": "2026-11-14T00:56:15+00:00",
+  "period": {
+    "first": "2020-01-02",
+    "last": "2022-12-30",
+    "experiment_start": "2022-01-03",
+    "trading_days": 756
+  },
+  "files": {
+    "market_2022.csv.gz": {
+      "sha256": "6377384cd1902329bf69dcb85338335b15f0e9e4485a753ad005cd370c9238fc",
+      "rows": 72466,
+      "columns": [
+        "date",
+        "symbol",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "adj",
+        "dividend",
+        "split"
+      ]
+    },
+    "news_2022.jsonl.gz": {
+      "sha256": "d5bf10935f3f2842f2f70e07be9faaa8f2e5b63e720c0825ff713e40e611a468",
+      "path": "riskaware/news/data/news_2022.jsonl.gz"
+    }
+  },
+  "symbols": {
+    "stocks": [
+      "AAPL",
+      "ABBV",
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "AVGO",
+      "BAC",
+      "BKNG",
+      "BRK-B",
+      "CAT",
+      "CDNS",
+      "COST",
+      "CRM",
+      "CRWD",
+      "CSCO",
+      "CVX",
+      "DE",
+      "DIS",
+      "DUK",
+      "GE",
+      "GOOGL",
+      "GS",
+      "HD",
+      "HON",
+      "INTU",
+      "ISRG",
+      "JNJ",
+      "JPM",
+      "KO",
+      "LIN",
+      "LLY",
+      "LOW",
+      "MA",
+      "MCD",
+      "META",
+      "MRK",
+      "MSFT",
+      "NEE",
+      "NFLX",
+      "NKE",
+      "NOW",
+      "NVDA",
+      "O",
+      "ORCL",
+      "PANW",
+      "PEP",
+      "PG",
+      "PLD",
+      "QCOM",
+      "RTX",
+      "SBUX",
+      "SHOP",
+      "SNPS",
+      "SO",
+      "SPGI",
+      "TMO",
+      "TMUS",
+      "TSLA",
+      "TXN",
+      "UNH",
+      "UNP",
+      "V",
+      "WMT",
+      "XOM"
+    ],
+    "etfs": [
+      "BIL",
+      "DIA",
+      "HYG",
+      "IEF",
+      "IWM",
+      "LQD",
+      "QQQ",
+      "RSP",
+      "SGOV",
+      "SHV",
+      "SHY",
+      "SPY",
+      "TLT",
+      "VTI",
+      "XLB",
+      "XLC",
+      "XLE",
+      "XLF",
+      "XLI",
+      "XLK",
+      "XLP",
+      "XLRE",
+      "XLU",
+      "XLV",
+      "XLY"
+    ],
+    "volatility": [
+      "^VIX9D",
+      "^VIX",
+      "^VIX3M",
+      "^VVIX"
+    ],
+    "cross_asset": [
+      "GLD",
+      "USO",
+      "UUP"
+    ]
+  },
+  "cross_asset": {
+    "GLD": "gold",
+    "USO": "oil",
+    "UUP": "US dollar"
+  },
+  "not_trading_yet": [
+    "IBIT"
+  ],
+  "late_start": {
+    "SGOV": "2020-06-01"
+  },
+  "missing_days": {},
+  "source": "Yahoo Finance daily bars via yfinance (auto_adjust=False, actions=True)",
+  "prices": "open, high, low, close as traded (split-adjusted); adj = Adj Close / Close turns them into total-return prices; dividend and split are the cash dividend and split ratio of that day"
+}

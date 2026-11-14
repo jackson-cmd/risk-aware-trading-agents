@@ -164,8 +164,8 @@ class Backtester:
             raise RuntimeError("not enough trading days in the backtest window")
         notes = ["Signals use the close of day t; orders fill on day t+1 (open or limit)."]
         if self.news is None:
-            notes.append("News is not used in this backtest (turn it on with --news; 2026 headlines ship with the "
-                         "package, other years come from `riskaware news-history`).")
+            notes.append("News is not used in this backtest (turn it on with --news; 2020, 2022 and 2026 headlines ship "
+                         "with the package, other years come from `riskaware news-history`).")
         else:
             covered = [s for s in universe if s in self.news.symbols]
             feeds = ", ".join(f"{k} {v}" for k, v in sorted(self.news.feeds().items()))

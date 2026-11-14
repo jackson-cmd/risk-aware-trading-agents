@@ -4,7 +4,7 @@
 
 **先看宏观日历、恐慌指数和经过交叉验证的新闻，再决定买不买的美股 AI 交易智能体。**
 
-用 VIX 和 FOMC / CPI 日历判断市场状态 · 财报过关才抄底 · 始终留 30% 现金 · 新闻交叉验证 · 和 SPY 比的模拟盘智能体 · 不偷看未来的新闻回测 · 供研究用的冻结 2026 年数据 · 通过 MCP 接入 LLM 智能体 · 10 家券商的模拟盘和实盘。
+用 VIX 和 FOMC / CPI 日历判断市场状态 · 财报过关才抄底 · 始终留 30% 现金 · 新闻交叉验证 · 和 SPY 比的模拟盘智能体 · 不偷看未来的新闻回测 · 供研究用的冻结 2020、2022、2026 三段市场 · 通过 MCP 接入 LLM 智能体 · 10 家券商的模拟盘和实盘。
 
 [🌐 项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [English → README.md](README.md) · [🚀 快速开始](#-快速开始) · [🆕 新功能](#-新功能) · [🔬 研究工具箱](#-研究工具箱) · [🔗 MCP](#-mcp-服务器) · [📸 截图](#-截图一览) · [更新记录](docs/zh/CHANGELOG.md)
 
@@ -37,6 +37,7 @@ riskaware --lang zh agents init       # 四个示例模拟盘智能体
 riskaware --lang zh agents run        # 现在让它们交易一次
 riskaware agents schedule --install   # 以后每个交易日自动交易
 riskaware --lang zh research run -s swing_trend   # 在冻结的 2026 年市场上跑一个策略，带防偷看检查
+riskaware --lang zh research run -s swing_trend --period 2022   # 同一个策略放到 2022 年熊市里
 ```
 
 上面这些命令都不需要券商账户或 API key。在配置文件里写 `language: zh`，以后就不用每次加 `--lang zh`。想用 GitHub 上还没发版的最新代码，就改用 `pip install "risk-aware-trading-agents[dashboard,mcp] @ git+https://github.com/jackson-cmd/risk-aware-trading-agents"`；想改代码的话，先克隆仓库，再用 `pip install -e ".[dashboard,mcp]"` 安装。
@@ -56,12 +57,12 @@ docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp            
 
 - 你做**美股，持有几天到几周**，想要一套看得懂的规则：好公司回调时买、始终留现金、从不恐慌割肉。
 - 你想要**不会作弊的回测**：新闻按发布时间回放，次日开盘成交，研究工具箱的每次实验都做防偷看检查。
-- 你在**研究 LLM 交易智能体**，需要别人也能复现的数据和流程：冻结的 2026 年市场、盲测模式、每次运行都有完整记录。
+- 你在**研究 LLM 交易智能体**，需要别人也能复现的数据和流程：三段冻结的市场（2020 年暴跌、2022 年熊市、2026 年）、盲测模式、每次运行都有完整记录。
 - 你用 **Claude、Codex 或 Gemini**，想让它们帮你测试用大白话描述的策略，走你自己的订阅，不需要 API key。
 - 你想**先模拟交易**：几个策略同时用模拟资金跑，每个交易日和 SPY 比一次。
 - 你看**中文或英文**：命令行、网页看板、回测报告和文档都有两种语言。
 
-<sub>如果你在找美股 AI 交易机器人、带历史新闻又不偷看未来的回测工具、按时间点记录的 2026 年价格、VIX 和新闻数据、LLM 交易智能体的评测基准、做交易研究用的 MCP 服务器，或者能接 Alpaca 等券商的模拟盘智能体：这里都有，而且开源。</sub>
+<sub>如果你在找美股 AI 交易机器人、带历史新闻又不偷看未来的回测工具、按时间点记录的 2020、2022、2026 年价格、VIX 和新闻数据、LLM 交易智能体的评测基准、做交易研究用的 MCP 服务器，或者能接 Alpaca 等券商的模拟盘智能体：这里都有，而且开源。</sub>
 
 ---
 
@@ -110,7 +111,7 @@ docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp            
 | | **网页看板** | **命令行** | **AI 助手（MCP）** | **Python** |
 |---|---|---|---|---|
 | 从这里开始 | `riskaware dashboard` | `riskaware scan` | `riskaware mcp-setup claude-desktop --apply` | `from riskaware.research import run_experiment` |
-| 用来做什么 | 看市场状态、信号、智能体和回测，中英文都有 | 扫描、回测、模拟交易，以及让智能体每天自动交易 | 用大白话说出策略，让 Claude、Codex 或 Gemini 写代码、测试并解释结果 | 在冻结的 2026 年市场上做实验，留下能写进论文的记录 |
+| 用来做什么 | 看市场状态、信号、智能体和回测，中英文都有 | 扫描、回测、模拟交易，以及让智能体每天自动交易 | 用大白话说出策略，让 Claude、Codex 或 Gemini 写代码、测试并解释结果 | 在冻结的 2020、2022、2026 年市场上做实验，留下能写进论文的记录 |
 | 需要 | `dashboard` 扩展 | 不需要别的 | `mcp` 扩展；走你的订阅，不需要 API key | 不需要别的 |
 
 ```python
@@ -230,33 +231,43 @@ riskaware mcp-setup claude-desktop --apply   # 也可以是 claude-code、codex�
 
 ### 🔬 研究工具箱
 
-整个 2026 年随安装包一起提供，冻结不变，做的实验任何人都能重跑：64 只股票和 25 个 ETF 自 2024 年起的日线、VIX 期限结构、16,945 条标题和 SEC 公告，以及智能体用到的每个技术指标和市场状态读数，每个值都是当天收盘时已知的样子。同一份数据也放在 [Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026)，是 Parquet 格式，可在线浏览，另附原始文件。
+三个很不一样的年份随安装包一起提供，冻结不变，做的实验任何人都能重跑：**2026** 年至今（上涨行情）、**2022** 年（加息熊市：SPY -18.2%）和 **2020** 年（疫情暴跌：SPY 23 天跌 34%，之后创新高）。每个时段都有 64 只股票和 25 个 ETF 从前两年起的日线、VIX 期限结构、当年的新闻标题，以及智能体用到的每个技术指标和市场状态读数，每个值都是当天收盘时已知的样子。
+
+| 时段 | 测试区间 | 64 只股票的新闻 |
+|---|---|---|
+| `2026`（默认） | 2026-01-02 到 2026-11-11 | 16,945 条 Benzinga 标题和 SEC 8-K 公告 |
+| `2022` | 全年 | 29,300 条 Benzinga 标题 |
+| `2020` | 全年 | 19,618 条 Benzinga 标题 |
+
+它们是从一个本地新闻库里切出来的：2011 到 2026 年约 320 万条 Benzinga 标题（2020 年约 20.2 万、2022 年约 27.0 万、2026 年约 25 万），足够回测读新闻的交易智能体、挖掘新闻因子。2026 年的数据也放在 [Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026)，是 Parquet 格式，可在线浏览，另附原始文件。
 
 ```bash
 riskaware research day 2026-04-08 --symbols NVDA,TSLA           # 那天收盘时已知的全部信息
 riskaware research run --strategy swing_trend --split 2026-07-01
-riskaware research trade --llm ollama:qwen2.5:3b --universe core --blind
+riskaware research run --strategy swing_trend --period 2022     # 熊市
+riskaware research trade --llm ollama:qwen2.5:3b --universe core --blind --period 2020
 ```
 
 - **按时间点。** 收盘出信号，次日开盘成交：基于日线的波段交易。标题发布之后才算数，技术指标只往回看。
-- **每次运行都做防偷看检查。** 把三个切点之后的每个价格和每条标题都换成随机的，再跑一遍，每个切点之前的决定必须一模一样。
+- **每次运行都做防偷看检查。** 把三个切点之后的每个价格和每条标题都换成随机的，再跑一遍，每个切点之前的决定必须一模一样。LLM 运行则重放模型自己的回复，检查每个切点之前模型看到的内容一点没变，不用再问一遍模型。
 - **留下可用于论文的记录。** 每次运行都保存数据哈希、代码、设置、指标、bootstrap 区间、成交和每一个决定。
-- **为 LLM 设计。** 通过 MCP，你描述一个策略，Claude 就写代码并测试（`run_experiment`），可以查任意一天（`market_day`），也可以一步一步把这一年交易一遍（`trading_session_start`），还能盲测：看不到股票代码、公司名和日期。
+- **为 LLM 设计。** 通过 MCP，你描述一个策略，Claude 就写代码并测试（`run_experiment`），可以查任意一天（`market_day`），也可以一步一步把一个时段交易一遍（`trading_session_start`），还能盲测：看不到股票代码、公司名和日期。
 
-五种常见波段策略，2026-01-02 到 2026-11-11，megacap 的 56 只股票，最多 10 个等额仓位：
+五种常见波段策略，megacap 的 56 只股票，最多 10 个等额仓位；收益写成「不开新闻 / 开新闻」：
 
-| 策略 | 不开新闻 | 开新闻 | Sharpe | 最大回撤 |
-|---|---:|---:|---:|---:|
-| 趋势跟随（EMA20 上穿 EMA50） | **+21.1%** | +19.6% | **1.44** | **-4.7%** |
-| 新闻后的惯性（不开新闻时：同样的交易，改由价格异动触发） | +15.7% | +4.4% | 1.01 | -9.8% |
-| Connors RSI(2) | +12.7% | +10.8% | 0.85 | -7.9% |
-| 上升趋势中买回调 | +2.3% | +1.7% | -0.13 | -4.4% |
-| 20 日突破 | -0.3% | -3.5% | -0.15 | -15.6% |
-| SPY 买入持有 | +12.1% | | 0.77 | -8.9% |
+| 策略 | 2026 年（到 11 月 11 日） | 2022 年 | 2020 年 |
+|---|---:|---:|---:|
+| 趋势跟随（EMA20 上穿 EMA50） | **+21.1%** / +19.6% | -6.0% / -5.0% | +36.6% / **+68.4%** |
+| 新闻后的惯性（不开新闻时：同样的交易，改由价格异动触发） | +15.7% / +4.4% | -13.3% / -14.1% | +9.4% / +28.4% |
+| Connors RSI(2) | +12.7% / +10.8% | -2.2% / -5.7% | +14.0% / +12.7% |
+| 上升趋势中买回调 | +2.3% / +1.7% | **-4.7% / -4.0%** | +2.3% / +3.3% |
+| 20 日突破 | -0.3% / -3.5% | -12.8% / -13.7% | +33.1% / +30.4% |
+| SPY 买入持有 | +12.1% | -18.6% | +17.2% |
+| 等权买入持有，同样 56 只股票 | +11.4% | -12.4% | +40.1% |
 
 <img src="site/assets/research_baselines.png" width="820" alt="五种波段策略 2026 年的表现，开和不开新闻">
 
-Sharpe 和回撤都是不开新闻时的数字。趋势跟随跑赢了 SPY，回撤只有 SPY 的一半。加新闻过滤让每个策略都略差一点；按正面标题买入，也不如按同样幅度的价格异动买入。所有区间都彼此重叠，每次运行都通过了防偷看检查。策略定义、带 95% 区间的完整表格和写论文的建议见 [docs/zh/research.md](docs/zh/research.md)。
+没有哪条规则年年都赢。两个上涨年份里趋势跟随最好；2022 年五个策略全都亏钱，但都比 SPY 亏得少，回调买入亏得最少。新闻过滤在 2026 年让收益变差，在 2020 年看起来有帮助，但 2020 年多出来的收益来自一个仓位：开新闻时空出了一个位置，趋势跟随在 2020 年 4 月买进了特斯拉，一直拿到年底。等权那一行能看出今天的大盘股带来的幸存者偏差，2020 年最大。所有区间都彼此重叠，每次运行都通过了防偷看检查。策略定义、带 95% 区间的完整表格和写论文的建议见 [docs/zh/research.md](docs/zh/research.md)。
 
 ### 📊 回测
 
@@ -302,7 +313,7 @@ riskaware backtest --synthetic                             # 离线演示，不�
 
 #### 用新闻回测
 
-回测只能用当天已经能看到的新闻，所以每条新闻都要有发布时间。2026 年的新闻随安装包自带：内置股票池 64 只股票的 16,945 条（Benzinga 标题，只有标题，加上 SEC 8-K 公告，2026 年 1 月 1 日到 11 月 11 日）。其他年份用 `riskaware news-history` 在你自己的电脑上建新闻库（`~/.riskaware/news`，不进代码仓库）。回测加 `--news` 会把两者一起按天回放，走的是和实盘一样的聚类和两家来源交叉验证。每天只能看到当天收盘前（美东时间 16:00，提前收盘的日子是 13:00）发布的新闻，第二天才成交。
+回测只能用当天已经能看到的新闻，所以每条新闻都要有发布时间。2020、2022 和 2026 年的新闻随安装包自带，都是内置股票池的 64 只股票：分别是 19,618、29,300 和 16,945 条（Benzinga 标题，只有标题；2026 年另有 SEC 8-K 公告，1 月 1 日到 11 月 11 日）。其他年份用 `riskaware news-history` 在你自己的电脑上建新闻库（`~/.riskaware/news`，不进代码仓库）。回测加 `--news` 会把两者一起按天回放，走的是和实盘一样的聚类和两家来源交叉验证。每天只能看到当天收盘前（美东时间 16:00，提前收盘的日子是 13:00）发布的新闻，第二天才成交。
 
 ```bash
 riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset megacap --start 2026-01-02 --news   # 2026 年什么都不用下载
@@ -316,14 +327,14 @@ riskaware backtest --strategy examples/strategies/news_earnings_drift.py --prese
 
 | 来源 | 存进新闻库的内容 | 费用 |
 |---|---|---|
-| 安装包自带 | 内置股票池 64 只股票的 2026 年 Benzinga 标题（只有标题）和 SEC 8-K 公告 | 免费，装好就有 |
+| 安装包自带 | 内置股票池 64 只股票的 2020、2022、2026 年 Benzinga 标题（只有标题），以及 2026 年的 SEC 8-K 公告 | 免费，装好就有 |
 | SEC EDGAR | 每一份 8-K（财报、高管变动、并购、减值、财报重述），带 SEC 受理时间 | 免费；SEC 要求注明联系邮箱 |
 | Benzinga | 用你自己的新闻 API key 拉到的标题 | 你的 Benzinga 套餐 |
 | CSV | 任何你有权使用的新闻 | — |
 
 `core` 股票池是 SPY、QQQ、AAPL、MSFT、NVDA、AMZN、GOOGL、META、TSLA。SPY、QQQ 是基金不是公司，SEC 新闻库里基本没有它们的公告；议息、CPI、非农日历本来就在每次回测里决定市场状态。Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或第二家媒体佐证之前都算"单一来源"。你下载或导入的新闻只存在你自己的电脑上。详见 [docs/zh/news-history.md](docs/zh/news-history.md)。
 
-**更多历史数据。** 我们手里的新闻库大得多，2011 到 2026 年约 320 万条 Benzinga 标题，放不进安装包，所以只带了内置股票池的 2026 年。如果你需要更多年份或更多股票，欢迎开 issue，我们再看怎么提供，比如做成单独下载。
+**更多历史数据。** 我们手里的新闻库大得多，2011 到 2026 年约 320 万条 Benzinga 标题（每年 20 万到 30 万条），放不进安装包，所以只带了内置股票池的 2020、2022 和 2026 年。如果你需要更多年份或更多股票，欢迎开 issue，我们再看怎么提供，比如做成单独下载。
 
 ### 📚 策略库
 
@@ -479,10 +490,10 @@ llm:
 | `riskaware run [--dry-run] [--live]` | 跑一次交易循环 |
 | `riskaware schedule [--print-cron]` | 每个交易日在 `execution.run_time`（美东时间）自动运行 |
 | `riskaware portfolio` | 账户、持仓、未成交订单 |
-| `riskaware backtest [--news]` | 回测和策略对比（`--news` 回放新闻；安装包自带 2026 年） |
+| `riskaware backtest [--news]` | 回测和策略对比（`--news` 回放新闻；安装包自带 2020、2022、2026 年） |
 | `riskaware lab 文件 [--check-only] [--save 名字]` | 检查策略有没有偷看未来、有没有副作用，再在单独的进程里回测 |
 | `riskaware news-history build / import / status / show` | 回测用的本地历史新闻库 |
-| `riskaware research day / run / baselines / trade / runs / data` | 冻结的 2026 年市场：任意一天的数据、带防偷看检查的实验、LLM 交易 |
+| `riskaware research day / run / baselines / trade / runs / data` | 冻结的 2020、2022、2026 年市场（`--period`）：任意一天的数据、带防偷看检查的实验、LLM 交易 |
 | `riskaware strategies` / `new-strategy` | 列出内置策略 / 生成策略模板 |
 | `riskaware brokers` | 支持的券商及所需配置 |
 | `riskaware halt` / `resume` | 一键停止 / 恢复交易 |
@@ -500,8 +511,8 @@ src/riskaware/      Python 包本体
   risk.py           风控（现金底线、各类上限、分批、状态规则）
   engine.py         模拟盘 / 实盘交易循环、安全开关、日志、持仓状态
   backtest/         回测引擎、指标、HTML 报告
-  research/         冻结的 2026 年市场、按日期查询、实验、防偷看检查、LLM 交易会话
-  news/             Finviz + RSS + SEC 新闻源、相关性过滤、交叉验证、2026 年新闻文件
+  research/         冻结的 2020、2022、2026 年市场、按日期查询、实验、防偷看检查、LLM 交易会话
+  news/             Finviz + RSS + SEC 新闻源、相关性过滤、交叉验证、2020、2022、2026 年新闻文件
   data/             价格（Yahoo、CSV、模拟数据）、FOMC/BLS/BEA 日历、基本面、CNN 恐慌贪婪指数
   brokers/          模拟盘 + 9 家券商接口
   options/          回测用的期权定价和合约选择
@@ -534,15 +545,15 @@ docker/             Dockerfile 和 docker-compose.yml
 
 ### 回测用的历史新闻数据从哪里来？
 
-2026 年的数据随安装包提供：64 只美国大盘股的 16,945 条新闻，包括 Benzinga 标题（只有标题）和 SEC 8-K 公告，每条都带发布时间。其他年份可以用 `riskaware news-history build` 免费下载 SEC 8-K 公告，也可以用你自己的 API key 下载 Benzinga 标题；任何包含时间、代码和标题的 CSV 也能导入。详见 [docs/zh/news-history.md](docs/zh/news-history.md)。
+2020、2022 和 2026 年的数据随安装包提供，都是 64 只美国大盘股：分别是 19,618、29,300 和 16,945 条新闻，Benzinga 标题（只有标题；2026 年另有 SEC 8-K 公告），每条都带发布时间。其他年份可以用 `riskaware news-history build` 免费下载 SEC 8-K 公告，也可以用你自己的 API key 下载 Benzinga 标题；任何包含时间、代码和标题的 CSV 也能导入。详见 [docs/zh/news-history.md](docs/zh/news-history.md)。
 
 ### 有没有免费的、按时间点记录的美股价格、VIX 和新闻数据？
 
-有。研究工具箱里冻结的市场数据包括 64 只股票和 25 个 ETF 从 2024 年 1 月到 2026 年 11 月的日线、VIX 期限结构（VIX9D、VIX、VIX3M、VVIX）以及 2026 年的新闻，并附带 SHA-256 哈希，论文可以准确引用用到的数据。`riskaware research day 2026-04-08` 可以看到那天收盘时已知的全部信息。详见[自带哪些数据](docs/zh/research.md#自带哪些数据)。
+有。研究工具箱里有三段冻结的市场：2026 年至今、2022 年和 2020 年，每段都有 64 只股票和 25 个 ETF 从前两年起的日线、VIX 期限结构（VIX9D、VIX、VIX3M、VVIX）和当年的新闻，并附带 SHA-256 哈希，论文可以准确引用用到的数据。`riskaware research day 2022-06-13` 可以看到那天收盘时已知的全部信息。详见[自带哪些数据](docs/zh/research.md#自带哪些数据)。
 
 ### 怎么公平地评测一个 LLM 交易智能体？
 
-让它在冻结的 2026 年市场上一步一步做决定：用 `riskaware research trade --llm ...`，或者通过 MCP 调 `trading_session_start`。每份观察只包含那天收盘时已知的信息，订单在次日开盘成交，整次运行连同每一笔订单和相对 SPY 的指标一起保存。盲测模式会替换股票代码、公司名和日期，模型没法凭记忆知道某只股票后来怎么样。详见 [LLM 智能体](docs/zh/research.md#让-llm-把这一年交易一遍)。
+让它在一段冻结的市场（2026、2022 或 2020 年）上一步一步做决定：用 `riskaware research trade --llm ...`，或者通过 MCP 调 `trading_session_start`。每份观察只包含那天收盘时已知的信息，订单在次日开盘成交，整次运行连同每一笔订单和相对 SPY 的指标一起保存。盲测模式会替换股票代码、公司名和日期，模型没法凭记忆知道某只股票后来怎么样。详见 [LLM 智能体](docs/zh/research.md#让-llm-把一个时段交易一遍)。
 
 ### Claude、ChatGPT（Codex）或 Gemini 能帮我回测策略吗？
 
@@ -575,7 +586,7 @@ docker/             Dockerfile 和 docker-compose.yml
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24202496.svg)](https://doi.org/10.5281/zenodo.24202496)
 
-如果在研究里用到了本项目或冻结的 2026 年市场数据，请引用。每个版本都存档在 Zenodo；[10.5281/zenodo.24202496](https://doi.org/10.5281/zenodo.24202496) 总是指向最新版本，每个版本在那里也有自己的 DOI。GitHub 页面上的 **Cite this repository** 按钮可以给出其他格式（[CITATION.cff](CITATION.cff)）；引用数据时，再加上 `src/riskaware/research/data/manifest.json` 里的版本和 SHA-256。
+如果在研究里用到了本项目或冻结的市场数据，请引用。每个版本都存档在 Zenodo；[10.5281/zenodo.24202496](https://doi.org/10.5281/zenodo.24202496) 总是指向最新版本，每个版本在那里也有自己的 DOI。GitHub 页面上的 **Cite this repository** 按钮可以给出其他格式（[CITATION.cff](CITATION.cff)）；引用数据时，再加上时段、它的版本，以及 `src/riskaware/research/data/` 下它的 manifest 里的 SHA-256。
 
 ```bibtex
 @software{risk_aware_trading_agents,

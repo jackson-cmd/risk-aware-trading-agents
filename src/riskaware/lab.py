@@ -419,7 +419,7 @@ def run_research_job(job: dict[str, Any]) -> dict[str, Any]:
 
     settings = dict(job["research"])
     exp = Experiment(**settings)
-    market = bundled_market()  # read the data before any strategy code runs
+    market = bundled_market(exp.period)  # read the data before any strategy code runs
     install_guard()
     try:
         cls = load_code(job["code"])

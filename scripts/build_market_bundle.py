@@ -1,6 +1,7 @@
-"""Build the market data that ships with the package: src/riskaware/research/data/market_2026.csv.gz.
+"""Build the market data of a bundled period: src/riskaware/research/data/market_<year>.csv.gz and its manifest.
 
-    python scripts/build_market_bundle.py --start 2024-01-02 --end 2026-11-11
+    python scripts/build_market_bundle.py --period 2026     # 2024-01-02 to 2026-11-11, manifest.json
+    python scripts/build_market_bundle.py --period 2022     # 2020-01-02 to 2022-12-30, manifest_2022.json
 
 Daily bars from Yahoo Finance (yfinance, ``auto_adjust=False``) for:
 
@@ -13,8 +14,9 @@ Daily bars from Yahoo Finance (yfinance, ``auto_adjust=False``) for:
 
 Each row keeps the prices as traded (adjusted for splits only), the volume, the cash dividend and split of that
 day, and ``adj``, the factor that turns the prices into total-return prices (Yahoo's Adj Close / Close). The two
-years before 2026 are there so that slow indicators (EMA200, 52-week highs) are fully warmed up on the first day
-of 2026.
+years before a period's test window are there so that slow indicators (EMA200, 52-week highs) are fully warmed up
+on its first day. A symbol that did not trade yet (IBIT before 2024) is left out of that period and listed in the
+manifest.
 
 The output is sorted and written with a fixed gzip timestamp; manifest.json next to it records the period, the
 symbols and the SHA-256 of this file and of the bundled news file. Prices on Yahoo change when a dividend is paid
@@ -36,10 +38,11 @@ from pathlib import Path
 
 import pandas as pd
 
+from riskaware.research.periods import get_period
 from riskaware.universe import PRESETS, SECTOR_MAP, is_etf
 
 OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "riskaware" / "research" / "data"
-NEWS_FILE = Path(__file__).resolve().parent.parent / "src" / "riskaware" / "news" / "data" / "news_2026.jsonl.gz"
+NEWS_DIR = Path(__file__).resolve().parent.parent / "src" / "riskaware" / "news" / "data"
 WATCHLISTS = ("core", "megacap", "tech", "defensive")
 VOLATILITY = ["^VIX9D", "^VIX", "^VIX3M", "^VVIX"]
 CROSS_ASSET = {"GLD": "gold", "USO": "oil", "UUP": "US dollar", "IBIT": "bitcoin"}
@@ -104,18 +107,25 @@ def sha256(path: Path) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--start", default="2024-01-02")
-    ap.add_argument("--end", default="2026-11-11")
+    ap.add_argument("--period", default="2026", help="a bundled period (see riskaware.research.periods)")
+    ap.add_argument("--start", help="first day of data (default: two years before the period's test window)")
+    ap.add_argument("--end", help="last day of data (default: the period's last day)")
     ap.add_argument("--out", default=str(OUT_DIR))
     args = ap.parse_args()
-    start, end = date.fromisoformat(args.start), date.fromisoformat(args.end)
+    per = get_period(args.period)
+    start = date.fromisoformat(args.start) if args.start else date(per.start.year - 2, 1, 2)
+    end = date.fromisoformat(args.end) if args.end else per.end
     groups = default_symbols()
     symbols = [s for g in groups.values() for s in g]
     print(f"downloading {len(symbols)} symbols, {start} to {end}")
     raw = download(symbols, start, end)
-    missing = [s for s in symbols if s not in raw]
+    missing = [s for s in symbols if s not in raw or tidy(s, raw[s], start, end).empty]
+    if "SPY" in missing:
+        raise SystemExit("no data for SPY")
     if missing:
-        raise SystemExit(f"no data for {missing}")
+        print(f"not trading yet in this period, left out: {missing}")
+        groups = {k: [s for s in v if s not in missing] for k, v in groups.items()}
+        symbols = [s for s in symbols if s not in missing]
     table = pd.concat([tidy(s, raw[s], start, end) for s in symbols], ignore_index=True)
     table = table.sort_values(["date", "symbol"]).reset_index(drop=True)
     spy_days = set(table.loc[table["symbol"] == "SPY", "date"])
@@ -130,7 +140,8 @@ def main() -> None:
     with open(path, "wb") as fh, gzip.GzipFile(filename="", mode="wb", fileobj=fh, mtime=0, compresslevel=9) as gz:
         gz.write(buf.getvalue().encode("utf-8"))
 
-    first_trading = min(d for d in spy_days if d >= f"{end.year}-01-01")
+    first_trading = min(d for d in spy_days if d >= per.start.isoformat())
+    news_file = NEWS_DIR / per.news
     manifest = {
         "name": f"riskaware market {end.year}",
         "version": end.isoformat(),
@@ -139,19 +150,21 @@ def main() -> None:
                    "trading_days": len(spy_days)},
         "files": {
             path.name: {"sha256": sha256(path), "rows": int(len(table)), "columns": COLUMNS},
-            "news_2026.jsonl.gz": {"sha256": sha256(NEWS_FILE), "path": "riskaware/news/data/news_2026.jsonl.gz"},
+            per.news: {"sha256": sha256(news_file) if news_file.is_file() else None,
+                       "path": f"riskaware/news/data/{per.news}"},
         },
         "symbols": groups,
-        "cross_asset": CROSS_ASSET,
+        "cross_asset": {k: v for k, v in CROSS_ASSET.items() if k in symbols},
+        "not_trading_yet": missing,
         "late_start": late,
         "missing_days": {s: n for s, n in gaps.items() if n and s not in late and not s.startswith("^")},
         "source": "Yahoo Finance daily bars via yfinance (auto_adjust=False, actions=True)",
         "prices": "open, high, low, close as traded (split-adjusted); adj = Adj Close / Close turns them into "
                   "total-return prices; dividend and split are the cash dividend and split ratio of that day",
     }
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    (out_dir / per.manifest).write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     size = path.stat().st_size / 1e6
-    print(f"wrote {path} ({len(table):,} rows, {size:.2f} MB) and manifest.json")
+    print(f"wrote {path} ({len(table):,} rows, {size:.2f} MB) and {per.manifest}")
     if late:
         print("start later than the period:", late)
     bad = {s: n for s, n in manifest["missing_days"].items()}

@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from .data import manifest
+from .data import available_periods, manifest
 from .experiment import PROTOCOL
+from .periods import DEFAULT_PERIOD, get_period
 
 
 def guide() -> dict[str, Any]:
@@ -14,14 +15,22 @@ def guide() -> dict[str, Any]:
 
     m = manifest()
     groups = m["symbols"]
+    periods = {}
+    for name in available_periods():
+        p, pm = get_period(name), manifest(name)
+        periods[name] = {**p.describe(), "data_from": pm["period"]["first"],
+                         "not_trading_yet": pm.get("not_trading_yet", [])}
     return {
         "what": (
-            "A frozen copy of the 2026 US stock market for experiments that others can repeat: daily bars from "
-            f"{m['period']['first']} to {m['period']['last']} ({m['period']['trading_days']} trading days; 2026 is the "
-            "test year, the two years before it warm up slow indicators such as EMA200), the VIX term structure, "
-            "and 2026 news (Benzinga headlines, titles only, and SEC 8-K filings). It ships with the package, so an "
-            "experiment never touches the network and gives the same numbers on any machine; each record carries "
-            "the SHA-256 of the data."),
+            "Frozen copies of the US stock market in three different years, for experiments that others can repeat: "
+            "2026 to date (the default), 2022 (the rate-hike bear market) and 2020 (the COVID crash). Each period has "
+            "daily bars from two years before it (to warm up slow indicators such as EMA200), the VIX term "
+            "structure, and that year's news (Benzinga headlines, titles only; 2026 also SEC 8-K filings). It ships "
+            "with the package, so an experiment never touches the network and gives the same numbers on any "
+            "machine; each record carries the SHA-256 of the data. Pass period='2022' (or '2020') to "
+            "run_experiment and trading_session_start; market_day picks the period from the day."),
+        "periods": periods,
+        "default_period": DEFAULT_PERIOD,
         "data": {
             "stocks": groups["stocks"], "etfs": groups["etfs"], "volatility": groups["volatility"],
             "cross_asset": {k: v for k, v in m.get("cross_asset", {}).items()},
@@ -75,15 +84,20 @@ def guide() -> dict[str, Any]:
             "News: an item counts from the first close after its timestamp (16:00 New York, 13:00 on early-close "
             "days); items without a time count at the end of their day; future-dated items are dropped.",
             "The leak check re-runs every experiment with a random future after three cut days and compares the "
-            "decisions before each cut.",
+            "decisions before each cut. For an LLM or trading session it replays the replies and compares the "
+            "observations instead, so the model is not asked twice.",
             "Code may not name dates or tickers, so a model cannot pick the stocks or days it remembers.",
-            "A model trained on 2026 text may remember how it went. Trading sessions have a blind mode (aliases "
-            "for tickers and companies, day numbers instead of dates, prices rebased to 100).",
+            "A model trained on text from a period may remember how it went: 2020 and 2022 are in the training data "
+            "of every current model, 2026 only of the newest ones. Trading sessions have a blind mode (aliases for "
+            "tickers and companies, day numbers instead of dates, prices rebased to 100); compare blind and named "
+            "runs, and periods before and after the model's training cutoff.",
         ],
         "for_papers": [
-            "Decide the hypothesis, period and settings before looking at results; tune on 2026-01-02 to 2026-06-30 "
-            "and test once on 2026-07-01 to 2026-11-11 (split='2026-07-01').",
-            "Report the intervals: ten months is short, and most differences between strategies are within them.",
+            "Decide the hypothesis, period and settings before looking at results; tune on the first half of a "
+            "period and test once on the second (split='2026-07-01', '2022-07-01' or '2020-07-01').",
+            "Run every strategy on all three periods: a rising market (2026), a bear market (2022) and a crash and "
+            "rebound (2020). A result that holds in only one of them is a statement about that year.",
+            "Report the intervals: one year is short, and most differences between strategies are within them.",
             "Every variant you try is a test; say how many you ran.",
             "The stock lists are today's large caps, chosen with hindsight (survivorship bias): compare strategies "
             "with each other and with the equal-weight universe, not only with SPY.",

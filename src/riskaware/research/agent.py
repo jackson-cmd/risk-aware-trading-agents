@@ -18,10 +18,16 @@ Blind mode hides what a model could recognise: tickers become S01, S02, ..., dat
 rebased to 100 on the first day, and company names and tickers in headlines become the same aliases. It lowers the
 chance that a model trained on text from 2026 recalls how a stock did; it cannot rule it out (an unusual headline,
 a sector and a price path together may still give a stock away).
+
+The decisions come from the policy, so the strategy leak check (same decisions with a random future) says nothing
+here. Every run instead checks the harness: it replays the policy's replies on copies of the market whose prices
+and headlines after a cut day are random, and the observations up to each cut must be identical. That proves no
+future price or headline reaches the prompt; whether the model itself remembers 2026 is a separate question.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import secrets
@@ -37,22 +43,28 @@ import numpy as np
 from ..backtest.engine import Backtester
 from ..config import RISKAWARE_HOME
 from ..data.events import EventCalendar
+from ..news.history import decision_time
 from ..news.relevance import company_names
 from ..strategy.base import Strategy
 from ..types import Action, Signal
 from ..universe import sector_of
-from .data import bundled_market
+from .data import FrozenMarket, bundled_market
 from .experiment import (
+    RUNS_DIR,
     Experiment,
     ExperimentResult,
     _archive,
     _config,
     _dates,
     _news,
+    _PoisonedNews,
     _run,
     _symbols,
+    cut_days,
     run_experiment,
+    save_run,
 )
+from .periods import DEFAULT_PERIOD, get_period
 
 NY = ZoneInfo("America/New_York")
 SESSIONS_DIR = RISKAWARE_HOME / "research" / "sessions"
@@ -248,11 +260,13 @@ class PolicyStrategy(Strategy):
         self.name = label
         self.params = {"decide_every": self.decide_every, "blind": blind, "news": news, "max_news": max_news}
         self.transcript: list[dict[str, Any]] = []
+        self.replies: list[Any] = []
+        self.observed: list[tuple[str, str]] = []  # (day, SHA-256 of the observation) for every step that built one
 
     def on_start(self, universe: list[str]) -> None:
         self.trading_day, self.step, self.start_equity = 0, 0, None
         self.blind = Blind.make(universe, self.seed) if self.use_blind else None
-        self.transcript = []
+        self.transcript, self.replies, self.observed = [], [], []
         self._problems: list[str] = []
 
     def on_bar(self, ctx: Any) -> list[Signal]:
@@ -274,7 +288,9 @@ class PolicyStrategy(Strategy):
             obs = observe(ctx, step=self.step, trading_day=self.trading_day, start_equity=self.start_equity,
                           blind=self.blind, news=self.news, max_news=self.max_news, max_positions=self.max_positions,
                           size=self.size, problems=self._problems)
+            self.observed.append((ctx.day.isoformat(), _digest(obs)))
             reply = self.policy(obs)
+        self.replies.append(reply)
         signals, problems, kept = to_signals(reply, ctx, self.blind, self.size)
         self._problems = problems
         note = reply.get("note") if isinstance(reply, dict) else None
@@ -286,11 +302,84 @@ class PolicyStrategy(Strategy):
         return 0
 
 
+def _digest(obs: dict) -> str:
+    return hashlib.sha256(json.dumps(obs, sort_keys=True, default=str, separators=(",", ":")).encode()).hexdigest()
+
+
+class _Replay:
+    """Gives back recorded replies in order and keeps every observation it is shown (no model is called)."""
+
+    def __init__(self, replies: list[Any]):
+        self.replies = list(replies)
+        self.n = 0
+
+    def __call__(self, obs: dict) -> Any:
+        self.n += 1
+        return self.replies[self.n - 1] if self.n <= len(self.replies) else {"orders": []}
+
+
+def observation_check(exp: Experiment, replies: list[Any], decide_every: int, blind: bool, max_news: int,
+                      market: FrozenMarket | None = None) -> dict[str, Any]:
+    """The look-ahead check of a policy run: the observations up to each cut day must not change when every price
+    and headline after it is random. Replays the recorded replies, so no model is called."""
+    market = market or bundled_market(exp.period)
+    symbols = _symbols(exp, market)
+    start, end = _dates(exp, market)
+    cfg = _config(exp, symbols)
+    size = exp.position_size or 1.0 / max(1, exp.max_positions)
+    archive = _archive(exp) if exp.news else None
+
+    def replay_on(mk: FrozenMarket, news_archive: Any, stop: Any) -> list[tuple[str, str]]:
+        made: list[PolicyStrategy] = []
+
+        def factory() -> PolicyStrategy:
+            s = PolicyStrategy(_Replay(replies), decide_every, blind, exp.news, max_news, exp.max_positions, size,
+                               exp.seed, "replay")
+            made.append(s)
+            return s
+
+        _run(mk, cfg, exp, factory, symbols, start, stop, news_archive)
+        return made[-1].observed
+
+    days = market.trading_days(start, end)[:-1]
+    if len(days) < 10:
+        return {"verdict": "skipped", "kind": "observations", "why": "fewer than 10 decision days"}
+    base = replay_on(market, archive, end)
+    checks = []
+    for k, cut in enumerate(cut_days(days, exp.leak_cuts)):
+        pm = market.poisoned(cut, seed=exp.seed + 101 + k)
+        pa = None
+        if archive is not None:
+            after = [d for d in market.trading_days(cut, None) if d > cut]
+            pa = _PoisonedNews(archive, decision_time(cut), after, seed=exp.seed + 202 + k)
+        stop = market.next_trading_day(cut) or end
+        other = replay_on(pm, pa, min(stop, end))
+        upto = [(d, h) for d, h in base if d <= cut.isoformat()]
+        mine = [(d, h) for d, h in other if d <= cut.isoformat()]
+        pairs = enumerate(zip(upto, mine, strict=False))
+        first = next(({"day": a[0], "step": i + 1, "what": "observation"} for i, (a, b) in pairs if a != b), None)
+        if first is None and len(upto) != len(mine):
+            first = {"day": None, "what": "number of steps", "original": len(upto), "with_a_different_future": len(mine)}
+        checks.append({"cut": str(cut), "decision_days_compared": len(upto), "same": first is None,
+                       "first_difference": first})
+    if all(c["same"] for c in checks):
+        return {"verdict": "pass", "kind": "observations", "cuts": checks,
+                "meaning": "with every price and headline after each cut day replaced by random ones, the policy was "
+                           "shown exactly the same observations up to the cut: nothing from the future reached it"}
+    return {"verdict": "fail", "kind": "observations", "cuts": checks,
+            "meaning": "an observation before a cut changed when only the data after the cut changed: the harness "
+                       "leaks the future into the prompt. The first difference is listed for each cut"}
+
+
 def run_policy(policy: Callable[[dict], Any], exp: Experiment | None = None, decide_every: int = 1,
-               blind: bool = False, max_news: int = 3, label: str = "policy", save: bool = True) -> ExperimentResult:
-    """Trade the experiment's period with ``policy`` and save the record, with the policy's orders by step."""
+               blind: bool = False, max_news: int = 3, label: str = "policy", save: bool = True,
+               check: bool = True) -> ExperimentResult:
+    """Trade the experiment's period with ``policy`` and save the record, with the policy's orders by step.
+
+    ``check`` runs the look-ahead check of the observations (see ``observation_check``): it replays the recorded
+    replies, so the model is called once per step and no more."""
     exp = exp or Experiment(universe="core", max_positions=5)
-    exp.leak_check = False  # the observation is built from point-in-time data; an LLM is too costly to re-run
+    exp.leak_check = False  # the strategy check would re-ask the model; observation_check replays it instead
     exp.label = exp.label or label
     size = exp.position_size or 1.0 / max(1, exp.max_positions)
     made: list[PolicyStrategy] = []
@@ -300,11 +389,15 @@ def run_policy(policy: Callable[[dict], Any], exp: Experiment | None = None, dec
         made.append(s)
         return s
 
-    result = run_experiment(exp, factory=factory, save=save)
-    if result.folder is not None and made:
-        run = next((s for s in made if s.transcript), made[0])
+    result = run_experiment(exp, factory=factory, save=False)
+    run = next((s for s in made if s.transcript), made[0])
+    if check:
+        result.leak = observation_check(exp, run.replies, decide_every, blind, max_news)
+    if save:
+        save_run(result, RUNS_DIR / result.run_id, run)
         (Path(result.folder) / "policy_log.json").write_text(
-            json.dumps({"decide_every": decide_every, "blind": blind, "steps": run.transcript}, indent=1,
+            json.dumps({"decide_every": decide_every, "blind": blind, "max_news": max_news, "steps": run.transcript,
+                        "replies": run.replies, "observations_sha256": run.observed}, indent=1,
                        default=str) + "\n", encoding="utf-8")
     return result
 
@@ -378,7 +471,8 @@ def _load(session_id: str) -> tuple[dict, list[Any], Path]:
 
 
 def _experiment(cfg: dict) -> Experiment:
-    return Experiment(strategy="llm_session", start=cfg["start"], end=cfg["end"], universe=cfg.get("universe"),
+    return Experiment(strategy="llm_session", period=cfg.get("period", DEFAULT_PERIOD), start=cfg["start"],
+                      end=cfg["end"], universe=cfg.get("universe"),
                       symbols=cfg.get("symbols"), news=cfg["news"], max_positions=cfg["max_positions"],
                       position_size=cfg.get("position_size"), cash=cfg["cash"], leak_check=False,
                       label=cfg.get("label") or "llm-session", seed=cfg.get("seed", 0))
@@ -387,7 +481,7 @@ def _experiment(cfg: dict) -> Experiment:
 def _advance(session_id: str) -> dict[str, Any]:
     cfg, logged, d = _load(session_id)
     exp = _experiment(cfg)
-    market = bundled_market()
+    market = bundled_market(exp.period)
     symbols = _symbols(exp, market)
     start, end = _dates(exp, market)
     acfg = _config(exp, symbols)
@@ -400,7 +494,7 @@ def _advance(session_id: str) -> dict[str, Any]:
         made.append(s)
         return s
 
-    key = (tuple(symbols), start, end, exp.news)
+    key = (exp.period, tuple(symbols), start, end, exp.news)
     bt = _BACKTESTERS.get(key)
     if bt is None:
         news = _news(acfg, _archive(exp), symbols) if exp.news else None
@@ -417,10 +511,11 @@ def _advance(session_id: str) -> dict[str, Any]:
         total_steps = (decision_days - 1) // cfg["decide_every"] + 1
         return {"session_id": session_id, "done": False, "step": len(logged) + 1, "steps_total": total_steps,
                 "last_orders_applied": last["orders"] if last else None, "observation": p.obs}
-    # every decision day has orders: write the record
-    result = run_experiment(exp, factory=lambda: factory(pause=False), save=True,
-                            out_dir=d / "record")
+    # every decision day has orders: write the record, with the look-ahead check of the observations
+    result = run_experiment(exp, factory=lambda: factory(pause=False), save=False)
     strat = next((s for s in reversed(made) if s.transcript), made[-1])
+    result.leak = observation_check(exp, logged, cfg["decide_every"], cfg["blind"], cfg["max_news"], market)
+    save_run(result, d / "record", strat)
     (Path(result.folder) / "policy_log.json").write_text(
         json.dumps({"session": cfg, "steps": strat.transcript}, indent=1, default=str) + "\n", encoding="utf-8")
     out = result.summary()
@@ -434,16 +529,18 @@ def _advance(session_id: str) -> dict[str, Any]:
 def session_start(start: str | None = None, end: str | None = None, universe: str | None = "core",
                   symbols: list[str] | None = None, news: bool = True, blind: bool = False, decide_every: int = 5,
                   max_positions: int = 5, position_size: float | None = None, cash: float = 100_000.0,
-                  max_news: int = 3, seed: int = 0, label: str | None = None) -> dict[str, Any]:
-    exp = Experiment(start=start, end=end, universe=universe, symbols=symbols, news=news, max_positions=max_positions,
-                     position_size=position_size, cash=cash)
-    market = bundled_market()
+                  max_news: int = 3, seed: int = 0, label: str | None = None,
+                  period: str | None = None) -> dict[str, Any]:
+    per = get_period(period).name
+    exp = Experiment(period=per, start=start, end=end, universe=universe, symbols=symbols, news=news,
+                     max_positions=max_positions, position_size=position_size, cash=cash)
+    market = bundled_market(per)
     syms = _symbols(exp, market)
     s0, s1 = _dates(exp, market)
     sid = f"{datetime.now():%Y%m%d-%H%M%S}-{secrets.token_hex(3)}"
     d = SESSIONS_DIR / sid
     d.mkdir(parents=True, exist_ok=True)
-    cfg = {"start": s0.isoformat(), "end": s1.isoformat(), "universe": None if symbols else universe,
+    cfg = {"period": per, "start": s0.isoformat(), "end": s1.isoformat(), "universe": None if symbols else universe,
            "symbols": [s.upper() for s in symbols] if symbols else None, "news": news, "blind": blind,
            "decide_every": max(1, int(decide_every)), "max_positions": int(max_positions),
            "position_size": position_size, "cash": float(cash), "max_news": int(max_news), "seed": int(seed),
@@ -452,7 +549,7 @@ def session_start(start: str | None = None, end: str | None = None, universe: st
     (d / "orders.jsonl").write_text("", encoding="utf-8")
     out = _advance(sid)
     out["rules"] = RULES
-    out["settings"] = {k: cfg[k] for k in ("start", "end", "stocks", "news", "blind", "decide_every",
+    out["settings"] = {k: cfg[k] for k in ("period", "start", "end", "stocks", "news", "blind", "decide_every",
                                            "max_positions")}
     return out
 

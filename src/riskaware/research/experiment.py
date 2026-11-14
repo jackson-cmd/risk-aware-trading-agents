@@ -52,6 +52,7 @@ from . import stats as S
 from .data import FrozenMarket, bundled_market, dataset_info
 from .day import NO_LOCAL_NEWS, _WithExtra, research_config
 from .execution import PlainPlanner
+from .periods import DEFAULT_PERIOD, get_period
 
 RUNS_DIR = RISKAWARE_HOME / "research" / "runs"
 CASH_VEHICLES = {"SGOV", "BIL", "SHV"}
@@ -64,9 +65,16 @@ PROTOCOL = {
                  "trading on daily bars, no intraday trading)",
     "prices": "total-return prices (split- and dividend-adjusted) from the bundled file; indicators only look back",
     "cash": "uninvested cash earns the daily return of the T-bill ETF BIL",
-    "news": "bundled Benzinga headlines (titles only) and SEC 8-K filings, run through the same relevance filter "
-            "and cross-verification as live trading",
+    "news": "the period's bundled headlines, run through the same relevance filter and cross-verification as live "
+            "trading",
 }
+
+
+def protocol(period: str | None = None) -> dict[str, str]:
+    """How a backtest on a period decides and fills; the news line names that period's sources."""
+    p = get_period(period)
+    return {**PROTOCOL, "news": f"{p.news_feeds} for {p.name}, run through the same relevance filter and "
+                                "cross-verification as live trading"}
 
 
 @dataclass
@@ -75,6 +83,7 @@ class Experiment:
 
     strategy: str = "risk_aware"  # a built-in name, a research baseline, or path/to/file.py[:Class]
     params: dict[str, Any] = field(default_factory=dict)
+    period: str = DEFAULT_PERIOD  # a bundled period: 2026, 2022 or 2020 (see periods.py)
     start: str | None = None
     end: str | None = None
     universe: str | None = "megacap"  # megacap, tech, defensive, core, sectors, etf
@@ -230,9 +239,9 @@ def _dates(exp: Experiment, market: FrozenMarket) -> tuple[date, date]:
     end = date.fromisoformat(exp.end) if exp.end else market.last_day
     if start < market.first_day + timedelta(days=200):
         raise ValueError(f"start on or after {market.first_day + timedelta(days=200)}: the year before it warms up "
-                         f"the indicators (data from {market.first_day})")
+                         f"the indicators (the {market.period} data starts on {market.first_day})")
     if end > market.last_day:
-        raise ValueError(f"the bundled data ends on {market.last_day}")
+        raise ValueError(f"the bundled {market.period} data ends on {market.last_day}")
     if end <= start:
         raise ValueError("end must be after start")
     return start, end
@@ -249,7 +258,7 @@ def _planner(exp: Experiment, cfg: AppConfig) -> Any:
 
 
 def _archive(exp: Experiment) -> NewsArchive:
-    base = NewsArchive(NO_LOCAL_NEWS, bundled=True)
+    base = NewsArchive(NO_LOCAL_NEWS, bundled=True, bundle_path=get_period(exp.period).news_path)
     return _WithExtra(base, exp.extra_news) if exp.extra_news else base
 
 
@@ -289,7 +298,7 @@ class _PoisonedNews(NewsArchive):
     """The experiment's news until a cut time, then random invented headlines (good, bad and severe)."""
 
     def __init__(self, base: NewsArchive, cut: datetime, days: list[date], seed: int):
-        super().__init__(base.root, bundled=base.bundled, bundle_path=base.bundle_path)
+        super().__init__(base.root, bundled=base.bundled, bundle_paths=base.bundle_paths)
         self._base, self._cut, self._days, self._seed = base, cut, days, seed
 
     def records(self, symbol: str) -> list[dict]:
@@ -340,6 +349,13 @@ def _first_difference(a: list[tuple], b: list[tuple]) -> dict[str, Any] | None:
     return None
 
 
+def cut_days(days: list[date], n: int) -> list[date]:
+    """The cut days of a leak check: 30%, 55% and 80% of the way through the decision days (for n = 3)."""
+    n = max(1, int(n))
+    return sorted({days[int(len(days) * (0.3 + 0.5 * k / max(1, n - 1)))] if n > 1 else days[len(days) // 2]
+                   for k in range(n)})
+
+
 def leak_check(market: FrozenMarket, cfg: AppConfig, exp: Experiment, factory: Callable[[], Strategy],
                symbols: list[str], start: date, end: date, base: tuple[Recorder, RecordingPlanner],
                archive: NewsArchive | None) -> dict[str, Any]:
@@ -347,9 +363,7 @@ def leak_check(market: FrozenMarket, cfg: AppConfig, exp: Experiment, factory: C
     days = market.trading_days(start, end)[:-1]  # decision days
     if len(days) < 10:
         return {"verdict": "skipped", "why": "fewer than 10 decision days"}
-    n = max(1, int(exp.leak_cuts))
-    cuts = sorted({days[int(len(days) * (0.3 + 0.5 * k / max(1, n - 1)))] if n > 1 else days[len(days) // 2]
-                   for k in range(n)})
+    cuts = cut_days(days, exp.leak_cuts)
     checks = []
     for k, cut in enumerate(cuts):
         pm = market.poisoned(cut, seed=exp.seed + 101 + k)
@@ -408,7 +422,10 @@ def run_experiment(exp: Experiment, factory: Callable[[], Strategy] | None = Non
     """Run one experiment (see the module docstring). ``factory`` makes a fresh strategy for each run (the leak
     check needs several); by default it loads ``exp.strategy`` with ``exp.params``. ``code`` is the strategy's source
     when it came as text (the strategy lab), so the record keeps it."""
-    market = market or bundled_market()
+    if market is None:
+        market = bundled_market(exp.period)
+    elif market.period != get_period(exp.period).name:
+        raise ValueError(f"the market is the {market.period} period but the experiment asks for {exp.period}")
     symbols = _symbols(exp, market)
     start, end = _dates(exp, market)
     cfg = _config(exp, symbols)
@@ -487,12 +504,14 @@ def _decisions_frame(rec: Recorder, plan: RecordingPlanner) -> pd.DataFrame:
 def _run_id(exp: Experiment, name: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", (exp.label or name).lower()).strip("-")[:40] or "run"
     news = "news" if exp.news else "nonews"
-    return f"{datetime.now():%Y%m%d-%H%M%S}-{slug}-{news}"
+    return f"{datetime.now():%Y%m%d-%H%M%S}-{slug}-{get_period(exp.period).name}-{news}"
 
 
 # ----------------------------------------------------------------------------------- the record
 def reproduce_command(exp: Experiment) -> str:
     parts = ["riskaware research run", f"--strategy {exp.strategy}"]
+    if get_period(exp.period).name != DEFAULT_PERIOD:
+        parts.append(f"--period {get_period(exp.period).name}")
     if exp.params:
         parts.append(f"--params '{json.dumps(exp.params, sort_keys=True)}'")
     if exp.start:
@@ -537,14 +556,14 @@ def save_run(result: ExperimentResult, folder: Path, strategy: Strategy, code: s
         "riskaware": {"version": riskaware.__version__, "git_commit": _git_commit()},
         "python": platform.python_version(), "platform": platform.platform(),
         "packages": {"pandas": pd.__version__, "numpy": np.__version__},
-        "dataset": dataset_info(),
+        "dataset": dataset_info(exp.period),
         "experiment": {**exp.to_dict(), "start": str(result.start), "end": str(result.end)},
         "symbols": result.symbols,
         "strategy": {"name": result.strategy, "class": type(strategy).__name__,
                      "description": getattr(strategy, "description", ""), "params": getattr(strategy, "params", {}),
                      "source_sha256": src_hash, "source_file": "strategy.py" if src else None},
         "execution": result.execution,
-        "protocol": PROTOCOL,
+        "protocol": protocol(exp.period),
         "leak_check": result.leak,
         "reproduce": reproduce_command(exp) if not code else "riskaware research run --code strategy.py (same settings)",
     }
@@ -643,10 +662,10 @@ def render_report(r: ExperimentResult) -> str:
             lines.append(f"- cut after {c['cut']}: {c['decision_days_compared']} decision days compared, "
                          + ("same decisions" if c["same"] else f"first difference on {c['first_difference']['day']}"))
         lines.append("")
-    lines += ["## How the backtest works", ""] + [f"- **{k}**: {v}" for k, v in PROTOCOL.items()] + [""]
+    lines += ["## How the backtest works", ""] + [f"- **{k}**: {v}" for k, v in protocol(exp.period).items()] + [""]
     if r.notes:
         lines += ["## Notes", ""] + [f"- {n}" for n in r.notes] + [""]
-    ds = dataset_info()
+    ds = dataset_info(exp.period)
     lines += ["## Data", "", f"- {ds['name']}, version {ds['version']}: `{ds['prices']['file']}` sha256 "
               f"`{ds['prices']['sha256'][:16]}...`; news `{ds['news']['file']}` sha256 `{(ds['news']['sha256'] or '')[:16]}...`",
               f"- Reproduce: `{reproduce_command(exp)}`", ""]

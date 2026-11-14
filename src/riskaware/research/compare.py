@@ -36,9 +36,14 @@ def _row(r: ExperimentResult, news: bool) -> dict[str, Any]:
 def run_baselines(start: str | None = None, end: str | None = None, universe: str = "megacap",
                   max_positions: int = 10, strategies: list[str] | None = None, leak_check: bool = True,
                   out_dir: str | Path | None = None, split: str | None = None,
-                  progress: Callable[[str], None] | None = None) -> tuple[pd.DataFrame, Path]:
+                  progress: Callable[[str], None] | None = None,
+                  period: str | None = None) -> tuple[pd.DataFrame, Path]:
+    from .periods import get_period
+
+    per = get_period(period).name
     names = strategies or list(RESEARCH_STRATEGIES)
-    folder = Path(out_dir).expanduser() if out_dir else RUNS_DIR / f"{datetime.now():%Y%m%d-%H%M%S}-baselines"
+    folder = (Path(out_dir).expanduser() if out_dir
+              else RUNS_DIR / f"{datetime.now():%Y%m%d-%H%M%S}-baselines-{per}")
     folder.mkdir(parents=True, exist_ok=True)
     rows, curves = [], {}
     last: ExperimentResult | None = None
@@ -46,7 +51,7 @@ def run_baselines(start: str | None = None, end: str | None = None, universe: st
         for news in (False, True):
             if progress:
                 progress(f"{name} {'with' if news else 'without'} news")
-            exp = Experiment(strategy=name, params={"news": news}, start=start, end=end, universe=universe,
+            exp = Experiment(strategy=name, params={"news": news}, period=per, start=start, end=end, universe=universe,
                              news=news, max_positions=max_positions, leak_check=leak_check, split=split,
                              label=name)
             r = run_experiment(exp, out_dir=folder / f"{name}-{'news' if news else 'nonews'}")

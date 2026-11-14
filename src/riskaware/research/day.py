@@ -36,6 +36,7 @@ from ..data.events import EventCalendar
 from ..news.history import NewsArchive, PointInTimeNews, decision_time, load_bundle
 from ..universe import MACRO_SYMBOLS, is_etf, sector_of
 from .data import DATA_DIR, FrozenMarket, bundled_market
+from .periods import get_period
 
 NY = ZoneInfo("America/New_York")
 NO_LOCAL_NEWS = DATA_DIR / "_no_local_news"  # never exists: research reads the bundled news only
@@ -78,8 +79,9 @@ class MarketView:
     """The bundled period as the agents saw it, day by day."""
 
     def __init__(self, market: FrozenMarket | None = None, cfg: AppConfig | None = None, news: bool = True,
-                 extra_news: list[dict] | None = None):
-        self.market = market or bundled_market()
+                 extra_news: list[dict] | None = None, period: str | None = None):
+        self.market = market or bundled_market(period)
+        self.period = self.market.period
         self.cfg = cfg or research_config()
         self.calendar = EventCalendar(self.cfg.macro.events, cache=None)
         syms = self.market.symbols
@@ -91,8 +93,8 @@ class MarketView:
             {s: f for s, f in self.frames.items() if s in MACRO_SYMBOLS}, self.index)
         self.stocks = [s for s in syms if not s.startswith("^") and not is_etf(s) and s not in {"GLD", "USO", "UUP",
                                                                                               "IBIT"}]
-        self.news = news_replay(self.cfg, self.stocks, extra_news) if news else None
-        self._earnings = earnings_releases(extra_news)
+        self.news = news_replay(self.cfg, self.stocks, extra_news, period=self.period) if news else None
+        self._earnings = earnings_releases(extra_news, period=self.period)
         self._tech = TechnicalAgent(breakouts_enabled=True)
 
     # ------------------------------------------------------------------ days
@@ -104,7 +106,7 @@ class MarketView:
             raise ValueError(f"day must look like 2026-04-08, got {day!r}") from None
         first, last = self.market.first_day, self.market.last_day
         if d < first or d > last:
-            raise ValueError(f"{d} is outside the bundled data ({first} to {last})")
+            raise ValueError(f"{d} is outside the bundled {self.period} data ({first} to {last})")
         t = self.market.last_trading_day(d)
         if t is None:
             raise ValueError(f"no trading day on or before {d}")
@@ -245,9 +247,10 @@ class MarketView:
         return out
 
 
-def news_replay(cfg: AppConfig, symbols: list[str], extra_news: list[dict] | None = None) -> PointInTimeNews | None:
-    """Point-in-time news from the bundled file only (never a local archive), plus ``extra_news`` if given."""
-    archive = NewsArchive(NO_LOCAL_NEWS, bundled=True)
+def news_replay(cfg: AppConfig, symbols: list[str], extra_news: list[dict] | None = None,
+                period: str | None = None) -> PointInTimeNews | None:
+    """Point-in-time news from a period's bundled file only (never a local archive), plus ``extra_news`` if given."""
+    archive = NewsArchive(NO_LOCAL_NEWS, bundled=True, bundle_path=get_period(period).news_path)
     if extra_news:
         archive = _WithExtra(archive, extra_news)
     pit = PointInTimeNews(archive, cfg.news, symbols)
@@ -258,7 +261,7 @@ class _WithExtra(NewsArchive):
     """The bundled news plus records added for one experiment (counterfactual or injected headlines)."""
 
     def __init__(self, base: NewsArchive, extra: list[dict]):
-        super().__init__(base.root, bundled=base.bundled, bundle_path=base.bundle_path)
+        super().__init__(base.root, bundled=base.bundled, bundle_paths=base.bundle_paths)
         self._extra: dict[str, list[dict]] = {}
         for rec in extra:
             r = {"ts": rec["ts"], "symbol": rec["symbol"].upper(), "headline": rec["headline"],
@@ -276,10 +279,10 @@ class _WithExtra(NewsArchive):
         return sorted(set(super().symbols()) | set(self._extra))
 
 
-def earnings_releases(extra_news: list[dict] | None = None) -> dict[str, list[datetime]]:
-    """Times of 8-K filings with Item 2.02 (results of operations) per stock, from the bundled SEC records."""
+def earnings_releases(extra_news: list[dict] | None = None, period: str | None = None) -> dict[str, list[datetime]]:
+    """Times of 8-K filings with Item 2.02 (results of operations) per stock, from a period's bundled SEC records."""
     out: dict[str, list[datetime]] = {}
-    recs = [r for v in load_bundle().values() for r in v]
+    recs = [r for v in load_bundle(get_period(period).news_path).values() for r in v]
     for r in [*recs, *(extra_news or [])]:
         if r.get("feed") != "sec" or "2.02" not in str(r.get("summary", "")):
             continue

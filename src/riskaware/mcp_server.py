@@ -27,8 +27,9 @@ INSTRUCTIONS = (
     "strategy the user describes in words, read strategy_guide, write the Strategy class, and run it with "
     "backtest_code; fix the problems it reports and run it again. The agents_* tools manage paper-trading agents "
     "that run on simulated money every trading day. For experiments that others can repeat (papers, strategy "
-    "research), read research_guide: market_day shows everything known at any 2026 close, run_experiment tests a "
-    "strategy on the frozen 2026 market with a look-ahead check and saves a citable record, and "
+    "research), read research_guide: market_day shows everything known at any close of the bundled periods (2020, "
+    "2022, 2026), run_experiment tests a strategy on a frozen period with a look-ahead check and saves a citable "
+    "record, and "
     "trading_session_start / trading_session_step let you trade the period yourself. Nothing here is investment "
     "advice and no tool can trade a real account."
 )
@@ -289,20 +290,24 @@ def agents_run(names: list[str] | None = None, dry_run: bool = False) -> dict[st
 
 
 # ------------------------------------------------------------------------------------------- research
-_VIEW: list[Any] = []
+_VIEWS: dict[str, Any] = {}
 
 
-def _market_view():
-    if not _VIEW:
+def _market_view(period: str | None = None):
+    from .research.periods import get_period
+
+    name = get_period(period).name
+    if name not in _VIEWS:
         from .research.day import MarketView
 
-        _VIEW.append(MarketView())
-    return _VIEW[0]
+        _VIEWS[name] = MarketView(period=name)
+    return _VIEWS[name]
 
 
 def research_guide() -> dict[str, Any]:
-    """Read this first for experiments on the frozen 2026 market: what data ships with the package (daily bars
-    2024 to November 2026, the VIX term structure, 2026 news), how a backtest decides and fills (after the close,
+    """Read this first for experiments on the frozen markets: what data ships with the package (three periods:
+    2026 to date, the 2022 bear market and the 2020 crash, each with daily bars, the VIX term structure and that
+    year's news), how a backtest decides and fills (after the close,
     at the next open: swing trading), the look-ahead rules and check, how to write a strategy, the five baseline
     swing strategies, what a saved record holds, and advice for papers."""
     from .research.guide import guide
@@ -311,15 +316,20 @@ def research_guide() -> dict[str, Any]:
 
 
 def market_day(day: str, symbols: list[str] | None = None, news: bool = True, headlines: int = 3) -> dict[str, Any]:
-    """Everything known at the close of one day of the bundled period (2024-01-02 to 2026-11-11; news in 2026):
+    """Everything known at the close of one day of the bundled periods (2018 to 2020, 2020 to 2022, 2024 to
+    2026-11-11; news in 2020, 2022 and 2026):
     the market regime, VIX, VIX9D, VIX3M, VVIX and the term structure, fear & greed, breadth, credit stress, the
     macro events of the next two weeks; and per stock its prices and returns, indicators (EMAs, RSI, MACD, ATR, ADX,
     Bollinger, 52-week high), technical setups and the news published before the close (score, verified status,
     red flags, headlines, last earnings release). Nothing after that close is visible. Without symbols it lists all
     64 stocks in a compact table; name up to 10 symbols for the full detail with headlines. A weekend or holiday
     shows the close before it."""
-    view = _market_view()
     try:
+        from datetime import date as _date
+
+        from .research.periods import period_of
+
+        view = _market_view(period_of(_date.fromisoformat(day)).name)
         if symbols:
             snap = view.snapshot(day, symbols=[s.upper() for s in symbols[:10]], news=news, headlines=headlines)
             return _plain(snap)
@@ -346,8 +356,10 @@ def run_experiment(strategy: str | None = None, code: str | None = None, params:
                    symbols: list[str] | None = None, news: bool = True, execution: str = "plain",
                    max_positions: int = 10, position_size: float | None = None, split: str | None = None,
                    leak_check: bool = True, label: str | None = None,
-                   extra_news: list[dict[str, Any]] | None = None) -> dict[str, Any]:
-    """Run an experiment on the frozen 2026 market and save a record (see research_guide).
+                   extra_news: list[dict[str, Any]] | None = None, period: str = "2026") -> dict[str, Any]:
+    """Run an experiment on a frozen period and save a record (see research_guide). period is 2026 (default, a
+    rising year), 2022 (the rate-hike bear market) or 2020 (the COVID crash and rebound); start and end default to
+    the period's test window.
 
     Give either strategy (a built-in name such as swing_rsi2, swing_trend, swing_breakout, swing_pullback,
     swing_news, risk_aware, rsi2, momentum_rotation; or the path of a saved strategy) or code (one Strategy class,
@@ -361,7 +373,13 @@ def run_experiment(strategy: str | None = None, code: str | None = None, params:
     report.md, chart)."""
     from pathlib import Path
 
-    settings = {"start": start, "end": end, "universe": None if symbols else universe,
+    from .research.periods import get_period
+
+    try:
+        per = get_period(period)
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}
+    settings = {"period": per.name, "start": start, "end": end, "universe": None if symbols else universe,
                 "symbols": [s.upper() for s in symbols] if symbols else None, "news": news, "execution": execution,
                 "max_positions": max_positions, "position_size": position_size, "split": split,
                 "leak_check": leak_check, "label": label, "extra_news": extra_news, "params": params or {}}
@@ -371,8 +389,8 @@ def run_experiment(strategy: str | None = None, code: str | None = None, params:
         from .lab import backtest_code as _lab
 
         settings["strategy"] = "code"
-        return _lab(code, symbols=symbols, universe=None if symbols else universe, start=start or "2026-01-02",
-                    end=end, news=news, research=settings, timeout=900.0)
+        return _lab(code, symbols=symbols, universe=None if symbols else universe,
+                    start=start or per.start.isoformat(), end=end, news=news, research=settings, timeout=900.0)
     from .research.experiment import Experiment
     from .research.experiment import run_experiment as _run
 
@@ -405,18 +423,19 @@ def experiment_report(run_id: str) -> dict[str, Any]:
 def trading_session_start(start: str | None = None, end: str | None = None, universe: str | None = "core",
                           symbols: list[str] | None = None, news: bool = True, blind: bool = False,
                           decide_every: int = 5, max_positions: int = 5, cash: float = 100_000.0,
-                          max_news: int = 3) -> dict[str, Any]:
+                          max_news: int = 3, period: str = "2026") -> dict[str, Any]:
     """Trade the frozen market yourself, one decision at a time (an LLM-agent experiment). Returns the rules and
     the first observation: the market, your portfolio, and per stock the main indicators and the news published
     before that close. Answer with trading_session_step. decide_every=5 decides once a week (about 44 steps for
     2026); 1 decides every day. blind=True hides tickers, company names and dates so that you cannot recall what
-    happened. Orders fill at the next open; long only; at most max_positions stocks."""
+    happened. Orders fill at the next open; long only; at most max_positions stocks. period is 2026 (default), 2022
+    or 2020."""
     from .research.agent import session_start
 
     try:
         return _plain(session_start(start=start, end=end, universe=None if symbols else universe, symbols=symbols,
                                     news=news, blind=blind, decide_every=decide_every, max_positions=max_positions,
-                                    cash=cash, max_news=max_news))
+                                    cash=cash, max_news=max_news, period=period))
     except (ValueError, KeyError) as exc:
         return {"ok": False, "error": str(exc)}
 

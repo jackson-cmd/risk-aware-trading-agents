@@ -28,6 +28,7 @@ def no_bundled_news(monkeypatch, tmp_path_factory):
     from riskaware.news import history
 
     monkeypatch.setattr(history, "BUNDLE_PATH", tmp_path_factory.getbasetemp() / "no-bundle.jsonl.gz")
+    monkeypatch.setattr(history, "EARLIER_BUNDLES", ())
 
 
 @pytest.fixture
