@@ -153,11 +153,11 @@ def report_cmd(
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     """Paired comparisons with the baseline: intervals, p-values, Holm correction. / 和基线配对比较，给区间和校正后的 p 值"""
-    from . import prompts as P
+    from .prompt_report import report
 
     con = _console()
     try:
-        r = P.report(lab, site=site)
+        r = report(lab, site=site)
     except (ValueError, FileNotFoundError) as exc:
         con.print(f"[red]{escape(str(exc))}[/]")
         raise typer.Exit(2) from exc
@@ -167,3 +167,32 @@ def report_cmd(
     con.print((Path(lab) / "prompts.md").read_text(encoding="utf-8"))
     con.print(f"{_L('Files', '文件')}: {Path(lab) / 'prompts.json'}, prompts.md, prompts.png"
               + (f", {site}" if site else ""), soft_wrap=True)
+
+
+@app.command("board")
+def board_cmd(
+    labs: list[Path] = typer.Argument(..., help="Lab folders, one model each"),
+    site: Path = typer.Option(Path("site/assets/data/prompts.json"), help="Where to write the website's data"),
+) -> None:
+    """Combine labs (one model each) into the website's prompt board. / 把几个模型的实验合成网站上的 prompt 榜"""
+    from .prompt_report import board
+
+    con = _console()
+    try:
+        out = board(labs, site=site)
+    except (ValueError, FileNotFoundError) as exc:
+        con.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
+    con.print(_L(f"{len(out['boards'])} boards", f"{len(out['boards'])} 个模型的榜") + f" -> {site}", soft_wrap=True)
+    ac = out.get("across_models")
+    if ac:
+        t = Table(title=_L("Across models: vs the baseline", "跨模型：和基线比"))
+        for col in ("variant", "Δ Sharpe", "95% CI", "p (Holm)", "Δ return", "wins", "verdict"):
+            t.add_column(col)
+        for v in ac["variants"]:
+            c, tr = (v["vs_baseline"] or {}).get("sharpe"), (v["vs_baseline"] or {}).get("total_return")
+            if not c:
+                continue
+            t.add_row(v["name"], f"{c['diff']:+.2f}", f"{c['ci95'][0]:+.2f} to {c['ci95'][1]:+.2f}", f"{c['p_holm']:.3f}",
+                      f"{tr['diff'] * 100:+.1f}%" if tr else "", f"{c['wins']}/{c['pairs']}", c["verdict"])
+        con.print(t)

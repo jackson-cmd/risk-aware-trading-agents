@@ -12,6 +12,7 @@ from typer.testing import CliRunner
 
 from riskaware.news import history
 from riskaware.research import agent
+from riskaware.research import prompt_report as R
 from riskaware.research import prompts as P
 
 REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
@@ -49,10 +50,11 @@ class FakeModel:
 # ----------------------------------------------------------------------------------- the variant set
 def test_every_factor_of_the_study_has_registered_variants():
     factors = {v.factor for v in P.VARIANTS.values()}
-    assert {"baseline", "role", "risk_rules", "reasoning", "focus", "few_shot", "format", "news_count",
-            "frequency"} <= factors
-    assert {"role_pm", "role_quant", "role_risk", "focus_news", "focus_trend", "news_0", "news_6",
-            "daily"} <= set(P.VARIANTS)
+    assert {"baseline", "role", "risk_rules", "risk_rule_part", "cash_level", "decision_rule", "reasoning", "focus",
+            "few_shot", "format", "news_count", "frequency"} <= factors
+    assert {"role_pm", "role_quant", "role_risk", "focus_news", "focus_trend", "news_0", "news_6", "daily",
+            "trend_news", "cap_25", "regime_cash", "stop_loss", "above_200", "cash_30", "cash_50"} <= set(P.VARIANTS)
+    assert set(P.FACTORS) == factors - {"baseline"}
     assert P.VARIANTS["news_0"].max_news == 0 and P.VARIANTS["news_6"].max_news == 6
     assert P.VARIANTS["daily"].decide_every == 1 and P.VARIANTS["baseline"].decide_every == 5
     assert {v.response_format for v in P.VARIANTS.values()} == set(P.FORMATS)
@@ -73,6 +75,14 @@ def test_baseline_is_the_package_prompt_and_each_variant_changes_one_factor():
     assert P.VARIANTS["news_0"].prompt_sha256 == base.prompt_sha256 != P.VARIANTS["news_0"].sha256
 
 
+def test_risk_rules_are_the_four_parts_in_the_same_words():
+    text = P.VARIANTS["risk_rules"].text
+    for name in P.RULE_PARTS:
+        part = P.VARIANTS[name].text[len(agent.SYSTEM_PROMPT + P.RULE):]
+        assert part.rstrip(".") in text, name
+    assert P.VARIANTS["trend_news"].text == agent.SYSTEM_PROMPT + P.TREND_NEWS
+
+
 def test_tune_sends_the_seed_and_the_reply_format():
     from riskaware.llm import llm_config
     from riskaware.llm.openai_compat import OpenAICompatProvider
@@ -83,6 +93,7 @@ def test_tune_sends_the_seed_and_the_reply_format():
 
     b = body("baseline")
     assert b["seed"] == 7 and b["response_format"]["type"] == "json_schema" and "JSON schema" in b["messages"][0]["content"]
+    assert b["stream"] is False and "seed" not in body("baseline", seed=None)
     assert body("format_json")["response_format"] == {"type": "json_object"}
     t = body("format_text")
     assert "response_format" not in t and t["messages"][0]["content"] == "SYS"
@@ -123,11 +134,11 @@ def test_lab_with_a_fake_model_runs_records_and_reports(tmp_path):
     assert "--variants risk_rules" in man["reproduce"]
     calls = [json.loads(x) for x in (folder / "calls.jsonl").read_text().splitlines()]
     assert [c["status"] for c in calls].count("format") == 1 and calls[1]["raw"] == "I would buy S01."
-    row = P.read_run(folder)
+    row = R.read_run(folder)
     assert row["format_errors"] == 1 and row["invalid_orders"] == row["orders"] > 0  # one typo per good reply
     assert row["invalid_order_rate"] == 0.5
 
-    r = P.report(lab, site=tmp_path / "site" / "prompts.json")
+    r = R.report(lab, site=tmp_path / "site" / "prompts.json")
     assert {v["name"] for v in r["variants"]} == {"baseline", "risk_rules", "reason_first"}
     c = next(v for v in r["variants"] if v["name"] == "risk_rules")["vs_baseline"]["sharpe"]
     assert c["pairs"] == 2 and c["verdict"] == "noise" and c["p_holm"] >= c["p"]
@@ -135,9 +146,33 @@ def test_lab_with_a_fake_model_runs_records_and_reports(tmp_path):
         assert (lab / f).is_file()
     assert "Δ Sharpe vs baseline" in (lab / "prompts.md").read_text()
     site = json.loads((tmp_path / "site" / "prompts.json").read_text())
-    assert site["format"] == "rta-prompt-board-1" and site["baseline"] == "baseline"
-    assert {"name", "factor", "about", "prompt_sha256", "metrics", "vs_baseline"} <= set(site["variants"][0])
-    assert site["cost"]["calls"] == sum(v["steps"] for v in r["variants"])
+    assert site["format"] == "rta-prompt-board-1" and site["baseline"] == "baseline" and site["across_models"] is None
+    b = site["boards"][0]
+    assert b["model"] == "fake:model" and b["variants"][0]["name"] == "baseline" and b["variants"][0]["vs_baseline"] is None
+    assert {"name", "factor", "about", "prompt_sha256", "metrics", "vs_baseline", "attribution"} <= set(b["variants"][1])
+    assert b["cost"]["calls"] == sum(v["steps"] for v in r["variants"])
+
+    at = r["attribution"]["risk_rules"]
+    assert at["pairs"] == 2 and abs(at["total"] - at["exposure"] - at["selection"] - at["residual"]) < 1e-9
+    assert "Where the return difference comes from" in (lab / "prompts.md").read_text()
+
+    # a run made elsewhere joins a lab as one more seed, copied, with the prompt's hashes
+    other = P.start_lab(tmp_path / "other", chosen, P.LabSettings(**{**st.to_dict(), "seeds": [5]}))
+    dst = P.import_run(folder, other, P.VARIANTS["risk_rules"], 5, note="from the first lab")
+    m2 = json.loads((dst / "manifest.json").read_text())
+    assert m2["imported_from"]["folder"] == str(folder) and m2["prompt"]["name"] == "risk_rules"
+    assert R.read_run(dst)["seed"] == 5 and (folder / "manifest.json").is_file()
+    with pytest.raises(ValueError):  # the record's settings do not match the variant
+        P.import_run(P.run_folder(lab, "baseline", "2026", 0), other, P.VARIANTS["news_6"], 5)
+
+    # two labs (two models) make one board with a comparison across them
+    lab2 = P.run_lab(chosen, P.LabSettings(**{**st.to_dict(), "llm": "fake:other"}), tmp_path / "lab2", workers=3,
+                     provider_factory=lambda v, s: FakeModel(s + 7), check=False)
+    both = R.board([lab, lab2], site=tmp_path / "site" / "both.json")
+    assert [x["model"] for x in both["boards"]] == ["fake:model", "fake:other"]
+    ac = both["across_models"]
+    assert ac["models"] == ["fake:model", "fake:other"]
+    assert next(v for v in ac["variants"] if v["name"] == "risk_rules")["vs_baseline"]["sharpe"]["pairs"] == 4
 
     # a second run of the same lab only does what is missing
     again = []
@@ -155,14 +190,40 @@ def test_a_policy_run_passes_the_look_ahead_check(tmp_path):
     assert log["max_news"] == 6 and log["blind"] is True
 
 
+def test_attribution_puts_a_lower_exposure_in_the_exposure_part(tmp_path):
+    import pandas as pd
+
+    days = pd.bdate_range("2026-02-02", periods=40)
+    rng = np.random.default_rng(1)
+    stock = rng.normal(-0.004, 0.02, len(days))  # a falling market
+    cash = R.cash_returns("2026").reindex(days).fillna(0.0).to_numpy()
+
+    def write(folder, expo):
+        e = np.full(len(days), expo)  # the same exposure every day: no timing
+        prev = np.r_[0.0, e[:-1]]
+        r = prev * stock + (1 - prev) * cash
+        eq = 100_000 * np.cumprod(1 + r)
+        ew = 100_000 * np.cumprod(1 + stock)
+        folder.mkdir()
+        pd.DataFrame({"date": days.date, "equity": eq, "spy": eq, "equal_weight": ew, "cash_ratio": 1 - e,
+                      "exposure": e, "positions": 3, "regime": "NEUTRAL"}).to_csv(folder / "equity.csv", index=False)
+        return folder
+
+    full, half = write(tmp_path / "full", 1.0), write(tmp_path / "half", 0.5)
+    a = R.attribution(half, full, "2026")
+    assert a["total"] > 0.02 and abs(a["exposure"] - a["total"]) < 1e-9
+    assert abs(a["selection"]) < 1e-9 and abs(a["exposure_timing"]) < 1e-9 and a["days"] == len(days) - 1
+    assert a["exposure_variant"] < a["exposure_baseline"]
+
+
 # ----------------------------------------------------------------------------------- statistics
 def test_sign_flip_holm_and_bootstrap():
-    assert P.sign_flip_p(np.array([1.0, 1.0, 1.0])) == pytest.approx(2 / 8)
-    assert P.sign_flip_p(np.array([1.0, -1.0])) == 1.0
-    assert P.sign_flip_p(np.ones(9)) == pytest.approx(2 / 512)
-    adj = P.holm({"a": 0.01, "b": 0.04, "c": 0.03})
+    assert R.sign_flip_p(np.array([1.0, 1.0, 1.0])) == pytest.approx(2 / 8)
+    assert R.sign_flip_p(np.array([1.0, -1.0])) == 1.0
+    assert R.sign_flip_p(np.ones(9)) == pytest.approx(2 / 512)
+    adj = R.holm({"a": 0.01, "b": 0.04, "c": 0.03})
     assert adj["a"] == pytest.approx(0.03) and adj["c"] == pytest.approx(0.06) and adj["b"] == pytest.approx(0.06)
-    lo, hi = P.bootstrap_ci(np.array([0.1, 0.2, 0.3, 0.4]), np.array(["a", "a", "b", "b"]))
+    lo, hi = R.bootstrap_ci(np.array([0.1, 0.2, 0.3, 0.4]), np.array(["a", "a", "b", "b"]))
     assert 0.1 <= lo < 0.25 < hi <= 0.4
 
 
@@ -175,7 +236,7 @@ def test_compare_calls_a_consistent_large_gain_better_and_a_small_one_noise():
             rows.append({"variant": "baseline", "period": p, "seed": s, "sharpe": b})
             rows.append({"variant": "good", "period": p, "seed": s, "sharpe": b + 1.0 + 0.05 * s})
             rows.append({"variant": "meh", "period": p, "seed": s, "sharpe": b + (0.1 if s % 2 else -0.1)})
-    out = P.compare(rows, "sharpe")
+    out = R.compare(rows, "sharpe")
     assert out["good"]["verdict"] == "better" and out["good"]["same_sign_periods"] == 3
     assert out["meh"]["verdict"] == "noise" and out["good"]["pairs"] == 12
 
