@@ -1,11 +1,11 @@
 # Risk-Aware Trading Agents
 
-> A benchmark for LLM trading agents, with news replayed by the minute it was published: three frozen US stock markets (the 2020 crash, the 2022 bear market and 2026) ship with 65,863 timestamped headlines and SEC filings, a public leaderboard (rta-bench-1) scores each model blind and with names, apart before and after its training cutoff, and every result is a JSON file that replays to the same numbers. The open-source Python package (MIT license) also has a prompt leaderboard, a point-in-time research kit with a look-ahead check, risk-aware AI trading agents for US stocks that check the macro calendar, the VIX term structure and cross-verified news before they buy, an MCP server, and paper or live trading through 9 broker adapters. Nothing in it is investment advice.
+> A benchmark for LLM trading agents, with news replayed by the minute it was published: three frozen US stock markets (the 2020 crash, the 2022 bear market and 2026), a public leaderboard (rta-bench-1) that scores each model blind and with names, apart before and after its training cutoff, and every result a JSON file that replays to the same numbers. The results are based on 65,863 headlines and SEC filings replayed by publication time; the headline data has license restrictions and is not distributed with the package. The open-source Python package (MIT license) also has a prompt leaderboard, a point-in-time research kit with a look-ahead check, risk-aware AI trading agents for US stocks that check the macro calendar, the VIX term structure and cross-verified news before they buy, an MCP server, and paper or live trading through 9 broker adapters. Nothing in it is investment advice.
 
 - Install: `pip install risk-aware-trading-agents` (Python 3.10+), or run the dashboard with `docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard`.
 - Run the benchmark: `riskaware research bench --llm openai:MODEL` runs the six tasks (2026, 2022 and 2020, each blind and named) with seeds 0, 1 and 2; `riskaware research submit RUN_ID --model NAME --cutoff YYYY-MM` writes the entry for a pull request.
 - Leaderboard models so far (last update 2026-11-13, 26 entries): claude-haiku-5.5 (Anthropic, training cutoff 2026-06), claude-sonnet-4.6 (Anthropic, training cutoff 2026-01), gemini-3.5-flash (Google, training cutoff 2025-01), gpt-5.6-luna (OpenAI, training cutoff 2026-02-16).
-- Research kit: three frozen periods (2026 to date, the 2022 bear market, the 2020 crash), each with daily prices for 64 large-cap stocks and 25 ETFs from two years before, the VIX term structure, and 65,863 headlines and SEC 8-K filings with publication times in all, with SHA-256 hashes. Every experiment runs a look-ahead check.
+- Research kit: three frozen periods (2026 to date, the 2022 bear market, the 2020 crash), each with daily prices for 64 large-cap stocks and 25 ETFs from two years before, the VIX term structure and the macro calendar, with SHA-256 hashes. Every experiment runs a look-ahead check.
 - MCP server: `uvx risk-aware-trading-agents mcp` (stdio, 21 tools). The tools are read-only or work on local paper accounts; none can send an order to a broker.
 - Brokers: Alpaca (tested on a paper account), Public, Tradier, Interactive Brokers, Charles Schwab, tastytrade, Futu/moomoo, Tiger and Longbridge, plus a built-in paper account.
 
@@ -15,7 +15,7 @@
 - [LLM trading agent benchmarks compared](https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html): rta-bench-1 next to StockBench, CLQT, LiveTradeBench, AI-Trader, InvestorBench, FinSABER, BlindTrade and Agent Market Arena on news timing, frozen periods, blind and named runs, training-cutoff splits and replayable submissions
 - [News backtesting without look-ahead bias](https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html): point-in-time replay, a 16:00 cutoff, orders at the next open, and a check that the backtest never saw the future
 - [Do news headlines predict stock returns? Ten news factors tested point in time](https://jackson-cmd.github.io/risk-aware-trading-agents/news-factors.html): rank IC, quintiles, decay and price controls for ten headline factors in 2020, 2022 and 2026, and how much a calendar-date news join inflates them
-- [Point-in-time financial news dataset and US stock market data for 2020, 2022 and 2026](https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html): daily prices, the VIX term structure and 65,863 headlines and SEC filings with publication times, with SHA-256 hashes, for reproducible backtests
+- [Point-in-time US stock market data for 2020, 2022 and 2026](https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html): daily prices, the VIX term structure and the macro calendar, with SHA-256 hashes, for reproducible backtests
 - [Test LLM trading agents on a frozen market](https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html): trade a frozen market one close at a time with Claude, GPT, Gemini or local models, with a blind mode against memorization
 
 ## Documentation
@@ -34,9 +34,9 @@
 ## Optional
 
 - [Everything above in one file](https://jackson-cmd.github.io/risk-aware-trading-agents/llms-full.txt): the benchmark, the data, how to run and submit a model, the comparison with other benchmarks, the current results and answers to common questions
+- [Leaderboard on Hugging Face Spaces](https://huggingface.co/spaces/jacksonwangpro1/llm-trading-agent-leaderboard): the same tables, read from the results file below
 - [Leaderboard results as JSON](https://jackson-cmd.github.io/risk-aware-trading-agents/assets/data/leaderboard.json)
-- [Dataset on Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026): the frozen 2026 market as Parquet, with the original files
-- [Zenodo archive, DOI 10.5281/zenodo.24202496](https://doi.org/10.5281/zenodo.24202496): every release with its code and data
+- [Dataset on Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark): the prices of the three periods, every leaderboard entry and the anchors, as Parquet, with the original files
 - [PyPI package](https://pypi.org/project/risk-aware-trading-agents/)
 - [Docker image](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents)
 - [README in Chinese](https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/README_zh.md)

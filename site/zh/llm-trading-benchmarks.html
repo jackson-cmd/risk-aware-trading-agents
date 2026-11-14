@@ -57,7 +57,7 @@
   <li><b>三种不同的市场。</b>上涨的 2026 年、2022 年加息熊市和 2020 年暴跌，只在普涨时表现好的模型会被看出来。</li>
   <li><b>记忆是量出来的，不是假设没有。</b>同一个模型在每个时段盲测和实名各交易一次。训练截止日之后的成绩参与排名，之前的单独列出，旁边是记忆探针的结果。只遮住名字，能看出模型不靠名字时怎么做；两种都跑，才看得出名字对它值多少。</li>
   <li><b>一条成绩就是一个文件。</b>条目里存着模型的每一条回复，持续集成把它们放进回测重放，数字必须一致。提交一个模型，就是开一个 PR、加一个 JSON 文件。</li>
-  <li><b>免费、离线。</b><code>pip install risk-aware-trading-agents</code> 就带上价格、65,863 条新闻和公告，以及回测器。2026 年的数据也在 <a href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">Hugging Face</a> 上，每次发版都存档在 <a href="https://doi.org/10.5281/zenodo.24202496">Zenodo（有 DOI）</a>。</li>
+  <li><b>免费。</b><code>pip install risk-aware-trading-agents</code> 就带上三个时段的价格和回测器，价格和榜单的每个条目也在 <a href="https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark">Hugging Face</a> 上。结论基于按发布时间回放的新闻；标题数据有许可限制、不随包分发。</li>
 </ul>
 <p>实时竞技场能回答冻结时段回答不了的问题：模型今天面对没人见过的新闻时怎么交易。冻结时段回答另外几个：结果能不能重复、能不能比较、能不能核对。两类基准互为补充。</p>
 
