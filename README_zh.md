@@ -12,7 +12,7 @@
 
 [🌐 项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [🏆 LLM 模型榜单](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html) · [English → README.md](README.md) · [🚀 快速开始](#-快速开始) · [🆕 新功能](#-新功能) · [🔬 研究工具箱](#-研究工具箱) · [🔗 MCP](#-mcp-服务器) · [📸 截图](#-截图一览) · [更新记录](docs/zh/CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.7.2-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.8.0-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
 
 <img src="site/assets/demo_zh.gif" alt="16 秒导览：市场状态、今天的信号、一个决定是怎么做出来的、模拟盘智能体和 SPY 对比、回测、回测看到的新闻、交叉验证新闻，以及一次带防偷看检查的研究实验" width="100%">
 
@@ -79,6 +79,7 @@ docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp            
 
 ## 🆕 新功能
 
+- **0.8.0** · 🏆 **LLM 交易智能体榜单 rta-bench-1**：六个模型在 2026 年、2022 年熊市和 2020 年暴跌上交易，盲测和实名各一次，新闻按发布时间回放，成交成本按真实情况算。按训练截止日之后计分，Claude Haiku 4.5 以 2026 年 **+7.2%** 领先，仍跑输 SPY 的 +12.1%。[看榜单 →](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html) 另外新增：2022 和 2020 两个冻结时段、真实成交成本、收益归因（暴露和 alpha）、新闻因子、做空和保证金、记忆检测和 prompt 测试。有许可限制的新闻标题不再随包分发，结论和数字照旧公开；发布的版本不再存档到 Zenodo。
 - **0.7.2** · 🔗 **一步接入 Claude 和其他 MCP 客户端**：服务器上了官方 MCP Registry，`uvx risk-aware-trading-agents mcp` 不用先安装就能启动，每个版本还附带 Claude Desktop 扩展（`.mcpb`），打开就能装。[怎么用 →](#-mcp-服务器)
 - **0.7.1** · 📦 **上架 PyPI 和 Docker**：`pip install risk-aware-trading-agents` 就能装；不想装 Python，也可以直接用 `ghcr.io/jackson-cmd/risk-aware-trading-agents` 跑网页看板或 MCP 服务器；在 GitHub Codespaces 里打开整个仓库，依赖都已装好。[怎么用 →](#-快速开始)
 - **0.7.0** · 🔬 **冻结的 2026 年市场，供研究用**：全年按时间点记录的价格和 VIX 随安装包提供，新闻按发布的那一分钟回放（0.7.2 之后不再分发有许可限制的标题，需要你自己的新闻）。可以查任意一天收盘时已知的信息，可以让 Claude 把你描述的策略写成代码并测试，也可以让 LLM 一步一步把这一年交易一遍。每次运行都做防偷看检查，并留下可以用于论文的记录；趋势跟随赚了 **+21.1%**，同期 SPY 是 +12.1%。[怎么用 →](#-研究工具箱)
@@ -594,7 +595,7 @@ docker/             Dockerfile 和 docker-compose.yml
   title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
-  version = {0.7.2},
+  version = {0.8.0},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```

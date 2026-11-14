@@ -6,7 +6,7 @@
 - Run the benchmark: `riskaware research bench --llm openai:MODEL` runs the six tasks (2026, 2022 and 2020, each blind and named) with seeds 0, 1 and 2; `riskaware research submit RUN_ID --model NAME --cutoff YYYY-MM` writes the entry for a pull request.
 - Leaderboard models so far (last update 2026-11-14, 67 entries): claude-haiku-4.5 (Anthropic, training cutoff 2025-07), claude-haiku-5.5 (Anthropic, training cutoff 2026-06), claude-sonnet-4.6 (Anthropic, training cutoff 2026-01), gemini-3.5-flash (Google, training cutoff 2025-01), llama3.2 (Meta, training cutoff 2023-12), gpt-5.6-luna (OpenAI, training cutoff 2026-02-16).
 - Research kit: three frozen periods (2026 to date, the 2022 bear market, the 2020 crash), each with daily prices for 64 large-cap stocks and 25 ETFs from two years before, the VIX term structure and the macro calendar, with SHA-256 hashes. Every experiment runs a look-ahead check.
-- MCP server: `uvx risk-aware-trading-agents mcp` (stdio, 21 tools). The tools are read-only or work on local paper accounts; none can send an order to a broker.
+- MCP server: `uvx risk-aware-trading-agents mcp` (stdio, 22 tools). The tools are read-only or work on local paper accounts; none can send an order to a broker.
 - Brokers: Alpaca (tested on a paper account), Public, Tradier, Interactive Brokers, Charles Schwab, tastytrade, Futu/moomoo, Tiger and Longbridge, plus a built-in paper account.
 
 ## Guides
