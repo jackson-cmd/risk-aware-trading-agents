@@ -800,7 +800,33 @@
    }
   }
  },
- "memory": null,
+ "memory": {
+  "score": null,
+  "ci95": null,
+  "p_value": null,
+  "verdict": null,
+  "why": "paired probe not run (Claude row cap); direct recall only",
+  "scored_points": "all",
+  "beyond_control": null,
+  "beyond_control_ci95": null,
+  "recall_score": -0.06746698679471788,
+  "recall_ci95": [
+   -0.37569943068195544,
+   0.222223318922643
+  ],
+  "recall_verdict": "no sign",
+  "recall_direction_accuracy": 0.42,
+  "recall_majority_baseline": 0.56,
+  "recall_windows": 50,
+  "control_period": null,
+  "missing_answers": {
+   "named": 100,
+   "blind": 100,
+   "recall": 0
+  },
+  "paired": "not run (Claude row cap)",
+  "probe": "riskaware.research.memory: direct recall only (50 windows per period, temperature 0), with the model's cutoff; the paired named/blind probe was not run (Claude row cap); recall_score = rank correlation of the guessed and actual moves, each scaled by the stock's usual 20-day move"
+ },
  "usage": {
   "calls": 44,
   "input_tokens": 539491,

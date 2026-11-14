@@ -245,6 +245,9 @@ def money_block(b: dict, lang: str) -> str:
 
 VERDICTS = {"en": {"clean": "no sign", "contaminated": "remembers", "inconclusive": "inconclusive"},
             "zh": {"clean": "没有迹象", "contaminated": "记得", "inconclusive": "无定论"}}
+# direct recall alone, where the paired probe was not run (riskaware.research.memory.recall_scores)
+RECALL = {"en": {"recalls": "recalls", "no sign": "no sign", "too few": "too few", "_": "recall only"},
+          "zh": {"recalls": "记得", "no sign": "没有迹象", "too few": "样本太少", "_": "只有直接回忆"}}
 
 
 def memory_block(b: dict, lang: str) -> str:
@@ -266,6 +269,9 @@ def memory_block(b: dict, lang: str) -> str:
             if pr and pr.get("score") is not None:
                 word = VERDICTS[lang].get(pr.get("verdict"), pr.get("verdict") or "")
                 cells.append(td(f'{num(pr["score"])} <span class="muted">{esc(word)}</span>'))
+            elif pr and pr.get("recall_score") is not None:
+                word = RECALL[lang].get(pr.get("recall_verdict"), pr.get("recall_verdict") or "")
+                cells.append(td(f'{num(pr["recall_score"])} <span class="muted">{RECALL[lang]["_"]}: {esc(word)}</span>'))
             else:
                 cells.append(td("—"))
         rows.append(f"<tr>{model_cell(m['row'], lang)}" + "".join(cells) + "</tr>")

@@ -87,11 +87,11 @@ vix = market.raw("^VIX")["close"]
 
 import pandas as pd                # 也可以直接读文件
 prices = pd.read_csv("src/riskaware/research/data/market_2020.csv.gz", parse_dates=["date"])</pre>
-<p>不安装也能用：三个时段的价格和榜单的每个条目都在 <a href="https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark">Hugging Face</a> 上，是 Parquet 格式，可在线浏览，另有原始文件。</p>
+<p>不安装也能用：三个时段的价格都在 <a href="https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark">Hugging Face</a> 上，是 Parquet 格式，可在线浏览，另有原始文件。</p>
 <pre>import pandas as pd             # 读 Parquet 需要 pyarrow
 base = "https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark/resolve/main/data/"
-prices = pd.read_parquet(base + "prices.parquet")        # 2026 年；另两段是 prices_2022.parquet 和 prices_2020.parquet
-board = pd.read_parquet(base + "leaderboard.parquet")    # 榜单每个条目一行</pre>
+prices = pd.read_parquet(base + "prices.parquet")        # 2026 年；另两段是 prices_2022.parquet 和 prices_2020.parquet</pre>
+<p>榜单的结果在 <a href="../assets/data/leaderboard.json">leaderboard.json</a>，条目在 <a href="https://github.com/jackson-cmd/risk-aware-trading-agents/tree/main/leaderboard/entries">leaderboard/entries</a>。</p>
 
 <h2>按天查看</h2>
 <p>这份数据的价值在于每一天当时知道什么。<code>riskaware research day 2026-04-08</code>（MCP 里是 <code>market_day</code>）会列出那天收盘时已知的全部信息：市场状态、VIX 和期限结构、恐慌贪婪、板块广度、未来两周的宏观日程，以及每只股票的涨跌、技术指标和技术形态。三个测试窗口里的任何一天都可以，命令会自己找到对应的时段。</p>

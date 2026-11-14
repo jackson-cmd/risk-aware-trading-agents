@@ -136,7 +136,7 @@ riskaware research submit RUN_ID --model gpt-5.6-luna --cutoff 2026-02 --provide
 | `claude-sonnet-4.6` | Anthropic | 一个 OpenAI 兼容网关，关闭扩展思考 | 2026-01 | Anthropic 模型页：训练数据截止 2026 年 1 月（可靠知识截止 2025 年 8 月） |
 | `gemini-3.5-flash` | Google | 一个 OpenAI 兼容网关，`reasoning_effort` minimal | 2025-01 | Box 模型列表里 Gemini 3.5 Flash 的模型卡：知识截止 2025 年 1 月；Google 自己的模型卡指向 Gemini 3 Flash，没写日期 |
 
-所以 2026 年对 Llama、Haiku 4.5 和 Gemini 是干净的，对 Sonnet 4.6（从 1 月 30 日起计分）、Luna（从 2 月 13 日起）和 Haiku 5.5（从 6 月 30 日起）是部分干净的，2022 和 2020 年六个模型都可能记得。Sonnet 4.6 只有一个种子、六个任务里的四个，Haiku 5.5 只有一个种子的三个盲测任务；其余模型随着运行完成补齐三个种子。榜单在每个模型名下写明它的运行日期。
+所以 2026 年对 Llama、Haiku 4.5 和 Gemini 是干净的，对 Sonnet 4.6（从 1 月 30 日起计分）、Luna（从 2 月 13 日起）和 Haiku 5.5（从 6 月 30 日起）是部分干净的，2022 和 2020 年六个模型都可能记得。Luna 六个任务三个种子都齐了。Llama、Haiku 4.5 和 Gemini 六个任务都有种子 0；Llama 和 Gemini 的种子 1、2 随运行完成补上，Haiku 4.5 只有一个种子，因为请求队列限制了一个项目调用 Claude 的次数。Sonnet 4.6 有六个任务里的四个、一个种子，Haiku 5.5 只有一个种子的三个盲测任务。榜单在每个模型名下写明它的运行日期。
 
 最早一批盲测（2026 年 11 月 13 日，在包里把新闻标题中的日期和美元金额也遮住之前）在部分标题里仍能读到日期或目标价，之后的运行读不到。每个条目都记着运行时包的版本和提交。
 
