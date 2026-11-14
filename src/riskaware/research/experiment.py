@@ -39,8 +39,8 @@ import numpy as np
 import pandas as pd
 
 from ..backtest import metrics as M
-from ..backtest.engine import Backtester, BacktestResult
-from ..config import RISKAWARE_HOME, AppConfig, ExecutionConfig
+from ..backtest.engine import Backtester, BacktestResult, describe_costs
+from ..config import RISKAWARE_HOME, AppConfig, BacktestConfig, ExecutionConfig
 from ..data.events import EventCalendar
 from ..news.history import NY, NewsArchive, PointInTimeNews, decision_time
 from ..news.relevance import company_names
@@ -70,11 +70,20 @@ PROTOCOL = {
 }
 
 
-def protocol(period: str | None = None) -> dict[str, str]:
-    """How a backtest on a period decides and fills; the news line names that period's sources."""
+COST_MODELS = ("fixed", "realistic")
+
+
+def protocol(period: str | None = None, costs: str = "fixed", slippage_bps: float = 5.0) -> dict[str, str]:
+    """How a backtest on a period decides and fills; the news line names that period's sources and, with realistic
+    costs, the execution line gives the cost rule."""
     p = get_period(period)
-    return {**PROTOCOL, "news": f"{p.news_feeds} for {p.name}, run through the same relevance filter and "
-                                "cross-verification as live trading"}
+    out = {**PROTOCOL, "news": f"{p.news_feeds} for {p.name}, run through the same relevance filter and "
+                               "cross-verification as live trading"}
+    if costs == "realistic":
+        rule = describe_costs(BacktestConfig(cost_model="realistic", slippage_bps=slippage_bps))
+        out["execution"] = (f"orders fill at the next trading day's open with realistic costs: {rule}; positions are "
+                            "held across days (swing trading on daily bars, no intraday trading)")
+    return out
 
 
 @dataclass
@@ -96,6 +105,7 @@ class Experiment:
     cash: float = 100_000.0
     slippage_bps: float = 5.0
     commission_per_share: float = 0.0
+    costs: str = "fixed"  # fixed (slippage_bps on every fill) or realistic (+ gap, impact, volume cap; docs/costs.md)
     split: str | None = None  # first day of the out-of-sample part
     leak_check: bool = True
     leak_cuts: int = 3
@@ -146,6 +156,8 @@ class ExperimentResult:
             "strategy": self.strategy, "params": self.experiment.params, "period": f"{self.start} to {self.end}",
             "universe": self.experiment.universe if not self.experiment.symbols else "custom",
             "stocks": len(self.symbols), "news": self.experiment.news, "execution": self.execution,
+            "costs": {k: _r(v) if isinstance(v, float) else v
+                      for k, v in (self.backtest.costs if self.backtest else {}).items()},
             "metrics": {k: _r(self.metrics.get(k)) for k in KEY_METRICS if k in self.metrics},
             "spy": {k: _r(self.spy.get(k)) for k in ("total_return", "sharpe", "max_drawdown", "volatility")},
             "equal_weight": {k: _r(self.equal_weight.get(k)) for k in ("total_return", "sharpe", "max_drawdown")},
@@ -227,9 +239,11 @@ def _symbols(exp: Experiment, market: FrozenMarket) -> list[str]:
 
 
 def _config(exp: Experiment, symbols: list[str]) -> AppConfig:
+    if exp.costs not in COST_MODELS:
+        raise ValueError(f"costs must be one of {', '.join(COST_MODELS)}, not {exp.costs!r}")
     cfg = research_config({"profile": exp.profile, "backtest": {
         "initial_cash": float(exp.cash), "slippage_bps": float(exp.slippage_bps),
-        "commission_per_share": float(exp.commission_per_share)}})
+        "commission_per_share": float(exp.commission_per_share), "cost_model": exp.costs}})
     cfg.universe.preset, cfg.universe.symbols = None, list(symbols)
     return cfg
 
@@ -474,6 +488,7 @@ def run_experiment(exp: Experiment, factory: Callable[[], Strategy] | None = Non
     execution = PlainPlanner(int(exp.max_positions), exp.position_size).describe() if exp.execution == "plain" else {
         "execution": "risk_aware", "profile": exp.profile,
         "orders": "the risk manager's limit orders at the next open (cash floor, regime limits, caps, tranches)"}
+    execution["costs"] = f"{exp.costs}: {describe_costs(cfg.backtest)}"
     result = ExperimentResult(
         run_id=run_id, folder=None, experiment=exp, strategy=strat_name, start=res.start, end=res.end,
         symbols=symbols, metrics=metrics, spy=spy, equal_weight=ew_metrics, stats=stats, periods=periods, leak=leak,
@@ -504,7 +519,8 @@ def _decisions_frame(rec: Recorder, plan: RecordingPlanner) -> pd.DataFrame:
 def _run_id(exp: Experiment, name: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", (exp.label or name).lower()).strip("-")[:40] or "run"
     news = "news" if exp.news else "nonews"
-    return f"{datetime.now():%Y%m%d-%H%M%S}-{slug}-{get_period(exp.period).name}-{news}"
+    costs = "-realistic" if exp.costs == "realistic" else ""
+    return f"{datetime.now():%Y%m%d-%H%M%S}-{slug}-{get_period(exp.period).name}-{news}{costs}"
 
 
 # ----------------------------------------------------------------------------------- the record
@@ -531,6 +547,8 @@ def reproduce_command(exp: Experiment) -> str:
         parts.append(f"--split {exp.split}")
     if exp.slippage_bps != 5.0:
         parts.append(f"--slippage-bps {exp.slippage_bps}")
+    if exp.costs != "fixed":
+        parts.append(f"--costs {exp.costs}")
     return " ".join(parts)
 
 
@@ -563,13 +581,15 @@ def save_run(result: ExperimentResult, folder: Path, strategy: Strategy, code: s
                      "description": getattr(strategy, "description", ""), "params": getattr(strategy, "params", {}),
                      "source_sha256": src_hash, "source_file": "strategy.py" if src else None},
         "execution": result.execution,
-        "protocol": protocol(exp.period),
+        "protocol": protocol(exp.period, exp.costs, exp.slippage_bps),
         "leak_check": result.leak,
         "reproduce": reproduce_command(exp) if not code else "riskaware research run --code strategy.py (same settings)",
     }
     (folder / "manifest.json").write_text(json.dumps(manifest, indent=2, default=str) + "\n", encoding="utf-8")
     metrics = {"strategy": result.metrics, "spy": result.spy, "equal_weight": result.equal_weight,
                "vs_spy": result.stats, "periods": result.periods}
+    if exp.costs != "fixed" and result.backtest is not None:
+        metrics["costs"] = result.backtest.costs  # what the fills paid (a fixed run pays slippage_bps on each)
     (folder / "metrics.json").write_text(json.dumps(metrics, indent=2, default=_json_num) + "\n", encoding="utf-8")
     eq = result.equity.copy()
     eq.index = [d.date() for d in eq.index]
@@ -622,7 +642,9 @@ def render_report(r: ExperimentResult) -> str:
               f"{len(r.symbols)} stocks ({exp.universe if not exp.symbols else 'custom list'}), news "
               f"{'replayed' if exp.news else 'off'}, {r.execution.get('execution')} execution"
               + (f" with at most {exp.max_positions} positions" if exp.execution == "plain" else "")
-              + f", {exp.slippage_bps:g} bps slippage, ${exp.cash:,.0f} to start.", ""]
+              + (f", {exp.slippage_bps:g} bps slippage" if exp.costs == "fixed" else
+                 f", realistic costs ({exp.slippage_bps:g} bps, the overnight gap and square-root impact; see below)")
+              + f", ${exp.cash:,.0f} to start.", ""]
     lines += ["| | Strategy | SPY | Equal weight |", "|---|---:|---:|---:|"]
     for key, label, fmt in (("total_return", "Total return", _pct), ("cagr", "Annualized", _pct),
                             ("volatility", "Volatility", _upct), ("sharpe", "Sharpe", _num2),
@@ -662,7 +684,8 @@ def render_report(r: ExperimentResult) -> str:
             lines.append(f"- cut after {c['cut']}: {c['decision_days_compared']} decision days compared, "
                          + ("same decisions" if c["same"] else f"first difference on {c['first_difference']['day']}"))
         lines.append("")
-    lines += ["## How the backtest works", ""] + [f"- **{k}**: {v}" for k, v in protocol(exp.period).items()] + [""]
+    lines += ["## How the backtest works", ""] + [f"- **{k}**: {v}" for k, v in
+                                                  protocol(exp.period, exp.costs, exp.slippage_bps).items()] + [""]
     if r.notes:
         lines += ["## Notes", ""] + [f"- {n}" for n in r.notes] + [""]
     ds = dataset_info(exp.period)

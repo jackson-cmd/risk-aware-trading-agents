@@ -356,10 +356,13 @@ def run_experiment(strategy: str | None = None, code: str | None = None, params:
                    symbols: list[str] | None = None, news: bool = True, execution: str = "plain",
                    max_positions: int = 10, position_size: float | None = None, split: str | None = None,
                    leak_check: bool = True, label: str | None = None,
-                   extra_news: list[dict[str, Any]] | None = None, period: str = "2026") -> dict[str, Any]:
+                   extra_news: list[dict[str, Any]] | None = None, period: str = "2026",
+                   costs: str = "fixed") -> dict[str, Any]:
     """Run an experiment on a frozen period and save a record (see research_guide). period is 2026 (default, a
     rising year), 2022 (the rate-hike bear market) or 2020 (the COVID crash and rebound); start and end default to
-    the period's test window.
+    the period's test window. costs='fixed' (default) pays 5 bps on every fill at the open; costs='realistic' adds
+    10% of the overnight gap and square-root market impact and fills each order for at most 1% of its 20-day
+    average volume.
 
     Give either strategy (a built-in name such as swing_rsi2, swing_trend, swing_breakout, swing_pullback,
     swing_news, risk_aware, rsi2, momentum_rotation; or the path of a saved strategy) or code (one Strategy class,
@@ -379,10 +382,13 @@ def run_experiment(strategy: str | None = None, code: str | None = None, params:
         per = get_period(period)
     except ValueError as exc:
         return {"ok": False, "error": str(exc)}
+    if costs not in ("fixed", "realistic"):
+        return {"ok": False, "error": f"costs must be 'fixed' or 'realistic', not {costs!r}"}
     settings = {"period": per.name, "start": start, "end": end, "universe": None if symbols else universe,
                 "symbols": [s.upper() for s in symbols] if symbols else None, "news": news, "execution": execution,
                 "max_positions": max_positions, "position_size": position_size, "split": split,
-                "leak_check": leak_check, "label": label, "extra_news": extra_news, "params": params or {}}
+                "leak_check": leak_check, "label": label, "extra_news": extra_news, "params": params or {},
+                "costs": costs}
     if code is None and strategy and strategy.endswith(".py") and Path(strategy).expanduser().is_file():
         code = Path(strategy).expanduser().read_text(encoding="utf-8")
     if code is not None:

@@ -323,12 +323,27 @@ class StrategyConfig(_Model):
 
 
 class BacktestConfig(_Model):
+    """How the backtester fills orders. ``cost_model`` picks the price a fill at the open pays (docs/costs.md):
+
+    * ``fixed``: the open plus ``slippage_bps`` on every fill;
+    * ``realistic``: ``slippage_bps`` plus ``gap_cost`` times the overnight gap plus square-root market impact,
+      ``impact_coef`` x daily volatility x sqrt(shares / 20-day average volume), with each order cut to
+      ``max_participation`` of the 20-day average volume. Volatility and volume come from the days before the fill.
+    """
+
     start: str = "2018-01-01"
     end: str | None = None
     initial_cash: float = 100_000.0
     commission_per_share: float = 0.0
     commission_min: float = 0.0
     slippage_bps: float = 5.0
+    cost_model: Literal["fixed", "realistic"] = "fixed"
+    impact_coef: float = Field(1.0, ge=0.0, description="realistic costs: k in k x daily volatility x "
+                                                        "sqrt(shares / 20-day average volume)")
+    gap_cost: float = Field(0.1, ge=0.0, le=1.0, description="realistic costs: share of the overnight gap "
+                                                             "|open / previous close - 1| paid by a fill at the open")
+    max_participation: float = Field(0.01, gt=0.0, le=1.0, description="realistic costs: most shares one order fills, "
+                                                                       "as a share of the 20-day average volume")
     max_chase: float = 0.01
     cash_yield_symbol: str | None = "BIL"
     output_dir: str = "backtests"
