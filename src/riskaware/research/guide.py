@@ -106,7 +106,8 @@ def guide() -> dict[str, Any]:
             "Code may not name dates or tickers, so a model cannot pick the stocks or days it remembers.",
             "A model trained on text from a period may remember how it went: 2020 and 2022 are in the training data "
             "of every current model, 2026 only of the newest ones. Trading sessions have a blind mode (aliases for "
-            "tickers and companies, day numbers instead of dates, prices rebased to 100); compare blind and named "
+            "tickers and companies, day numbers instead of dates, prices rebased to 100, and in headlines the dates, "
+            "best-known people, products and price levels masked); compare blind and named "
             "runs, and periods before and after the model's training cutoff. The memory probe measures it: "
             "riskaware research memory --llm MODEL --period 2022 --cutoff YYYY-MM (memory_probe in Python) asks "
             "the same points named and blind and judges the gap against points after the cutoff (docs/memory.md).",

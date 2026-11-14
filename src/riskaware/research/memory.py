@@ -58,7 +58,7 @@ from ..config import RISKAWARE_HOME
 from ..news.history import decision_time
 from ..news.relevance import ALIASES
 from ..universe import sector_of
-from .agent import Blind
+from .agent import DATE_MASKS, DOLLARS, PEOPLE, PRODUCTS, Blind, mask_dates, rebase_dollars  # noqa: F401
 from .periods import PERIODS, get_period
 
 PROBE_VERSION = 1  # part of every cache key: a change to the prompts or the records needs a new number
@@ -70,43 +70,6 @@ TOLERANCE = 0.05  # an AUC gap below this is too small to matter (see ``_paired_
 MIN_PAIRS = 30
 N_BOOT = 2000
 CHUNK = 4  # batches per block of points (see ``plan_probe``)
-
-# people and products that name a company as surely as its name does; blind records mask them too
-PEOPLE: dict[str, list[str]] = {
-    "AAPL": ["Tim Cook"], "MSFT": ["Satya Nadella", "Nadella"], "NVDA": ["Jensen Huang"],
-    "AMZN": ["Andy Jassy", "Jassy", "Jeff Bezos", "Bezos"], "META": ["Mark Zuckerberg", "Zuckerberg"],
-    "GOOGL": ["Sundar Pichai", "Pichai"], "GOOG": ["Sundar Pichai", "Pichai"], "TSLA": ["Elon Musk", "Musk"],
-    "JPM": ["Jamie Dimon", "Dimon"], "BRK-B": ["Warren Buffett", "Buffett", "Greg Abel"],
-    "DIS": ["Bob Iger", "Iger", "Bob Chapek", "Chapek"], "AMD": ["Lisa Su"],
-    "NFLX": ["Reed Hastings", "Ted Sarandos", "Sarandos"], "INTC": ["Pat Gelsinger", "Gelsinger"],
-    "CRM": ["Marc Benioff", "Benioff"], "ORCL": ["Larry Ellison", "Safra Catz"],
-    "UBER": ["Dara Khosrowshahi", "Khosrowshahi"], "PFE": ["Albert Bourla", "Bourla"],
-    "BA": ["Dave Calhoun", "Kelly Ortberg"], "WMT": ["Doug McMillon"], "SBUX": ["Howard Schultz"],
-    "GS": ["David Solomon"], "PLTR": ["Alex Karp"], "BAC": ["Brian Moynihan"], "C": ["Jane Fraser"],
-    "WFC": ["Charlie Scharf"], "IBM": ["Arvind Krishna"], "AVGO": ["Hock Tan"], "QCOM": ["Cristiano Amon"],
-    "XOM": ["Darren Woods"], "CVX": ["Mike Wirth"],
-}
-PRODUCTS: dict[str, list[str]] = {
-    "AAPL": ["iPad", "iPod", "MacBook", "Vision Pro"], "MSFT": ["Xbox", "Azure"], "NVDA": ["GeForce"],
-    "AMZN": ["Whole Foods", "Alexa"], "META": ["Oculus"], "GOOGL": ["Waymo", "DeepMind"],
-    "GOOG": ["Waymo", "DeepMind"], "TSLA": ["Cybertruck", "Model Y", "Model 3"], "DIS": ["ESPN", "Pixar"],
-    "PFE": ["Paxlovid", "Comirnaty"], "MRK": ["Keytruda"], "LLY": ["Mounjaro", "Zepbound"],
-    "ABBV": ["Humira", "Skyrizi", "Rinvoq"], "BA": ["737 MAX", "Dreamliner"],
-}
-
-_MONTH = (r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|"
-          r"Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)")
-DATE_MASKS: list[tuple[re.Pattern, str]] = [  # headlines often carry their date ("Whale Trades For May 10")
-    (re.compile(r"(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)"), "[date]"),
-    (re.compile(r"(?<![\d/.])(?:0?[1-9]|1[0-2])/(?:0?[1-9]|[12]\d|3[01])(?:/(?:19|20)?\d{2})?(?![\d/])"), "[date]"),
-    (re.compile(rf"\b{_MONTH}\.? \d{{1,2}}(?:st|nd|rd|th)?\b(?:,? (?:19|20)\d{{2}}\b)?"), "[date]"),
-    (re.compile(r"\b(FY|CY|Q[1-4]|[1-4]Q|H[12]) ?'?(?:19|20)?\d{2}\b(?![%.\d])"), r"\1 [year]"),
-    (re.compile(r"(?<![\d,.$])(?:19|20)\d{2}(?![\d%]|,\d)"), "[year]"),
-    (re.compile(r"(?<![A-Za-z])'\d{2}\b"), "'[year]"),
-]
-# per-share dollar amounts ("Price Target to $264", "EPS $1.21"), not totals ("$16.95B", "$5 billion")
-DOLLARS = re.compile(r"\$ ?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)(?![\d,]|\.\d)"
-                     r"(?! ?(?:[BMKTbmkt]\b|bn\b|mn\b|mln\b|billions?\b|millions?\b|thousands?\b|trillions?\b))")
 
 ANSWER_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -249,28 +212,9 @@ def _price(x: float) -> str:
 
 
 def masker(symbol: str, alias: str) -> Blind:
-    """Blind-mode masking for one stock: ``agent.Blind``'s company names and ticker, plus its best-known people
-    ("the S01 chief") and products ("[product]")."""
-    pats = [(p, alias) for p, _ in Blind.make([symbol]).patterns]
-    for name in PEOPLE.get(symbol, []):
-        pats.append((re.compile(rf"(?<![A-Za-z0-9]){re.escape(name)}('s)?(?![A-Za-z0-9])", re.IGNORECASE),
-                     f"the {alias} chief\\1"))
-    for name in PRODUCTS.get(symbol, []):
-        pats.append((re.compile(rf"(?<![A-Za-z0-9]){re.escape(name)}(?![A-Za-z0-9])", re.IGNORECASE), "[product]"))
-    pats.sort(key=lambda p: len(p[0].pattern), reverse=True)
-    return Blind({symbol: alias}, {alias: symbol}, pats)
-
-
-def mask_dates(text: str) -> str:
-    for pat, repl in DATE_MASKS:
-        text = pat.sub(repl, text)
-    return text
-
-
-def rebase_dollars(text: str, factor: float) -> str:
-    """Per-share dollar amounts times ``factor``, the way blind records rebase prices: a price target keeps its
-    distance from the price, and the price level stops naming the stock."""
-    return DOLLARS.sub(lambda m: "$" + _price(float(m.group(1).replace(",", "")) * factor), text)
+    """Blind-mode masking for one stock under ``alias``: its company names and ticker, its best-known people ("the
+    S01 chief") and products ("[product]"), the same as ``agent.Blind``."""
+    return Blind.make([symbol], aliases={symbol: alias})
 
 
 def mask_headline(text: str, blind: Blind, factor: float) -> str:

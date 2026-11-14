@@ -48,7 +48,7 @@ print(r.report())               # the report (r.report("zh") in Chinese)
 - RSI(14), the distance from EMA 50 and EMA 200, ATR as a share of the price, the distance from the 52-week high, relative volume, and the 21-day return next to SPY's;
 - up to three headlines published before that day's close, with how many hours before the close each appeared.
 
-The **named** record gives the ticker, the company, the sector, the date and the prices as traded. The **blind** record gives an alias (S01), the sector and "day 0", rebases the prices so that the first close is 100, and masks the headlines: the company's names and ticker (the masking of blind trading mode), its best-known people ("the S01 chief") and products ("[product]"), and every date and year. Per-share dollar amounts in headlines are rebased like the prices, so "Raises Price Target to $264" keeps its distance from the price and stops naming the stock:
+The **named** record gives the ticker, the company, the sector, the date and the prices as traded. The **blind** record gives an alias (S01), the sector and "day 0", rebases the prices so that the first close is 100, and masks the headlines the way blind trading mode does: the company's names and ticker, its best-known people ("the S01 chief") and products ("[product]"), and every date and year. Per-share dollar amounts in headlines are rebased like the prices, so "Raises Price Target to $264" keeps its distance from the price and stops naming the stock:
 
 ```
 [a1] LLY (Eli Lilly, Health Care), close of 2022-04-13
