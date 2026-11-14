@@ -175,6 +175,8 @@ Over MCP, `trading_session_start` returns the first observation and `trading_ses
 
 **Changing the news.** `extra_news` adds headlines to one experiment, for example to see how a strategy or a model reacts to a story that never ran. The record lists them in its manifest.
 
+**Which prompt works.** `riskaware research prompts` trades versioned system-prompt variants, each changing one thing (a persona, risk rules, a reasoning field, examples, the reply format, headlines per stock, how often it decides), and compares each with the baseline on the same period and seed: [prompts.md](prompts.md).
+
 ## Five swing strategies, with and without news
 
 Five common swing strategies, written the way textbooks define them (`riskaware/strategy/swing.py`):

@@ -34,6 +34,11 @@ baseline on the same model and period: twelve pairs.
 - **"Less stock" is not the whole story.** In 2020 the rules *raised* exposure for the two most cautious models
   (`claude-haiku-5-5` from 19% to 49%, `llama3.2` from 19% to 41%), which paid off in the rebound. The rules change how
   invested a model is and when; whether that pays depends on the market.
+- **The decisions themselves did not get better.** Scored one by one (research/analysis.py: each buy against SPY over
+  the next five trading days, each sell by what it avoided), the baseline's decisions were right 37% to 45% of the
+  time and trailed SPY by 0.2% to 0.5% each, depending on the model. The rule prompts moved the hit rate by +0.7 pp
+  (`risk_rules`) and +3.7 pp (`trend_news`) and the five-day excess by +0.1 and -0.2 pp, all within the noise (Holm
+  p 0.7 to 0.9). The rules changed how much the agents held, not how well they picked.
 - No reply in any of the 36 runs broke the format; invalid orders (unknown symbols, sells of stocks not held) stayed
   between 0% and 7% of orders under every prompt.
 
