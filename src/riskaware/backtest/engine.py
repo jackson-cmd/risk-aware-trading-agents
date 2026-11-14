@@ -11,7 +11,10 @@ Timeline for each trading day t:
 4. The strategy sees data up to the close of t and returns signals; the risk
    manager turns them into orders for t+1.
 
-The strategy, agents and risk manager are the same objects used live.
+The strategy, agents and risk manager are the same objects used live. A planner
+with margin rules (the research kit's long_short and margin modes) trades signed
+positions instead: shorts are negative quantities, and step 3 also charges the
+day's borrow fee and margin interest (``riskaware.research.execution``).
 """
 
 from __future__ import annotations
@@ -181,6 +184,9 @@ class BacktestResult:
     rejections: dict[str, int] = field(default_factory=dict)
     final_holdings: dict[str, float] = field(default_factory=dict)
     costs: dict[str, Any] = field(default_factory=dict)  # the cost model and, for realistic costs, what fills paid
+    # long_short and margin accounts (research kit): P&L of the longs and the shorts, borrow fees, margin interest,
+    # margin calls, and the long and short exposure by day; empty for long-only runs
+    account: dict[str, Any] = field(default_factory=dict)
 
     def summary_rows(self) -> list[tuple[str, str, str]]:
         rows = []
@@ -289,6 +295,12 @@ class Backtester:
         x = ExecutionConfig(order_type="LIMIT", limit_offset=bt.max_chase, allow_fractional=False)
         risk = self.planner if self.planner is not None else RiskManager(prof, cfg.universe, x, manage_cash=True,
                                                                             options=cfg.options)
+        # a planner with margin rules (riskaware.research.execution, modes long_short and margin) trades signed
+        # positions: shorts, borrowed cash, a borrow fee and margin interest every day; None trades long only
+        margin = getattr(risk, "margin", None)
+        acct = {"pnl_long": 0.0, "pnl_short": 0.0, "borrow_fees": 0.0, "margin_interest": 0.0}
+        rec_long: list[float] = []  # value of the longs and of the shorts at each close (margin accounts)
+        rec_short: list[float] = []
         rate = (cash_ret.rolling(63, min_periods=10).mean() * 252).clip(0.0, 0.08).fillna(0.02)
         vix_s = macro["vix"]
         oc = cfg.options
@@ -358,6 +370,60 @@ class Backtester:
                 h_.avg_cost = (h_.avg_cost * h_.qty + px * qty) / (h_.qty + qty)
                 h_.qty += qty
                 h_.last_entry, h_.last_entry_price = t_idx, px
+
+        def fill_signed(order: PlannedOrder, o: float, ts: pd.Timestamp, t_idx: int) -> None:
+            """A market order in a long_short or margin account (riskaware.research.execution): it may close, open or
+            add to a long or a short (negative quantity). It pays the cost model like any fill at the open (a short
+            sale is a SELL, a cover a BUY). The part that adds exposure is cut to the gross limit at the open's prices;
+            the planner already sized it at the close."""
+            nonlocal cash
+            sym, buy = order.symbol, order.side == Side.BUY
+            side = Side.BUY if buy else Side.SELL
+            h_ = holdings.get(sym)
+            held = h_.qty if h_ is not None else 0.0
+            qty = volume_cap(sym, ts, float(order.qty)) if realistic else float(order.qty)
+            closing = min(qty, abs(held)) if (held < 0 if buy else held > 0) else 0.0
+            px, bps = open_fill(side, sym, ts, o, qty, None)
+            if qty > closing:
+                equity_open, gross_open = cash, 0.0
+                for s, hh in holdings.items():
+                    b_ = bar(s, ts)
+                    p_ = b_[0] if b_ else (last_close(s, ts) or hh.last_entry_price)
+                    equity_open += hh.qty * p_
+                    gross_open += abs(hh.qty) * p_
+                room = margin.max_gross * equity_open - gross_open + closing * o
+                most = closing + max(0, math.floor(room / (px * (1 + 1e-9))))
+                if qty > most:
+                    rejections["gross limit at the open"] = rejections.get("gross limit at the open", 0) + 1
+                    qty = float(most)
+                    if realistic and qty > 0:  # the smaller order moves the price less
+                        px, bps = open_fill(side, sym, ts, o, qty, None)
+            if qty <= 0:
+                return
+            if realistic:
+                open_bps.append(bps)
+            commission = max(bt.commission_min, bt.commission_per_share * qty)
+            cash += (-qty if buy else qty) * px - commission
+            pnl, held_days = np.nan, np.nan
+            if closing > 0:
+                pnl = (px - h_.avg_cost) * closing * (1.0 if held > 0 else -1.0) - commission
+                held_days = t_idx - h_.first_entry
+                acct["pnl_long" if held > 0 else "pnl_short"] += pnl
+            new = held + (qty if buy else -qty)
+            if abs(new) <= 1e-9:
+                del holdings[sym]
+            elif h_ is None or held * new < 0:  # a new position, or the other side after closing this one
+                holdings[sym] = Holding(qty=new, avg_cost=px, first_entry=t_idx, last_entry=t_idx, last_entry_price=px,
+                                        tranches=1, target_weight=order.target_weight, peak_price=px)
+            elif abs(new) > abs(held):
+                h_.avg_cost = (h_.avg_cost * abs(held) + px * (abs(new) - abs(held))) / abs(new)
+                h_.qty, h_.last_entry, h_.last_entry_price = new, t_idx, px
+                h_.tranches += 1
+            else:
+                h_.qty, h_.last_trim, h_.last_trim_price = new, t_idx, px
+            trades.append(dict(date=ts, symbol=sym, side="BUY" if buy else "SELL", qty=qty, price=px, value=qty * px,
+                               commission=commission, tag=order.tag, reason=order.reason, pnl=pnl,
+                               holding_days=held_days, cost_bps=bps))
 
         def fill_option(order: PlannedOrder, ts: pd.Timestamp, t_idx: int) -> None:
             nonlocal cash, collateral
@@ -490,6 +556,9 @@ class Backtester:
                     continue
                 o, h, lo, _c = b
                 lim = order.limit_price
+                if margin is not None:  # long_short or margin account: signed positions
+                    fill_signed(order, o, ts, t_idx)
+                    continue
                 if order.side == Side.BUY:
                     if lim is None or o <= lim:
                         at_open = True
@@ -591,11 +660,23 @@ class Backtester:
                 h_.mark = bs_price(spot, c.strike, year_fraction(day_now, c.expiry), float(rate.get(ts, 0.02)),
                                    h_.iv, c.right)
                 option_value += h_.contracts * 100 * h_.mark
+            if margin is not None:  # a day of borrow fee on the shorts and of margin interest on borrowed cash
+                long_v = sum(h_.qty * closes[s] for s, h_ in holdings.items() if h_.qty > 0)
+                short_v = -sum(h_.qty * closes[s] for s, h_ in holdings.items() if h_.qty < 0)
+                fee, spread, loan = margin.daily_costs(cash, short_v)
+                cash -= fee + spread
+                acct["borrow_fees"] += fee
+                acct["margin_interest"] += spread + loan * float(cash_ret.get(ts, 0.0))  # BIL part: in step 2
+                rec_long.append(long_v)
+                rec_short.append(short_v)
             equity = cash + value + option_value
             peak = max(peak, equity)
             stock_val = sum(h_.qty * closes[s] for s, h_ in holdings.items() if s != tsym)
             rec_equity.append(equity)
-            rec_cash.append((cash - collateral) / equity if equity > 0 else 1.0)
+            if margin is not None:  # free cash: short-sale proceeds are collateral; below zero it is borrowed
+                rec_cash.append((cash - collateral - rec_short[-1]) / equity if equity > 0 else 0.0)
+            else:
+                rec_cash.append((cash - collateral) / equity if equity > 0 else 1.0)
             rec_expo.append(stock_val / equity if equity > 0 else 0.0)
             rec_pos.append(sum(1 for s in holdings if s != tsym))
             if progress and (t_idx % 50 == 0 or t_idx == n_days - 1):
@@ -692,14 +773,46 @@ class Backtester:
         if any(t["tag"].startswith("option") for t in trades):
             notes.append("Options are priced with Black-Scholes on modelled implied volatility (realized volatility "
                          "and VIX), paying half the bid-ask spread; there are no historical option quotes.")
+        account = self._account(margin, acct, holdings, closes, trades, rec_long, rec_short, rec_equity, idx,
+                                initial_cash, notes) if margin is not None else {}
         return BacktestResult(
             strategy=strategy.name, profile=prof.name, start=idx[0].date(), end=idx[-1].date(),
             initial_cash=initial_cash, equity=equity_s, benchmark=bench_eq, cash_ratio=cash_ratio,
             exposure=exposure, regimes=regimes, fear_greed=macro["fear_greed"].reindex(idx),
             positions=pd.Series(rec_pos, index=idx), trades=trades_df, metrics=metrics,
             benchmark_metrics=bench_metrics, notes=notes, rejections=dict(sorted(rejections.items(), key=lambda kv: -kv[1])),
-            final_holdings=final, costs=costs,
+            final_holdings=final, costs=costs, account=account,
         )
+
+    @staticmethod
+    def _account(margin: Any, acct: dict[str, float], holdings: dict[str, Holding], closes: dict[str, float],
+                 trades: list[dict[str, Any]], rec_long: list[float], rec_short: list[float], rec_equity: list[float],
+                 idx: pd.DatetimeIndex, initial_cash: float, notes: list[str]) -> dict[str, Any]:
+        """What a long_short or margin account made and paid: the longs' and the shorts' P&L (closed trades plus
+        what is still open at the last close), borrow fees, margin interest, the T-bill interest on cash and
+        short-sale proceeds (the rest of the change in equity), margin calls, and the exposures by day."""
+        out = dict(acct)
+        for s, h_ in holdings.items():
+            out["pnl_long" if h_.qty > 0 else "pnl_short"] += (closes.get(s, h_.last_entry_price) - h_.avg_cost) * h_.qty
+        out["cash_interest"] = (rec_equity[-1] - initial_cash - out["pnl_long"] - out["pnl_short"]
+                                + out["borrow_fees"] + out["margin_interest"])
+        calls = sorted({pd.Timestamp(t["date"]).date().isoformat() for t in trades if t["tag"] == "margin_call"})
+        wiped = next((pd.Timestamp(t["date"]).date().isoformat() for t in trades if t["tag"] == "wiped_out"), None)
+        eq = np.asarray(rec_equity, dtype=float)
+        safe = np.where(eq > 0, eq, np.nan)
+        series = pd.DataFrame({"long": np.asarray(rec_long) / safe, "short": np.asarray(rec_short) / safe}, index=idx)
+        series["gross"] = series["long"] + series["short"]
+        out.update(mode=margin.mode, margin_calls=len(calls), margin_call_days=calls, wiped_out=wiped,
+                   avg_gross=float(series["gross"].mean()), max_gross=float(series["gross"].max()),
+                   avg_long=float(series["long"].mean()), avg_short=float(series["short"].mean()), series=series)
+        notes.append(f"Execution mode {margin.mode}: short selling{' and buying on margin' if margin.max_gross > 1 else ''}"
+                     f", long plus short positions up to {margin.max_gross:g}x equity, each short up to "
+                     f"{margin.max_short:.0%}; a borrow fee of {margin.borrow_fee:.2%} a year on the shorts and BIL + "
+                     f"{margin.margin_spread:.2%} a year on borrowed cash, charged every trading day; maintenance "
+                     f"margin {margin.maint_long:.0%} of the longs and {margin.maint_short:.0%} of the shorts. "
+                     f"{len(calls)} margin call{'s' if len(calls) != 1 else ''}"
+                     + (f"; equity reached zero on {wiped} and trading stopped." if wiped else "."))
+        return out
 
 
 def _fast_state(row: pd.Series, day: date) -> MarketState:

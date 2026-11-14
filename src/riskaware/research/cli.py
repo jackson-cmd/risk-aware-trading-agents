@@ -61,6 +61,9 @@ def _num(v: Any, nd: int = 2) -> str:
 PERIOD_HELP = "Bundled period: 2026 (default), 2022 (rate-hike bear market) or 2020 (COVID crash)"
 COSTS_HELP = ("fixed (default: the slippage on every fill at the open) or realistic (also part of the overnight gap "
               "and square-root market impact; each order at most 1% of the 20-day volume; docs/costs.md)")
+MODE_HELP = ("long_only (default), long_short (shorts, no leverage) or margin (Reg T: shorts and up to 2x gross); "
+             "docs/short-margin.md")
+MODE_PARAMS_HELP = "Override the mode's rules as JSON, e.g. '{\"max_short\": 0.1, \"borrow_fee\": 0.01}'"
 
 
 @app.command("data")
@@ -227,6 +230,8 @@ def run_cmd(
     symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols instead of a universe"),
     news: bool = typer.Option(True, "--news/--no-news"),
     execution: str = typer.Option("plain", help="plain (the strategy's own rules) or risk_aware"),
+    mode: str = typer.Option("long_only", help=MODE_HELP),
+    mode_params: Optional[str] = typer.Option(None, help=MODE_PARAMS_HELP),
     profile: str = typer.Option("balanced", help="Risk profile for --execution risk_aware"),
     max_positions: int = typer.Option(10, help="Plain execution: most positions at once"),
     position_size: Optional[float] = typer.Option(None, help="Plain execution: share of equity per position"),
@@ -255,6 +260,8 @@ def run_cmd(
                     news=news,
                     execution=execution, profile=profile, max_positions=max_positions, position_size=position_size,
                     split=split, leak_check=leak_check, slippage_bps=slippage_bps, label=label, costs=costs)
+    if mode != "long_only":
+        settings.update(mode=mode, mode_params=json.loads(mode_params) if mode_params else None)
     t0 = time.time()
     if code is not None:
         from ..lab import backtest_code
@@ -377,6 +384,7 @@ def trade_cmd(
     news: bool = typer.Option(True, "--news/--no-news"),
     max_positions: int = typer.Option(5),
     base_url: Optional[str] = typer.Option(None, help="For compat:model, the server's URL"),
+    mode: str = typer.Option("long_only", help=MODE_HELP),
 ) -> None:
     """Let an LLM trade the period step by step and save the record. / 让 LLM 逐步交易这段时间并保存记录"""
     from .agent import llm_policy, run_policy
@@ -391,8 +399,8 @@ def trade_cmd(
         text = ", ".join(f"{o.get('action')} {o.get('symbol')}" for o in orders) or L("hold", "持有")
         console.print(f"[dim]{obs['day']}[/] {escape(text)}")
 
-    policy = llm_policy(llm, base_url=base_url, on_reply=show)
+    policy = llm_policy(llm, base_url=base_url, on_reply=show, mode=mode)
     exp = Experiment(period=period, start=start, end=end, universe=None if syms else universe, symbols=syms,
-                     news=news, max_positions=max_positions, label=f"llm-{llm.split(':')[0]}")
+                     news=news, max_positions=max_positions, label=f"llm-{llm.split(':')[0]}", mode=mode)
     res = run_policy(policy, exp, decide_every=decide_every, blind=blind, label=f"llm:{llm}")
     _print_summary({"ok": True, **res.summary()})

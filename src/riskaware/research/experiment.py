@@ -99,6 +99,8 @@ class Experiment:
     symbols: list[str] | None = None
     news: bool = True
     execution: str = "plain"  # plain or risk_aware
+    mode: str = "long_only"  # plain execution: long_only, long_short or margin (execution.py, docs/short-margin.md)
+    mode_params: dict[str, float] | None = None  # override the mode's rules, e.g. {"max_short": 0.1}
     profile: str = "balanced"  # risk profile for execution="risk_aware"
     max_positions: int = 10
     position_size: float | None = None
@@ -168,8 +170,23 @@ class ExperimentResult:
             "trades": {"orders": int(len(t)), "closed": int(len(sells)), "best": trade_rows(best),
                        "worst": trade_rows(worst)},
             "refused": dict(list(self.rejections.items())[:6]),
+            **({"account": acct} if (acct := self.account()) else {}),
             "notes": self.notes,
         }
+
+    def account(self) -> dict[str, Any] | None:
+        """long_short and margin runs: what the longs and the shorts made, the borrow fees, margin interest and
+        T-bill interest (all as shares of the starting cash), margin calls and exposures. None when long only."""
+        a = self.backtest.account if self.backtest is not None else {}
+        if not a:
+            return None
+        cash = float(self.experiment.cash) or 1.0
+        out: dict[str, Any] = {"mode": a["mode"]}
+        out.update({k: _r(a[k] / cash) for k in ("pnl_long", "pnl_short", "borrow_fees", "margin_interest",
+                                                 "cash_interest")})
+        out.update({k: _r(a[k]) for k in ("avg_long", "avg_short", "avg_gross", "max_gross")})
+        out.update(margin_calls=a["margin_calls"], margin_call_days=a["margin_call_days"], wiped_out=a["wiped_out"])
+        return out
 
 
 def _r(v: Any, nd: int = 4) -> Any:
@@ -212,6 +229,7 @@ class RecordingPlanner:
 
     def __init__(self, inner: Any):
         self.inner = inner
+        self.margin = getattr(inner, "margin", None)  # the backtester trades signed positions when set
         self.log: dict[date, list[dict[str, Any]]] = {}
 
     def plan(self, signals: list[Signal], ctx: Any, prices: dict[str, float]) -> Any:
@@ -263,7 +281,10 @@ def _dates(exp: Experiment, market: FrozenMarket) -> tuple[date, date]:
 
 def _planner(exp: Experiment, cfg: AppConfig) -> Any:
     if exp.execution == "plain":
-        return PlainPlanner(max_positions=int(exp.max_positions), position_size=exp.position_size)
+        return PlainPlanner(max_positions=int(exp.max_positions), position_size=exp.position_size, mode=exp.mode,
+                            mode_params=exp.mode_params)
+    if exp.mode != "long_only":
+        raise ValueError("short selling and margin (mode long_short or margin) need execution='plain'")
     if exp.execution == "risk_aware":
         bt = cfg.backtest
         x = ExecutionConfig(order_type="LIMIT", limit_offset=bt.max_chase, allow_fractional=False)
@@ -444,7 +465,7 @@ def run_experiment(exp: Experiment, factory: Callable[[], Strategy] | None = Non
     start, end = _dates(exp, market)
     cfg = _config(exp, symbols)
     if factory is None:
-        from .strategies import RESEARCH_STRATEGIES
+        from .strategies import LONG_SHORT_STRATEGIES, RESEARCH_STRATEGIES
 
         def factory() -> Strategy:
             params = dict(exp.params)
@@ -452,6 +473,8 @@ def run_experiment(exp: Experiment, factory: Callable[[], Strategy] | None = Non
             if cls is not None:
                 params.setdefault("news", bool(exp.news))  # the news switch follows the experiment unless set
                 return cls(**params)
+            if exp.strategy in LONG_SHORT_STRATEGIES:
+                return LONG_SHORT_STRATEGIES[exp.strategy](**params)
             return load_strategy(exp.strategy, params)
 
     archive = _archive(exp) if exp.news else None
@@ -483,9 +506,12 @@ def run_experiment(exp: Experiment, factory: Callable[[], Strategy] | None = Non
                                  "spy_sharpe": mb.get("sharpe")}
     equity = pd.DataFrame({"equity": res.equity, "spy": res.benchmark, "equal_weight": ew, "cash_ratio": res.cash_ratio,
                            "exposure": res.exposure, "positions": res.positions, "regime": res.regimes})
+    if res.account:  # long_short and margin: exposure is net; the longs, the shorts and gross as shares of equity
+        equity = equity.join(res.account["series"])
     decisions = _decisions_frame(rec, plan)
     run_id = _run_id(exp, strat_name)
-    execution = PlainPlanner(int(exp.max_positions), exp.position_size).describe() if exp.execution == "plain" else {
+    execution = PlainPlanner(int(exp.max_positions), exp.position_size, mode=exp.mode,
+                             mode_params=exp.mode_params).describe() if exp.execution == "plain" else {
         "execution": "risk_aware", "profile": exp.profile,
         "orders": "the risk manager's limit orders at the next open (cash floor, regime limits, caps, tranches)"}
     execution["costs"] = f"{exp.costs}: {describe_costs(cfg.backtest)}"
@@ -520,7 +546,8 @@ def _run_id(exp: Experiment, name: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", (exp.label or name).lower()).strip("-")[:40] or "run"
     news = "news" if exp.news else "nonews"
     costs = "-realistic" if exp.costs == "realistic" else ""
-    return f"{datetime.now():%Y%m%d-%H%M%S}-{slug}-{get_period(exp.period).name}-{news}{costs}"
+    mode = "" if exp.mode == "long_only" else "-" + exp.mode.replace("_", "-")
+    return f"{datetime.now():%Y%m%d-%H%M%S}-{slug}-{get_period(exp.period).name}-{news}{costs}{mode}"
 
 
 # ----------------------------------------------------------------------------------- the record
@@ -537,6 +564,10 @@ def reproduce_command(exp: Experiment) -> str:
     parts.append(f"--symbols {','.join(exp.symbols)}" if exp.symbols else f"--universe {exp.universe}")
     parts.append("--news" if exp.news else "--no-news")
     parts.append(f"--execution {exp.execution}")
+    if exp.mode != "long_only":
+        parts.append(f"--mode {exp.mode}")
+        if exp.mode_params:
+            parts.append(f"--mode-params '{json.dumps(exp.mode_params, sort_keys=True)}'")
     if exp.execution == "plain":
         parts.append(f"--max-positions {exp.max_positions}")
         if exp.position_size:
@@ -590,6 +621,8 @@ def save_run(result: ExperimentResult, folder: Path, strategy: Strategy, code: s
                "vs_spy": result.stats, "periods": result.periods}
     if exp.costs != "fixed" and result.backtest is not None:
         metrics["costs"] = result.backtest.costs  # what the fills paid (a fixed run pays slippage_bps on each)
+    if result.account():
+        metrics["account"] = result.account()
     (folder / "metrics.json").write_text(json.dumps(metrics, indent=2, default=_json_num) + "\n", encoding="utf-8")
     eq = result.equity.copy()
     eq.index = [d.date() for d in eq.index]
@@ -657,6 +690,18 @@ def render_report(r: ExperimentResult) -> str:
               f"{_pct(m.get('win_rate')).lstrip('+')}, profit factor {_num2(m.get('profit_factor'))}, average holding "
               f"{_num2(m.get('avg_holding_days'))} trading days, average stock exposure "
               f"{_pct(m.get('avg_exposure')).lstrip('+')}.", ""]
+    a = r.account()
+    if a:
+        calls = a["margin_calls"]
+        lines += [f"## Short selling and margin ({a['mode']})", "",
+                  f"As shares of the starting cash: the longs made {_pct(a['pnl_long'])}, the shorts "
+                  f"{_pct(a['pnl_short'])}; borrow fees cost {_upct(a['borrow_fees'])} and margin interest "
+                  f"{_upct(a['margin_interest'])}; cash and short-sale proceeds earned {_pct(a['cash_interest'])} at the "
+                  f"T-bill rate. Average exposure: longs {_upct(a['avg_long'])}, shorts {_upct(a['avg_short'])}, gross "
+                  f"{_upct(a['avg_gross'])} (highest {_upct(a['max_gross'])}); the exposure above is net. "
+                  + (f"{calls} margin call{'s' if calls != 1 else ''} ({', '.join(a['margin_call_days'][:8])}"
+                     f"{' ...' if calls > 8 else ''})." if calls else "No margin call.")
+                  + (f" Equity reached zero on {a['wiped_out']} and trading stopped." if a["wiped_out"] else ""), ""]
     s = r.stats
     if "beta" in s:
         lines += ["## Against SPY", "",

@@ -92,6 +92,7 @@ print(r.summary()["metrics"], r.leak, r.folder)
 | `universe` / `symbols` | `megacap` | megacap、tech、defensive、core、sectors、etf，或一组代码 |
 | `news` | 开 | 回放该时段的新闻 |
 | `execution` | `plain` | `plain` 完全照策略说的做：等额仓位，最多 `max_positions`（10）个，只做多，先卖后买。`risk_aware` 加上本项目的风控（现金底线、市场状态限制、分批、上限） |
+| `mode` | `long_only` | 纯执行的账户类型：`long_short` 可以做空、不加杠杆，`margin` 是 Reg T 保证金账户（最多 2 倍，会追加保证金）；费用、利息和规则见 [short-margin.md](short-margin.md) |
 | `split` | 无 | 样本外的第一天；报告会分两段列出 |
 | `leak_check` | 开 | 见下文 |
 | `extra_news` | 无 | 只在这次实验里加的标题（`ts`、`symbol`、`headline`、`source`）：做反事实和稳健性测试 |

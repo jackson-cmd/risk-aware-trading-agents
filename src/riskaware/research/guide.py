@@ -11,7 +11,7 @@ from .periods import DEFAULT_PERIOD, get_period
 
 def guide() -> dict[str, Any]:
     from ..lab import NEWS_EXAMPLE, TEMPLATE, _indicator_columns
-    from .strategies import RESEARCH_STRATEGIES
+    from .strategies import LONG_SHORT_STRATEGIES, RESEARCH_STRATEGIES
 
     m = manifest()
     groups = m["symbols"]
@@ -78,6 +78,16 @@ def guide() -> dict[str, Any]:
                      "20-day average volume)), and fills each order for at most 1% of its 20-day average volume; "
                      "the volatility and volume are those of the days before the fill",
         },
+        "modes": {
+            "long_only (default)": "the plain execution above",
+            "long_short": "short positions too, no leverage: a signed target_weight (-0.1 = short 10% of equity), "
+                          "long plus short at most 100% of equity, each short at most 20%, short-sale proceeds held "
+                          "as collateral (they earn the T-bill rate), a borrow fee of 0.5% a year on the shorts",
+            "margin": "Reg T: initial margin 50% (up to 200% gross), maintenance 25% of longs and 30% of shorts with "
+                      "margin calls at the next open, borrowed cash pays BIL + 1.5% a year, the same borrow fee",
+            "how": "run_experiment(mode=...) or trading_session_start(mode=...); docs/short-margin.md",
+        },
+        "long_short_baselines": {name: cls.description for name, cls in LONG_SHORT_STRATEGIES.items()},
         "baselines": {name: cls.description for name, cls in RESEARCH_STRATEGIES.items()},
         "baseline_params": {name: cls.default_params for name, cls in RESEARCH_STRATEGIES.items()},
         "record": ["manifest.json: data hashes, package version and commit, every setting, the strategy's source "

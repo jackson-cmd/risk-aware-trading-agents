@@ -104,6 +104,7 @@ print(r.summary()["metrics"], r.leak, r.folder)
 | `universe` / `symbols` | `megacap` | megacap, tech, defensive, core, sectors, etf, or a list |
 | `news` | on | Replay the period's news |
 | `execution` | `plain` | `plain` trades exactly what the strategy says: equal-size positions, at most `max_positions` (10), long only, sells before buys. `risk_aware` adds the package's risk manager (cash floor, regime limits, tranches, caps) |
+| `mode` | `long_only` | Plain execution's account: `long_short` adds short positions without leverage, `margin` a Reg T margin account (up to 2x, margin calls); fees, interest and the rules in [short-margin.md](short-margin.md) |
 | `split` | none | First day of the out-of-sample part; the report shows both parts |
 | `leak_check` | on | See below |
 | `extra_news` | none | Headlines added for this experiment (`ts`, `symbol`, `headline`, `source`): counterfactual and robustness tests |
