@@ -140,22 +140,22 @@ FOCUS_TREND = (
     "52-week high (off_52w_high). Use the news mainly to avoid stocks with red flags.")
 
 FEW_SHOT = (
-    "Three examples with made-up numbers (not from this market); observations are shortened.\n"
+    "Three examples with made-up stocks and numbers (not from this market); observations are shortened.\n"
     'Observation: {"market":{"regime":"RISK_ON","vix":15.2},"portfolio":{"cash_share":0.6,"positions":[{"symbol":'
-    '"S07","weight":0.2,"gain":0.04,"days_held":10}],"max_positions":5,"default_weight":0.2},"stocks":[{"symbol":'
-    '"S03","ret_5d":0.03,"ret_21d":0.09,"vs_ema50":0.06,"rsi14":61,"news":{"score":0.6,"confirmed":2,"red_flags":[],'
-    '"headlines":[{"headline":"S03 raises full-year outlook","status":"confirmed","hours_before_close":5}]}}]}\n'
-    'Reply: {"orders":[{"symbol":"S03","action":"buy","weight":0.2,"fraction":0,"reason":"uptrend and a confirmed '
+    '"S87","weight":0.2,"gain":0.04,"days_held":10}],"max_positions":5,"default_weight":0.2},"stocks":[{"symbol":'
+    '"S81","ret_5d":0.03,"ret_21d":0.09,"vs_ema50":0.06,"rsi14":61,"news":{"score":0.6,"confirmed":2,"red_flags":[],'
+    '"headlines":[{"headline":"S81 raises full-year outlook","status":"confirmed","hours_before_close":5}]}}]}\n'
+    'Reply: {"orders":[{"symbol":"S81","action":"buy","weight":0.2,"fraction":0,"reason":"uptrend and a confirmed '
     'raised outlook"}],"note":"one new position; keep cash for later"}\n'
     'Observation: {"market":{"regime":"NEUTRAL","vix":21.4},"portfolio":{"cash_share":0.2,"positions":[{"symbol":'
-    '"S11","weight":0.2,"gain":-0.05,"days_held":6}]},"stocks":[{"symbol":"S11","ret_5d":-0.07,"vs_ema50":-0.03,'
+    '"S92","weight":0.2,"gain":-0.05,"days_held":6}]},"stocks":[{"symbol":"S92","ret_5d":-0.07,"vs_ema50":-0.03,'
     '"news":{"score":-0.7,"confirmed":2,"red_flags":["investigation"],"headlines":[{"headline":"Regulator opens probe '
-    'into S11 sales practices","status":"confirmed","hours_before_close":3}]}}]}\n'
-    'Reply: {"orders":[{"symbol":"S11","action":"sell","weight":0,"fraction":1,"reason":"confirmed probe and a falling '
+    'into S92 sales practices","status":"confirmed","hours_before_close":3}]}}]}\n'
+    'Reply: {"orders":[{"symbol":"S92","action":"sell","weight":0,"fraction":1,"reason":"confirmed probe and a falling '
     'price"}],"note":"exit on a red flag"}\n'
     'Observation: {"market":{"regime":"NEUTRAL","vix":17.8},"portfolio":{"cash_share":0.4,"positions":[{"symbol":'
-    '"S02","weight":0.3,"gain":0.02,"days_held":15},{"symbol":"S05","weight":0.3,"gain":0.01,"days_held":15}]},'
-    '"stocks":[{"symbol":"S02","ret_5d":0.01,"vs_ema50":0.02,"news":{"score":0.1,"confirmed":0,"red_flags":[],'
+    '"S95","weight":0.3,"gain":0.02,"days_held":15},{"symbol":"S97","weight":0.3,"gain":0.01,"days_held":15}]},'
+    '"stocks":[{"symbol":"S95","ret_5d":0.01,"vs_ema50":0.02,"news":{"score":0.1,"confirmed":0,"red_flags":[],'
     '"headlines":[]}}]}\n'
     'Reply: {"orders":[],"note":"nothing new; hold"}')
 
@@ -714,6 +714,19 @@ def holm(pvals: dict[str, float]) -> dict[str, float]:
     return out
 
 
+def bh(pvals: dict[str, float]) -> dict[str, float]:
+    """Benjamini-Hochberg q-values (false discovery rate), a less strict companion to Holm."""
+    items = sorted(((p, k) for k, p in pvals.items() if p == p), key=lambda t: t[0])
+    m, out, run = len(items), {}, 1.0
+    for i in range(m - 1, -1, -1):
+        p, k = items[i]
+        run = min(run, p * m / (i + 1))
+        out[k] = run
+    for k in pvals:
+        out.setdefault(k, math.nan)
+    return out
+
+
 def _mean(xs: Iterable[float | None]) -> float | None:
     v = [x for x in xs if x is not None and x == x]
     return float(np.mean(v)) if v else None
@@ -739,9 +752,9 @@ def compare(rows: list[dict[str, Any]], metric: str, baseline: str = BASELINE,
                      "p": sign_flip_p(d, seed=seed), "by_period": by,
                      "same_sign_periods": int(sum(1 for v in by.values() if np.sign(v) == np.sign(np.mean(d)))),
                      "wins": int((d > 0).sum()), "losses": int((d < 0).sum())}
-    adj = holm({k: v["p"] for k, v in out.items()})
+    adj, q = holm({k: v["p"] for k, v in out.items()}), bh({k: v["p"] for k, v in out.items()})
     for k, v in out.items():
-        v["p_holm"] = adj[k]
+        v["p_holm"], v["q_bh"] = adj[k], q[k]
         better = HIGHER_IS_BETTER.get(metric)
         if better is None or not (v["p_holm"] < 0.05):
             v["verdict"] = "noise" if better is not None else "differs" if v["p_holm"] < 0.05 else "same"
@@ -805,8 +818,8 @@ def report(lab: str | Path, site: str | Path | None = None, analysis: bool = Tru
     order = [n for n in known if any(r["variant"] == n for r in rows)]
     summary = summarize(rows)
     comparisons = {m: compare(rows, m) for m in ("sharpe", "total_return", "max_drawdown", "excess_vs_spy",
-                                                  "volatility", "turnover", "format_error_rate",
-                                                  "invalid_order_rate")}
+                                                  "volatility", "turnover", "avg_exposure", "orders_per_step",
+                                                  "format_error_rate", "invalid_order_rate")}
     tokens_in = sum(r["prompt_tokens"] for r in rows)
     tokens_out = sum(r["completion_tokens"] for r in rows)
     pi, po = settings.get("price_in"), settings.get("price_out")
