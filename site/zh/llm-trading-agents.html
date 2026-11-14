@@ -17,6 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../assets/guide.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"在冻结的市场上测试 LLM 交易智能体，不偷看未来","description":"怎样在按时间点记录的 2026 年美股数据上评测 LLM 交易智能体：一步一步交易、盲测模式、完整记录，支持 Python 和 MCP。","inLanguage":"zh-CN","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-agents.html","image":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/decisions_zh.jpg","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["LLM 交易智能体","智能体评测","未来函数","MCP"],"isPartOf":{"@type":"WebSite","name":"风险感知交易智能体","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/"},{"@type":"ListItem","position":2,"name":"测试 LLM 交易智能体","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-agents.html"}]}</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -35,7 +36,7 @@
 <p class="lead">问一个 LLM「去年春天你会买什么」，这样的测试意义不大：它可能记得后来发生了什么，粗心的设置还会把第二天的价格或新闻交给它。风险感知交易智能体让任何模型一个收盘一个收盘地交易 2026 年美股，用的数据只包含当天已知的信息，每一笔订单都和结果一起保存下来。</p>
 <div class="cta">
   <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents">在 GitHub 上获取</a>
-  <a class="btn" href="point-in-time-market-data.html">2026 年数据集</a>
+  <a class="btn" href="point-in-time-market-data.html">按时间点数据集</a>
   <a class="btn" href="news-backtesting.html">新闻回测</a>
 </div>
 
@@ -88,7 +89,7 @@ print(result.summary()["metrics"], result.folder)</pre>
 <h2>更多指南</h2>
 <div class="more">
   <a href="news-backtesting.html">用新闻回测，不用未来函数<span>按时间点回放新闻和防偷看检查</span></a>
-  <a href="point-in-time-market-data.html">按时间点记录的 2026 年数据<span>价格、VIX 和新闻，附 SHA-256 哈希</span></a>
+  <a href="point-in-time-market-data.html">按时间点的新闻数据<span>价格、VIX 和新闻，附 SHA-256 哈希</span></a>
   <a href="../?lang=zh">风险感知交易智能体<span>智能体、券商和看板</span></a>
 </div>
 </main>

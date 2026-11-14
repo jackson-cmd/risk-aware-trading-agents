@@ -5,7 +5,9 @@
 
 The tables go between ``<!-- board:NAME -->`` and ``<!-- /board:NAME -->`` in site/leaderboard.html,
 site/zh/leaderboard.html and the two home pages, so the pages stay plain HTML that search engines can read. The
-prompt board on the same page is drawn in the browser from site/assets/data/prompts.json.
+prompt board on the same page is drawn in the browser from site/assets/data/prompts.json. For AI search tools, the
+line that starts with ``- Leaderboard models`` in site/llms.txt and site/llms-full.txt lists the models with entries,
+and the ``## Current results`` section of site/llms-full.txt gives the results as text.
 """
 
 from __future__ import annotations
@@ -26,6 +28,8 @@ from riskaware.research import bench  # noqa: E402
 DATA = ROOT / "site" / "assets" / "data" / "leaderboard.json"
 PAGES = {"en": ROOT / "site" / "leaderboard.html", "zh": ROOT / "site" / "zh" / "leaderboard.html"}
 HOMES = {"en": ROOT / "site" / "index.html", "zh": ROOT / "site" / "zh" / "index.html"}
+LLMS = ROOT / "site" / "llms.txt"
+LLMS_FULL = ROOT / "site" / "llms-full.txt"
 
 SECTORS_ZH = {"Technology": "科技", "Communication Services": "通信服务", "Consumer Discretionary": "可选消费",
               "Consumer Staples": "必需消费", "Health Care": "医疗", "Financials": "金融", "Industrials": "工业",
@@ -223,7 +227,7 @@ def money_block(b: dict, lang: str) -> str:
                      f"{td(num(run.get('avg_holding_days'), 0) + ' ' + t['days'] if run.get('avg_holding_days') is not None else '—')}"
                      "</tr>")
         news = next((x for x in a.get("by_trigger") or [] if x.get("group") == "news"), None)
-        good.append(f"<tr>{model_cell(r, lang)}{td(period)}{td(str(s.get('decisions') or '—'))}"
+        good.append(f"<tr>{model_cell(r, lang)}{td(period)}{td(num(s.get('decisions'), 0))}"
                     f"{td(with_t(s.get('buy_excess_5d'), s.get('buy_excess_5d_t'), lambda v: pct(v, nd=2)))}"
                     f"{td(pct(s.get('decision_hit_rate_5d'), sign=False, nd=0))}"
                     f"{td(with_t(s.get('decision_ic'), s.get('decision_ic_t'), lambda v: num(v, 3)))}"
@@ -287,6 +291,64 @@ def teaser_block(b: dict, lang: str) -> str:
     return table([t["model"], t["from"], t["ret"], t["spy_same"], t["ew_same"], t["sharpe"]], rows)
 
 
+def model_list(b: dict) -> str:
+    seen: dict[str, dict] = {}
+    for p in b["periods"].values():
+        for r in p["clean"] + p["may_remember"]:
+            seen.setdefault(r["model"], r)
+    rows = sorted(seen.values(), key=lambda r: ((r.get("provider") or "").lower(), r["model"]))
+    return ", ".join(f"{r['model']} ({r.get('provider') or 'unknown provider'}, training cutoff "
+                     f"{r.get('cutoff') or 'unknown'})" for r in rows)
+
+
+def llms_models(text: str, b: dict) -> str:
+    """The generated line of llms.txt and llms-full.txt: the models that have entries."""
+    line = (f"- Leaderboard models so far (last update {b.get('generated_utc') or '—'}, {b['entries']} entries): "
+            f"{model_list(b) or 'none yet'}.")
+    return re.sub(r"^- Leaderboard models.*$", lambda m: line, text, count=1, flags=re.M)
+
+
+def _seeds(n: Any) -> str:
+    return f"{n} seed" + ("" if n == 1 else "s")
+
+
+def llms_results(b: dict) -> str:
+    """The results as plain text, for llms-full.txt."""
+    out = [f"Last update {b.get('generated_utc') or '—'}: {b['entries']} entries from {b['models']} models, blind "
+           "runs, the mean over the seeds each model has so far. Clean: from the model's training cutoff to the end "
+           "of the period, next to SPY and the equal-weight portfolio over the same days. May remember: the whole "
+           "period, before the cutoff. Tables: https://jackson-cmd.github.io/risk-aware-trading-agents/"
+           "leaderboard.html; data: https://jackson-cmd.github.io/risk-aware-trading-agents/assets/data/"
+           "leaderboard.json", ""]
+    for period, p in b["periods"].items():
+        out.append(f"{period} ({p['window']['start']} to {p['window']['end']}):")
+        for r in p["clean"]:
+            bl = r.get("blind") or {}
+            a = bl.get("after_cutoff") or {}
+            out.append(f"- {r['model']} ({r.get('provider')}, cutoff {r.get('cutoff')}, {_seeds(bl.get('n'))}), "
+                       f"clean: {pct(a.get('total_return'))} from {a.get('from', '—')}, Sharpe {num(a.get('sharpe'))}; "
+                       f"SPY {pct(a.get('spy_total_return'))}, equal weight "
+                       f"{pct(a.get('equal_weight_total_return'))}")
+        for r in p["may_remember"]:
+            bl = r.get("blind") or {}
+            out.append(f"- {r['model']} ({r.get('provider')}, cutoff {r.get('cutoff')}, {_seeds(bl.get('n'))}), "
+                       f"may remember: {pct(bl.get('total_return'))}, Sharpe {num(bl.get('sharpe'))}, "
+                       f"{pct(bl.get('excess_vs_equal_weight'))} against equal weight")
+        held = {a["name"]: a for a in p["anchors"]}
+        names = {"SPY": "SPY buy and hold", "Equal weight": "equal weight of the 56 stocks"}
+        bh = [f"{names[n]} {pct(held[n].get('total_return'))}" for n in names if n in held]
+        if bh:
+            out.append(f"- Whole period: {', '.join(bh)}")
+        out.append("")
+    return "\n".join(out)
+
+
+def put_section(text: str, heading: str, content: str) -> str:
+    """Replace the body of a markdown section, from its heading to the next ``## `` heading."""
+    pat = re.compile(rf"(^## {re.escape(heading)}\n\n)(.*?)(?=^## )", re.S | re.M)
+    return pat.sub(lambda m: m.group(1) + content.rstrip("\n") + "\n\n", text, count=1)
+
+
 def build() -> tuple[dict, dict[Path, str]]:
     root = ROOT / "leaderboard"
     entries = bench.load_entries(root / "entries")
@@ -307,6 +369,11 @@ def build() -> tuple[dict, dict[Path, str]]:
             body = (f'<div lang="en">{teaser_block(b, "en")}</div>\n<div lang="zh">{teaser_block(b, "zh")}</div>'
                     if lang == "en" else teaser_block(b, lang))
             out[page] = put(page.read_text(encoding="utf-8"), "teaser", body)
+    if LLMS.is_file():
+        out[LLMS] = llms_models(LLMS.read_text(encoding="utf-8"), b)
+    if LLMS_FULL.is_file():
+        out[LLMS_FULL] = put_section(llms_models(LLMS_FULL.read_text(encoding="utf-8"), b), "Current results",
+                                     llms_results(b))
     return b, out
 
 

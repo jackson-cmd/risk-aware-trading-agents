@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM 交易智能体基准对比：StockBench、CLQT、LiveTradeBench、AI-Trader、InvestorBench、FinSABER、BlindTrade、Agent Market Arena · 风险感知交易智能体</title>
+<meta name="description" content="rta-bench-1（按发布时间回放新闻的 LLM 交易智能体基准）和 StockBench、CLQT、LiveTradeBench、AI-Trader、InvestorBench、FinSABER、BlindTrade、Agent Market Arena 的对比：新闻是否按发布的那一分钟回放、冻结时段、盲测和实名、按训练截止日分开计分、能重放的提交。">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-benchmarks.html">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-benchmarks.html">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-benchmarks.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-benchmarks.html">
+<meta property="og:title" content="LLM 交易智能体基准对比">
+<meta property="og:description" content="rta-bench-1 和 StockBench、CLQT、LiveTradeBench、AI-Trader、InvestorBench、FinSABER、BlindTrade、Agent Market Arena 放在一起比：智能体能知道什么，结果能不能重跑，模型会不会记得测试的那段行情。">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM 交易智能体基准对比","description":"rta-bench-1（按发布时间回放新闻的 LLM 交易智能体基准）和 StockBench、CLQT、LiveTradeBench、AI-Trader、InvestorBench、FinSABER、BlindTrade、Agent Market Arena 的对比。","inLanguage":"zh-Hans","datePublished":"2026-11-14","dateModified":"2026-11-14","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-benchmarks.html","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["LLM 交易智能体基准","LLM 交易智能体榜单","新闻回测","未来函数","数据污染"],"mentions":[{"@type":"ScholarlyArticle","name":"StockBench: Can LLM Agents Trade Stocks Profitably In Real-world Markets?","url":"https://arxiv.org/abs/2510.02209"},{"@type":"ScholarlyArticle","name":"CLQT: A Closed-Loop, Cost-Aware, Strategy-Consistent Benchmark for Diagnostic Evaluation of LLM Portfolio-Management Agents","url":"https://arxiv.org/abs/2606.29771"},{"@type":"ScholarlyArticle","name":"LiveTradeBench: Seeking Real-World Alpha with Large Language Models","url":"https://arxiv.org/abs/2511.03628"},{"@type":"ScholarlyArticle","name":"AI-Trader: Benchmarking Autonomous Agents in Real-Time Financial Markets","url":"https://arxiv.org/abs/2512.10971"},{"@type":"ScholarlyArticle","name":"InvestorBench: A Benchmark for Financial Decision-Making Tasks with LLM-based Agent","url":"https://arxiv.org/abs/2412.18174"},{"@type":"ScholarlyArticle","name":"Can LLM-based Financial Investing Strategies Outperform the Market in Long Run?","url":"https://arxiv.org/abs/2505.07078"},{"@type":"ScholarlyArticle","name":"Can Blindfolded LLMs Still Trade? An Anonymization-First Framework for Portfolio Optimization","url":"https://arxiv.org/abs/2603.17692"},{"@type":"ScholarlyArticle","name":"When Agents Trade: Live Multi-Market Trading Benchmark for LLM Agents","url":"https://arxiv.org/abs/2510.11695"}],"isPartOf":{"@type":"WebSite","name":"风险感知交易智能体","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/"},{"@type":"ListItem","position":2,"name":"模型榜单","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html"},{"@type":"ListItem","position":3,"name":"基准对比","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/llm-trading-benchmarks.html"}]}</script>
+</head>
+<body>
+<header><div class="wrap wide">
+  <a class="brand" href="index.html">风险感知交易智能体</a>
+  <nav>
+    <a href="leaderboard.html">模型榜单</a>
+    <a href="news-backtesting.html">新闻回测</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+    <a href="../llm-trading-benchmarks.html" hreflang="en" lang="en">English</a>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<p class="crumbs"><a href="index.html">首页</a> › <a href="leaderboard.html">模型榜单</a> › 基准对比</p>
+<h1>LLM 交易智能体基准对比</h1>
+<p class="lead">已经有不少基准在问 LLM 智能体会不会交易。它们的区别在于：智能体做决定时能知道什么，结果能不能重跑，模型会不会只是记得测试的那段行情。这一页把我们的 <a href="leaderboard.html">LLM 交易智能体榜单</a>所用的基准 rta-bench-1 和另外八个放在一起，就这几点逐项对比。</p>
+<p class="note">除我们自己这一行，每一行都摘自论文的 arXiv 摘要页，读取于 2026 年 11 月 13 日。「未说明」指摘要页没有写，论文正文可能有。发现写错的地方，欢迎开 issue 或 PR 指正。</p>
+
+<h2 id="table">逐项对比</h2>
+<div class="table-wrap"><table class="board compare">
+<thead><tr><th>基准</th><th>新闻按发布的那一分钟回放</th><th>冻结时段</th><th>盲测和实名</th><th>按训练截止日分开计分</th><th>一个文件、能重放的提交</th></tr></thead>
+<tbody>
+<tr><td class="wrap"><b>rta-bench-1</b>（本项目）<br><span class="muted small">回放 56 只美股大盘股</span></td><td class="wrap">是：Benzinga 新闻标题（2026 年另有 SEC 8-K 公告）在发布的那一分钟送到；收盘后决策，次日开盘成交</td><td class="wrap">3 个：2026 年至今、2022 年熊市、2020 年暴跌</td><td class="wrap">每个模型两种都跑，另有记忆探针</td><td class="wrap">是：截止日之后的成绩参与排名，之前的单独列出</td><td class="wrap">是：一个 JSON 条目存着模型的全部回复，CI 重放后数字必须一致</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2510.02209"><b>StockBench</b></a><br><span class="muted small">为期数月的股票交易环境</span></td><td class="wrap">每日信号里有新闻；时间口径未说明</td><td class="wrap">未说明</td><td class="wrap">未说明</td><td class="wrap">未说明；称没有数据污染</td><td class="wrap">未说明；以开源基准发布</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2606.29771"><b>CLQT</b></a><br><span class="muted small">一年的历史回测，加四周券商模拟盘实时赛道</span></td><td class="wrap">未说明</td><td class="wrap">1 段一年期回测，另有实时赛道</td><td class="wrap">未说明</td><td class="wrap">实时赛道用截止日之后的数据；用「TimeGate」只放行按时间点的数据</td><td class="wrap">未说明</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2511.03628"><b>LiveTradeBench</b></a><br><span class="muted small">实时：美股和 Polymarket，21 个 LLM 测 50 天</span></td><td class="wrap">实时推送</td><td class="wrap">没有：实时</td><td class="wrap">未说明</td><td class="wrap">只用实时数据</td><td class="wrap">未说明</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2512.10971"><b>AI-Trader</b></a><br><span class="muted small">实时：美股、A 股和加密货币</span></td><td class="wrap">智能体自己搜索信息</td><td class="wrap">没有：实时</td><td class="wrap">未说明</td><td class="wrap">只用实时数据；称没有数据污染</td><td class="wrap">未说明；代码和评测数据在 GitHub</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2412.18174"><b>InvestorBench</b></a><br><span class="muted small">股票、加密货币和 ETF；13 个 LLM 底座</span></td><td class="wrap">未说明</td><td class="wrap">未说明</td><td class="wrap">未说明</td><td class="wrap">未说明</td><td class="wrap">未说明；开源的多模态数据集</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2505.07078"><b>FinSABER</b></a><br><span class="muted small">二十年、100 多只标的的历史回测</span></td><td class="wrap">未说明</td><td class="wrap">历史：二十年</td><td class="wrap">未说明</td><td class="wrap">未说明；针对幸存者偏差和数据窥探偏差</td><td class="wrap">未说明</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2603.17692"><b>BlindTrade</b></a><br><span class="muted small">名字匿名化的历史回测</span></td><td class="wrap">未说明</td><td class="wrap">历史：2025 年至 8 月 1 日，扩展到 2024–2025 年</td><td class="wrap">盲测：股票代码和公司名匿名化，并做了阴性对照</td><td class="wrap">未说明</td><td class="wrap">未说明</td></tr>
+<tr><td class="wrap"><a href="https://arxiv.org/abs/2510.11695"><b>Agent Market Arena</b></a><br><span class="muted small">实时、持续运行：加密货币和股票</span></td><td class="wrap">经专家核对的新闻，实时</td><td class="wrap">没有：实时</td><td class="wrap">未说明</td><td class="wrap">只用实时数据</td><td class="wrap">未说明</td></tr>
+</tbody></table></div>
+
+<h2 id="difference">rta-bench-1 不一样的地方</h2>
+<ul>
+  <li><b>按分钟回放新闻。</b>实时基准靠交易当下来避免偷看未来，但明年发布的模型再去交易这些日子时，已经读过关于它们的报道。rta-bench-1 回放历史：每条新闻在发布的那一分钟送到，每次运行都要通过对模型所见内容的防偷看检查。很多新闻回测按日历日期把新闻和价格对齐；在<a href="news-backtesting.html">我们的例子</a>里，这会把一个每笔亏 6.7 bp 的信号变成每笔赚 32 bp。</li>
+  <li><b>三种不同的市场。</b>上涨的 2026 年、2022 年加息熊市和 2020 年暴跌，只在普涨时表现好的模型会被看出来。</li>
+  <li><b>记忆是量出来的，不是假设没有。</b>同一个模型在每个时段盲测和实名各交易一次。训练截止日之后的成绩参与排名，之前的单独列出，旁边是记忆探针的结果。只遮住名字，能看出模型不靠名字时怎么做；两种都跑，才看得出名字对它值多少。</li>
+  <li><b>一条成绩就是一个文件。</b>条目里存着模型的每一条回复，持续集成把它们放进回测重放，数字必须一致。提交一个模型，就是开一个 PR、加一个 JSON 文件。</li>
+  <li><b>免费、离线。</b><code>pip install risk-aware-trading-agents</code> 就带上价格、65,863 条新闻和公告，以及回测器。2026 年的数据也在 <a href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">Hugging Face</a> 上，每次发版都存档在 <a href="https://doi.org/10.5281/zenodo.24202496">Zenodo（有 DOI）</a>。</li>
+</ul>
+<p>实时竞技场能回答冻结时段回答不了的问题：模型今天面对没人见过的新闻时怎么交易。冻结时段回答另外几个：结果能不能重复、能不能比较、能不能核对。两类基准互为补充。</p>
+
+<h2>更多</h2>
+<div class="more">
+  <a href="leaderboard.html">LLM 交易智能体榜单<span>rta-bench-1 上的模型，干净和可能记得的成绩分开</span></a>
+  <a href="news-backtesting.html">新闻回测，不用未来函数<span>为什么按日历日期对齐新闻会虚高</span></a>
+  <a href="point-in-time-market-data.html">按时间点的新闻数据<span>2020、2022、2026 年，附 SHA-256 哈希</span></a>
+</div>
+</main>
+
+<footer><div class="wrap wide">MIT 开源协议 · 不构成投资建议 · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="../llm-trading-benchmarks.html" hreflang="en">English</a></div></footer>
+</body>
+</html>

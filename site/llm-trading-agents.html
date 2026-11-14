@@ -17,6 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/guide.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Test LLM trading agents on a frozen market, without look-ahead","description":"How to evaluate LLM trading agents on point-in-time 2026 US stock market data, step by step, with a blind mode and saved records, from Python or over MCP.","inLanguage":"en","datePublished":"2026-11-12","dateModified":"2026-11-12","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html","image":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/decisions_en.jpg","author":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"about":["LLM trading agents","AI agent evaluation","look-ahead bias","Model Context Protocol"],"isPartOf":{"@type":"WebSite","name":"Risk-Aware Trading Agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/"},{"@type":"ListItem","position":2,"name":"Test LLM trading agents","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/llm-trading-agents.html"}]}</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -35,7 +36,7 @@
 <p class="lead">Asking an LLM what it would have bought last spring is a poor test: it may know what happened, and a careless setup hands it tomorrow's prices or headlines. Risk-Aware Trading Agents lets any model trade the 2026 US stock market one close at a time, on data that holds only what was known that day, and saves every order with the result.</p>
 <div class="cta">
   <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents">Get it on GitHub</a>
-  <a class="btn" href="point-in-time-market-data.html">The 2026 dataset</a>
+  <a class="btn" href="point-in-time-market-data.html">The point-in-time dataset</a>
   <a class="btn" href="news-backtesting.html">News backtesting</a>
 </div>
 
@@ -88,7 +89,7 @@ print(result.summary()["metrics"], result.folder)</pre>
 <h2>More guides</h2>
 <div class="more">
   <a href="news-backtesting.html">Backtest with news, without look-ahead<span>Point-in-time replay and the look-ahead check</span></a>
-  <a href="point-in-time-market-data.html">Point-in-time market data for 2026<span>Prices, VIX and news with SHA-256 hashes</span></a>
+  <a href="point-in-time-market-data.html">Point-in-time financial news dataset<span>Prices, VIX and news with SHA-256 hashes</span></a>
   <a href="./">Risk-Aware Trading Agents<span>The agents, brokers and dashboard</span></a>
 </div>
 </main>
