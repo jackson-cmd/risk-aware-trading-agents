@@ -8,8 +8,9 @@ backtester: "what had been published about SYMBOL by the close of DAY?"
 
 The archive is one JSON Lines file per symbol. Items come from:
 
-* the package itself: 2026 headlines for the stocks of the built-in watchlists
-  (Benzinga headlines, titles only, and SEC 8-K filings), read-only, see ``BUNDLE_PATH``;
+* the package itself: 2020, 2022 and 2026 headlines for the stocks of the built-in
+  watchlists (Benzinga headlines, titles only; for 2026 also SEC 8-K filings),
+  read-only, see ``default_bundles``;
 * SEC EDGAR 8-K filings (``riskaware news-history build``), public and stamped
   with the time SEC accepted them;
 * your own Benzinga API key (``--source benzinga``), kept local;
@@ -52,7 +53,15 @@ log = logging.getLogger(__name__)
 NY = ZoneInfo("America/New_York")
 DEFAULT_ROOT = RISKAWARE_HOME / "news"
 #: Headlines that ship with the package (titles only), read-only; see ``load_bundle``.
-BUNDLE_PATH = Path(__file__).with_name("data") / "news_2026.jsonl.gz"
+BUNDLE_DIR = Path(__file__).with_name("data")
+BUNDLE_PATH = BUNDLE_DIR / "news_2026.jsonl.gz"
+#: Earlier years that ship with the package, read together with ``BUNDLE_PATH`` by default.
+EARLIER_BUNDLES: tuple[Path, ...] = (BUNDLE_DIR / "news_2020.jsonl.gz", BUNDLE_DIR / "news_2022.jsonl.gz")
+
+
+def default_bundles() -> list[Path]:
+    """The headline files an archive reads besides your own items: every year that ships with the package."""
+    return [*EARLIER_BUNDLES, BUNDLE_PATH]
 #: An item stamped later than this after the moment it is added is bad data and is dropped.
 MAX_FUTURE = timedelta(days=1)
 _DATE_ONLY = re.compile(r"\d{4}-\d{2}-\d{2}")
@@ -151,12 +160,29 @@ def _load_bundle(path: str, mtime: float) -> dict[str, tuple[dict, ...]]:
     return {sym: tuple(sorted(recs, key=lambda r: r["ts"])) for sym, recs in out.items()}
 
 
-def load_bundle(path: str | Path = BUNDLE_PATH) -> dict[str, tuple[dict, ...]]:
-    """The headlines that ship with the package, by symbol, oldest first (empty if the file is missing)."""
-    p = Path(path)
+def load_bundle(path: str | Path | None = None) -> dict[str, tuple[dict, ...]]:
+    """The headlines of one bundled file (the 2026 one by default), by symbol, oldest first (empty if missing)."""
+    p = Path(path) if path is not None else BUNDLE_PATH
     if not p.is_file():
         return {}
     return _load_bundle(str(p), p.stat().st_mtime)
+
+
+@lru_cache(maxsize=4)
+def _merge_bundles(files: tuple[tuple[str, float], ...]) -> dict[str, tuple[dict, ...]]:
+    out: dict[str, list[dict]] = {}
+    for path, mtime in files:
+        for sym, recs in _load_bundle(path, mtime).items():
+            out.setdefault(sym, []).extend(recs)
+    return {sym: tuple(sorted(recs, key=lambda r: r["ts"])) for sym, recs in out.items()}
+
+
+def load_bundles(paths: Iterable[str | Path]) -> dict[str, tuple[dict, ...]]:
+    """Several bundled files together, by symbol, oldest first (missing files are skipped)."""
+    files = tuple((str(p), p.stat().st_mtime) for p in map(Path, paths) if p.is_file())
+    if len(files) == 1:
+        return _load_bundle(*files[0])
+    return _merge_bundles(files) if files else {}
 
 
 class NewsArchive:
@@ -166,17 +192,22 @@ class NewsArchive:
     your own files.
     """
 
-    def __init__(self, root: str | Path | None = None, bundled: bool = True, bundle_path: str | Path | None = None):
+    def __init__(self, root: str | Path | None = None, bundled: bool = True, bundle_path: str | Path | None = None,
+                 bundle_paths: Iterable[str | Path] | None = None):
         self.root = Path(root).expanduser() if root else DEFAULT_ROOT
         self.bundled = bundled
-        self.bundle_path = Path(bundle_path) if bundle_path else BUNDLE_PATH
+        if bundle_paths is not None:
+            self.bundle_paths = [Path(p) for p in bundle_paths]
+        else:
+            self.bundle_paths = [Path(bundle_path)] if bundle_path else default_bundles()
+        self.bundle_path = self.bundle_paths[-1] if self.bundle_paths else BUNDLE_PATH
         self._mem: dict[str, list[dict]] = {}
 
     def path(self, symbol: str) -> Path:
         return self.root / f"{_safe_name(symbol)}.jsonl"
 
     def bundle(self) -> dict[str, tuple[dict, ...]]:
-        return load_bundle(self.bundle_path) if self.bundled else {}
+        return load_bundles(self.bundle_paths) if self.bundled else {}
 
     def records(self, symbol: str) -> list[dict]:
         """Your records and the bundled ones for a symbol, oldest first; your copy of an item wins."""
@@ -193,7 +224,8 @@ class NewsArchive:
         if not b:
             return None
         recs = [r for v in b.values() for r in v]
-        return {"path": str(self.bundle_path), "items": len(recs), "symbols": len(b),
+        return {"path": ", ".join(str(p) for p in self.bundle_paths if p.is_file()), "items": len(recs),
+                "symbols": len(b),
                 "first": _parse_time(min(r["ts"] for r in recs)), "last": _parse_time(max(r["ts"] for r in recs)),
                 "feeds": dict(Counter(r.get("feed", "?") for r in recs))}
 

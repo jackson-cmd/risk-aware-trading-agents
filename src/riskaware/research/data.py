@@ -1,8 +1,9 @@
-"""The frozen market: the daily bars from January 2024 to November 2026 that ship with the package.
+"""The frozen markets: the daily bars of each bundled period (see ``periods``) that ship with the package.
 
 Experiments in ``riskaware.research`` read prices from here and never from the network, so an experiment gives the
-same numbers on any machine and on any later day. ``data/manifest.json`` says what the file holds and gives its
-SHA-256; every experiment copies that into its own manifest. ``scripts/build_market_bundle.py`` rebuilds the file.
+same numbers on any machine and on any later day. Each period has a manifest (``data/manifest.json`` for 2026,
+``data/manifest_2022.json`` for 2022) that says what its files hold and gives their SHA-256; every experiment copies
+that into its own manifest. ``scripts/build_market_bundle.py`` rebuilds the files.
 
 The file keeps prices as traded (adjusted for splits) plus the factor ``adj`` that turns them into total-return
 prices. Backtests and indicators use the total-return prices, like the rest of the package; ``raw()`` gives the
@@ -21,20 +22,27 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from .periods import DEFAULT_PERIOD, PERIODS, get_period
+
 DATA_DIR = Path(__file__).resolve().parent / "data"
 MANIFEST_PATH = DATA_DIR / "manifest.json"
 OHLCV = ["open", "high", "low", "close", "volume"]
 
 
-@functools.lru_cache(maxsize=1)
-def manifest() -> dict:
-    """What the bundled market file holds: the period, the symbols by group, and the SHA-256 of each file."""
-    return json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+@functools.lru_cache(maxsize=8)
+def manifest(period: str | None = None) -> dict:
+    """What a period's market file holds: its dates, the symbols by group, and the SHA-256 of each file."""
+    return json.loads((DATA_DIR / get_period(period).manifest).read_text(encoding="utf-8"))
 
 
-def market_path() -> Path:
-    name = next(k for k in manifest()["files"] if k.endswith(".csv.gz"))
+def market_path(period: str | None = None) -> Path:
+    name = next(k for k in manifest(period)["files"] if k.endswith(".csv.gz"))
     return DATA_DIR / name
+
+
+def available_periods() -> list[str]:
+    """The periods whose files are present (all of them in an installed package)."""
+    return [p for p in sorted(PERIODS) if (DATA_DIR / PERIODS[p].manifest).is_file()]
 
 
 @functools.lru_cache(maxsize=2)
@@ -62,11 +70,13 @@ class FrozenMarket:
     """
 
     def __init__(self, frames: dict[str, pd.DataFrame] | None = None, label: str = "bundled",
-                 fingerprint: str | None = None):
+                 fingerprint: str | None = None, period: str | None = None):
+        self.period = get_period(period).name
         if frames is None:
-            path = market_path()
+            path = market_path(self.period)
             frames = _load(str(path), path.stat().st_mtime)
-            fingerprint = fingerprint or manifest()["files"][path.name]["sha256"]
+            fingerprint = fingerprint or manifest(self.period)["files"][path.name]["sha256"]
+            label = label if label != "bundled" else f"bundled {self.period}"
         self._raw = frames
         self.label = label
         self._fingerprint = fingerprint
@@ -95,8 +105,11 @@ class FrozenMarket:
 
     @property
     def experiment_start(self) -> date:
-        """The first trading day of the experiment year; the days before it are warm-up."""
-        year = self.last_day.year
+        """The first trading day of the period's test window; the days before it are warm-up."""
+        start = get_period(self.period).start
+        if self.first_day <= start <= self.last_day:
+            return next(ts.date() for ts in self.calendar if ts.date() >= start)
+        year = self.last_day.year  # a market built by hand: the first day of its last year
         return next(ts.date() for ts in self.calendar if ts.year == year)
 
     def fingerprint(self) -> str:
@@ -189,40 +202,51 @@ class FrozenMarket:
             f.loc[after, "adj"] = float(r.loc[~after, "adj"].iloc[-1])
             f.loc[after, "dividend"], f.loc[after, "split"] = 0.0, 0.0
             frames[sym] = f
-        return FrozenMarket(frames, label=f"poisoned after {cut}")
+        return FrozenMarket(frames, label=f"poisoned after {cut}", period=self.period)
 
 
-@functools.lru_cache(maxsize=1)
-def bundled_market() -> FrozenMarket:
-    """The bundled market, loaded once per process."""
-    return FrozenMarket()
+@functools.lru_cache(maxsize=4)
+def _bundled(period: str) -> FrozenMarket:
+    return FrozenMarket(period=period)
 
 
-def dataset_info() -> dict:
+def bundled_market(period: str | None = None) -> FrozenMarket:
+    """A bundled period's market (2026 by default), loaded once per process."""
+    return _bundled(get_period(period).name)
+
+
+def news_path(period: str | None = None) -> Path:
+    """The headline file of a period."""
+    return get_period(period).news_path
+
+
+def dataset_info(period: str | None = None) -> dict:
     """The dataset part of an experiment's manifest: versions and hashes of the price and news files."""
-    m = manifest()
-    path = market_path()
-    news = m["files"].get("news_2026.jsonl.gz", {})
-    from ..news.history import BUNDLE_PATH
-
-    news_now = _sha256(BUNDLE_PATH) if BUNDLE_PATH.is_file() else None
+    p = get_period(period)
+    m = manifest(p.name)
+    path = market_path(p.name)
+    news = m["files"].get(p.news, {})
+    news_now = _sha256(p.news_path) if p.news_path.is_file() else None
     return {
-        "name": m["name"], "version": m["version"], "period": m["period"],
+        "name": m["name"], "version": m["version"], "period": m["period"], "test_window": p.describe(),
         "prices": {"file": path.name, "sha256": m["files"][path.name]["sha256"], "rows": m["files"][path.name]["rows"],
                    "source": m["source"]},
-        "news": {"file": BUNDLE_PATH.name, "sha256": news_now, "matches_manifest": news_now == news.get("sha256")},
+        "news": {"file": p.news, "sha256": news_now, "matches_manifest": news_now == news.get("sha256")},
     }
 
 
-def verify() -> dict:
-    """Check the bundled files against the SHA-256 in the manifest."""
-    m = manifest()
+def verify(period: str | None = None) -> dict:
+    """Check the bundled files against the SHA-256 in their manifest (every available period by default)."""
     out = {}
-    for name, meta in m["files"].items():
-        p = DATA_DIR / name if (DATA_DIR / name).is_file() else None
-        if p is None:
-            from ..news.history import BUNDLE_PATH
-
-            p = BUNDLE_PATH if BUNDLE_PATH.name == name else None
-        out[name] = bool(p and p.is_file() and _sha256(p) == meta.get("sha256"))
+    for name in [get_period(period).name] if period else available_periods():
+        p = get_period(name)
+        for fname, meta in manifest(name)["files"].items():
+            path = DATA_DIR / fname if (DATA_DIR / fname).is_file() else None
+            if path is None and fname == p.news:
+                path = p.news_path
+            out[fname] = bool(path and path.is_file() and _sha256(path) == meta.get("sha256"))
     return out
+
+
+__all__ = ["DEFAULT_PERIOD", "FrozenMarket", "available_periods", "bundled_market", "dataset_info", "manifest",
+           "market_path", "news_path", "verify"]

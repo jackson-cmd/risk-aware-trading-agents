@@ -58,25 +58,33 @@ def _num(v: Any, nd: int = 2) -> str:
     return "n/a" if math.isnan(f) or math.isinf(f) else f"{f:.{nd}f}"
 
 
-@app.command("data")
-def data_cmd() -> None:
-    """What the bundled data holds, and a check of its SHA-256. / 自带数据的内容和校验"""
-    from .data import manifest, verify
+PERIOD_HELP = "Bundled period: 2026 (default), 2022 (rate-hike bear market) or 2020 (COVID crash)"
 
-    m = manifest()
-    ok = verify()
-    t = Table(title=L(f"Frozen market, version {m['version']}", f"冻结市场数据，版本 {m['version']}"))
-    t.add_column(L("What", "项目"))
-    t.add_column(L("Value", "内容"))
-    t.add_row(L("Period", "时间"), f"{m['period']['first']} – {m['period']['last']} ({m['period']['trading_days']} "
-                                   + L("trading days", "个交易日") + ")")
-    t.add_row(L("Experiment year starts", "实验年份起点"), m["period"]["experiment_start"])
-    for group, syms in m["symbols"].items():
-        t.add_row(group, f"{len(syms)}: " + ", ".join(syms[:12]) + (" ..." if len(syms) > 12 else ""))
-    for name, meta in m["files"].items():
-        t.add_row(name, f"sha256 {meta['sha256'][:16]}... " + ("[green]OK[/]" if ok.get(name) else "[red]changed[/]"))
-    t.add_row(L("Source", "来源"), m["source"])
-    console.print(t)
+
+@app.command("data")
+def data_cmd(period: Optional[str] = typer.Option(None, help="Show one period (default: all)")) -> None:
+    """What the bundled data holds, and a check of its SHA-256. / 自带数据的内容和校验"""
+    from .data import available_periods, manifest, verify
+    from .periods import get_period
+
+    for name in [get_period(period).name] if period else list(reversed(available_periods())):
+        per, m = get_period(name), manifest(name)
+        ok = verify(name)
+        t = Table(title=L(f"{per.title} (version {m['version']})", f"{per.title_zh}（版本 {m['version']}）"))
+        t.add_column(L("What", "项目"))
+        t.add_column(L("Value", "内容"))
+        t.add_row(L("Test window", "测试区间"), f"{per.start} – {per.end}  " + L(per.about, per.about_zh))
+        t.add_row(L("Data", "数据"), f"{m['period']['first']} – {m['period']['last']} ({m['period']['trading_days']} "
+                                     + L("trading days; the years before the test window warm up the indicators",
+                                         "个交易日；测试区间之前的年份用来预热指标") + ")")
+        for group, syms in m["symbols"].items():
+            t.add_row(group, f"{len(syms)}: " + ", ".join(syms[:12]) + (" ..." if len(syms) > 12 else ""))
+        for fname, meta in m["files"].items():
+            t.add_row(fname, f"sha256 {(meta['sha256'] or '')[:16]}... "
+                      + ("[green]OK[/]" if ok.get(fname) else "[red]changed[/]"))
+        t.add_row(L("News", "新闻"), per.news_feeds)
+        t.add_row(L("Source", "来源"), m["source"])
+        console.print(t)
 
 
 @app.command("day")
@@ -84,12 +92,21 @@ def day_cmd(
     day: str = typer.Argument(..., help="YYYY-MM-DD"),
     symbols: Optional[str] = typer.Option(None, help="Comma-separated stocks (default: all 64)"),
     headlines: int = typer.Option(3, help="Headlines per stock"),
+    period: Optional[str] = typer.Option(None, help="Bundled period (default: the one that holds the day)"),
     as_json: bool = typer.Option(False, "--json", help="Print the full JSON"),
 ) -> None:
     """Everything known at one day's close: regime, VIX, indicators, setups, news. / 某天收盘时已知的全部信息"""
-    from .day import MarketView
+    from datetime import date as _date
 
-    view = MarketView()
+    from .day import MarketView
+    from .periods import get_period, period_of
+
+    try:
+        per = get_period(period).name if period else period_of(_date.fromisoformat(day)).name
+    except ValueError as exc:
+        console.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
+    view = MarketView(period=per)
     syms = [s.strip().upper() for s in symbols.split(",")] if symbols else None
     try:
         snap = view.snapshot(day, symbols=syms, headlines=headlines)
@@ -195,8 +212,9 @@ def run_cmd(
     strategy: str = typer.Option("swing_rsi2", "--strategy", "-s", help="Built-in name or path/to/file.py[:Class]"),
     code: Optional[Path] = typer.Option(None, help="A strategy file to check and run like AI-written code (strategy lab)"),
     params: Optional[str] = typer.Option(None, help="Strategy parameters as JSON"),
-    start: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default 2026-01-02)"),
-    end: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default: the last bundled day)"),
+    period: str = typer.Option("2026", help=PERIOD_HELP),
+    start: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default: the first day of the period)"),
+    end: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default: the period's last day)"),
     universe: str = typer.Option("megacap", help="megacap, tech, defensive, core, sectors, etf"),
     symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols instead of a universe"),
     news: bool = typer.Option(True, "--news/--no-news"),
@@ -211,12 +229,19 @@ def run_cmd(
     out: Optional[Path] = typer.Option(None, help="Record folder (default ~/.riskaware/research/runs/<id>)"),
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
-    """Run a strategy on the frozen 2026 market and save a record. / 在冻结的 2026 年市场上做一次实验"""
+    """Run a strategy on a frozen period and save a record. / 在冻结的某个时段上做一次实验"""
     from .experiment import Experiment, run_experiment
+    from .periods import get_period
 
     syms = [s.strip().upper() for s in symbols.split(",")] if symbols else None
     p = json.loads(params) if params else {}
-    settings = dict(params=p, start=start, end=end, universe=None if syms else universe, symbols=syms, news=news,
+    try:
+        per = get_period(period)
+    except ValueError as exc:
+        console.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
+    settings = dict(params=p, period=per.name, start=start, end=end, universe=None if syms else universe, symbols=syms,
+                    news=news,
                     execution=execution, profile=profile, max_positions=max_positions, position_size=position_size,
                     split=split, leak_check=leak_check, slippage_bps=slippage_bps, label=label)
     t0 = time.time()
@@ -226,7 +251,8 @@ def run_cmd(
         settings["strategy"] = "code"
         with console.status(L("Checking and running the code ...", "检查并运行代码 ...")):
             s = backtest_code(code.read_text(encoding="utf-8"), symbols=syms, universe=None if syms else universe,
-                              start=start or "2026-01-02", end=end, news=news, research=settings, timeout=900.0)
+                              start=start or per.start.isoformat(), end=end, news=news, research=settings,
+                              timeout=900.0)
     else:
         try:
             with console.status(L("Running ...", "运行中 ...")):
@@ -244,21 +270,24 @@ def run_cmd(
 
 @app.command("baselines")
 def baselines_cmd(
+    period: str = typer.Option("2026", help=PERIOD_HELP),
     start: Optional[str] = typer.Option(None),
     end: Optional[str] = typer.Option(None),
     universe: str = typer.Option("megacap"),
     max_positions: int = typer.Option(10),
-    split: Optional[str] = typer.Option("2026-07-01", help="Out-of-sample start for the in/out-of-sample columns"),
+    split: Optional[str] = typer.Option(None, help="Out-of-sample start (default: 1 July of the period's year)"),
     leak_check: bool = typer.Option(True, "--leak-check/--no-leak-check"),
     out: Optional[Path] = typer.Option(None),
 ) -> None:
     """The five swing strategies, with and without news, side by side. / 五种波段策略，开和不开新闻对比"""
     from .compare import run_baselines
+    from .periods import get_period
 
+    per = get_period(period)
     with console.status("...") as st:
         table, folder = run_baselines(start=start, end=end, universe=universe, max_positions=max_positions,
-                                      split=split, leak_check=leak_check, out_dir=out,
-                                      progress=lambda msg: st.update(msg))
+                                      split=split or per.split.isoformat(), leak_check=leak_check, out_dir=out,
+                                      progress=lambda msg: st.update(msg), period=per.name)
     console.print((folder / "baselines.md").read_text(encoding="utf-8"))
     console.print(f"{L('Folder', '文件夹')}: {folder}", soft_wrap=True)
 
@@ -294,6 +323,7 @@ def trade_cmd(
     llm: str = typer.Option(..., help="provider:model, e.g. ollama:qwen2.5:3b, openai:gpt-5.6-luna, claude-cli"),
     universe: str = typer.Option("core"),
     symbols: Optional[str] = typer.Option(None),
+    period: str = typer.Option("2026", help=PERIOD_HELP),
     start: Optional[str] = typer.Option(None),
     end: Optional[str] = typer.Option(None),
     decide_every: int = typer.Option(5, help="Trading days between decisions (5 = weekly)"),
@@ -316,7 +346,7 @@ def trade_cmd(
         console.print(f"[dim]{obs['day']}[/] {escape(text)}")
 
     policy = llm_policy(llm, base_url=base_url, on_reply=show)
-    exp = Experiment(start=start, end=end, universe=None if syms else universe, symbols=syms, news=news,
-                     max_positions=max_positions, label=f"llm-{llm.split(':')[0]}")
+    exp = Experiment(period=period, start=start, end=end, universe=None if syms else universe, symbols=syms,
+                     news=news, max_positions=max_positions, label=f"llm-{llm.split(':')[0]}")
     res = run_policy(policy, exp, decide_every=decide_every, blind=blind, label=f"llm:{llm}")
     _print_summary({"ok": True, **res.summary()})
