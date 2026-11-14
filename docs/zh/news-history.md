@@ -2,12 +2,12 @@
 
 实盘里新闻是发生一条读一条。回测要还原每个交易日当时已经知道什么，所以每条新闻都必须有发布时间。没有发布时间的话，策略会在新闻出现之前就"看到"它，任何新闻策略的回测结果都会虚高。
 
-2026 年的新闻已经随安装包自带，这一年用 `riskaware backtest --news` 什么都不用下载。其他年份用 `riskaware news-history` 在你自己的电脑上建一个按时间存的新闻库，回测会把两者一起回放。
+安装包不带新闻。`riskaware news-history` 在你自己的电脑上建一个按时间存的新闻库，三个冻结时段的标题文件如果你有，放在 `~/.riskaware/news/periods`；回测会把两者一起回放。
 
 ## 快速开始
 
 ```bash
-# 2026 年不用准备：标题随安装包自带
+# 2026 年：需要把你自己的标题文件放在 ~/.riskaware/news/periods
 riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset megacap --start 2026-01-02 --news --compare buy_and_hold
 
 # 其他年份：core 股票池 2018 年以来的 SEC 8-K 公告（免费；SEC 要求注明联系邮箱）
@@ -24,16 +24,14 @@ riskaware news-history show NVDA --date 2026-05-20
 
 看板的回测页打开 **回放新闻** 开关也可以。在 `riskaware.yaml` 里写一次 `data.contact_email`，以后就不用加 `--contact-email`。设置 `backtest.news: true`，每次回测都会回放新闻。
 
-## 安装包自带的新闻
+## 冻结时段的标题文件
 
-`riskaware/news/data/news_2026.jsonl.gz`（0.7 MB）收了内置股票池（`core`、`megacap`、`tech`、`defensive`）里 64 只股票的 16,945 条新闻，时间从 2026 年 1 月 1 日到 11 月 11 日：
+本项目的结果按冻结时段各回放一个标题文件，覆盖内置股票池（`core`、`megacap`、`tech`、`defensive`）的 64 只股票。2026 年（1 月 1 日到 11 月 11 日）的文件有 16,945 条：
 
-- Benzinga 标题 16,249 条：只有标题、发布时间和股票代码，别的都没有（没有正文、摘要、链接和情绪分）。只有 Benzinga 给这条新闻标了这只股票、并且标题本身提到这家公司或代码时，才算这只股票的新闻。机器生成的数据汇总（"当年投 1000 美元现在值多少"、股息计算、期权异动、做空比例、市盈率汇总、电视节目荐股清单）没有收：它们只是复述价格，不是新闻。
+- 标题 16,249 条：只有标题、发布时间和股票代码，别的都没有（没有正文、摘要、链接和情绪分）。只有新闻源给这条新闻标了这只股票、并且标题本身提到这家公司或代码时，才算这只股票的新闻。机器生成的数据汇总（"当年投 1000 美元现在值多少"、股息计算、期权异动、做空比例、市盈率汇总、电视节目荐股清单）没有收：它们只是复述价格，不是新闻。
 - SEC 8-K 公告 696 份，带 SEC 受理时间和公告链接。
 
-回测会把它和你自己的新闻库一起读；两边有同一条时以你的为准，`remove` 只删你自己的。不想用的话设置 `news.bundled: false`。`scripts/build_news_bundle.py` 可以从一个新闻库重新生成这个文件。
-
-**更多历史数据。** 我们手里的新闻库大得多，2011 到 2026 年约 320 万条 Benzinga 标题，放不进安装包，所以只带了内置股票池的 2026 年。如果你需要更多年份或更多股票，欢迎开 issue，我们再看怎么提供，比如做成单独下载。
+这些文件不再分发：安装包和代码仓库里都没有。把你自己的副本放到 `~/.riskaware/news/periods`（`news_2026.jsonl.gz`、`news_2022.jsonl.gz`、`news_2020.jsonl.gz`）；`scripts/build_news_bundle.py` 可以从新闻库生成，每个时段 manifest（`src/riskaware/research/data/`）里的 SHA-256 能核对你的文件是不是我们的结果用的那一份。回测会把它们和你自己的新闻库一起读；两边有同一条时以你的为准，`remove` 只删你自己的。不想用的话设置 `news.bundled: false`。
 
 ## 回测怎么防止偷看未来
 
@@ -95,7 +93,7 @@ Benzinga 算一家来源，只有 Benzinga 报道的新闻在有 SEC 公告或�
 
 - 位置：`~/.riskaware/news/`（配置里的 `news.archive_dir`；跟随 `RISKAWARE_HOME`）。
 - 每只股票一个 JSON Lines 文件，按时间排序，按来源、链接和时间去重。再次运行 `build` 只会加新的新闻。
-- `riskaware news-history remove 代码 [--feed sec|benzinga|import]` 删除你自己的新闻。自带的 2026 年新闻只读；`status` 在"自带"一列里单独计数。
+- `riskaware news-history remove 代码 [--feed sec|benzinga|import]` 删除你自己的新闻。时段标题文件只读；`status` 在"时段文件"一列里单独计数。
 
 ## 写一个用新闻的策略
 

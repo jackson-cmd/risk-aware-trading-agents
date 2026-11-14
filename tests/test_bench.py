@@ -14,8 +14,9 @@ from riskaware.news import history
 from riskaware.research import bench
 from riskaware.research.agent import ORDER_SCHEMA, run_policy
 from riskaware.research.experiment import Experiment
+from tests.conftest import needs_news
 
-REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
+REAL_NEWS = history.period_news_path("news_2026.jsonl.gz")  # your copy (not redistributed), if any
 ROOT = Path(__file__).resolve().parent.parent
 WINDOW = (date(2026, 2, 2), date(2026, 4, 30))
 
@@ -67,6 +68,7 @@ def test_tasks_and_training_cutoffs():
     assert bench.contamination("2026", None) == "unknown"
 
 
+@needs_news  # a benchmark run needs the period's headline file
 def test_a_run_becomes_an_entry_that_replays_to_the_same_numbers(blind_run, tmp_path):
     task, problems = bench.check_record(blind_run)
     assert problems == [] and task.name == "2026-blind"
@@ -100,6 +102,7 @@ def test_a_run_becomes_an_entry_that_replays_to_the_same_numbers(blind_run, tmp_
     assert any("contamination" in p for p in bench.check_entry(edited))
 
 
+@needs_news  # a benchmark run needs the period's headline file
 def test_each_seed_is_its_own_entry_and_replays_with_its_aliases(tmp_path):
     res = bench.run_task(momentum, "2026-blind", label="rules:momentum", seed=1)
     entry = bench.make_entry(res.folder, model="rules-momentum", cutoff="2025-06")
@@ -111,6 +114,7 @@ def test_each_seed_is_its_own_entry_and_replays_with_its_aliases(tmp_path):
     assert not bench.verify_entry(wrong)["ok"]
 
 
+@needs_news  # a benchmark run needs the period's headline file
 def test_a_run_with_other_fill_costs_is_replayed_under_the_benchmarks():
     if not bench.costs_supported():
         pytest.skip("this version has no cost models")
@@ -159,6 +163,7 @@ def test_the_board_puts_clean_and_may_remember_apart():
     assert p["anchors"] == anchors and b["models"] == 3 and b["entries"] == 5
 
 
+@needs_news  # a benchmark run needs the period's headline file
 def test_cli_submit_and_leaderboard(blind_run, tmp_path):
     from riskaware.research.cli import app
 

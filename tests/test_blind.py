@@ -6,6 +6,7 @@ import re
 
 from riskaware.research import Experiment
 from riskaware.research.agent import Blind, run_policy
+from tests.conftest import needs_news
 
 YEAR = re.compile(r"(?<![\d$.,])(?:19|20)\d{2}(?!\d)")
 MONTH_DAY = re.compile(r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.? \d{1,2}\b")
@@ -36,6 +37,7 @@ def _run(blind: bool, check: bool):
     return res, heads
 
 
+@needs_news
 def test_blind_observations_of_2022_carry_no_date_or_price_level():
     _, named = _run(blind=False, check=False)
     res, blind = _run(blind=True, check=True)

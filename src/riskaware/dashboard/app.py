@@ -802,8 +802,8 @@ def page_backtest() -> None:
         custom = st.text_input(L("…or your own strategy file", "…或你自己的策略文件"),
                                placeholder="/path/to/my_strategy.py:MyStrategy", help=HQ("own_file"))
         news = st.toggle(L("Replay news: each day sees only what was published before its close "
-                           "(2026 headlines ship with the package)",
-                           "回放新闻：每天只看到收盘前已发布的新闻（安装包自带 2026 年标题）"), value=False,
+                           "(from your own news archive)",
+                           "回放新闻：每天只看到收盘前已发布的新闻（来自你自己的新闻库）"), value=False,
                          help=HQ("replay_news"))
         run = st.form_submit_button(L("Run backtest", "开始回测"), type="primary")
     if run:

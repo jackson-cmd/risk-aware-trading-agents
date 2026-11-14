@@ -2,7 +2,7 @@
 
 [中文](zh/news-factors.md)
 
-`riskaware research factors` turns the headlines that ship with the package into ten daily news factors for 64 large US stocks, plus an eleventh from a language model's reading of each headline, using only what was published before each day's close, and tests them against returns from the next open in three very different markets: 2020 (the COVID crash), 2022 (the rate-hike bear market) and 2026 (a rising market). It then computes the same factors the way many news backtests do, joined to prices by calendar date, and measures how much that shortcut inflates them.
+`riskaware research factors` turns the frozen periods' headline files (not redistributed: it needs your own copies in `~/.riskaware/news/periods`) into ten daily news factors for 64 large US stocks, plus an eleventh from a language model's reading of each headline, using only what was published before each day's close, and tests them against returns from the next open in three very different markets: 2020 (the COVID crash), 2022 (the rate-hike bear market) and 2026 (a rising market). It then computes the same factors the way many news backtests do, joined to prices by calendar date, and measures how much that shortcut inflates them.
 
 **What we found**
 
@@ -138,7 +138,7 @@ The calendar join puts a headline published at 16:05 on the row of that day's 16
 
 The calendar join with next-open returns does not leak (the evening's news is out before the next open) and it is no better than the honest replay, which is the point: the shortcut's IC is the overnight move that follows after-close news, collected by a trade that starts before it.
 
-A calendar-date join moves 13% of the 2026 Benzinga headlines and 62.5% of the 2026 8-K filings (companies report after the close) to an earlier trading day than their publication time allows; 10% of the headlines in 2022 and 11% in 2020. For a simpler demonstration with one headline rule, see `examples/news_timing.py` and the [news backtesting guide](https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html).
+A calendar-date join moves 13% of the 2026 headlines and 62.5% of the 2026 8-K filings (companies report after the close) to an earlier trading day than their publication time allows; 10% of the headlines in 2022 and 11% in 2020. For a simpler demonstration with one headline rule, see `examples/news_timing.py` and the [news backtesting guide](https://jackson-cmd.github.io/risk-aware-trading-agents/news-backtesting.html).
 
 ## An LLM sentiment factor
 
@@ -155,7 +155,7 @@ A calendar-date join moves 13% of the 2026 Benzinga headlines and 62.5% of the 2
 ## Limits
 
 - 64 of the largest US stocks: heavily covered and quickly priced. News factors may do better on small caps, where this data has nothing to say.
-- Headlines only, from one feed (Benzinga), plus 8-K filings in 2026. No article text, no social media, no analyst data.
+- Headlines only, from one news feed, plus 8-K filings in 2026. No article text, no social media, no analyst data.
 - One decision a day at the close. Faster reactions to news (minutes after a headline) are outside what daily bars can test.
 - A year per period is short: an IC of 0.01 needs several years to separate from zero.
 

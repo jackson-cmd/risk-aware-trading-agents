@@ -1,8 +1,12 @@
-"""Build the headline file of a bundled period: src/riskaware/news/data/news_<year>.jsonl.gz.
+"""Build the headline file of a frozen period: ~/.riskaware/news/periods/news_<year>.jsonl.gz.
 
     python scripts/build_news_bundle.py --archive DIR --start 2026-01-01 --end 2026-11-11
-    python scripts/build_news_bundle.py --parquet benzinga_news_2022.parquet --start 2022-01-01 --end 2022-12-30 \
-        --out src/riskaware/news/data/news_2022.jsonl.gz
+    python scripts/build_news_bundle.py --parquet news_2022.parquet --start 2022-01-01 --end 2022-12-30 \
+        --out ~/.riskaware/news/periods/news_2022.jsonl.gz
+
+The file stays on your machine: neither the package nor the repository carries headlines (they are not
+redistributed). The SHA-256 in the period's manifest (src/riskaware/research/data/manifest*.json) says whether your
+file is byte for byte the one the published results used.
 
 DIR is a local news archive (see ``riskaware news-history``) that already holds the source items, for example
 filled with ``RISKAWARE_CONFIG=build.yaml riskaware news-history build --source sec ...`` plus an import of
@@ -30,7 +34,7 @@ from collections import Counter
 from datetime import date, datetime, timezone
 from pathlib import Path
 
-from riskaware.news.history import BUNDLE_PATH, NewsArchive
+from riskaware.news.history import NewsArchive, period_news_path
 from riskaware.news.relevance import company_names, mentions
 from riskaware.universe import PRESETS, is_etf
 
@@ -133,7 +137,7 @@ def main() -> None:
     ap.add_argument("--start", default="2026-01-01")
     ap.add_argument("--end", required=True, help="last day to include, YYYY-MM-DD")
     ap.add_argument("--symbols", help="comma-separated (default: the stocks of the built-in watchlists)")
-    ap.add_argument("--out", default=str(BUNDLE_PATH))
+    ap.add_argument("--out", default=str(period_news_path("news_2026.jsonl.gz")))
     a = ap.parse_args()
     symbols = [s.strip().upper() for s in a.symbols.split(",")] if a.symbols else default_symbols()
     start, end = date.fromisoformat(a.start), date.fromisoformat(a.end)

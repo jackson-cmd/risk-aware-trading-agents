@@ -49,7 +49,7 @@ import pandas as pd
 
 from ..universe import preset_symbols
 from .agent import ORDER_SCHEMA, SYSTEM_PROMPT, _Replay, run_policy
-from .data import bundled_market, dataset_info
+from .data import bundled_market, dataset_info, manifest
 from .experiment import CASH_VEHICLES, Experiment, ExperimentResult, run_experiment
 from .periods import get_period
 
@@ -311,8 +311,12 @@ def check_record(folder: str | Path) -> tuple[Task | None, list[str]]:
     ds, now = man.get("dataset") or {}, dataset_info(period)
     if (ds.get("prices") or {}).get("sha256") != now["prices"]["sha256"]:
         problems.append("the price file differs from the bundled one (SHA-256)")
-    if (ds.get("news") or {}).get("sha256") != now["news"]["sha256"]:
-        problems.append("the news file differs from the bundled one (SHA-256)")
+    if not (ds.get("news") or {}).get("sha256"):
+        problems.append("the run had no headline file: the benchmark replays the period's news (not redistributed; "
+                        f"put your copy in {get_period(period).news_path.parent})")
+    elif (ds.get("news") or {}).get("sha256") != (manifest(period)["files"].get(get_period(period).news) or {}).get(
+            "sha256"):
+        problems.append("the news file differs from the period's (SHA-256 in its manifest)")
     leak = man.get("leak_check") or {}
     if leak.get("verdict") != "pass":
         problems.append(f"the look-ahead check of the observations is {leak.get('verdict')!r}, not 'pass'")
@@ -551,8 +555,9 @@ def check_entry(entry: dict) -> list[str]:
     now = dataset_info(task.period)
     if entry["data"].get("prices_sha256") != now["prices"]["sha256"]:
         problems.append("data.prices_sha256 is not the bundled price file")
-    if entry["data"].get("news_sha256") != now["news"]["sha256"]:
-        problems.append("data.news_sha256 is not the bundled news file")
+    # The headline file is not redistributed: without a copy the replay checks the orders and the prices only.
+    if now["news"]["sha256"] is not None and entry["data"].get("news_sha256") != now["news"]["sha256"]:
+        problems.append("data.news_sha256 is not the period's news file")
     if _sha(entry["replies"]) != entry["record"].get("replies_sha256"):
         problems.append("the replies do not match record.replies_sha256")
     if entry.get("look_ahead_check") != "pass":

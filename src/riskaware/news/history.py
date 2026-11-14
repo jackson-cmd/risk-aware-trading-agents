@@ -8,9 +8,11 @@ backtester: "what had been published about SYMBOL by the close of DAY?"
 
 The archive is one JSON Lines file per symbol. Items come from:
 
-* the package itself: 2020, 2022 and 2026 headlines for the stocks of the built-in
-  watchlists (Benzinga headlines, titles only; for 2026 also SEC 8-K filings),
-  read-only, see ``default_bundles``;
+* the headline files of the frozen periods (2020, 2022 and 2026, for the stocks
+  of the built-in watchlists), read-only, see ``period_news_path``. Neither the
+  package nor the repository carries them: the headlines are not redistributed.
+  Keep your own copies in ``~/.riskaware/news/periods``; the SHA-256 in each
+  period's manifest says whether a file is the one the published results used;
 * SEC EDGAR 8-K filings (``riskaware news-history build``), public and stamped
   with the time SEC accepted them;
 * your own Benzinga API key (``--source benzinga``), kept local;
@@ -52,15 +54,30 @@ from .verify import NewsReport, analyze_news
 log = logging.getLogger(__name__)
 NY = ZoneInfo("America/New_York")
 DEFAULT_ROOT = RISKAWARE_HOME / "news"
-#: Headlines that ship with the package (titles only), read-only; see ``load_bundle``.
+#: Where the headline file of a frozen period is looked for, in this order: next to this module (a source checkout
+#: may keep a copy there; git ignores it and the package never carries it), then your own folder.
 BUNDLE_DIR = Path(__file__).with_name("data")
-BUNDLE_PATH = BUNDLE_DIR / "news_2026.jsonl.gz"
-#: Earlier years that ship with the package, read together with ``BUNDLE_PATH`` by default.
-EARLIER_BUNDLES: tuple[Path, ...] = (BUNDLE_DIR / "news_2020.jsonl.gz", BUNDLE_DIR / "news_2022.jsonl.gz")
+PERIOD_NEWS_DIR = DEFAULT_ROOT / "periods"
+
+
+def period_news_path(name: str) -> Path:
+    """Where the headline file ``name`` of a frozen period (``news_2026.jsonl.gz``, ...) is: next to this module if a
+    copy is there, else ``~/.riskaware/news/periods/<name>``, which is returned even when the file is not there."""
+    for folder in (BUNDLE_DIR, PERIOD_NEWS_DIR):
+        if (folder / name).is_file():
+            return folder / name
+    return PERIOD_NEWS_DIR / name
+
+
+#: The 2026 headline file (titles only), read-only; see ``load_bundle``. Missing unless you have a copy.
+BUNDLE_PATH = period_news_path("news_2026.jsonl.gz")
+#: Earlier years, read together with ``BUNDLE_PATH`` by default.
+EARLIER_BUNDLES: tuple[Path, ...] = (period_news_path("news_2020.jsonl.gz"), period_news_path("news_2022.jsonl.gz"))
 
 
 def default_bundles() -> list[Path]:
-    """The headline files an archive reads besides your own items: every year that ships with the package."""
+    """The headline files an archive reads besides your own items: the frozen periods' files (missing ones are
+    skipped)."""
     return [*EARLIER_BUNDLES, BUNDLE_PATH]
 #: An item stamped later than this after the moment it is added is bad data and is dropped.
 MAX_FUTURE = timedelta(days=1)
@@ -145,7 +162,7 @@ class SymbolStats:
     first: datetime | None
     last: datetime | None
     feeds: dict[str, int]
-    bundled: int = 0  # items that come from the package, not from your own archive
+    bundled: int = 0  # items that come from the period headline files, not from your own archive
 
 
 @lru_cache(maxsize=4)
@@ -161,7 +178,7 @@ def _load_bundle(path: str, mtime: float) -> dict[str, tuple[dict, ...]]:
 
 
 def load_bundle(path: str | Path | None = None) -> dict[str, tuple[dict, ...]]:
-    """The headlines of one bundled file (the 2026 one by default), by symbol, oldest first (empty if missing)."""
+    """The headlines of one period file (the 2026 one by default), by symbol, oldest first (empty if missing)."""
     p = Path(path) if path is not None else BUNDLE_PATH
     if not p.is_file():
         return {}
@@ -178,7 +195,7 @@ def _merge_bundles(files: tuple[tuple[str, float], ...]) -> dict[str, tuple[dict
 
 
 def load_bundles(paths: Iterable[str | Path]) -> dict[str, tuple[dict, ...]]:
-    """Several bundled files together, by symbol, oldest first (missing files are skipped)."""
+    """Several period files together, by symbol, oldest first (missing files are skipped)."""
     files = tuple((str(p), p.stat().st_mtime) for p in map(Path, paths) if p.is_file())
     if len(files) == 1:
         return _load_bundle(*files[0])
@@ -188,8 +205,8 @@ def load_bundles(paths: Iterable[str | Path]) -> dict[str, tuple[dict, ...]]:
 class NewsArchive:
     """One JSON Lines file per symbol, sorted by publication time, de-duplicated.
 
-    Reads also include the headlines bundled with the package (``bundled=True``); writes and deletes only touch
-    your own files.
+    Reads also include the frozen periods' headline files that you have (``bundled=True``); writes and deletes only
+    touch your own files.
     """
 
     def __init__(self, root: str | Path | None = None, bundled: bool = True, bundle_path: str | Path | None = None,
@@ -219,7 +236,7 @@ class NewsArchive:
         return sorted([*local, *(r for r in extra if _key(r) not in seen)], key=lambda r: r["ts"])
 
     def bundle_info(self) -> dict | None:
-        """What the bundled file holds: item and symbol counts, first and last item, items per feed."""
+        """What the period headline files hold: item and symbol counts, first and last item, items per feed."""
         b = self.bundle()
         if not b:
             return None

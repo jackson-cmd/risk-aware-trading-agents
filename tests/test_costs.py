@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import math
 from datetime import date
-from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -26,8 +25,9 @@ from riskaware.research.experiment import Experiment, protocol, reproduce_comman
 from riskaware.strategy import load_strategy
 from riskaware.strategy.base import SymbolData
 from riskaware.types import Side
+from tests.conftest import needs_news
 
-REAL_NEWS = Path(history.__file__).parent / "data" / "news_2026.jsonl.gz"
+REAL_NEWS = history.period_news_path("news_2026.jsonl.gz")  # your copy (not redistributed), if any
 WINDOW = {"start": "2026-02-02", "end": "2026-04-30"}
 SYMBOLS = ["AAA", "BBB", "CCC", "DDD", "EEE", "FFF"]
 START, END = date(2018, 1, 2), date(2020, 12, 31)
@@ -162,7 +162,8 @@ def test_fixed_costs_fill_at_the_open_plus_the_slippage_exactly():
 
 
 @pytest.mark.parametrize("kw, equity, trades, value", [
-    (dict(strategy="swing_rsi2", universe="core"), 102132.8496833413, 30, 297940.8331728964),
+    pytest.param(dict(strategy="swing_rsi2", universe="core"), 102132.8496833413, 30, 297940.8331728964,
+                 marks=needs_news),  # reads the 2026 headlines
     (dict(strategy="swing_trend", universe="megacap", news=False), 109682.95588468251, 28, 267390.72103457444),
 ])
 def test_fixed_costs_leave_existing_backtests_unchanged(kw, equity, trades, value):

@@ -1,10 +1,12 @@
 """Example: how much a news backtest gains by reading headlines before they were published.
 
-Run it with the data that ships with the package (no download, no API key):
+It needs the 2026 headline file, which does not ship with the package (the headlines are not redistributed): put
+your own copy at ~/.riskaware/news/periods/news_2026.jsonl.gz (scripts/build_news_bundle.py builds it from an
+archive), then run
 
     python examples/news_timing.py
 
-One simple headline rule is backtested twice on the 2026 Benzinga headlines. A headline scores +1 when it says
+One simple headline rule is backtested twice on the 2026 headlines. A headline scores +1 when it says
 a company beat estimates or raised its outlook and -1 when it missed or cut, and the trade holds for one day in
 that direction.
 
@@ -23,6 +25,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import sys
 from importlib.resources import files
 
 import numpy as np
@@ -38,8 +41,13 @@ def load() -> tuple[pd.DataFrame, pd.DataFrame]:
     package = files("riskaware")
     with (package / "research" / "data" / "market_2026.csv.gz").open("rb") as raw:
         prices = pd.read_csv(raw, compression="gzip", parse_dates=["date"])
-    with (package / "news" / "data" / "news_2026.jsonl.gz").open("rb") as raw:
-        news = pd.DataFrame(json.loads(line) for line in gzip.open(raw, "rt", encoding="utf-8"))
+    from riskaware.news.history import period_news_path
+
+    path = period_news_path("news_2026.jsonl.gz")
+    if not path.is_file():
+        sys.exit(f"No 2026 headline file at {path}: the package does not carry the headlines; put your copy there.")
+    with gzip.open(path, "rt", encoding="utf-8") as fh:
+        news = pd.DataFrame(json.loads(line) for line in fh)
     news["ts"] = pd.to_datetime(news["ts"], utc=True)
     return prices, news
 
@@ -98,7 +106,7 @@ def compare(prices: pd.DataFrame, news: pd.DataFrame) -> dict:
 
 def main() -> None:
     result = compare(*load())
-    print(f"{result['headlines']} scored Benzinga headlines in 2026, {result['after the close']} of them published "
+    print(f"{result['headlines']} scored headlines in 2026, {result['after the close']} of them published "
           "after the 16:00 close\n")
     print(f"{'join':<18}{'trades':>8}{'mean per trade':>17}{'hit rate':>10}")
     for join in ("calendar date", "publication time"):
@@ -108,7 +116,7 @@ def main() -> None:
     print(f"\nHeadlines published after the close: {by_time['calendar date'][True]:+.1f} bp per trade joined by "
           f"calendar date, {by_time['publication time'][True]:+.1f} bp joined by publication time.")
     moved = result["moved to another day"]
-    print(f"Respecting the timestamp moves {moved['benzinga']:.0%} of the Benzinga headlines and {moved['sec']:.0%} "
+    print(f"Respecting the timestamp moves {moved['benzinga']:.0%} of the headlines and {moved['sec']:.0%} "
           "of the SEC 8-K filings to a later trading day.")
 
 

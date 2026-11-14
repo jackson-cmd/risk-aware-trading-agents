@@ -15,6 +15,7 @@ from riskaware.research.data import available_periods, bundled_market, dataset_i
 from riskaware.research.day import MarketView
 from riskaware.research.experiment import Experiment, run_experiment
 from riskaware.research.periods import PERIODS, get_period, period_of
+from tests.conftest import needs_news
 
 SPRING_2022 = {"period": "2022", "start": "2022-02-01", "end": "2022-05-31"}
 
@@ -28,15 +29,17 @@ def momentum(obs: dict) -> dict:
 # ----------------------------------------------------------------------------------- data
 def test_every_period_ships_and_matches_its_manifest():
     assert available_periods() == ["2020", "2022", "2026"]
-    checks = verify()
-    assert len(checks) == 6 and all(checks.values())
+    checks = verify()  # a headline file that is not installed is None (the package carries none)
+    assert len(checks) == 6 and all(v is not False for v in checks.values())
+    assert all(checks[f"market_{y}.csv.gz"] for y in (2020, 2022, 2026))
     for name, p in PERIODS.items():
         mk = bundled_market(name)
         assert mk.period == name and mk.last_day == p.end and mk.experiment_start >= p.start
         assert mk.first_day.year == p.start.year - 2  # two warm-up years
         assert len(manifest(name)["symbols"]["stocks"]) >= 63
         info = dataset_info(name)
-        assert info["prices"]["file"] == f"market_{p.end.year}.csv.gz" and info["news"]["matches_manifest"]
+        assert info["prices"]["file"] == f"market_{p.end.year}.csv.gz"
+        assert info["news"]["sha256"] is None or info["news"]["matches_manifest"]
 
 
 def test_periods_by_name_and_by_day():
@@ -57,6 +60,7 @@ def test_symbols_that_did_not_trade_yet_are_left_out():
     assert bundled_market("2020").raw("CRWD").index[0].year == 2019  # listed in June 2019
 
 
+@needs_news
 @pytest.mark.parametrize("name", ["2020", "2022"])
 def test_period_news_is_in_its_window_and_names_its_stock(name):
     p = get_period(name)
@@ -70,10 +74,11 @@ def test_period_news_is_in_its_window_and_names_its_stock(name):
         assert named or (r["symbol"] == "META" and mentions(r["headline"], "FB", [])), r
 
 
+@needs_news
 def test_an_archive_reads_every_bundled_year_unless_given_one(monkeypatch, tmp_path):
-    monkeypatch.setattr(history, "BUNDLE_PATH", history.BUNDLE_DIR / "news_2026.jsonl.gz")
-    monkeypatch.setattr(history, "EARLIER_BUNDLES", (history.BUNDLE_DIR / "news_2020.jsonl.gz",
-                                                     history.BUNDLE_DIR / "news_2022.jsonl.gz"))
+    monkeypatch.setattr(history, "BUNDLE_PATH", history.period_news_path("news_2026.jsonl.gz"))
+    monkeypatch.setattr(history, "EARLIER_BUNDLES", (history.period_news_path("news_2020.jsonl.gz"),
+                                                     history.period_news_path("news_2022.jsonl.gz")))
     years = {r["ts"][:4] for r in history.NewsArchive(tmp_path, bundled=True).records("NVDA")}
     assert {"2020", "2022", "2026"} <= years
     one = history.NewsArchive(tmp_path, bundled=True, bundle_path=get_period("2022").news_path)
@@ -91,6 +96,7 @@ def test_market_view_and_experiment_on_2022():
         run_experiment(Experiment(universe="core", **SPRING_2022), market=bundled_market("2026"), save=False)
 
 
+@needs_news
 def test_observation_check_passes_and_catches_a_news_timing_leak(monkeypatch):
     exp = Experiment(universe="core", max_positions=3, **SPRING_2022)
     r = agent.run_policy(momentum, exp, decide_every=5, save=False)

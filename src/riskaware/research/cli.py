@@ -85,8 +85,11 @@ def data_cmd(period: Optional[str] = typer.Option(None, help="Show one period (d
         for group, syms in m["symbols"].items():
             t.add_row(group, f"{len(syms)}: " + ", ".join(syms[:12]) + (" ..." if len(syms) > 12 else ""))
         for fname, meta in m["files"].items():
+            state = ok.get(fname)
             t.add_row(fname, f"sha256 {(meta['sha256'] or '')[:16]}... "
-                      + ("[green]OK[/]" if ok.get(fname) else "[red]changed[/]"))
+                      + ("[green]OK[/]" if state else "[red]changed[/]" if state is False
+                         else "[yellow]" + L(f"not installed (put your copy in {per.news_path.parent})",
+                                             f"未安装（把你自己的副本放到 {per.news_path.parent}）") + "[/]"))
         t.add_row(L("News", "新闻"), per.news_feeds)
         t.add_row(L("Source", "来源"), m["source"])
         console.print(t)

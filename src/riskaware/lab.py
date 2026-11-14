@@ -576,9 +576,10 @@ def guide() -> dict[str, Any]:
     from .news.history import load_bundle
 
     bundle = load_bundle()
-    news_note = (f"Bundled news: {sum(len(v) for v in bundle.values())} headlines and SEC 8-K filings for "
-                 f"{len(bundle)} stocks of the built-in watchlists, January to November 2026."
-                 if bundle else "No news ships with this install; news comes from the local archive.")
+    news_note = (f"2026 news: {sum(len(v) for v in bundle.values())} headlines and SEC 8-K filings for "
+                 f"{len(bundle)} stocks of the built-in watchlists, January to November 2026 (your own copy)."
+                 if bundle else "No news ships with the package (the headlines are not redistributed); news comes "
+                                "from your local archive.")
     return {
         "how_it_works": (
             "Write one Python class that subclasses Strategy and defines on_bar(self, ctx). Each trading day, "

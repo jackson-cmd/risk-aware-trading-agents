@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>按时间点的新闻数据和美股行情：2020、2022、2026 年，免费 · 风险感知交易智能体</title>
-<meta name="description" content="免费、按时间点记录的三段美股数据，用于可复现的回测和 LLM 交易智能体：2020 年疫情暴跌、2022 年熊市和 2026 年。64 只大盘股和 25 个 ETF 的日线、VIX 期限结构，以及 65,863 条带发布时间的新闻标题和 SEC 8-K 公告，附 SHA-256 哈希。">
+<title>按时间点的美股行情数据：2020、2022、2026 年，新闻按发布时间回放 · 风险感知交易智能体</title>
+<meta name="description" content="免费、按时间点记录的三段美股数据，用于可复现的回测和 LLM 交易智能体：2020 年疫情暴跌、2022 年熊市和 2026 年。64 只大盘股和 25 个 ETF 的日线和 VIX 期限结构，附 SHA-256 哈希；新闻按发布时间从你自己的副本回放。">
 <link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html">
 <link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html">
 <link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html">
 <link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/point-in-time-market-data.html">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html">
-<meta property="og:title" content="2020、2022、2026 年美股按时间点数据：价格、VIX 和新闻">
-<meta property="og:description" content="2020 年暴跌、2022 年熊市和 2026 年的日线、VIX 期限结构，以及 65,863 条带发布时间的新闻标题和 SEC 公告，冻结保存并附 SHA-256 哈希，回测可以复现。">
+<meta property="og:title" content="2020、2022、2026 年美股按时间点数据：价格和 VIX">
+<meta property="og:description" content="2020 年暴跌、2022 年熊市和 2026 年的日线和 VIX 期限结构，冻结保存并附 SHA-256 哈希，回测可以复现；新闻按发布时间回放。">
 <meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/dashboard_zh.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../assets/guide.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"美股按时间点数据：2020、2022、2026 年的价格和新闻","alternateName":"按时间点的新闻数据","description":"冻结保存、按时间点记录的三段美股数据，用于可复现的回测和 LLM 交易智能体基准：2020 年疫情暴跌和反弹、2022 年加息熊市、2026 年至 11 月 11 日。每段都有测试窗口之前两年起的日线（64 只美国大盘股和 25 个 ETF，按拆股调整的价格、分红、拆股和全收益系数）、VIX 期限结构（VIX9D、VIX、VIX3M）和 VVIX，以及这段时间带发布时间的新闻：一共 65,863 条，每段都有 Benzinga 新闻标题（只有标题），2026 年另有 SEC 8-K 公告。随开源项目「风险感知交易智能体」的安装包发布，附 SHA-256 哈希，也是 rta-bench-1 LLM 交易智能体榜单所用的数据。","inLanguage":"zh-Hans","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html","identifier":"https://doi.org/10.5281/zenodo.24202496","sameAs":["https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/research.md","https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026"],"keywords":["按时间点的新闻数据","按时间点数据","美股数据","历史新闻数据","新闻回测","未来函数","VIX","SEC 8-K 公告","2020 年暴跌","2022 年熊市","LLM 交易智能体基准"],"license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"temporalCoverage":["2018-01-02/2022-12-30","2024-01-02/2026-11-11"],"creator":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"distribution":[{"@type":"DataDownload","name":"2026 年价格","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2026.csv.gz"},{"@type":"DataDownload","name":"2022 年价格","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2022.csv.gz"},{"@type":"DataDownload","name":"2020 年价格","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2020.csv.gz"},{"@type":"DataDownload","name":"2026 年新闻","encodingFormat":"application/x-ndjson","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/news/data/news_2026.jsonl.gz"},{"@type":"DataDownload","name":"2022 年新闻","encodingFormat":"application/x-ndjson","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/news/data/news_2022.jsonl.gz"},{"@type":"DataDownload","name":"2020 年新闻","encodingFormat":"application/x-ndjson","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/news/data/news_2020.jsonl.gz"},{"@type":"DataDownload","name":"2026 年价格（Hugging Face 上的 Parquet）","encodingFormat":"application/vnd.apache.parquet","contentUrl":"https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/prices.parquet"},{"@type":"DataDownload","name":"2026 年新闻（Hugging Face 上的 Parquet）","encodingFormat":"application/vnd.apache.parquet","contentUrl":"https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/news.parquet"},{"@type":"DataDownload","name":"每次发版的代码和数据（Zenodo）","encodingFormat":"application/zip","contentUrl":"https://doi.org/10.5281/zenodo.24202496"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/"},{"@type":"ListItem","position":2,"name":"按时间点的市场和新闻数据","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"美股按时间点数据：2020、2022、2026 年的价格","alternateName":"按时间点的新闻数据","description":"冻结保存、按时间点记录的三段美股数据，用于可复现的回测和 LLM 交易智能体基准：2020 年疫情暴跌和反弹、2022 年加息熊市、2026 年至 11 月 11 日。每段都有测试窗口之前两年起的日线（64 只美国大盘股和 25 个 ETF，按拆股调整的价格、分红、拆股和全收益系数）、VIX 期限结构（VIX9D、VIX、VIX3M）和 VVIX，附 SHA-256 哈希；每段新闻文件（65,863 条带发布时间的标题和 SEC 8-K 公告）的 SHA-256 也有记录，但新闻标题不再分发。随开源项目「风险感知交易智能体」的安装包发布，也是 rta-bench-1 LLM 交易智能体榜单所用的数据。","inLanguage":"zh-Hans","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html","identifier":"https://doi.org/10.5281/zenodo.24202496","sameAs":["https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/research.md"],"keywords":["按时间点的新闻数据","按时间点数据","美股数据","历史新闻数据","新闻回测","未来函数","VIX","SEC 8-K 公告","2020 年暴跌","2022 年熊市","LLM 交易智能体基准"],"license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"temporalCoverage":["2018-01-02/2022-12-30","2024-01-02/2026-11-11"],"creator":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"distribution":[{"@type":"DataDownload","name":"2026 年价格","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2026.csv.gz"},{"@type":"DataDownload","name":"2022 年价格","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2022.csv.gz"},{"@type":"DataDownload","name":"2020 年价格","encodingFormat":"text/csv","contentUrl":"https://github.com/jackson-cmd/risk-aware-trading-agents/raw/main/src/riskaware/research/data/market_2020.csv.gz"},{"@type":"DataDownload","name":"每次发版的代码和数据（Zenodo）","encodingFormat":"application/zip","contentUrl":"https://doi.org/10.5281/zenodo.24202496"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/"},{"@type":"ListItem","position":2,"name":"按时间点的市场数据","item":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/point-in-time-market-data.html"}]}</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -32,20 +32,19 @@
 
 <main class="wrap">
 <p class="crumbs"><a href="index.html">首页</a> › 指南</p>
-<h1>2020、2022、2026 年美股按时间点数据：价格、VIX 和新闻</h1>
-<p class="lead">开源项目「风险感知交易智能体」的安装包里带了三段冻结的美股市场：2020 年疫情暴跌、2022 年熊市和 2026 年。每段都有日线价格、VIX 期限结构和这段时间的新闻，新闻带着发布的那一分钟，每个值都是当天收盘时已知的样子。在上面跑的每个回测、每个 LLM 交易智能体，在任何机器上都得出同样的数字；文件附带 SHA-256 哈希，论文可以准确引用。<a href="leaderboard.html">LLM 交易智能体榜单</a>用的就是这份数据。</p>
+<h1>2020、2022、2026 年美股按时间点数据：价格和 VIX</h1>
+<p class="lead">开源项目「风险感知交易智能体」的安装包里带了三段冻结的美股市场：2020 年疫情暴跌、2022 年熊市和 2026 年。每段都有日线价格和 VIX 期限结构，每个值都是当天收盘时已知的样子；代码会把这段时间的新闻从发布的那一分钟起回放。新闻标题本身不再分发：代码读你自己的副本。在上面跑的每个回测、每个 LLM 交易智能体，在任何机器上都得出同样的数字；文件附带 SHA-256 哈希，论文可以准确引用。<a href="leaderboard.html">LLM 交易智能体榜单</a>用的就是这份数据。</p>
 <div class="cta">
   <a class="btn primary" href="https://github.com/jackson-cmd/risk-aware-trading-agents/tree/main/src/riskaware/research/data">数据文件</a>
-  <a class="btn" href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">Hugging Face 上的 2026 年数据</a>
   <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/research.md">研究工具箱文档</a>
 </div>
 
 <h2 id="periods">三个时段</h2>
 <div class="table-wrap"><table>
   <tr><th>时段</th><th>测试窗口</th><th>价格起点</th><th>新闻</th><th>行情</th></tr>
-  <tr><td>2026</td><td>2026-01-02 到 2026-11-11</td><td>2024-01-02（719 个交易日）</td><td>16,945 条：16,249 条 Benzinga 标题和 696 份 SEC 8-K 公告</td><td>SPY 涨 12.1%，三月最大回撤 -8.9%</td></tr>
-  <tr><td>2022</td><td>2022-01-03 到 2022-12-30</td><td>2020-01-02（756 个交易日）</td><td>29,300 条 Benzinga 标题</td><td>SPY 跌 18.2%，纳斯达克 100 跌 32.6%：美联储加息八次，六月 CPI 超过 9%</td></tr>
-  <tr><td>2020</td><td>2020-01-02 到 2020-12-31</td><td>2018-01-02（756 个交易日）</td><td>19,618 条 Benzinga 标题</td><td>SPY 在 23 个交易日里跌 34%，VIX 收盘最高 82.7，全年仍涨 18.3%</td></tr>
+  <tr><td>2026</td><td>2026-01-02 到 2026-11-11</td><td>2024-01-02（719 个交易日）</td><td>16,945 条：16,249 条标题和 696 份 SEC 8-K 公告</td><td>SPY 涨 12.1%，三月最大回撤 -8.9%</td></tr>
+  <tr><td>2022</td><td>2022-01-03 到 2022-12-30</td><td>2020-01-02（756 个交易日）</td><td>29,300 条标题</td><td>SPY 跌 18.2%，纳斯达克 100 跌 32.6%：美联储加息八次，六月 CPI 超过 9%</td></tr>
+  <tr><td>2020</td><td>2020-01-02 到 2020-12-31</td><td>2018-01-02（756 个交易日）</td><td>19,618 条标题</td><td>SPY 在 23 个交易日里跌 34%，VIX 收盘最高 82.7，全年仍涨 18.3%</td></tr>
 </table></div>
 <p>每个测试窗口之前的两年，是为了让 200 日 EMA、52 周高点这类慢指标在窗口第一个交易日就完全预热好。三段行情是特意挑得不一样的：只在一种市场里表现好的策略或 LLM，说明不了多少。</p>
 
@@ -56,18 +55,18 @@
   <tr><td>ETF</td><td>25 个指数、行业和债券 ETF：SPY、QQQ、IWM、DIA、VTI、RSP、11 个行业 SPDR、BIL、SGOV、SHV、SHY、IEF、TLT、HYG、LQD</td></tr>
   <tr><td>波动率</td><td>VIX9D、VIX 和 VIX3M（VIX 期限结构）以及 VVIX</td></tr>
   <tr><td>跨资产</td><td>GLD（黄金）、USO（原油）、UUP（美元），2026 年另有 IBIT（比特币）：和股市同时收盘的 ETF</td></tr>
-  <tr><td>新闻</td><td>这 64 只股票的 Benzinga 标题（只有标题，没有正文），2026 年另有带 SEC 受理时间的 8-K 公告</td></tr>
+  <tr><td>新闻</td><td>这 64 只股票的标题（只有标题，没有正文），2026 年另有带 SEC 受理时间的 8-K 公告。不再分发：代码从 <code>~/.riskaware/news/periods</code> 读你自己的副本</td></tr>
   <tr><td>日程</td><td>FOMC 议息、CPI、PPI 和非农，都是事先公布的日期</td></tr>
 </table></div>
 <p>有几个代码上市得晚，所以数据开始得也晚：XLC 从 2018 年 6 月、CRWD 从 2019 年 6 月、SGOV 从 2020 年 6 月、IBIT 从 2024 年 1 月开始。</p>
 
 <h2>文件和字段</h2>
-<p>每个时段是三个文件：<code>src/riskaware/research/data/</code> 里的价格文件、<code>src/riskaware/news/data/</code> 里的新闻文件，以及一份清单，列出时间范围、股票代码和两个文件的 SHA-256。</p>
+<p>每个时段是 <code>src/riskaware/research/data/</code> 里的一个价格文件和一份清单，清单列出时间范围、股票代码、价格文件和这个时段新闻文件的 SHA-256。新闻文件不再分发；你自己的副本放在 <code>~/.riskaware/news/periods/</code>，用 SHA-256 就能核对它是不是发表的结果用的那一份。</p>
 <div class="table-wrap"><table>
   <tr><th>时段</th><th>价格</th><th>新闻</th><th>清单</th></tr>
-  <tr><td>2026</td><td><code>market_2026.csv.gz</code>（1.4 MB，69,738 行）</td><td><code>news_2026.jsonl.gz</code>（0.7 MB）</td><td><code>manifest.json</code></td></tr>
-  <tr><td>2022</td><td><code>market_2022.csv.gz</code>（1.5 MB，72,466 行）</td><td><code>news_2022.jsonl.gz</code>（1.0 MB）</td><td><code>manifest_2022.json</code></td></tr>
-  <tr><td>2020</td><td><code>market_2020.csv.gz</code>（1.4 MB，71,490 行）</td><td><code>news_2020.jsonl.gz</code>（0.8 MB）</td><td><code>manifest_2020.json</code></td></tr>
+  <tr><td>2026</td><td><code>market_2026.csv.gz</code>（1.4 MB，69,738 行）</td><td><code>news_2026.jsonl.gz</code>（不再分发）</td><td><code>manifest.json</code></td></tr>
+  <tr><td>2022</td><td><code>market_2022.csv.gz</code>（1.5 MB，72,466 行）</td><td><code>news_2022.jsonl.gz</code>（不再分发）</td><td><code>manifest_2022.json</code></td></tr>
+  <tr><td>2020</td><td><code>market_2020.csv.gz</code>（1.4 MB，71,490 行）</td><td><code>news_2020.jsonl.gz</code>（不再分发）</td><td><code>manifest_2020.json</code></td></tr>
 </table></div>
 <pre>date,symbol,open,high,low,close,volume,adj,dividend,split
 2026-04-08,NVDA,...</pre>
@@ -87,13 +86,7 @@ traded = market.raw("AAPL")        # 按拆股调整的价格、分红、拆股�
 vix = market.raw("^VIX")["close"]
 
 import pandas as pd                # 也可以直接读文件
-prices = pd.read_csv("src/riskaware/research/data/market_2020.csv.gz", parse_dates=["date"])
-news = pd.read_json("src/riskaware/news/data/news_2020.jsonl.gz", lines=True)</pre>
-<p>不安装也能用：2026 年这一段在 <a href="https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026">Hugging Face</a> 上是 Parquet 格式，可在线浏览，另有原始文件。</p>
-<pre>import pandas as pd             # 读 Parquet 需要 pyarrow
-base = "https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026/resolve/main/data/"
-prices = pd.read_parquet(base + "prices.parquet")   # 69,738 行
-news = pd.read_parquet(base + "news.parquet")       # 16,945 行</pre>
+prices = pd.read_csv("src/riskaware/research/data/market_2020.csv.gz", parse_dates=["date"])</pre>
 
 <h2>按天查看</h2>
 <p>这份数据的价值在于每一天当时知道什么。<code>riskaware research day 2026-04-08</code>（MCP 里是 <code>market_day</code>）会列出那天收盘时已知的全部信息：市场状态、VIX 和期限结构、恐慌贪婪、板块广度、未来两周的宏观日程，以及每只股票的涨跌、技术指标、技术形态和纽约时间 16:00 之前发布的新闻。三个测试窗口里的任何一天都可以，命令会自己找到对应的时段。</p>
@@ -113,7 +106,7 @@ news = pd.read_parquet(base + "news.parquet")       # 16,945 行</pre>
 <ul>
   <li>价格来自 Yahoo Finance 的日线，<code>scripts/build_market_bundle.py</code> 可以重建。价格按建文件那天（2026 年 11 月）之前的全部拆股调整过，所以后来拆过股的股票，价格比当时的报价小：NVDA 2020 年的价格因为 2021 和 2024 年两次拆股被除以了 40。收益率不受影响。</li>
   <li>股票池是今天的大盘股，是事后挑的，2020 和 2022 年也用这一份（幸存者偏差）：策略之间互相比、和等权组合比，不要只和 SPY 比。</li>
-  <li>新闻只有一个标题来源（2026 年另有 SEC 公告），所以多数报道只有单一出处。这些标题切自一个约 320 万条的本地 Benzinga 新闻库（2011–2026 年）。</li>
+  <li>新闻只有一个标题来源（2026 年另有 SEC 公告），所以多数报道只有单一出处。新闻标题不再分发。</li>
 </ul>
 
 <h2>更多指南</h2>

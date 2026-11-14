@@ -4,10 +4,22 @@ from __future__ import annotations
 
 import os
 import tempfile
+from pathlib import Path
 
 # must happen before riskaware.config is imported anywhere
+_YOUR_HOME = Path(os.environ.get("RISKAWARE_HOME", "~/.riskaware")).expanduser()
 os.environ["RISKAWARE_HOME"] = tempfile.mkdtemp(prefix="riskaware-test-")
 os.environ.pop("RISKAWARE_CONFIG", None)
+
+# The frozen periods' headline files are not redistributed, so neither the package nor the repository has them. If
+# you keep copies in ~/.riskaware/news/periods, the tests read them through the temporary home; without them, the
+# tests that need real headlines are skipped (``needs_news``).
+NEWS_FILES = ("news_2020.jsonl.gz", "news_2022.jsonl.gz", "news_2026.jsonl.gz")
+_PERIOD_NEWS = Path(os.environ["RISKAWARE_HOME"]) / "news" / "periods"
+_PERIOD_NEWS.mkdir(parents=True)
+for _name in NEWS_FILES:
+    if (_YOUR_HOME / "news" / "periods" / _name).is_file():
+        (_PERIOD_NEWS / _name).symlink_to(_YOUR_HOME / "news" / "periods" / _name)
 
 from datetime import date  # noqa: E402
 
@@ -20,6 +32,18 @@ from riskaware.config import AppConfig  # noqa: E402
 from riskaware.data.prices import SyntheticPrices  # noqa: E402
 from riskaware.strategy.base import PortfolioView, PositionView, StrategyContext  # noqa: E402
 from riskaware.types import Quote, Regime  # noqa: E402
+
+
+def have_news(*names: str) -> bool:
+    """Whether the headline files ``names`` (all three by default) are installed."""
+    from riskaware.news.history import period_news_path
+
+    return all(period_news_path(n).is_file() for n in (names or NEWS_FILES))
+
+
+#: Skips a test that reads the real headlines when they are not installed (as on CI).
+needs_news = pytest.mark.skipif(not have_news(), reason="needs the periods' headline files, which are not "
+                                                        "redistributed: put copies in ~/.riskaware/news/periods")
 
 
 @pytest.fixture(autouse=True)

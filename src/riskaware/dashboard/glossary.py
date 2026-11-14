@@ -499,7 +499,8 @@ GLOSSARY: dict[str, dict[str, dict[str, str]]] = {
         "- etf: 6 broad-market ETFs and the 11 sector ETFs\n"
         "- sectors: the 11 sector ETFs",
         "These are today's large caps, so long backtests on them carry survivorship bias: they are in the list "
-        "because they did well. Bundled 2026 news covers the stocks of megacap, tech, defensive and core.",
+        "because they did well. The frozen periods' headline files cover the stocks of megacap, tech, defensive "
+        "and core.",
     ), (
         "股票池",
         "策略可以交易哪些股票。",
@@ -508,7 +509,7 @@ GLOSSARY: dict[str, dict[str, dict[str, str]]] = {
         "- defensive：20 只分红股和防御股\n"
         "- etf：6 只大盘 ETF 和 11 只行业 ETF\n"
         "- sectors：11 只行业 ETF",
-        "这些都是今天的大盘股，在上面做长期回测有幸存者偏差：它们在名单里，正是因为过去涨得好。自带的 2026 年新闻覆盖 "
+        "这些都是今天的大盘股，在上面做长期回测有幸存者偏差：它们在名单里，正是因为过去涨得好。各时段的标题文件覆盖 "
         "megacap、tech、defensive 和 core 里的股票。",
     )),
     "dates": _e((
@@ -576,15 +577,16 @@ GLOSSARY: dict[str, dict[str, dict[str, str]]] = {
         "Replay news",
         "Lets the strategy read the news in the backtest, as it would have seen it on each day.",
         "Each day the strategy sees only items published before that day's close (16:00 New York, 13:00 on "
-        "early-close days), from the last 72 hours; orders fill the next day. 2026 headlines and SEC filings for "
-        "the built-in lists ship with the package; other years come from `riskaware news-history`.",
+        "early-close days), from the last 72 hours; orders fill the next day. The news comes from your own "
+        "archive (`riskaware news-history`: SEC 8-K filings for free, your Benzinga key, or a CSV); no headlines "
+        "ship with the package.",
         "Turn it on for news strategies and to see the built-in strategy with its news rules. After the run, News "
         "the backtest saw shows the news behind each trade.",
     ), (
         "回放新闻",
         "让策略在回测里读新闻，读到的就是每一天当时能看到的那些。",
-        "每天只看到当天收盘前（美东 16:00，提前收盘的日子 13:00）发布的、最近 72 小时的新闻；订单第二天成交。安装包自带"
-        "内置股票池 2026 年的标题和 SEC 公告；其他年份用 `riskaware news-history` 下载。",
+        "每天只看到当天收盘前（美东 16:00，提前收盘的日子 13:00）发布的、最近 72 小时的新闻；订单第二天成交。新闻来自你"
+        "自己的新闻库（`riskaware news-history`：免费的 SEC 8-K 公告、你自己的 Benzinga key 或 CSV）；安装包不带新闻标题。",
         "用新闻的策略要打开它，内置策略的新闻规则也要它才生效。跑完以后，「回测看到的新闻」会列出每笔交易背后的新闻。",
     )),
     # ------------------------------------------------------------------------------------------- backtest

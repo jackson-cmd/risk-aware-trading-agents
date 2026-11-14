@@ -2,6 +2,20 @@
 
 [English](../../CHANGELOG.md)
 
+## 0.8.0（2026-11-14）
+
+- **新闻标题不再随安装包提供，也不再放在代码仓库里：不再分发。** 你有副本的话，代码从 `~/.riskaware/news/periods` 读每个冻结时段的标题文件（`scripts/build_news_bundle.py` 可以从新闻库生成，时段 manifest 里的 SHA-256 能核对它是不是发表的结果用的那一份）；没有的话，这个时段就不带新闻运行，`riskaware research data` 会标成「未安装」，跑基准则需要这个文件。`riskaware research leaderboard --verify` 没有它也照样能重放每个条目的订单和数字。价格、VIX 期限结构和所有结果都不变，你自己的新闻库（`riskaware news-history`：免费的 SEC 8-K 公告、你自己的 Benzinga key 或 CSV）照常可用。
+- **LLM 交易智能体榜单（rta-bench-1）**（[docs/zh/leaderboard.md](leaderboard.md)）：在三个冻结时段上给 LLM 交易智能体定了一套固定的基准：六个任务（2026、2022、2020 年，每年盲测和实名各一次），每个任务三个种子，megacap 的 56 只股票，每 5 个交易日收盘后决策一次，最多 10 个仓位，新闻按发布时间回放，成交成本用 realistic。`riskaware research bench --llm ...` 用这个包能调用的任何模型跑任务；`riskaware research submit` 按基准核对一次运行并写出条目（模型的全部回复、数据哈希、指标、训练截止日之后的成绩、运行分析和记忆探针结果）；`riskaware research leaderboard` 显示榜单，加 `--verify` 不调用模型就重放核对每个条目。基准里的本地模型改走 Ollama 原生接口、上下文 16,384 token，因为它的 OpenAI 兼容接口会把 prompt 截到 4,096 token。网站新增中英文榜单页，首页一开头就讲按发布时间回放新闻、模型榜单和 Prompt 榜。
+- **研究工具箱新增两个冻结时段：2022 年熊市和 2020 年暴跌。** 除了 2026 年，安装包现在还带 2022 年（SPY -18.2%）和 2020 年（SPY 23 天跌 34%），每段都有前两年起的日线和 VIX 期限结构。所有研究命令、MCP 工具和交易会话都能加 `--period`。LLM 运行和交易会话也有了防偷看检查：在随机的未来上重放模型的回复，每个切点之前它看到的内容不能变。三年放在一起，没有哪个基准策略年年都赢。
+- **回测加入更真实的成交成本**（[docs/zh/costs.md](costs.md)）：在 `riskaware backtest`、`riskaware research run` 和 `riskaware research baselines` 上加 `--costs realistic`（`Experiment` 和 MCP 工具 `run_experiment` 里是 `costs="realistic"`），每笔开盘成交付 5 个基点，加隔夜跳空的十分之一，再加平方根市场冲击（日波动率 × √(股数 / 20 日平均成交量)），而且一笔订单最多成交这只股票 20 日平均成交量的 1%。波动率和成交量只用成交日之前的数据。默认仍是固定 5 个基点，所有已发布的数字都不变；成交记录新增 `cost_bps` 一列。用真实成本时，10 万美元的账户每笔付 13 到 17 个基点：RSI(2) 在 2026 年和 2020 年的收益少了一半左右，趋势跟随几乎不变。
+- **一个策略或 LLM 智能体到底靠什么赚钱**（[docs/zh/analysis.md](analysis.md)）：`riskaware research analyze <run>`（MCP：`experiment_analysis`）读一份保存好的记录，不重跑任何东西，回答三个问题。决策：每笔买卖之后 1、5、20 个交易日相对 SPY 的超额收益，命中率和考虑了同日决策与窗口重叠的 t 值，以及每个决策日的 rank IC。因子：市场、规模、成长和动量暴露，Newey-West t 值，以及扣掉这些暴露后剩下的 alpha。盈亏：按持仓时长、行业、市场状态、是否新闻触发和单只股票拆开，并看利润是不是集中在一两个仓位上。空头仓位从卖空一直跟到买回，账户逐日重建，仓位、利息和费用加起来正好等于这次运行的盈亏，精确到分。在三年的五个基准策略上，扣掉这些因子后没有一次运行有显著的 alpha。
+- **研究工具箱可以做空、可以用保证金**（[docs/zh/short-margin.md](short-margin.md)）：纯执行可以选 `mode="long_short"`（能做空、不加杠杆，单只空头不超过 20%，卖空所得冻结作抵押，每年 0.5% 的借券费按日扣）或 `mode="margin"`（Reg T：总敞口最多 2 倍，维持保证金为多头的 25% 加空头的 30%，跌破就在下一个开盘按比例强制减仓，借款按 BIL 收益率加每年 1.5% 计息），`Experiment(mode=...)`、`riskaware research run/trade --mode` 和 MCP 工具都能用；默认仍是 `long_only`，数字一点不变。LLM 智能体多了 `short` 和 `cover` 两种订单；`momentum_ls` 和 `trend_ls` 是多空规则策略的基准。在 54 次盲测 LLM 运行里，没有一个模型用了给它的杠杆；做空在 2022 年熊市里有帮助，在 2020 年的反弹里有害。
+- **新闻因子**（[docs/zh/news-factors.md](news-factors.md)）：`riskaware research factors` 用每天收盘前发布的新闻给内置的 64 只股票算十个每日新闻因子（标题数和关注度异常、词典情绪分、核验后的 72 小时新闻分、已确认和单一来源的故事、风险红旗、财报 8-K、新颖度、共同提及），外加第十一个由语言模型给每条标题打分得出的因子，在 2020、2022、2026 年用次日开盘起算的全收益价格检验，并以动量、反转、低波动作对照。没有一个站得住；LLM 情绪分最强（1 天秩 IC 0.021，t = 2.5），但仍然太弱、变得太快，交易不了。按日历日期对齐、用收盘到收盘检验，同样的因子看起来好得多：词典情绪分的秩 IC 从 0.005 变成 0.032，LLM 的从 0.021 变成 0.050。新闻因子需要各时段的标题文件。
+- **记忆检测**（[docs/zh/memory.md](memory.md)）：`riskaware research memory --llm <模型> --period 2022 --cutoff <训练截止日>` 把随机抽的（股票，日期）各问两遍，一遍带代码和日期，一遍盲测，问接下来 20 个交易日跑赢 SPY 的概率，再不给数据直接问它这只股票后来怎么走的。记忆分是实名预测把赢家排在前面好了多少（AUC 差，带 bootstrap 置信区间），并和训练截止日之后的样本对照。
+- **prompt 测试**（[docs/zh/prompts.md](prompts.md)）：`riskaware research prompts` 衡量什么样的 system prompt 让 LLM 交易智能体做得更好：21 个有版本号的变体，每个只改一处，和同一时段、同一种子的基线比较，给出 bootstrap 区间、精确符号翻转检验和 Holm 校正。第一次 pilot 里，prompt 里写风险规则能减少 2022 年熊市的亏损，几乎都来自少持股。
+- **盲测模式也遮住了标题里的日期和价位**：公司最有名的人和产品、所有日期和年份都会遮掉，目标价这类每股美元金额也按价格同样的比例换算。盲测的观察和旧版本不同，比较盲测运行时请用同一个版本。
+- 网站按大家会搜的词重写了标题和描述，加了 Dataset、FAQ 和面包屑结构化数据，新增一页把 rta-bench-1 和另外八个 LLM 交易基准逐项对比，并提供给 AI 搜索用的 llms.txt 和 llms-full.txt。每个版本都存档到 Zenodo，带 DOI。
+
 ## 0.7.2（2026-11-13）
 
 - **上了官方 MCP Registry**，名称是 `io.github.jackson-cmd/risk-aware-trading-agents`：每次发版上传 PyPI 之后，会把 `server.json` 发布到那里，读取这个注册表的 MCP 客户端和目录就能找到并安装这个服务器。
@@ -46,7 +60,7 @@
 
 ## 0.6.0（2026-11-12）
 
-- 安装包自带 2026 年新闻：内置股票池 64 只股票的 16,945 条，2026 年 1 月 1 日到 11 月 11 日（Benzinga 标题 16,249 条，只有标题、时间和股票代码；SEC 8-K 公告 696 份），放在 `riskaware/news/data/news_2026.jsonl.gz`（0.7 MB）。回测加 `--news` 时会和你自己的新闻库一起读；`news.bundled: false` 可以不用它。只有 Benzinga 给新闻标了这只股票、并且标题提到这家公司或代码时才算这只股票的新闻；机器生成的价格汇总没有收。`scripts/build_news_bundle.py` 可以重新生成这个文件。
+- 安装包自带 2026 年新闻：内置股票池 64 只股票的 16,945 条，2026 年 1 月 1 日到 11 月 11 日（标题 16,249 条，只有标题、时间和股票代码；SEC 8-K 公告 696 份；从 0.8.0 起不再随安装包提供），放在 `riskaware/news/data/news_2026.jsonl.gz`（0.7 MB）。回测加 `--news` 时会和你自己的新闻库一起读；`news.bundled: false` 可以不用它。只有 Benzinga 给新闻标了这只股票、并且标题提到这家公司或代码时才算这只股票的新闻；机器生成的价格汇总没有收。`scripts/build_news_bundle.py` 可以重新生成这个文件。
 - 策略实验室：MCP 新工具 `strategy_guide` 和 `backtest_code`，让 Claude、Codex 或 Gemini 根据大白话描述把策略写成代码并回测。代码先检查（代码里不能写日期和股票代码，只能 import 白名单里的模块，不能读写文件、联网、用 `eval`、`getattr` 或私有属性），再放到单独的进程里跑：没有任何 API key，有时间上限，系统支持时还有 CPU 上限；策略代码运行时，审计钩子会拒绝联网、开子进程和访问文件。出错时返回策略里出错的行。`save_as` 把策略存到 `~/.riskaware/strategies/ai/`，之后 `list_strategies`、看板和 `agents_create` 都能用。命令行用 `riskaware lab 文件` 也一样。
 - 回测不偷看未来：每天只能看到收盘时刻之前发布的新闻，提前收盘的日子收盘时刻是 13:00；只有日期没有时间的，算那天结束时发布；没有时区的时间按美东时间读（CSV 导入以前默认按 UTC）；日期在未来的新闻被丢掉。指标行现在只存当天数值的副本，`ctx.history()` 返回副本，策略没法再通过背后的数组摸到之后的价格。每条规则都有新测试，另有一个测试把数据截断在每一天重算指标，证明指标没有用到之后的数据。
 - 看板的回测页新增 **回放新闻** 开关；保存下来的 AI 策略会出现在回测页和创建智能体的策略列表里。

@@ -663,7 +663,8 @@ def lab_cmd(
     preset: str = typer.Option("megacap", help="Universe preset when no --symbols"),
     start: str = typer.Option("2026-01-02", help="YYYY-MM-DD"),
     end: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default today)"),
-    news: bool = typer.Option(True, "--news/--no-news", help="Replay the news archive (2026 ships with the package)"),
+    news: bool = typer.Option(True, "--news/--no-news", help="Replay the news archive (yours; no news ships with the "
+                                                             "package)"),
     profile: str = typer.Option("balanced", help="Risk profile"),
     check_only: bool = typer.Option(False, "--check-only", help="Only check the code; do not run it"),
     save: Optional[str] = typer.Option(None, help="Keep the strategy under this name in ~/.riskaware/strategies/ai"),

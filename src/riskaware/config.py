@@ -231,7 +231,8 @@ class NewsConfig(_Model):
     request_interval: float = 1.0
     relevance_filter: bool = Field(True, description="ignore stories that do not name the company or its ticker")
     archive_dir: str = Field(str(RISKAWARE_HOME / "news"), description="local news history for backtests")
-    bundled: bool = Field(True, description="also replay the 2026 headlines that ship with the package")
+    bundled: bool = Field(True, description="also replay the frozen periods' headline files, if you have a copy in "
+                                            "~/.riskaware/news/periods (the package carries none)")
     benzinga_key_env: str = "BENZINGA_API_KEY"
 
     @property

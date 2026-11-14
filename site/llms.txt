@@ -1,6 +1,6 @@
 # Risk-Aware Trading Agents
 
-> A benchmark for LLM trading agents, with news replayed by the minute it was published: three frozen US stock markets (the 2020 crash, the 2022 bear market and 2026) ship with 65,863 timestamped headlines and SEC filings, a public leaderboard (rta-bench-1) scores each model blind and with names, apart before and after its training cutoff, and every result is a JSON file that replays to the same numbers. The open-source Python package (MIT license) also has a prompt leaderboard, a point-in-time research kit with a look-ahead check, risk-aware AI trading agents for US stocks that check the macro calendar, the VIX term structure and cross-verified news before they buy, an MCP server, and paper or live trading through 9 broker adapters. Nothing in it is investment advice.
+> A benchmark for LLM trading agents, with news replayed by the minute it was published: three frozen US stock markets (the 2020 crash, the 2022 bear market and 2026) with 65,863 headlines and SEC filings replayed by publication time (the headlines are not redistributed), a public leaderboard (rta-bench-1) scores each model blind and with names, apart before and after its training cutoff, and every result is a JSON file that replays to the same numbers. The open-source Python package (MIT license) also has a prompt leaderboard, a point-in-time research kit with a look-ahead check, risk-aware AI trading agents for US stocks that check the macro calendar, the VIX term structure and cross-verified news before they buy, an MCP server, and paper or live trading through 9 broker adapters. Nothing in it is investment advice.
 
 - Install: `pip install risk-aware-trading-agents` (Python 3.10+), or run the dashboard with `docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard`.
 - Run the benchmark: `riskaware research bench --llm openai:MODEL` runs the six tasks (2026, 2022 and 2020, each blind and named) with seeds 0, 1 and 2; `riskaware research submit RUN_ID --model NAME --cutoff YYYY-MM` writes the entry for a pull request.
@@ -35,7 +35,6 @@
 
 - [Everything above in one file](https://jackson-cmd.github.io/risk-aware-trading-agents/llms-full.txt): the benchmark, the data, how to run and submit a model, the comparison with other benchmarks, the current results and answers to common questions
 - [Leaderboard results as JSON](https://jackson-cmd.github.io/risk-aware-trading-agents/assets/data/leaderboard.json)
-- [Dataset on Hugging Face](https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026): the frozen 2026 market as Parquet, with the original files
 - [Zenodo archive, DOI 10.5281/zenodo.24202496](https://doi.org/10.5281/zenodo.24202496): every release with its code and data
 - [PyPI package](https://pypi.org/project/risk-aware-trading-agents/)
 - [Docker image](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents)

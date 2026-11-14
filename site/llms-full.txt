@@ -1,6 +1,6 @@
 # Risk-Aware Trading Agents: the full text for language models
 
-> A benchmark for LLM trading agents, with news replayed by the minute it was published: three frozen US stock markets (the 2020 crash, the 2022 bear market and 2026) ship with 65,863 timestamped headlines and SEC filings, a public leaderboard (rta-bench-1) scores each model blind and with names, apart before and after its training cutoff, and every result is a JSON file that replays to the same numbers. Open source, MIT license. Nothing in it is investment advice.
+> A benchmark for LLM trading agents, with news replayed by the minute it was published: three frozen US stock markets (the 2020 crash, the 2022 bear market and 2026) with 65,863 headlines and SEC filings replayed by publication time (the headlines are not redistributed), a public leaderboard (rta-bench-1) scores each model blind and with names, apart before and after its training cutoff, and every result is a JSON file that replays to the same numbers. Open source, MIT license. Nothing in it is investment advice.
 
 This file gathers what the website says about the benchmark, its data, how to run and submit a model, how it compares with other benchmarks, the current results and common questions. Website: https://jackson-cmd.github.io/risk-aware-trading-agents/ (Chinese: https://jackson-cmd.github.io/risk-aware-trading-agents/zh/). Code: https://github.com/jackson-cmd/risk-aware-trading-agents. Package: `pip install risk-aware-trading-agents`. Archive: https://doi.org/10.5281/zenodo.24202496.
 
@@ -23,11 +23,11 @@ rta-bench-1 is a benchmark for LLM trading agents with news. It has six tasks: t
 
 Each period has daily bars from two years before its test window for 64 large-cap US stocks and 25 ETFs (split-adjusted prices, dividends, splits and a total-return factor), the VIX term structure (VIX9D, VIX, VIX3M) and VVIX, the macro calendar (FOMC, CPI, PPI, jobs reports) and the period's news with its publication time. A headline counts from the first close after it was published.
 
-- 2026: prices from 2024-01-02 (719 trading days, 69,738 rows); 16,945 news items: 16,249 Benzinga headlines (titles only) and 696 SEC 8-K filings with SEC's acceptance time.
-- 2022: prices from 2020-01-02 (756 trading days, 72,466 rows); 29,300 Benzinga headlines.
-- 2020: prices from 2018-01-02 (756 trading days, 71,490 rows); 19,618 Benzinga headlines.
+- 2026: prices from 2024-01-02 (719 trading days, 69,738 rows); 16,945 news items: 16,249 headlines (titles only) and 696 SEC 8-K filings with SEC's acceptance time.
+- 2022: prices from 2020-01-02 (756 trading days, 72,466 rows); 29,300 headlines.
+- 2020: prices from 2018-01-02 (756 trading days, 71,490 rows); 19,618 headlines.
 
-The files are in the package (`src/riskaware/research/data/market_YYYY.csv.gz`, `src/riskaware/news/data/news_YYYY.jsonl.gz`) with a manifest of SHA-256 hashes per period; `bundled_market("2022")` loads a period in Python. The 2026 period is also on Hugging Face as Parquet: https://huggingface.co/datasets/jacksonwangpro1/point-in-time-market-data-2026. Prices come from Yahoo Finance daily bars and are adjusted for every split up to November 2026. The headlines are cut from a local archive of about 3.2 million Benzinga headlines from 2011 to 2026. The stock lists are today's large caps (survivorship bias), so compare with the equal-weight portfolio, not only with SPY.
+The price files are in the package (`src/riskaware/research/data/market_YYYY.csv.gz`) with a manifest of SHA-256 hashes per period, which also records the SHA-256 of the period's news file; `bundled_market("2022")` loads a period in Python. The headlines are not redistributed: the code reads your own copy from `~/.riskaware/news/periods`. Prices come from Yahoo Finance daily bars and are adjusted for every split up to November 2026. The stock lists are today's large caps (survivorship bias), so compare with the equal-weight portfolio, not only with SPY.
 
 ## Run and submit a model
 

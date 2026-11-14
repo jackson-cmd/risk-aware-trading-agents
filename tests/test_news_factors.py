@@ -15,6 +15,7 @@ import pytest
 from riskaware.news.history import decision_time, load_bundle
 from riskaware.research import news_factors as nf
 from riskaware.research.periods import get_period
+from tests.conftest import needs_news
 
 NY = ZoneInfo("America/New_York")
 # enough stocks for a cross-section (the price controls need 15), few enough to keep the tests quick
@@ -93,6 +94,7 @@ def panels():
     return honest, changed
 
 
+@needs_news
 def test_features_ignore_everything_published_at_or_after_the_close(panels):
     honest, changed = panels
     a, b = honest.features("publication"), changed.features("publication")
@@ -112,6 +114,7 @@ def test_a_calendar_date_join_reads_the_evening_news(panels):
     assert {"headlines", "sentiment", "earnings_8k"} <= set(moved)
 
 
+@needs_news
 def test_the_features_look_like_the_bundled_news(panels):
     honest, _ = panels
     f = honest.features("publication", report=False)
@@ -214,6 +217,7 @@ def study():
     return nf.run_study(["2026"], stocks=STOCKS, report=False)
 
 
+@needs_news
 def test_the_study_tests_each_factor_and_compares_the_joins(study, tmp_path):
     assert study.periods == ["2026"]
     assert {"headlines", "sentiment", "earnings_8k", "momentum", "low_vol"} <= set(study.pooled)
@@ -332,6 +336,7 @@ def test_batch_requests_and_their_results_fill_the_cache(tmp_path):
     assert m["model"] == "openai:gpt-5.6-luna" and m["system_prompt"] == nf.LLM_SYSTEM and len(m["prompt_sha256"]) == 64
 
 
+@needs_news
 def test_the_cli_exports_requests_and_imports_results(monkeypatch, tmp_path):
     from typer.testing import CliRunner
 
@@ -363,6 +368,7 @@ def test_the_cli_exports_requests_and_imports_results(monkeypatch, tmp_path):
     assert json.loads((tmp_path / "f" / "factors.json").read_text(encoding="utf-8"))["llm"]["scored"] == 120
 
 
+@needs_news
 def test_llm_scores_become_a_factor():
     recs = [r for r in _records() if r["symbol"] in STOCKS[:12]]
     scores = {nf.headline_key(r["symbol"], r["headline"]): (1.0 if "beat" in r["headline"].lower() else -0.2)
@@ -373,6 +379,7 @@ def test_llm_scores_become_a_factor():
     assert (f.stack().dropna() > 0).any() and (f.stack().dropna() < 0).any()
 
 
+@needs_news
 def test_pairs_to_score_skip_filings_and_duplicates():
     pairs = nf.headlines_to_score(["2026"])
     assert len(pairs) == len(set(pairs)) > 15000
@@ -383,6 +390,7 @@ def test_pairs_to_score_skip_filings_and_duplicates():
 ROOT = __import__("pathlib").Path(__file__).resolve().parent.parent
 
 
+@needs_news
 def test_the_guide_numbers_still_hold():
     """The join comparison the website and docs quote comes from the frozen data of all three periods."""
     parts = [nf.alignment_series("sentiment", nf.load_period(p, report=False)) for p in ("2026", "2022", "2020")]

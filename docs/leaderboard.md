@@ -2,7 +2,7 @@
 
 [中文](zh/leaderboard.md) · [The leaderboard on the website](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html)
 
-rta-bench-1 is a fixed game for LLM trading agents on the [research kit](research.md)'s frozen markets. Every model trades the same 56 large-cap US stocks through 2026 to date, the 2022 bear market and the 2020 crash, after every fifth close, on prices, indicators and headlines replayed by the minute they were published. It plays each period twice, with the real names and blind. A model's training cutoff decides which of its scores count as skill: those from after the cutoff are ranked, those from before it are listed apart. An entry is one JSON file that holds the model's replies, so anyone can replay it and get the same numbers without calling the model.
+rta-bench-1 is a fixed game for LLM trading agents on the [research kit](research.md)'s frozen markets. Every model trades the same 56 large-cap US stocks through 2026 to date, the 2022 bear market and the 2020 crash, after every fifth close, on prices, indicators and headlines replayed by the minute they were published. It plays each period twice, with the real names and blind. A model's training cutoff decides which of its scores count as skill: those from after the cutoff are ranked, those from before it are listed apart. An entry is one JSON file that holds the model's replies, so anyone can replay it and get the same numbers without calling the model. The headlines are not redistributed: without a copy of a period's headline file the replay still checks the orders, the prices and every number, but not what the model was shown, and a new run needs the file.
 
 - [The tasks](#the-tasks)
 - [Why these settings](#why-these-settings)
@@ -109,7 +109,7 @@ Then open a pull request that adds the file. Continuous integration replays ever
 
 Two levels, both without calling the model:
 
-1. **Form** (`bench.check_entry`, in every test run): the settings are the benchmark's, the data hashes are the bundled files', the replies match their hash, the look-ahead check passed, and the contamination label follows from the cutoff.
+1. **Form** (`bench.check_entry`, in every test run): the settings are the benchmark's, the data hashes are the period's files' (a headline file that is not installed is not checked), the replies match their hash, the look-ahead check passed, and the contamination label follows from the cutoff.
 2. **Replay** (`bench.verify_entry`, `riskaware research leaderboard --verify`, and the leaderboard workflow on every pull request that touches `leaderboard/`): the replies go through the backtest again, step by step, and return, Sharpe, drawdown, round trips and turnover must come out the same.
 
 The look-ahead check of a run replays its replies on copies of the market whose prices and headlines after three cut days are random: the observations up to each cut must be identical, which proves that nothing from the future reached the prompt. Whether the model remembers the period is a separate question, answered by the cutoff split, the named-minus-blind gap and the memory probe.
@@ -146,4 +146,4 @@ Two traps the runs ran into. Ollama keeps a 2,048- or 4,096-token context unless
 - **Survivorship.** The 56 stocks are today's large caps. Buying and holding all of them in 2020 returned +40%, more than anyone could have expected at the time; compare models with each other and with the rules, not only with the equal-weight list.
 - **Blind is not airtight.** Blind mode hides tickers and company names, but a headline can still carry a date ("Top WallStreetBets Mentions for Monday May 9, 2022") or a dollar price target that gives the price level away, and a sector, a price path and an unusual headline together may give a stock away.
 - **Ten to twelve months per period.** Short samples; the Sharpe interval in each entry says how short.
-- **One feed of news.** Benzinga titles, plus SEC 8-K filings in 2026.
+- **One feed of news.** Headlines from one news feed, plus SEC 8-K filings in 2026.

@@ -24,6 +24,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 import json
+import logging
 import math
 import platform
 import random
@@ -65,8 +66,8 @@ PROTOCOL = {
                  "trading on daily bars, no intraday trading)",
     "prices": "total-return prices (split- and dividend-adjusted) from the bundled file; indicators only look back",
     "cash": "uninvested cash earns the daily return of the T-bill ETF BIL",
-    "news": "the period's bundled headlines, run through the same relevance filter and cross-verification as live "
-            "trading",
+    "news": "the period's headline file (not redistributed: your own copy, see news_path), run through the same "
+            "relevance filter and cross-verification as live trading",
 }
 
 
@@ -292,8 +293,17 @@ def _planner(exp: Experiment, cfg: AppConfig) -> Any:
     raise ValueError("execution must be 'plain' or 'risk_aware'")
 
 
+_WARNED_NO_NEWS: set[str] = set()
+
+
 def _archive(exp: Experiment) -> NewsArchive:
-    base = NewsArchive(NO_LOCAL_NEWS, bundled=True, bundle_path=get_period(exp.period).news_path)
+    path = get_period(exp.period).news_path
+    if not path.is_file() and exp.period not in _WARNED_NO_NEWS:
+        _WARNED_NO_NEWS.add(exp.period)
+        logging.getLogger(__name__).warning(
+            "the %s headline file is not installed, so this run sees no headlines: the package does not carry them "
+            "(they are not redistributed); put your own copy at %s", exp.period, path)
+    base = NewsArchive(NO_LOCAL_NEWS, bundled=True, bundle_path=path)
     return _WithExtra(base, exp.extra_news) if exp.extra_news else base
 
 

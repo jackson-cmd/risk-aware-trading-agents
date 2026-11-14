@@ -235,15 +235,19 @@ def dataset_info(period: str | None = None) -> dict:
     }
 
 
-def verify(period: str | None = None) -> dict:
-    """Check the bundled files against the SHA-256 in their manifest (every available period by default)."""
-    out = {}
+def verify(period: str | None = None) -> dict[str, bool | None]:
+    """Check the bundled files against the SHA-256 in their manifest (every available period by default). A headline
+    file that is not installed is ``None``: the package carries none, and a period runs without news then."""
+    out: dict[str, bool | None] = {}
     for name in [get_period(period).name] if period else available_periods():
         p = get_period(name)
         for fname, meta in manifest(name)["files"].items():
             path = DATA_DIR / fname if (DATA_DIR / fname).is_file() else None
             if path is None and fname == p.news:
                 path = p.news_path
+                if not path.is_file():
+                    out[fname] = None
+                    continue
             out[fname] = bool(path and path.is_file() and _sha256(path) == meta.get("sha256"))
     return out
 

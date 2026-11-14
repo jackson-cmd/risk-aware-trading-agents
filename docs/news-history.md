@@ -2,15 +2,15 @@
 
 Live trading reads news as it is published. A backtest has to replay what was known on each past day, and that needs the publication time of every item. Without it, a strategy can "see" a headline before it existed, which makes any news strategy look better than it is.
 
-News for 2026 ships with the package, so `riskaware backtest --news` works for that year with nothing to download. For other years, `riskaware news-history` builds a point-in-time archive on your own machine, and the backtest replays both.
+No news ships with the package. `riskaware news-history` builds a point-in-time archive on your own machine, and the headline files of the three frozen periods, if you have them, go in `~/.riskaware/news/periods`; the backtest replays both.
 
 ## Quick start
 
 ```bash
-# 2026 needs no setup: the headlines ship with the package
+# 2026, with your copy of its headline file in ~/.riskaware/news/periods
 riskaware backtest --strategy examples/strategies/news_earnings_drift.py --preset megacap --start 2026-01-02 --news --compare buy_and_hold
 
-# other years: SEC 8-K filings for the core universe since 2018 (free; SEC asks for a contact email)
+# SEC 8-K filings for the core universe since 2018 (free; SEC asks for a contact email)
 riskaware news-history build --preset core --start 2018-01-01 --contact-email you@example.com
 
 # optional: more news from your own sources
@@ -24,16 +24,14 @@ riskaware news-history show NVDA --date 2026-05-20
 
 On the dashboard, turn on **Replay news** on the Backtest page. Put `data.contact_email` in `riskaware.yaml` once and you can drop `--contact-email`. Set `backtest.news: true` to replay news in every backtest.
 
-## What ships with the package
+## The frozen periods' headline files
 
-`riskaware/news/data/news_2026.jsonl.gz` (0.7 MB) holds 16,945 items for the 64 stocks of the built-in watchlists (`core`, `megacap`, `tech`, `defensive`), from January 1 to November 11, 2026:
+The results in this project replay one headline file per frozen period, for the 64 stocks of the built-in watchlists (`core`, `megacap`, `tech`, `defensive`). For 2026 (January 1 to November 11) it holds 16,945 items:
 
-- 16,249 Benzinga headlines: the title, the publication time and the ticker, nothing else (no article text, teaser, link or sentiment). A headline is kept for a stock only when Benzinga tagged the stock and the headline itself names the company or its ticker. Automated recaps (what an investment would be worth today, dividend calculators, options-flow, short-interest and P/E summaries, TV pick lists) are left out: they repeat prices instead of reporting news.
+- 16,249 headlines: the title, the publication time and the ticker, nothing else (no article text, teaser, link or sentiment). A headline is kept for a stock only when the feed tagged the stock and the headline itself names the company or its ticker. Automated recaps (what an investment would be worth today, dividend calculators, options-flow, short-interest and P/E summaries, TV pick lists) are left out: they repeat prices instead of reporting news.
 - 696 SEC 8-K filings with SEC's acceptance time and the link to the filing.
 
-Backtests read it together with your own archive; when both hold the same item, yours wins, and `remove` only deletes your items. Set `news.bundled: false` to leave it out. `scripts/build_news_bundle.py` rebuilds the file from an archive.
-
-**More history.** We keep a much larger archive, about 3.2 million Benzinga headlines from 2011 to 2026. It is far too big to ship in the package, so the package carries 2026 for the built-in watchlists. If you need more years or more stocks, open an issue and we will look at how to provide them, for example as a separate download.
+These files are not redistributed: neither the package nor the repository carries them. Put your copies in `~/.riskaware/news/periods` (`news_2026.jsonl.gz`, `news_2022.jsonl.gz`, `news_2020.jsonl.gz`); `scripts/build_news_bundle.py` builds them from an archive, and the SHA-256 in each period's manifest (`src/riskaware/research/data/`) says whether yours is the file our results used. Backtests read them together with your own archive; when both hold the same item, yours wins, and `remove` only deletes your items. Set `news.bundled: false` to leave them out.
 
 ## How the backtest avoids look-ahead
 
@@ -95,7 +93,7 @@ Backtests apply the same relevance filter as live trading: a story counts toward
 
 - Location: `~/.riskaware/news/` (`news.archive_dir` in the config; follows `RISKAWARE_HOME`).
 - One JSON Lines file per symbol, sorted by time, de-duplicated by source, link and time. Running `build` again only adds new items.
-- `riskaware news-history remove SYMBOL [--feed sec|benzinga|import]` deletes your items. The bundled 2026 items are read-only; `status` counts them in the Bundled column.
+- `riskaware news-history remove SYMBOL [--feed sec|benzinga|import]` deletes your items. The period files are read-only; `status` counts their items in the Period files column.
 
 ## Writing a strategy that uses news
 
