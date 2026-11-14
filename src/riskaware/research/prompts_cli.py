@@ -70,9 +70,11 @@ def run_cmd(
     prompt_file: Optional[Path] = typer.Option(None, help="Your own system prompt (a text file), run as one more variant"),
     name: Optional[str] = typer.Option(None, help="Name of the --prompt-file variant (default: the file name)"),
     periods: str = typer.Option("2026,2022,2020", help="Comma-separated bundled periods"),
-    seeds: int = typer.Option(4, help="Seeds 0..n-1 (each fixes the blind aliases and the sampling seed); with 13 "
-                                      "variants, 3 periods x 4 seeds is the smallest grid that can pass the Holm "
-                                      "correction"),
+    seeds: int = typer.Option(4, help="Seeds 0..n-1 (each fixes the blind aliases); with all 20 variants against "
+                                      "the baseline, ten pairs are the fewest that can pass the Holm correction, and "
+                                      "3 periods x 4 seeds give twelve"),
+    api_seed: bool = typer.Option(False, "--api-seed", help="Also send the seed as the API's sampling seed"),
+    key_env: Optional[str] = typer.Option(None, help="Environment variable with the API key (e.g. for compat:)"),
     seed_list: Optional[str] = typer.Option(None, help="Exact seeds instead, e.g. 0,1,2"),
     universe: str = typer.Option("core"),
     symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols instead of a universe"),
@@ -106,7 +108,7 @@ def run_cmd(
                            symbols=[x.strip().upper() for x in symbols.split(",")] if symbols else None,
                            max_positions=max_positions, temperature=temperature, max_tokens=max_tokens,
                            blind=not named, base_url=base_url, price_in=price_in, price_out=price_out, start=start,
-                           end=end)
+                           end=end, api_seed=api_seed, key_env=key_env)
         est = P.estimate(chosen, st, pilot)
     except (ValueError, FileNotFoundError) as exc:
         con.print(f"[red]{escape(str(exc))}[/]")

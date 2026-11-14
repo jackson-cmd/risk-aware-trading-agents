@@ -8,7 +8,38 @@ one thing from the package's own prompt. Every variant trades the same frozen pe
 news replayed by publication time and several seeds. Each variant is compared with the baseline run on the same
 period and seed, and the report says which differences are larger than the gap between two seeds of the same prompt.
 
-<!-- RESULTS -->
+## Results so far
+
+The first batch is a pilot: the baseline and two rule prompts (`risk_rules` and `trend_news`, below), four models
+(`gpt-5.6-luna`, `claude-haiku-5-5`, `gemini-3.1-flash-lite`, `llama3.2`), the three periods, blind, the `core`
+universe, a decision every fifth trading day, one seed. 36 runs, $0.26 in all. Each prompt is paired with the
+baseline on the same model and period: twelve pairs.
+
+| Against the baseline | `risk_rules` | `trend_news` |
+|---|---:|---:|
+| Total return | +9.8 pp (95% CI +2.0 to +16.3), better in 10 of 12 | +18.6 pp (+6.2 to +33.9), 9 of 12 |
+| Sharpe | +0.28 (-0.01 to +0.57) | +0.39 (+0.09 to +0.68) |
+| Maximum drawdown | 5.8 pp smaller (3.1 to 8.5) | 7.5 pp smaller (3.5 to 11.5) |
+| Return in 2026 / 2022 / 2020 | +2.3 / +17.8 / +9.2 pp | -1.9 / +25.9 / +31.8 pp |
+| Holm-corrected p (return) | 0.057 | 0.057 |
+
+- **Rules in the prompt helped, mostly in the bear market.** Both prompts lost less than the baseline in 2022 for every
+  model and did about as well in 2026's rising market. After correcting for testing two prompts, neither passes 5%:
+  suggestive, not yet established. `trend_news`'s 2020 figure is mostly one `llama3.2` run that held TSLA (+110.8%).
+- **The gain came from how much stock the models held, not from which stocks.** Splitting the return differences
+  (sums of daily returns, see "Where a difference comes from"): `risk_rules` +11.2 pp = exposure level +7.7, exposure
+  timing +2.8, selection +1.0; `trend_news` +17.9 pp = +11.7, +4.5, +1.5. In 2022 the rules cut the average share of
+  equity in stocks from 57% to 25% (`risk_rules`) and 16% (`trend_news`), and that alone accounts for the gain;
+  selection was slightly negative.
+- **"Less stock" is not the whole story.** In 2020 the rules *raised* exposure for the two most cautious models
+  (`claude-haiku-5-5` from 19% to 49%, `llama3.2` from 19% to 41%), which paid off in the rebound. The rules change how
+  invested a model is and when; whether that pays depends on the market.
+- No reply in any of the 36 runs broke the format; invalid orders (unknown symbols, sells of stocks not held) stayed
+  between 0% and 7% of orders under every prompt.
+
+The single-factor grid follows (every variant below, four seeds, one model) and asks the next questions: which of the
+four rules carries the effect, and whether a plain cash floor (`cash_30`, `cash_50`) does as well.
+
 
 ## The variants
 
@@ -22,7 +53,14 @@ other variant changes one factor:
 | `role_pm` | role | "You are an experienced portfolio manager at a long-only equity fund." in front |
 | `role_quant` | role | "You are a quantitative researcher at a systematic hedge fund." in front |
 | `role_risk` | role | "You are the risk manager of an investment firm." in front |
-| `risk_rules` | risk rules | At most 20% per stock, sell at -8%, at least 20% cash (50% when risk-off or VIX above 30), no buys on red flags |
+| `risk_rules` | risk rules | Four rules: at most 25% of equity per stock; at least 30% cash when the regime is UNCERTAIN or RISK_OFF; sell at 8% below the purchase price; prefer stocks above their 200-day average |
+| `cap_25` | one rule | Only the 25% cap per stock |
+| `regime_cash` | one rule | Only the 30% cash when the regime is UNCERTAIN or RISK_OFF |
+| `stop_loss` | one rule | Only the sell at 8% below the purchase price |
+| `above_200` | one rule | Only the preference for stocks above their 200-day average |
+| `cash_30` | cash floor | At least 30% in cash at all times, nothing else |
+| `cash_50` | cash floor | At least 50% in cash at all times, nothing else |
+| `trend_news` | decision rule | Buy only when the trend and the news are both positive; sell when the trend breaks or confirmed bad news arrives; otherwise hold; the judgement goes in each order's reason |
 | `reason_first` | reasoning | A `reasoning` field of 3 to 5 short sentences comes before the orders |
 | `focus_news` | focus | Decide mainly from the news (confirmation, recency, red flags); use prices to time entries |
 | `focus_trend` | focus | Decide mainly from returns, moving averages, RSI and the distance from the high; use news to avoid red flags |
@@ -32,6 +70,11 @@ other variant changes one factor:
 | `news_0` | headlines | No headlines; the news score, confirmation counts and red flags stay |
 | `news_6` | headlines | Six headlines per stock instead of three |
 | `daily` | frequency | A decision every trading day instead of every fifth |
+
+The four rules of `risk_rules` and the rule of `trend_news` are word for word the ones of the pilot above, so those
+runs count as seed 0 of the same variants (same SHA-256). `cap_25`, `regime_cash`, `stop_loss` and `above_200` state
+one of the four rules alone in the same words; `cash_30` and `cash_50` only change how much stays in cash, which tells
+whether the rules do more than hold less stock.
 
 `riskaware research prompts list` prints the table with each variant's SHA-256, and `--show <name>` prints the full
 text. The set is versioned (`SET_VERSION`): a changed text becomes a new version, never an edit, so a published number
@@ -90,10 +133,28 @@ the exposure to stocks, turnover and orders per step (behaviour), the format err
 (reliability), and the tokens per step (cost). SPY and the equal-weight universe are reported for every period.
 
 How much evidence is possible: the smallest two-sided sign-flip p-value that n pairs can produce is 2/2ⁿ, and Holm
-multiplies the smallest p-value by the number of variants. With thirteen variants, nine pairs (three periods, three
-seeds) can never pass: 13 × 2/512 is 0.051. That is why the default is four seeds: twelve pairs per variant, where a
-difference that points the same way in eleven or twelve of them can pass. The report says so when a lab is too small
-to show anything. A prompt effect that only appears in some periods or some seeds is not one to rely on.
+multiplies the smallest p-value by the number of variants. With twenty variants against the baseline, nine pairs
+(three periods, three seeds) can never pass: 20 × 2/512 is 0.078. That is why the default is four seeds: twelve
+pairs per variant, where a difference that points the same way in eleven or twelve of them can pass. The report says
+so when a lab is too small to show anything. A prompt effect that only appears in some periods or some seeds is not
+one to rely on.
+
+## Where a difference comes from
+
+A prompt can earn more by holding more or less stock, or by holding other stocks. The report splits each paired
+return difference into these parts. Every day the backtest's return is r = e·s + (1 - e)·c, where e is the share of
+equity in stocks at the previous close, s the return of the stock part and c what cash earns (the T-bill ETF BIL).
+Between a variant v and the baseline b:
+
+r_v - r_b = (e_v - e_b)(s_b - c) + e_v (s_v - s_b)
+
+The first term is the **exposure** effect: the baseline's own stocks, held at the variant's exposure. It splits into
+the **level** (the average exposure difference times the baseline's stock return over cash) and the **timing** (being
+in or out on the right days). The second term is **selection**: the variant's stocks against the baseline's. The
+parts are sums of daily returns, so they add up to the summed daily return difference, which is close to the
+difference in total return when returns are moderate. What is left (trades at the open of a decision day) is shown
+as "other". When a run holds almost no stock (less than 5% of equity), its stock return is undefined; the
+equal-weight universe stands in for the baseline's and the baseline's for the variant's.
 
 ## Run it yourself
 
@@ -123,6 +184,12 @@ riskaware research prompts run --llm openai:gpt-5.6-luna --workers 8 --out lab -
 riskaware research prompts report lab
 ```
 
+Several labs, one model each, make the website's prompt board, with a comparison across the models:
+
+```bash
+riskaware research prompts board lab-luna lab-haiku --site site/assets/data/prompts.json
+```
+
 Your own prompt runs as one more variant next to the built-in ones (with the baseline's settings):
 
 ```bash
@@ -148,19 +215,27 @@ cuts longer prompts, which would cut the observation of the few-shot and six-hea
 
 ## The website's data
 
-`riskaware research prompts report lab --site site/assets/data/prompts.json` writes the prompt board for the website
-(format `rta-prompt-board-1`):
+`riskaware research prompts board <lab> [<lab> ...] --site site/assets/data/prompts.json` reports every lab (one model
+each) and writes the prompt board for the website (format `rta-prompt-board-1`):
 
-- `model`, `baseline`, `primary_metric`, `set_version`, `generated_utc`;
-- `settings`: universe, symbols, max_positions, temperature, blind, news, periods, seeds;
-- `benchmarks`: per period, the window and SPY's and the equal-weight universe's return, Sharpe and drawdown;
-- `noise`: the mean Sharpe gap between two seeds of the baseline, and the standard deviation by period;
-- `variants`: one entry per variant, the baseline first, with `name`, `factor`, `about` (`en`, `zh`), the two
-  SHA-256 hashes, `runs`, `settings`, `metrics` (each with `mean` and `by_period`: sharpe, total_return,
-  max_drawdown, excess_vs_spy, turnover, format_error_rate, invalid_order_rate), `tokens_per_step` and `vs_baseline`
-  (null for the baseline; else per metric `diff`, `ci95`, `p`, `p_holm`, `pairs`, `by_period` and `verdict`);
-- `cost`: calls, input and output tokens, list price;
-- `method`: one sentence in English and Chinese on how to read the verdicts.
+- `generated_utc`, `set_version`, `baseline`, `primary_metric` (`sharpe`), `method` (`en`, `zh`: how to read it);
+- `boards`: one per lab, with
+  - `model`, `lab_note`, `settings` (universe, symbols, max_positions, temperature, blind, news, periods, seeds,
+    api_seed);
+  - `benchmarks`: per period, the window and SPY's and the equal-weight universe's return, Sharpe and drawdown;
+  - `noise`: the mean Sharpe gap between two seeds of the baseline and the standard deviation by period (null with
+    one seed); `power`: whether the lab has enough pairs to pass the correction at all;
+  - `variants`: the baseline first, then the others, each with `name`, `factor`, `about` (`en`, `zh`), the two
+    SHA-256 hashes, `runs`, `settings`, `metrics` (`mean` and `by_period` of sharpe, total_return, max_drawdown,
+    excess_vs_spy, avg_exposure, turnover, format_error_rate, invalid_order_rate), `tokens_per_step`, `vs_baseline`
+    (null for the baseline; per metric `diff`, `ci95`, `p`, `p_holm`, `q_bh`, `pairs`, `wins`, `losses`,
+    `by_period`, `verdict`) and `attribution` (`total`, `exposure_level`, `exposure_timing`, `selection`,
+    `residual`, the mean exposure of the variant and the baseline, and the same by period);
+  - `cost`: calls, input and output tokens, list price;
+- `across_models` (null with one lab): the variants every lab has, compared with the baseline over all models,
+  periods and seeds at once, with `vs_baseline` and `attribution` as above.
+
+Fractions are fractions (0.123 is 12.3%); Sharpe ratios are annualised.
 
 ## Limits
 
