@@ -4,7 +4,7 @@
 
 This file gathers what the website says about the benchmark, its data, how to run and submit a model, how it compares with other benchmarks, the current results and common questions. Website: https://jackson-cmd.github.io/risk-aware-trading-agents/ (Chinese: https://jackson-cmd.github.io/risk-aware-trading-agents/zh/). Code: https://github.com/jackson-cmd/risk-aware-trading-agents. Package: `pip install risk-aware-trading-agents`. Data and entries on Hugging Face: https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark.
 
-- Leaderboard models so far (last update 2026-11-14, 65 entries): claude-haiku-4.5 (Anthropic, training cutoff 2025-07), claude-haiku-5.5 (Anthropic, training cutoff 2026-06), claude-sonnet-4.6 (Anthropic, training cutoff 2026-01), gemini-3.5-flash (Google, training cutoff 2025-01), llama3.2 (Meta, training cutoff 2023-12), gpt-5.6-luna (OpenAI, training cutoff 2026-02-16).
+- Leaderboard models so far (last update 2026-11-14, 67 entries): claude-haiku-4.5 (Anthropic, training cutoff 2025-07), claude-haiku-5.5 (Anthropic, training cutoff 2026-06), claude-sonnet-4.6 (Anthropic, training cutoff 2026-01), gemini-3.5-flash (Google, training cutoff 2025-01), llama3.2 (Meta, training cutoff 2023-12), gpt-5.6-luna (OpenAI, training cutoff 2026-02-16).
 
 ## The benchmark: rta-bench-1
 
@@ -57,14 +57,14 @@ What rta-bench-1 puts together: news replayed by the minute it was published ove
 
 ## Current results
 
-Last update 2026-11-14: 65 entries from 6 models, blind runs, the mean over the seeds each model has so far. Clean: from the model's training cutoff to the end of the period, next to SPY and the equal-weight portfolio over the same days. May remember: the whole period, before the cutoff. Tables: https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html; data: https://jackson-cmd.github.io/risk-aware-trading-agents/assets/data/leaderboard.json
+Last update 2026-11-14: 67 entries from 6 models, blind runs, the mean over the seeds each model has so far. Clean: from the model's training cutoff to the end of the period, next to SPY and the equal-weight portfolio over the same days. May remember: the whole period, before the cutoff. Tables: https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html; data: https://jackson-cmd.github.io/risk-aware-trading-agents/assets/data/leaderboard.json
 
 2026 (2026-01-02 to 2026-11-11):
 - claude-haiku-4.5 (Anthropic, cutoff 2025-07, 1 seed), clean: +7.2% from 2026-01-02, Sharpe 0.42; SPY +12.1%, equal weight +11.4%
 - claude-sonnet-4.6 (Anthropic, cutoff 2026-01, 1 seed), clean: +6.2% from 2026-01-30, Sharpe 0.34; SPY +10.7%, equal weight +10.6%
 - gpt-5.6-luna (OpenAI, cutoff 2026-02-16, 3 seeds), clean: +4.5% from 2026-02-13, Sharpe 0.34; SPY +12.3%, equal weight +10.7%
 - gemini-3.5-flash (Google, cutoff 2025-01, 3 seeds), clean: +6.5% from 2026-01-02, Sharpe 0.33; SPY +12.1%, equal weight +11.4%
-- llama3.2 (Meta, cutoff 2023-12, 1 seed), clean: +2.7% from 2026-01-02, Sharpe -0.16; SPY +12.1%, equal weight +11.4%
+- llama3.2 (Meta, cutoff 2023-12, 3 seeds), clean: -0.8% from 2026-01-02, Sharpe -0.32; SPY +12.1%, equal weight +11.4%
 - claude-haiku-5.5 (Anthropic, cutoff 2026-06, 1 seed), clean: -0.6% from 2026-06-30, Sharpe -0.99; SPY +2.0%, equal weight +5.7%
 - Whole period: SPY buy and hold +12.1%, equal weight of the 56 stocks +11.4%
 

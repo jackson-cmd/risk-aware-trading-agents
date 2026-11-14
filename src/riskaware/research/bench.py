@@ -282,14 +282,15 @@ ORDER_FIELDS = ("symbol", "action", "weight", "fraction")
 
 
 def public_replies(replies: list[Any]) -> list[Any]:
-    """The replies as an entry publishes them: each order without its reason, each reply without its note. The
-    orders, and so every replayed number, stay the same."""
+    """The replies as an entry publishes them: each order without its reason, each reply with its orders only (no
+    note, and no other key a model wrote, such as a malformed ``"note:"``). A replay reads only the orders, so every
+    replayed number stays the same."""
     out: list[Any] = []
     for r in replies:
         if not isinstance(r, dict):
             out.append(r)
             continue
-        kept = {k: v for k, v in r.items() if k != "note"}
+        kept = {k: v for k, v in r.items() if k == "orders"}
         if isinstance(kept.get("orders"), list):
             kept["orders"] = [{k: o[k] for k in ORDER_FIELDS if k in o} if isinstance(o, dict) else o
                               for o in kept["orders"]]

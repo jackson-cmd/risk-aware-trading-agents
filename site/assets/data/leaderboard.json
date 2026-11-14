@@ -1,6 +1,6 @@
 {
  "bench": "rta-bench-1",
- "entries": 65,
+ "entries": 67,
  "generated_utc": "2026-11-14",
  "models": 6,
  "periods": {
@@ -4669,116 +4669,131 @@
        "days": 216,
        "equal_weight_sharpe": 0.848303,
        "equal_weight_total_return": 0.114246,
-       "excess_vs_equal_weight": -0.087499,
-       "excess_vs_spy": -0.094123,
+       "excess_vs_equal_weight": -0.122158,
+       "excess_vs_spy": -0.128782,
        "from": "2026-01-02",
-       "max_drawdown": -0.027001,
-       "sharpe": -0.155351,
-       "sharpe_range": null,
+       "max_drawdown": -0.086142,
+       "sharpe": -0.315606,
+       "sharpe_range": [
+        -0.802985,
+        0.011518
+       ],
        "spy_sharpe": 0.76515,
        "spy_total_return": 0.12087,
        "to": "2026-11-11",
-       "total_return": 0.026747,
-       "total_return_range": null,
-       "volatility": 0.02832
+       "total_return": -0.007912,
+       "total_return_range": [
+        -0.080364,
+        0.029882
+       ],
+       "volatility": 0.080908
       },
-      "alpha_annual": -0.008198,
+      "alpha_annual": -0.070344,
       "analysis": {
        "by_sector": [
         {
          "contribution": -0.001251,
          "group": "Financials",
          "runs": 1
+        },
+        {
+         "contribution": -0.050165,
+         "group": "Technology",
+         "runs": 2
         }
        ],
        "by_trigger": [
         {
-         "contribution": -0.001251,
-         "group": "other",
+         "contribution": 0.002013,
+         "group": "no reason",
          "runs": 1
+        },
+        {
+         "contribution": -0.051797,
+         "group": "other",
+         "runs": 2
         }
        ],
-       "findings": [
-        "Buys: over the five trading days from the fill, the stocks it bought beat SPY by 4.75% on average (1 buys, 100% of them ahead of SPY; t = n/a, ).",
-        "Decision IC: on the 1 days it traded, what it bought ranked against what it sold and left alone by a mean rank IC of 0.171 with the next five days' returns (IC IR n/a, t = n/a, ).",
-        "Holdings IC: the weights it held after each of 43 decision days had a mean rank IC of 0.014 with the next five days' returns (t = 0.8, within noise).",
-        "Factor exposures: market 0.09 (t 6.3), size -0.01 (t -0.6), growth -0.09 (t -3.5), momentum -0.05 (t -6.6); together they explain 32% of the daily variation (R²).",
-        "Of its -0.4% a year over T-bills (arithmetic mean): momentum +1.1%, market +1.0%, growth -0.2%, size -0.0%; the alpha left is -2.2% a year (t = -0.8, within noise).",
-        "Verdict: the exposures account for +1.8% a year of it, and the -2.2% a year left over is not significant: one period of daily returns cannot tell it from luck.",
-        "P&L: +$2,720 in all, -$125 from 1 positions and +$2,845 of interest on idle cash.",
-        "By market regime of the previous close: risk-on 96 days +0.5% (SPY +2.0%); neutral 18 days +0.7% (SPY +4.5%); uncertain 97 days +1.2% (SPY +4.8%); risk-off 6 days +0.3% (SPY +0.3%).",
-        "News: no entry or exit gave news as its reason. News can still have shaped the run: a filter that keeps it out of a stock leaves no decision behind, so compare with the run without news.",
-        "Concentration: the positions lost $125 in all; the best was SPGI bought 2026-01-05 and still open at the end, -$125. Had the best position made nothing, the run would have returned +2.7% instead of +2.7%."
-       ],
-       "runs": 1,
+       "findings": null,
+       "runs": 3,
        "summary": {
-        "alpha_annual": -0.022485,
-        "alpha_t": -0.76843,
-        "best_trade_share": null,
-        "beta_growth": -0.091661,
-        "beta_market": 0.093906,
-        "beta_momentum": -0.045333,
-        "beta_size": -0.010072,
-        "buy_excess_5d": 0.04755,
+        "alpha_annual": -0.088933,
+        "alpha_t": -0.964939,
+        "best_trade_share": 1.0,
+        "beta_growth": 0.206957,
+        "beta_market": 0.190979,
+        "beta_momentum": -0.087766,
+        "beta_size": 0.033299,
+        "buy_excess_5d": 0.005147,
         "buy_excess_5d_t": null,
-        "capm_alpha_annual": -0.008198,
-        "capm_alpha_t": -0.251117,
-        "concentrated": false,
+        "capm_alpha_annual": -0.070344,
+        "capm_alpha_t": -0.598168,
+        "concentrated": true,
         "cover_excess_5d": null,
         "cover_excess_5d_t": null,
-        "decision_excess_5d": 0.04755,
+        "decision_excess_5d": 0.005147,
         "decision_excess_5d_t": null,
-        "decision_hit_rate_5d": 1.0,
-        "decision_ic": 0.171019,
+        "decision_hit_rate_5d": 0.666667,
+        "decision_ic": 0.015294,
         "decision_ic_t": null,
         "decisions": 1.0,
-        "exposure_return_annual": 0.018085,
+        "exposure_return_annual": 0.047096,
         "fees_contribution": 0.0,
         "forced_fills": 0.0,
-        "holdings_ic": 0.014454,
-        "holdings_ic_t": 0.828614,
-        "long_contribution": -0.001251,
+        "holdings_ic": -0.014737,
+        "holdings_ic_t": -0.479348,
+        "long_contribution": -0.03386,
         "news_decision_share": 0.0,
         "news_entry_pnl": 0.0,
-        "r2": 0.321327,
-        "return_without_best_trade": 0.027196,
+        "r2": 0.340202,
+        "return_without_best_trade": -0.008148,
         "sell_avoided_5d": null,
         "sell_avoided_5d_t": null,
         "short_avoided_5d": null,
         "short_avoided_5d_t": null,
         "short_contribution": 0.0,
         "spy_return": 0.12087,
-        "total_return": 0.026747
+        "total_return": -0.007912
        }
       },
-      "avg_exposure": 0.083652,
+      "avg_exposure": 0.13998,
       "avg_holding_days": null,
-      "beta": 0.035354,
-      "excess_vs_equal_weight": -0.087499,
-      "excess_vs_spy": -0.094123,
+      "beta": 0.265323,
+      "excess_vs_equal_weight": -0.122158,
+      "excess_vs_spy": -0.128782,
       "files": [
-       "llama3.2-2026-blind-s0.json"
+       "llama3.2-2026-blind-s0.json",
+       "llama3.2-2026-blind-s1.json",
+       "llama3.2-2026-blind-s2.json"
       ],
-      "max_drawdown": -0.027001,
-      "n": 1,
+      "max_drawdown": -0.086142,
+      "n": 3,
       "round_trips": 0.0,
       "run_dates": [
        "2026-11-14"
       ],
       "seeds": [
-       0
+       0,
+       1,
+       2
       ],
-      "sharpe": -0.155351,
-      "sharpe_range": null,
+      "sharpe": -0.315606,
+      "sharpe_range": [
+       -0.802985,
+       0.011518
+      ],
       "steps": 44,
-      "total_return": 0.026747,
-      "total_return_range": null,
-      "turnover": 0.056051,
+      "total_return": -0.007912,
+      "total_return_range": [
+       -0.080364,
+       0.029882
+      ],
+      "turnover": 0.098804,
       "usage": {
-       "calls": 44.0,
-       "input_tokens": 463045.0,
+       "calls": 132.0,
+       "input_tokens": 1390800.0,
        "list_price_usd": 0.0,
-       "output_tokens": 2419.0
+       "output_tokens": 7436.0
       }
      },
      "cutoff": "2023-12",
@@ -4950,8 +4965,8 @@
        "output_tokens": 11692.0
       }
      },
-     "named_minus_blind": 0.045972,
-     "named_minus_blind_after_cutoff": 0.045972,
+     "named_minus_blind": 0.080631,
+     "named_minus_blind_after_cutoff": 0.080631,
      "open_weights": true,
      "provider": "Meta",
      "slug": "llama3.2",
