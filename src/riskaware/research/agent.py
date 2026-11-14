@@ -19,9 +19,11 @@ prompt gets the mode's rules (``RULES_LONG_SHORT``, ``RULES_MARGIN``) and the ob
 buying power and margin (docs/short-margin.md).
 
 Blind mode hides what a model could recognise: tickers become S01, S02, ..., dates become day numbers, prices are
-rebased to 100 on the first day, and company names and tickers in headlines become the same aliases. It lowers the
-chance that a model trained on text from 2026 recalls how a stock did; it cannot rule it out (an unusual headline,
-a sector and a price path together may still give a stock away).
+rebased to 100 on the first day, and in headlines company names and tickers become the same aliases, the companies'
+best-known people and products are masked ("the S01 chief", "[product]"), every date and year is masked, and
+per-share dollar amounts (price targets, EPS) are rebased like the prices. It lowers the chance that a model trained
+on text from a period recalls how a stock did; it cannot rule it out (an unusual headline, a sector and a price path
+together may still give a stock away). ``memory.memory_probe`` measures how much it remembers.
 
 The decisions come from the policy, so the strategy leak check (same decisions with a random future) says nothing
 here. Every run instead checks the harness: it replays the policy's replies on copies of the market whose prices
@@ -164,6 +166,60 @@ def order_schema(mode: str = "long_only") -> dict[str, Any]:
 
 
 # ----------------------------------------------------------------------------------- blind mode
+# people and products that name a company as surely as its name does; blind mode masks them too
+PEOPLE: dict[str, list[str]] = {
+    "AAPL": ["Tim Cook"], "MSFT": ["Satya Nadella", "Nadella"], "NVDA": ["Jensen Huang"],
+    "AMZN": ["Andy Jassy", "Jassy", "Jeff Bezos", "Bezos"], "META": ["Mark Zuckerberg", "Zuckerberg"],
+    "GOOGL": ["Sundar Pichai", "Pichai"], "GOOG": ["Sundar Pichai", "Pichai"], "TSLA": ["Elon Musk", "Musk"],
+    "JPM": ["Jamie Dimon", "Dimon"], "BRK-B": ["Warren Buffett", "Buffett", "Greg Abel"],
+    "DIS": ["Bob Iger", "Iger", "Bob Chapek", "Chapek"], "AMD": ["Lisa Su"],
+    "NFLX": ["Reed Hastings", "Ted Sarandos", "Sarandos"], "INTC": ["Pat Gelsinger", "Gelsinger"],
+    "CRM": ["Marc Benioff", "Benioff"], "ORCL": ["Larry Ellison", "Safra Catz"],
+    "UBER": ["Dara Khosrowshahi", "Khosrowshahi"], "PFE": ["Albert Bourla", "Bourla"],
+    "BA": ["Dave Calhoun", "Kelly Ortberg"], "WMT": ["Doug McMillon"], "SBUX": ["Howard Schultz"],
+    "GS": ["David Solomon"], "PLTR": ["Alex Karp"], "BAC": ["Brian Moynihan"], "C": ["Jane Fraser"],
+    "WFC": ["Charlie Scharf"], "IBM": ["Arvind Krishna"], "AVGO": ["Hock Tan"], "QCOM": ["Cristiano Amon"],
+    "XOM": ["Darren Woods"], "CVX": ["Mike Wirth"],
+}
+PRODUCTS: dict[str, list[str]] = {
+    "AAPL": ["iPad", "iPod", "MacBook", "Vision Pro"], "MSFT": ["Xbox", "Azure"], "NVDA": ["GeForce"],
+    "AMZN": ["Whole Foods", "Alexa"], "META": ["Oculus"], "GOOGL": ["Waymo", "DeepMind"],
+    "GOOG": ["Waymo", "DeepMind"], "TSLA": ["Cybertruck", "Model Y", "Model 3"], "DIS": ["ESPN", "Pixar"],
+    "PFE": ["Paxlovid", "Comirnaty"], "MRK": ["Keytruda"], "LLY": ["Mounjaro", "Zepbound"],
+    "ABBV": ["Humira", "Skyrizi", "Rinvoq"], "BA": ["737 MAX", "Dreamliner"],
+}
+
+_MONTH = (r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|"
+          r"Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)")
+DATE_MASKS: list[tuple[re.Pattern, str]] = [  # headlines often carry their date ("Whale Trades For May 10")
+    (re.compile(r"(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)"), "[date]"),
+    (re.compile(r"(?<![\d/.])(?:0?[1-9]|1[0-2])/(?:0?[1-9]|[12]\d|3[01])(?:/(?:19|20)?\d{2})?(?![\d/])"), "[date]"),
+    (re.compile(rf"\b{_MONTH}\.? \d{{1,2}}(?:st|nd|rd|th)?\b(?:,? (?:19|20)\d{{2}}\b)?"), "[date]"),
+    (re.compile(r"\b(FY|CY|Q[1-4]|[1-4]Q|H[12]) ?'?(?:19|20)?\d{2}\b(?![%.\d])"), r"\1 [year]"),
+    (re.compile(r"(?<![\d,.$])(?:19|20)\d{2}(?![\d%]|,\d)"), "[year]"),
+    (re.compile(r"(?<![A-Za-z])'\d{2}\b"), "'[year]"),
+]
+# per-share dollar amounts ("Price Target to $264", "EPS $1.21"), not totals ("$16.95B", "$5 billion")
+DOLLARS = re.compile(r"\$ ?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)(?![\d,]|\.\d)"
+                     r"(?! ?(?:[BMKTbmkt]\b|bn\b|mn\b|mln\b|billions?\b|millions?\b|thousands?\b|trillions?\b))")
+
+
+def _amount(x: float) -> str:
+    return f"{x:.0f}" if x >= 1000 else f"{x:.1f}" if x >= 100 else f"{x:.2f}" if x >= 10 else f"{x:.3f}"
+
+
+def mask_dates(text: str) -> str:
+    for pat, repl in DATE_MASKS:
+        text = pat.sub(repl, text)
+    return text
+
+
+def rebase_dollars(text: str, factor: float) -> str:
+    """Per-share dollar amounts times ``factor``, the way blind records rebase prices: a price target keeps its
+    distance from the price, and the price level stops naming the stock."""
+    return DOLLARS.sub(lambda m: "$" + _amount(float(m.group(1).replace(",", "")) * factor), text)
+
+
 @dataclass
 class Blind:
     aliases: dict[str, str]
@@ -172,24 +228,41 @@ class Blind:
     base: dict[str, float] = field(default_factory=dict)
 
     @classmethod
-    def make(cls, symbols: list[str], seed: int = 0) -> Blind:
-        order = sorted(symbols)
-        rng = np.random.default_rng(seed)
-        rng.shuffle(order)
-        aliases = {s: f"S{i + 1:02d}" for i, s in enumerate(order)}
+    def make(cls, symbols: list[str], seed: int = 0, aliases: dict[str, str] | None = None) -> Blind:
+        """Aliases S01, S02, ... in a shuffled order (or the ``aliases`` given), and the patterns that put them in
+        place of each company's names and ticker, its best-known people ("the S01 chief") and products
+        ("[product]")."""
+        if aliases is None:
+            order = sorted(symbols)
+            rng = np.random.default_rng(seed)
+            rng.shuffle(order)
+            aliases = {s: f"S{i + 1:02d}" for i, s in enumerate(order)}
         pats: list[tuple[re.Pattern, str]] = []
         for s, a in aliases.items():
             names = sorted({n for n in company_names(s, fetch=False) if len(n) > 2}, key=len, reverse=True)
             for n in names:
                 pats.append((re.compile(rf"(?<![A-Za-z0-9]){re.escape(n)}(?:'s)?(?![A-Za-z0-9])", re.IGNORECASE), a))
             pats.append((re.compile(rf"\$?(?<![A-Za-z0-9.]){re.escape(s)}(?![A-Za-z0-9])"), a))  # tickers: case kept
+            for n in PEOPLE.get(s, []):
+                pats.append((re.compile(rf"(?<![A-Za-z0-9]){re.escape(n)}('s)?(?![A-Za-z0-9])", re.IGNORECASE),
+                             f"the {a} chief\\1"))
+            for n in PRODUCTS.get(s, []):
+                pats.append((re.compile(rf"(?<![A-Za-z0-9]){re.escape(n)}(?![A-Za-z0-9])", re.IGNORECASE), "[product]"))
         pats.sort(key=lambda p: len(p[0].pattern), reverse=True)
         return cls(aliases, {a: s for s, a in aliases.items()}, pats)
 
     def mask(self, text: str) -> str:
+        """Company names, tickers, people and products replaced (dates and dollar amounts stay: see ``headline``)."""
         for pat, alias in self.patterns:
             text = pat.sub(alias, text)
         return text
+
+    def headline(self, sym: str, text: str) -> str:
+        """A headline about ``sym`` as blind mode shows it: names, people and products masked (``mask``), every date
+        and year masked, and per-share dollar amounts rebased the way the stock's prices are, so that a price target
+        keeps its distance from the price and stops giving the price level away."""
+        base = self.base.get(sym)
+        return rebase_dollars(mask_dates(self.mask(text)), 100.0 / base if base else 1.0)
 
     def price(self, sym: str, px: float) -> float:
         b = self.base.setdefault(sym, px)
@@ -241,9 +314,11 @@ def observe(ctx: Any, *, step: int, trading_day: int, start_equity: float, blind
         if rep is not None:
             heads = []
             for cl in rep.top(max_news):
-                text = blind.mask(cl.headline) if blind else cl.headline
+                text = cl.headline[:200]  # cut before masking: named and blind show the same words
+                if blind:
+                    text = blind.headline(sym, text)
                 hrs = (close_t - cl.first_seen).total_seconds() / 3600 if cl.first_seen else None
-                heads.append({"headline": text[:200], "status": cl.status.value.lower(),
+                heads.append({"headline": text, "status": cl.status.value.lower(),
                               "hours_before_close": _f(hrs, 3), "flags": cl.live_flags})
             d["news"] = {"score": _f(rep.score), "confirmed": rep.confirmed, "single_source": rep.unconfirmed,
                          "red_flags": [*rep.red_flags_confirmed, *rep.red_flags_unconfirmed], "headlines": heads}

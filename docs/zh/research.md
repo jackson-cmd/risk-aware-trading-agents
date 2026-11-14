@@ -159,7 +159,7 @@ r = run_policy(llm_policy("ollama:qwen2.5:3b"), Experiment(universe="core", max_
 
 通过 MCP，`trading_session_start` 返回第一份观察，`trading_session_step(session_id, orders)` 返回下一份，直到给出结果。会话把订单存在磁盘上，每一步都重放一遍，所以服务器重启也不会丢。
 
-**盲测模式。** 用某段时间的文本训练过的模型，可能记得某只股票后来怎么样：2020 和 2022 年在所有现有模型的训练数据里，2026 年只在最新的模型里。`blind=True` 时，股票代码变成 S01、S02……，日期变成「第几天」，价格从第一天起换算成 100，标题里的公司名和代码也换成同样的化名（例如「S01 Stock Moves Lower As Investors Assess Its AI Edge Against S03」）。它能降低模型回忆起结果的可能，但排除不了：一条不寻常的标题、所属行业和价格走势放在一起，仍然可能暴露是哪只股票。要量一个模型对某个时段记得多少、它在那里的成绩干不干净，见[记忆检测](memory.md)。
+**盲测模式。** 用某段时间的文本训练过的模型，可能记得某只股票后来怎么样：2020 和 2022 年在所有现有模型的训练数据里，2026 年只在最新的模型里。`blind=True` 时，股票代码变成 S01、S02……，日期变成「第几天」，价格从第一天起换算成 100，标题里的公司名和代码也换成同样的化名（例如「S01 Stock Moves Lower As Investors Assess Its AI Edge Against S03」）。标题里会暴露股票或日期的东西也去掉：公司最有名的人和产品换成「the S01 chief」和「[product]」，所有日期和年份都遮掉（「Top WallStreetBets Mentions for Monday May 9, 2022」变成「... for Monday [date]」），每股美元金额按价格同样的比例换算，目标价和股价的距离不变，却不再透露价位。它能降低模型回忆起结果的可能，但排除不了：一条不寻常的标题、所属行业和价格走势放在一起，仍然可能暴露是哪只股票。要量一个模型对某个时段记得多少、它在那里的成绩干不干净，见[记忆检测](memory.md)。
 
 **改动新闻。** `extra_news` 可以给一次实验加几条标题，比如看策略或模型对一条从没发生过的新闻怎么反应。记录的 manifest 会列出这些标题。
 
