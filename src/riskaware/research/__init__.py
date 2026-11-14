@@ -10,7 +10,8 @@
 * ``agent``: let an LLM trade the period day by day, from Python or over MCP, optionally blind (no tickers, no
   dates) so that it cannot recall what happened;
 * ``memory``: measure whether a model remembers what happened next (the same points asked named and blind, and
-  direct recall), so a leaderboard can say whose results on a period are clean.
+  direct recall), so a leaderboard can say whose results on a period are clean;
+* ``bench``: rta-bench-1, the LLM trading leaderboard's six tasks, its entries and their replay check.
 
 Docs: docs/research.md. CLI: ``riskaware research --help``. MCP: ``research_guide`` first.
 """

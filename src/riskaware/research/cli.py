@@ -644,3 +644,145 @@ def memory_cmd(
 from .prompts_cli import app as prompts_app  # noqa: E402 - the sub-command's module imports nothing heavy
 
 app.add_typer(prompts_app, name="prompts")
+
+
+# ----------------------------------------------------------------------------------- the leaderboard (rta-bench-1)
+@app.command("bench")
+def bench_cmd(
+    llm: str = typer.Option(..., help="provider:model, e.g. openai:gpt-5.6-luna, ollama:llama3.2:3b, claude-cli"),
+    task: Optional[list[str]] = typer.Option(None, "--task", help="2026-blind, 2026-named, 2022-blind, 2022-named, "
+                                                                 "2020-blind or 2020-named; repeat it (default: all six)"),
+    seed: Optional[list[int]] = typer.Option(None, "--seed", help="Seeds to run (repeat it; default 0, 1 and 2)"),
+    base_url: Optional[str] = typer.Option(None, help="For compat:model, the server's URL"),
+    temperature: float = typer.Option(0.2),
+    max_tokens: int = typer.Option(2000),
+) -> None:
+    """Run rta-bench-1 tasks with an LLM and save each record. / 用一个 LLM 跑 rta-bench-1 的任务并保存记录"""
+    from .bench import SEEDS, TASKS, bench_policy, get_task, run_task
+
+    try:
+        tasks = [get_task(t).name for t in (task or TASKS)]
+    except ValueError as exc:
+        console.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
+
+    def show(obs: dict, reply: dict | None) -> None:
+        orders = (reply or {}).get("orders") or []
+        text = ", ".join(f"{o.get('action')} {o.get('symbol')}" for o in orders) or L("hold", "持有")
+        console.print(f"[dim]{obs['day']}[/] {escape(text)}")
+
+    for s, name in ((s, name) for s in (seed or SEEDS) for name in tasks):
+        console.print(f"[bold]{name}[/] seed {s}")
+        policy = bench_policy(llm, base_url=base_url, temperature=temperature, max_tokens=max_tokens, on_reply=show)
+        res = run_task(policy, name, label=f"llm:{llm}:{name}:s{s}", seed=s)
+        _print_summary({"ok": True, **res.summary()})
+        u = policy.usage  # type: ignore[attr-defined]
+        console.print(L(f"{u['calls']} calls, {u['input_tokens']:,} input and {u['output_tokens']:,} output tokens, "
+                        f"{u['failed']} unusable replies", f"调用 {u['calls']} 次，输入 {u['input_tokens']:,} token，"
+                        f"输出 {u['output_tokens']:,} token，{u['failed']} 次回复无法使用"))
+        console.print(L("Submit it: ", "提交：") + f"riskaware research submit {res.run_id} --model <name> "
+                      "--cutoff YYYY-MM", soft_wrap=True)
+
+
+@app.command("submit")
+def submit_cmd(
+    run: str = typer.Argument(..., help="Run id or folder of a benchmark run"),
+    model: str = typer.Option(..., help="The model's name on the board, e.g. gpt-5.6-luna"),
+    cutoff: str = typer.Option(..., help="The model's training cutoff, YYYY-MM"),
+    provider: Optional[str] = typer.Option(None, help="Who made the model, e.g. OpenAI"),
+    access: Optional[str] = typer.Option(None, help="How it was called, e.g. 'OpenAI API' or 'Ollama, Q4_K_M'"),
+    open_weights: Optional[bool] = typer.Option(None, "--open-weights/--closed-weights"),
+    parameters: Optional[str] = typer.Option(None, help="Model size if known, e.g. 3B"),
+    submitter: Optional[str] = typer.Option(None, help="Your name or GitHub handle"),
+    notes: Optional[str] = typer.Option(None),
+    memory: Optional[Path] = typer.Option(None, help="JSON file with the model's memory-probe result"),
+    out: Path = typer.Option(Path("leaderboard/entries"), help="Folder for the entry"),
+    force: bool = typer.Option(False, help="Replace an entry that already exists"),
+) -> None:
+    """Check a benchmark run and write its leaderboard entry. / 校验一次基准运行并写出榜单条目"""
+    from .bench import BenchError, make_entry, write_entry
+    from .experiment import run_folder
+
+    try:
+        folder = run_folder(run)
+        mem = json.loads(memory.read_text(encoding="utf-8")) if memory else None
+        entry = make_entry(folder, model=model, cutoff=cutoff, provider=provider, access=access,
+                           open_weights=open_weights, parameters=parameters, submitter=submitter, notes=notes,
+                           memory=mem)
+        path = write_entry(entry, out, overwrite=force)
+    except BenchError as exc:
+        console.print(f"[red]{L('Not a valid rta-bench-1 run:', '不是有效的 rta-bench-1 运行：')}[/]")
+        for p in exc.problems:
+            console.print(f"  - {escape(p)}")
+        raise typer.Exit(2) from exc
+    except (ValueError, FileNotFoundError, FileExistsError, json.JSONDecodeError) as exc:
+        console.print(f"[red]{escape(str(exc))}[/]")
+        raise typer.Exit(2) from exc
+    m = entry["metrics"]
+    console.print(f"{entry['task']}  {entry['contamination']}  {L('return', '收益')} {_pct(m.get('total_return'))}  "
+                  f"Sharpe {_num(m.get('sharpe'))}  {L('vs equal weight', '相对等权')} "
+                  f"{_pct(m.get('excess_vs_equal_weight'))}")
+    console.print(L("Entry: ", "条目：") + str(path), soft_wrap=True)
+    console.print(L("Open a pull request that adds this file; CI replays it.",
+                    "开一个只加这个文件的 PR，CI 会重放并核对它。"))
+
+
+@app.command("leaderboard")
+def leaderboard_cmd(
+    directory: Optional[Path] = typer.Option(None, "--dir", help="The leaderboard folder (default: ./leaderboard)"),
+    verify: bool = typer.Option(False, help="Replay every entry and check its numbers (no model is called)"),
+    anchors: bool = typer.Option(False, "--anchors", help="Rebuild anchors.json: the rule strategies on each period"),
+    as_json: bool = typer.Option(False, "--json"),
+    out: Optional[Path] = typer.Option(None, help="Also write the board as JSON to this file"),
+) -> None:
+    """The model leaderboard: every entry side by side, clean and may-remember apart. / 模型榜单"""
+    from .bench import anchor_rows, board, check_entry, default_dir, load_entries, verify_entry
+
+    root = directory or default_dir()
+    if root is None or not (root / "entries").is_dir():
+        console.print(L("No leaderboard folder here; clone the repository or pass --dir.",
+                        "这里没有 leaderboard 文件夹；克隆仓库，或用 --dir 指定。"))
+        raise typer.Exit(2)
+    if anchors:
+        with console.status("...") as st:
+            rows = anchor_rows(progress=lambda msg: st.update(msg))
+        (root / "anchors.json").write_text(json.dumps(rows, indent=1) + "\n", encoding="utf-8")
+    entries = load_entries(root / "entries")
+    bad = 0
+    for e in entries:
+        problems = verify_entry(e)["problems"] if verify else check_entry(e)
+        if problems:
+            bad += 1
+            console.print(f"[red]{escape(e['_file'])}[/]: " + "; ".join(escape(p) for p in problems))
+    rows = json.loads((root / "anchors.json").read_text(encoding="utf-8")) if (root / "anchors.json").is_file() else []
+    b = board(entries, rows)
+    if out:
+        out.write_text(json.dumps(b, indent=1) + "\n", encoding="utf-8")
+    if as_json:
+        console.print_json(json.dumps(b))
+        raise typer.Exit(1 if bad else 0)
+    for period, p in b["periods"].items():
+        for part, title in (("clean", L("clean: after the training cutoff", "干净：训练截止之后")),
+                            ("may_remember", L("may remember: before the cutoff", "可能记得：训练截止之前"))):
+            if not p[part]:
+                continue
+            t = Table(title=f"{period} · {title}")
+            for col in (L("Model", "模型"), L("Blind return", "盲测收益"), "Sharpe", L("Max DD", "最大回撤"),
+                        L("vs equal wt", "相对等权"), L("Exposure", "仓位"), L("Named return", "实名收益"),
+                        L("Named − blind", "实名−盲测")):
+                t.add_column(col, justify="left" if col in ("Model", "模型") else "right")
+            for r in p[part]:
+                bl, nm = r.get("blind") or {}, r.get("named") or {}
+                t.add_row(escape(r["model"]), _pct(bl.get("total_return")), _num(bl.get("sharpe")),
+                          _pct(bl.get("max_drawdown")), _pct(bl.get("excess_vs_equal_weight")),
+                          _pct(bl.get("avg_exposure"), sign=False), _pct(nm.get("total_return")),
+                          _pct(r.get("named_minus_blind")))
+            for a in p["anchors"]:
+                t.add_row(f"[dim]{escape(a['name'])}[/]", _pct(a.get("total_return")), _num(a.get("sharpe")),
+                          _pct(a.get("max_drawdown")), _pct(a.get("excess_vs_equal_weight")),
+                          _pct(a.get("avg_exposure"), sign=False), "", "")
+            console.print(t)
+    console.print(L(f"Entries: {b['entries']} · models: {b['models']} · with problems: {bad}",
+                    f"条目 {b['entries']} 个 · 模型 {b['models']} 个 · 有问题的 {bad} 个"))
+    if bad:
+        raise typer.Exit(1)

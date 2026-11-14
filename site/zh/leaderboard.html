@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM 交易智能体榜单：GPT、Claude、Gemini、Llama 按发布时间回放新闻实盘对比 · 风险感知交易智能体</title>
+<meta name="description" content="公开的 LLM 交易智能体榜单（rta-bench-1）：每个模型在 2026 年、2022 年熊市和 2020 年暴跌三个冻结时段里交易 56 只美股大盘股，新闻按发布时间回放，盲测和实名各跑一次，训练截止日前后的成绩分开列。每个数字都能从 JSON 文件重放出来。">
+<link rel="canonical" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html">
+<link rel="alternate" hreflang="en" href="https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html">
+<link rel="alternate" hreflang="x-default" href="https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html">
+<meta property="og:title" content="LLM 交易智能体榜单（rta-bench-1）">
+<meta property="og:description" content="Llama 3.2、GPT-5.6 Luna、Claude Haiku 5.5 和 Sonnet 4.6、Gemini 3.5 Flash 在 2026、2022、2020 三个时段按发布时间回放的新闻上交易，盲测和实名各一次，训练截止日前后分开计分。">
+<meta property="og:image" content="https://jackson-cmd.github.io/risk-aware-trading-agents/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/guide.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"rta-bench-1：LLM 交易智能体榜单","description":"LLM 交易智能体在 rta-bench-1 上的成绩：每个模型在冻结的 2026、2022、2020 三个时段里交易 megacap 列表的 56 只美股，价格和新闻按发布时间回放，实名和盲测各跑一次，每 5 个交易日收盘后决策一次，次日开盘成交。每条成绩记下模型的训练截止日、窗口是否在截止日之后、收益、Sharpe、回撤、收益来源和模型的全部回复，每个数字都能重算。","inLanguage":"zh-Hans","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"keywords":["LLM 交易智能体","大模型炒股","AI 交易榜单","新闻回测","未来函数","数据泄露","按时间点数据","GPT","Claude","Gemini","Llama"],"creator":{"@type":"Organization","name":"Risk-Aware Trading Agents contributors","url":"https://github.com/jackson-cmd/risk-aware-trading-agents"},"distribution":[{"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://jackson-cmd.github.io/risk-aware-trading-agents/assets/data/leaderboard.json"}],"isPartOf":{"@type":"WebSite","name":"Risk-Aware Trading Agents","url":"https://jackson-cmd.github.io/risk-aware-trading-agents/"}}</script>
+</head>
+<body>
+<header><div class="wrap wide">
+  <a class="brand" href="index.html">风险感知交易智能体</a>
+  <nav>
+    <a href="news-backtesting.html">新闻回测</a>
+    <a href="#prompts">Prompt 榜</a>
+    <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a>
+    <a href="../leaderboard.html" hreflang="en" lang="en">English</a>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<p class="crumbs"><a href="index.html">首页</a> › 模型榜单</p>
+<h1>LLM 交易智能体榜单</h1>
+<p class="lead">每个模型交易同样的 56 只美股大盘股，走完三个冻结的时段：2026 年至今、2022 年熊市、2020 年暴跌。每隔 5 个交易日收盘后，它能看到价格、技术指标和收盘前已发布的新闻标题，下的单在下一个交易日开盘成交。每个时段跑两次，一次用真实名字，一次盲测。训练截止日之后的成绩参与排名，之前的单独列出；页面上每个数字都能从对应的条目重算出来，不用再调用模型。</p>
+<div class="cta">
+  <a class="btn primary" href="#submit">提交一个模型</a>
+  <a class="btn" href="../assets/data/leaderboard.json">下载结果（JSON）</a>
+  <a class="btn" href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/leaderboard.md">基准怎么定的</a>
+</div>
+
+<!-- board:updated -->
+<p class="box"><b>持续更新中。</b>结果跑完一批更新一批；最近一次更新 2026-11-13，26 个条目、4 个模型。每个模型名下是它的运行日期（UTC）。</p>
+<!-- /board:updated -->
+
+<div class="facts">
+  <div><b>6 个任务</b><span>2026、2022、2020 年，每年盲测和实名各一次</span></div>
+  <div><b>56 只股票</b><span>11 个行业，最多 10 个仓位，只做多，本金 10 万美元</span></div>
+  <div><b>44 到 51 次决策</b><span>每 5 个交易日收盘后一次，次日开盘成交</span></div>
+  <div><b>65,863 条新闻</b><span>按发布时间回放，每次决策每只股票最多 3 条</span></div>
+</div>
+
+<h2 id="clean">干净的成绩：训练截止日之后</h2>
+<p>模型不可能读到训练截止日之后的事，所以这张表才衡量真本事。每个模型从它的截止日开始计分：训练数据截止在 2026 年中途的，从那天算起，旁边是同一段日子里 SPY 和等权组合的表现。这里用的是盲测任务；最后两列是整个窗口的收益，以及在这段日子里给它看名字后多赚了多少。</p>
+<!-- board:clean -->
+<h3 id="clean-2026">2026 · 2026-01-02 – 2026-11-11</h3>
+<div class="table-wrap"><table class="board"><thead><tr><th>模型</th><th class="num">训练截止</th><th class="num">计分起点</th><th class="num">种子数</th><th class="num">收益</th><th class="num">SPY</th><th class="num">等权</th><th class="num">Sharpe</th><th class="num">最大回撤</th><th class="num">整个窗口</th><th class="num">实名 − 盲测</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-01</td><td class="num">2026-01-30</td><td class="num">1</td><td class="num">+6.2%</td><td class="num">+10.7%</td><td class="num">+10.6%</td><td class="num">0.34</td><td class="num">-9.0%</td><td class="num">+8.1%</td><td class="num">+1.4%</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2025-01</td><td class="num">2026-01-02</td><td class="num">1</td><td class="num">+5.4%</td><td class="num">+12.1%</td><td class="num">+11.4%</td><td class="num">0.25</td><td class="num">-9.6%</td><td class="num">+5.4%</td><td class="num">+4.0%</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-02-16</td><td class="num">2026-02-13</td><td class="num">3</td><td class="num">+1.7% <span class="muted">-1.9% … +5.3%</span></td><td class="num">+12.3%</td><td class="num">+10.7%</td><td class="num">-0.15 <span class="muted">-0.90 … 0.64</span></td><td class="num">-4.8%</td><td class="num">+5.4%</td><td class="num">+11.6%</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-06</td><td class="num">2026-06-30</td><td class="num">1</td><td class="num">-0.6%</td><td class="num">+2.0%</td><td class="num">+5.7%</td><td class="num">-0.99</td><td class="num">-3.1%</td><td class="num">+2.4%</td><td class="num">—</td></tr>
+</tbody></table></div>
+<p class="note">规则策略和买入持有（整个窗口）</p><div class="table-wrap"><table class="board anchors"><thead><tr><th>模型</th><th class="num">收益</th><th class="num">Sharpe</th><th class="num">最大回撤</th><th class="num">相对等权</th><th class="num">平均持股</th></tr></thead><tbody>
+<tr class="anchor"><td>趋势跟随 <span class="muted">· 规则</span></td><td class="num">+19.0%</td><td class="num">1.27</td><td class="num">-5.0%</td><td class="num">+7.5%</td><td class="num">85%</td></tr>
+<tr class="anchor"><td>Connors RSI(2) <span class="muted">· 规则</span></td><td class="num">+4.9%</td><td class="num">0.23</td><td class="num">-7.7%</td><td class="num">-6.5%</td><td class="num">51%</td></tr>
+<tr class="anchor"><td>20 日突破 <span class="muted">· 规则</span></td><td class="num">-6.5%</td><td class="num">-0.60</td><td class="num">-16.8%</td><td class="num">-18.0%</td><td class="num">90%</td></tr>
+<tr class="anchor"><td>上升趋势中买回调 <span class="muted">· 规则</span></td><td class="num">+1.1%</td><td class="num">-0.39</td><td class="num">-4.5%</td><td class="num">-10.4%</td><td class="num">24%</td></tr>
+<tr class="anchor"><td>新闻后的惯性 <span class="muted">· 规则</span></td><td class="num">+2.0%</td><td class="num">-0.05</td><td class="num">-6.7%</td><td class="num">-9.5%</td><td class="num">61%</td></tr>
+<tr class="anchor"><td>SPY 买入持有 <span class="muted">· 买入持有</span></td><td class="num">+12.1%</td><td class="num">0.77</td><td class="num">-8.9%</td><td class="num">—</td><td class="num">—</td></tr>
+<tr class="anchor"><td>等权持有全部 56 只 <span class="muted">· 买入持有</span></td><td class="num">+11.4%</td><td class="num">0.85</td><td class="num">-7.2%</td><td class="num">—</td><td class="num">—</td></tr>
+</tbody></table></div>
+<!-- /board:clean -->
+
+<h2 id="remember">可能记得：训练截止日之前</h2>
+<p>2022 年熊市和 2020 年暴跌都在这里每个模型的训练文本里。这些成绩只做对照，不算本事：就算盲测，模型也可能记得 2022 年能源股大涨、2020 年科技股领涨反弹，因为盲测藏起了名字和日期，但保留了每只股票所属的行业。规则策略和买入持有那几行用的是同样的股票、仓位和成交规则。</p>
+<!-- board:remember -->
+<h3 id="remember-2022">2022 · 2022-01-03 – 2022-12-30</h3>
+<div class="table-wrap"><table class="board"><thead><tr><th>模型</th><th class="num">训练截止</th><th class="num">种子数</th><th class="num">盲测收益</th><th class="num">Sharpe</th><th class="num">最大回撤</th><th class="num">相对等权</th><th class="num">实名收益</th><th class="num">实名 − 盲测</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-01</td><td class="num">1</td><td class="num">+0.4%</td><td class="num">-0.03</td><td class="num">-13.5%</td><td class="num">+12.7%</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-06</td><td class="num">1</td><td class="num">+1.4%</td><td class="num">-0.03</td><td class="num">-0.7%</td><td class="num">+13.7%</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2025-01</td><td class="num">1</td><td class="num">-1.2%</td><td class="num">-0.24</td><td class="num">-8.7%</td><td class="num">+11.2%</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-02-16</td><td class="num">3</td><td class="num">-2.5% <span class="muted">-7.2% … +4.1%</span></td><td class="num">-0.50 <span class="muted">-1.01 … 0.39</span></td><td class="num">-8.5%</td><td class="num">+9.9%</td><td class="num">-8.7%</td><td class="num">-6.2%</td></tr>
+<tr class="anchor"><td>趋势跟随 <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">-5.9%</td><td class="num">-0.47</td><td class="num">-17.8%</td><td class="num">+6.4%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>Connors RSI(2) <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">-8.6%</td><td class="num">-0.98</td><td class="num">-16.6%</td><td class="num">+3.8%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>20 日突破 <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">-15.1%</td><td class="num">-1.35</td><td class="num">-22.0%</td><td class="num">-2.7%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>上升趋势中买回调 <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">-4.2%</td><td class="num">-1.03</td><td class="num">-6.3%</td><td class="num">+8.1%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>新闻后的惯性 <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">-16.3%</td><td class="num">-1.37</td><td class="num">-21.0%</td><td class="num">-3.9%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>SPY 买入持有 <span class="muted">· 买入持有</span></td><td class="num"></td><td class="num"></td><td class="num">-18.6%</td><td class="num">-0.80</td><td class="num">-24.5%</td><td class="num">—</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>等权持有全部 56 只 <span class="muted">· 买入持有</span></td><td class="num"></td><td class="num"></td><td class="num">-12.4%</td><td class="num">-0.53</td><td class="num">-23.1%</td><td class="num">—</td><td class="num"></td><td class="num"></td></tr>
+</tbody></table></div>
+<h3 id="remember-2020">2020 · 2020-01-02 – 2020-12-31</h3>
+<div class="table-wrap"><table class="board"><thead><tr><th>模型</th><th class="num">训练截止</th><th class="num">种子数</th><th class="num">盲测收益</th><th class="num">Sharpe</th><th class="num">最大回撤</th><th class="num">相对等权</th><th class="num">实名收益</th><th class="num">实名 − 盲测</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-01</td><td class="num">1</td><td class="num">+25.4%</td><td class="num">1.38</td><td class="num">-14.0%</td><td class="num">-14.7%</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-06</td><td class="num">1</td><td class="num">+7.4%</td><td class="num">0.77</td><td class="num">-9.0%</td><td class="num">-32.7%</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2025-01</td><td class="num">1</td><td class="num">+5.6%</td><td class="num">0.35</td><td class="num">-19.7%</td><td class="num">-34.4%</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026-02-16</td><td class="num">3</td><td class="num">+2.3% <span class="muted">-0.9% … +5.7%</span></td><td class="num">0.20 <span class="muted">-0.05 … 0.45</span></td><td class="num">-15.3%</td><td class="num">-37.8%</td><td class="num">+12.5%</td><td class="num">+10.2%</td></tr>
+<tr class="anchor"><td>趋势跟随 <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">+67.4%</td><td class="num">2.18</td><td class="num">-13.6%</td><td class="num">+27.4%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>Connors RSI(2) <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">+6.3%</td><td class="num">0.39</td><td class="num">-19.8%</td><td class="num">-33.8%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>20 日突破 <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">+27.6%</td><td class="num">1.23</td><td class="num">-13.4%</td><td class="num">-12.5%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>上升趋势中买回调 <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">+2.2%</td><td class="num">0.25</td><td class="num">-11.9%</td><td class="num">-37.8%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>新闻后的惯性 <span class="muted">· 规则</span></td><td class="num"></td><td class="num"></td><td class="num">+23.4%</td><td class="num">1.18</td><td class="num">-17.6%</td><td class="num">-16.7%</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>SPY 买入持有 <span class="muted">· 买入持有</span></td><td class="num"></td><td class="num"></td><td class="num">+17.2%</td><td class="num">0.63</td><td class="num">-33.7%</td><td class="num">—</td><td class="num"></td><td class="num"></td></tr>
+<tr class="anchor"><td>等权持有全部 56 只 <span class="muted">· 买入持有</span></td><td class="num"></td><td class="num"></td><td class="num">+40.1%</td><td class="num">1.13</td><td class="num">-32.5%</td><td class="num">—</td><td class="num"></td><td class="num"></td></tr>
+</tbody></table></div>
+<!-- /board:remember -->
+
+<h2 id="money">每个模型靠什么赚钱</h2>
+<p>根据每次盲测的运行记录，用包里的运行分析算出（<a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/analysis.md">原理</a>）。<b>收益从哪来：</b>平均有多少资金在股票里，市场 beta，相对短期国债的年化收益里由四个因子暴露（大盘、规模、成长、动量）解释的部分，以及剩下的 alpha 和它的 Newey-West t 值；赚得最多和亏得最多的行业，按占初始 10 万美元的比例；平均持有多少个交易日。<b>决策好不好：</b>买入的股票从成交起 5 个交易日相对 SPY 的表现；买卖决策在这 5 天里做对的比例；它的操作（买、卖、不动）和之后 5 天收益的秩相关（IC）；理由里引用了新闻的决策占多少，以及因新闻建仓的头寸赚了多少。|t| 小于 2 就在噪声范围内。</p>
+<!-- board:money -->
+<h3>收益从哪来</h3>
+<div class="table-wrap"><table class="board"><thead><tr><th>模型</th><th class="num">时段</th><th class="num">平均持股</th><th class="num">市场 beta</th><th class="num">来自因子暴露</th><th class="num">Alpha</th><th class="num">赚得最多的行业</th><th class="num">亏得最多的行业</th><th class="num">平均持有</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026</td><td class="num">86%</td><td class="num">0.59</td><td class="num">+4.8%/年</td><td class="num">+1.8% <span class="muted">t 0.2</span></td><td class="num">医疗 +4.7%</td><td class="num">通信服务 -2.1%</td><td class="num">29 天</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026</td><td class="num">94%</td><td class="num">0.70</td><td class="num">+6.0%/年</td><td class="num">-2.3% <span class="muted">t -0.2</span></td><td class="num">医疗 +7.9%</td><td class="num">通信服务 -2.2%</td><td class="num">30 天</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026</td><td class="num">49%</td><td class="num">0.36</td><td class="num">+1.7%/年</td><td class="num">+1.1% <span class="muted">t 0.2</span></td><td class="num">工业 +5.1%</td><td class="num">可选消费 -1.5%</td><td class="num">24 天</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026</td><td class="num">31%</td><td class="num">0.23</td><td class="num">+2.7%/年</td><td class="num">-3.2% <span class="muted">t -0.5</span></td><td class="num">金融 +3.2%</td><td class="num">科技 -3.9%</td><td class="num">23 天</td></tr>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2022</td><td class="num">70%</td><td class="num">0.55</td><td class="num">+0.2%/年</td><td class="num">-0.5% <span class="muted">t -0.1</span></td><td class="num">能源 +7.5%</td><td class="num">科技 -3.3%</td><td class="num">36 天</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2022</td><td class="num">2%</td><td class="num">0.01</td><td class="num">-0.0%/年</td><td class="num">-0.0% <span class="muted">t -0.0</span></td><td class="num">医疗 +0.2%</td><td class="num">工业 -0.1%</td><td class="num">10 天</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2022</td><td class="num">46%</td><td class="num">0.34</td><td class="num">+0.1%/年</td><td class="num">-2.3% <span class="muted">t -0.3</span></td><td class="num">医疗 +4.7%</td><td class="num">科技 -3.5%</td><td class="num">31 天</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2022</td><td class="num">41%</td><td class="num">0.30</td><td class="num">-2.0%/年</td><td class="num">-1.8% <span class="muted">t -0.3</span></td><td class="num">医疗 +2.5%</td><td class="num">科技 -2.9%</td><td class="num">26 天</td></tr>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2020</td><td class="num">62%</td><td class="num">0.34</td><td class="num">+20.2%/年</td><td class="num">+3.6% <span class="muted">t 0.4</span></td><td class="num">科技 +10.7%</td><td class="num">金融 +0.1%</td><td class="num">32 天</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2020</td><td class="num">22%</td><td class="num">0.23</td><td class="num">+9.8%/年</td><td class="num">-2.6% <span class="muted">t -0.6</span></td><td class="num">科技 +7.1%</td><td class="num">金融 -1.1%</td><td class="num">27 天</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2020</td><td class="num">64%</td><td class="num">0.43</td><td class="num">+18.5%/年</td><td class="num">-11.3% <span class="muted">t -1.0</span></td><td class="num">科技 +2.1%</td><td class="num">必需消费 -1.7%</td><td class="num">29 天</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2020</td><td class="num">45%</td><td class="num">0.28</td><td class="num">+9.4%/年</td><td class="num">-6.7% <span class="muted">t -0.8</span></td><td class="num">科技 +4.3%</td><td class="num">公用事业 -2.8%</td><td class="num">28 天</td></tr>
+</tbody></table></div>
+<h3>决策好不好</h3>
+<div class="table-wrap"><table class="board"><thead><tr><th>模型</th><th class="num">时段</th><th class="num">决策数</th><th class="num">买入后 5 日相对 SPY</th><th class="num">命中率</th><th class="num">决策 IC</th><th class="num">新闻触发的比例</th><th class="num">新闻触发买入的盈亏</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026</td><td class="num">170.0</td><td class="num">+0.25% <span class="muted">t 0.5</span></td><td class="num">56%</td><td class="num">0.023 <span class="muted">t 1.2</span></td><td class="num">29%</td><td class="num">-6.2%</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026</td><td class="num">126.0</td><td class="num">-0.65% <span class="muted">t -1.2</span></td><td class="num">53%</td><td class="num">-0.007 <span class="muted">t -0.4</span></td><td class="num">36%</td><td class="num">-5.3%</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026</td><td class="num">173.666667</td><td class="num">+0.15% <span class="muted">t 0.4</span></td><td class="num">48%</td><td class="num">0.004 <span class="muted">t 0.1</span></td><td class="num">19%</td><td class="num">+3.0%</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2026</td><td class="num">66.0</td><td class="num">-0.30% <span class="muted">t -0.2</span></td><td class="num">42%</td><td class="num">-0.036 <span class="muted">t -1.1</span></td><td class="num">43%</td><td class="num">+2.0%</td></tr>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2022</td><td class="num">156.0</td><td class="num">+0.33% <span class="muted">t 0.8</span></td><td class="num">46%</td><td class="num">-0.013 <span class="muted">t -0.7</span></td><td class="num">21%</td><td class="num">-4.3%</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2022</td><td class="num">4.0</td><td class="num">+0.27% <span class="muted">t 0.4</span></td><td class="num">75%</td><td class="num">0.052 <span class="muted">t 0.5</span></td><td class="num">50%</td><td class="num">-0.4%</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2022</td><td class="num">78.0</td><td class="num">+1.42% <span class="muted">t 2.2</span></td><td class="num">60%</td><td class="num">0.043 <span class="muted">t 1.9</span></td><td class="num">36%</td><td class="num">+1.3%</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2022</td><td class="num">169.666667</td><td class="num">+0.52% <span class="muted">t 1.3</span></td><td class="num">50%</td><td class="num">-0.002 <span class="muted">t -0.1</span></td><td class="num">15%</td><td class="num">+1.0%</td></tr>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2020</td><td class="num">152.0</td><td class="num">+0.28% <span class="muted">t 0.4</span></td><td class="num">46%</td><td class="num">-0.001 <span class="muted">t -0.0</span></td><td class="num">38%</td><td class="num">+11.6%</td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2020</td><td class="num">44.0</td><td class="num">-0.95% <span class="muted">t -1.7</span></td><td class="num">48%</td><td class="num">-0.015 <span class="muted">t -0.4</span></td><td class="num">55%</td><td class="num">+8.5%</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2020</td><td class="num">94.0</td><td class="num">+0.70% <span class="muted">t 1.1</span></td><td class="num">48%</td><td class="num">0.005 <span class="muted">t 0.2</span></td><td class="num">43%</td><td class="num">+7.4%</td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">2020</td><td class="num">160.0</td><td class="num">+0.44% <span class="muted">t 1.0</span></td><td class="num">51%</td><td class="num">0.005 <span class="muted">t 0.2</span></td><td class="num">17%</td><td class="num">+2.4%</td></tr>
+</tbody></table></div>
+<!-- /board:money -->
+
+<h2 id="memory">记忆</h2>
+<p>每个时段两项检查。<b>实名减盲测</b>：同一个模型在同一个时段，看得到名字和日期时的收益减去盲测时的收益。名字带来两样东西：模型记得的那段日子里发生的事，以及它对这些公司本身的了解；所以训练截止日之后的差距（那里记忆帮不上忙）属于后者。<b>记忆探针</b>（<a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/zh/memory.md">原理</a>）把这个时段里随机抽出的时点给模型看两遍，价格、指标和新闻完全相同，一遍带名字，一遍盲测（名字、人物、产品和日期都遮住），每次都问它这只股票接下来 20 个交易日跑赢 SPY 的可能性。分数是告诉它「是谁、是什么时候」之后，它把真正跑赢的股票排在前面的能力提高了多少（AUC 差，实名减盲测），只算训练截止日之前的时点；大于零说明名字有帮助。截止日之后的时点是对照组：格式在那里也可能有帮助，记忆不可能。「记得」表示截止日之前名字帮的忙比之后多（差值的 95% 区间在零以上），「没有迹象」表示没有多，「无定论」表示探针分辨不出来，比如截止日之前的时点不到 30 个。</p>
+<!-- board:memory -->
+<div class="table-wrap"><table class="board"><thead><tr><th>模型</th><th class="num">实名 − 盲测 2026</th><th class="num">记忆探针 2026</th><th class="num">实名 − 盲测 2022</th><th class="num">记忆探针 2022</th><th class="num">实名 − 盲测 2020</th><th class="num">记忆探针 2020</th></tr></thead><tbody>
+<tr><td><b>claude-sonnet-4.6</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">+0.4%</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td><b>gemini-3.5-flash</b><span class="muted"> · Google</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">+4.0%</td><td class="num">-0.05 <span class="muted">没有迹象</span></td><td class="num">—</td><td class="num">0.21 <span class="muted">记得</span></td><td class="num">—</td><td class="num">0.01 <span class="muted">无定论</span></td></tr>
+<tr><td><b>gpt-5.6-luna</b><span class="muted"> · OpenAI</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">+2.8%</td><td class="num">-0.42 <span class="muted">无定论</span></td><td class="num">-6.2%</td><td class="num">-0.01 <span class="muted">无定论</span></td><td class="num">+10.2%</td><td class="num">-0.02 <span class="muted">无定论</span></td></tr>
+<tr><td><b>claude-haiku-5.5</b><span class="muted"> · Anthropic</span><br><span class="muted small">运行于 2026-11-14</span></td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+</tbody></table></div>
+<!-- /board:memory -->
+
+<h2 id="prompts">Prompt 榜</h2>
+<p>什么样的系统提示词能让模型交易得更好？每个变体只改基线提示词的一处：加一个角色、写明风控规则、先写理由再下单、强调新闻或趋势、给几个示例、换输出格式、改每只股票的新闻条数，或者改决策频率。所有变体用同一个模型、在同样的盲测时段和几组随机种子上交易；只有当差别大于同一个提示词换个种子本来就有的波动时，才算数。</p>
+<div id="prompt-board" data-src="../assets/data/prompts.json" data-lang="zh"></div>
+
+<h2 id="submit">提交一个模型</h2>
+<pre>pip install risk-aware-trading-agents      # [llm] 会装上 Anthropic SDK
+riskaware research bench --llm openai:gpt-5.6-luna      # 六个任务 × 种子 0、1、2；少跑一些用 --task、--seed
+riskaware research submit RUN_ID --model gpt-5.6-luna --cutoff 2026-02 --provider OpenAI
+# 然后开一个 PR，把 leaderboard/entries/ 里新生成的文件加进去</pre>
+<p>这个包能调用的模型都可以：OpenAI 兼容接口（<code>openai:</code>，或者 <code>compat:</code> 加 <code>--base-url</code>）、Anthropic、通过 Ollama 跑的本地模型（<code>ollama:</code>，上下文开到 16,384 token），以及 Claude Code、Codex、Gemini 的命令行工具。在 Python 里，<code>bench.run_task(policy, "2026-blind")</code> 接受任何「观察值 → 订单」的函数。<code>submit</code> 会拒绝设置不同或没通过防偷看检查的运行，并把模型的全部回复写进条目；CI 会把这些回复重新放进回测，数字必须对得上。</p>
+<p>一个任务是 44 到 51 次决策，每次 1.1 万到 1.5 万个输入 token，每个种子六个任务合计 300 万到 450 万输入 token：小模型远不到 1 美元，Sonnet 级别的模型约 10 到 15 美元。榜单要求三个种子，并会显示每个条目有几个。</p>
+
+<h2 id="method">怎么读这个榜</h2>
+<ul>
+  <li><b>种子。</b>每个任务用种子 0、1、2 各跑一次（种子决定盲测的代号分配，接口支持时也用作采样种子）。表里是一个模型各个种子的平均，灰色是范围；暂时种子少的模型显示已有的那几个。比范围小的差别都是噪声。</li>
+  <li><b>训练截止日</b>取各家模型页面上写的训练数据截止日，不是发布日期。模型发布得再晚，也不知道截止日之后发生的事。</li>
+  <li><b>盲测</b>把代码、公司名和观察值里的日期换成代号，价格从 100 起算。从 2026 年 11 月 13 日起，新闻标题里的日期和美元金额也会遮住；榜单上最早一批盲测是在这之前跑的，部分标题里仍能读到日期（"Top WallStreetBets Mentions for Monday May 9, 2022"）或目标价。每个条目都记着运行时包的提交。即便如此，行业、价格走势和一条特别的新闻合在一起，也可能让模型认出某只股票。</li>
+  <li><b>幸存者偏差。</b>这 56 只是今天的大盘股，所以全部买入持有的结果比当时实际能做到的好看。</li>
+  <li><b>不是投资建议。</b>这是研究用的软件，十个月的交易时间也偏短。</li>
+</ul>
+
+<h2>更多指南</h2>
+<div class="more">
+  <a href="news-backtesting.html">用新闻回测，不用未来函数<span>为什么按日历日期对齐新闻会虚高</span></a>
+  <a href="llm-trading-agents.html">测试 LLM 交易智能体<span>在 Python 里或通过 MCP 交易冻结的市场</span></a>
+  <a href="point-in-time-market-data.html">按时间点记录的市场数据<span>价格、VIX 和新闻，附 SHA-256 哈希</span></a>
+</div>
+</main>
+
+<footer><div class="wrap wide">MIT 开源协议 · 不构成投资建议 · <a href="https://github.com/jackson-cmd/risk-aware-trading-agents">GitHub</a> · <a href="../leaderboard.html" hreflang="en">English</a></div></footer>
+<script src="../assets/prompt-board.js" defer></script>
+</body>
+</html>

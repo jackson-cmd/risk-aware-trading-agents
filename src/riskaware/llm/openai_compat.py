@@ -44,6 +44,9 @@ class OpenAICompatProvider:
         schema_hint = "Reply with one JSON object that matches this JSON schema:\n" + json.dumps(schema)
         body: dict[str, Any] = {
             "model": self.cfg.model,
+            # one JSON response: some OpenAI-compatible gateways answer with server-sent events unless told not to,
+            # and the reply could not be parsed
+            "stream": False,
             "messages": [{"role": "system", "content": system + "\n\n" + schema_hint},
                          {"role": "user", "content": user}],
             # strict structured output: the reply must match the schema and ends with the object (without it, small
