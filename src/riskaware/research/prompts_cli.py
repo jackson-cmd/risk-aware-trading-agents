@@ -178,13 +178,19 @@ def board_cmd(
     site: Path = typer.Option(Path("site/assets/data/prompts.json"), help="Where to write the website's data"),
     note: Optional[str] = typer.Option(None, help="A note for readers, in English (a model left out, say)"),
     note_zh: Optional[str] = typer.Option(None, help="The same note in Chinese"),
+    title: Optional[list[str]] = typer.Option(None, help="A title for each lab, in the order of the labs (repeat "
+                                              "the option; needed when two labs test the same model)"),
+    title_zh: Optional[list[str]] = typer.Option(None, help="The same titles in Chinese"),
 ) -> None:
     """Combine labs (one model each) into the website's prompt board. / 把几个模型的实验合成网站上的 prompt 榜"""
+    from itertools import zip_longest
+
     from .prompt_report import board
 
     con = _console()
+    titles = [{"en": en or zh, "zh": zh or en} for en, zh in zip_longest(title or [], title_zh or [])]
     try:
-        out = board(labs, site=site, notes={"en": note, "zh": note_zh or note} if note else None)
+        out = board(labs, site=site, notes={"en": note, "zh": note_zh or note} if note else None, titles=titles)
     except (ValueError, FileNotFoundError) as exc:
         con.print(f"[red]{escape(str(exc))}[/]")
         raise typer.Exit(2) from exc
