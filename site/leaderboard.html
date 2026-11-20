@@ -176,6 +176,7 @@
 
 <h2 id="prompts">Prompt leaderboard</h2>
 <p>Which system prompt makes a model trade better? Each variant changes one thing in the baseline prompt: a persona, explicit risk rules, reasoning before the orders, a focus on news or on trend, worked examples, the output format, the number of headlines, or how often it decides. All variants trade the same blind periods on several seeds with the same model, and a difference counts only when it is larger than what two seeds of the same prompt already differ by.</p>
+<p><b>So far</b>, 20 variants on gpt-5.6-luna in two grids, 198 runs (<a href="https://github.com/jackson-cmd/risk-aware-trading-agents/blob/main/docs/prompts.md">method and results</a>): no prompt changed the return or the Sharpe ratio by more than the noise, and the top of the board, at least 50% in cash at all times, is noise too. What the prompts change is how much stock the model holds. A focus on news, worked examples and reasoning before the orders cut the maximum drawdown measurably; a cash rule or a cash floor lost less in the 2022 bear market and made less in the 2020 rebound; no rule picked better stocks.</p>
 <div id="prompt-board" data-src="assets/data/prompts.json" data-lang="en"></div>
 
 <h2 id="submit">Submit a model</h2>

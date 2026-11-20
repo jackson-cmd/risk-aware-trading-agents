@@ -463,11 +463,19 @@ def _pv(v: Any) -> str:
     return "n/a" if f is None else ("<0.001" if f < 0.001 else f"{f:.3f}")
 
 
+def ran(r: dict[str, Any]) -> dict[str, list[Any]]:
+    """The periods and seeds a lab's finished runs cover: a lab stopped before its last seeds has fewer than its
+    settings planned."""
+    runs = r.get("runs") or []
+    return {"periods": sorted({str(x["period"]) for x in runs}) or list(r["settings"].get("periods") or []),
+            "seeds": sorted({int(x["seed"]) for x in runs}) or list(r["settings"].get("seeds") or [])}
+
+
 def render(r: dict[str, Any]) -> str:
     s = r["settings"]
     per = ", ".join(r["benchmarks"])
     lines = [f"# Prompt test: {s['llm']}", "",
-             f"{len(r['variants'])} prompt variants, each on {per}, seeds {', '.join(map(str, s['seeds']))}; "
+             f"{len(r['variants'])} prompt variants, each on {per}, seeds {', '.join(map(str, ran(r)['seeds']))}; "
              f"universe {s['universe'] or 'custom'} ({'blind' if s['blind'] else 'named'}), at most "
              f"{s['max_positions']} positions, temperature {s['temperature']}. Every variant changes one factor from "
              "the baseline. Differences are paired (same period, same seed): mean over periods, 95% bootstrap "
@@ -638,8 +646,9 @@ def _attr(a: dict[str, Any] | None) -> dict[str, Any] | None:
             "by_period": {p: {k: _round(v[k]) for k in keys} for p, v in a.get("by_period", {}).items()}}
 
 
-def board_entry(r: dict[str, Any]) -> dict[str, Any]:
-    """One model's prompt board (one lab's report) in the website's format."""
+def board_entry(r: dict[str, Any], title: dict[str, str] | None = None) -> dict[str, Any]:
+    """One model's prompt board (one lab's report) in the website's format; ``title`` ({"en", "zh"}) names the lab,
+    which tells apart several labs of the same model."""
     s = r["settings"]
     at = r.get("attribution") or {}
     rows = []
@@ -655,9 +664,9 @@ def board_entry(r: dict[str, Any]) -> dict[str, Any]:
             "vs_baseline": {k: _cmp(c) for k, c in v["vs_baseline"].items() if k in SITE_COMPARE} or None,
             "attribution": _attr(at.get(v["name"]) if isinstance(at, dict) else None)})
     noise = r["noise"]["sharpe"]
-    return {"model": s["llm"], "lab_note": s.get("note", ""),
-            "settings": {k: s.get(k) for k in ("universe", "symbols", "max_positions", "temperature", "blind", "news",
-                                               "periods", "seeds", "api_seed")},
+    return {"model": s["llm"], "title": title, "lab_note": s.get("note", ""),
+            "settings": {**{k: s.get(k) for k in ("universe", "symbols", "max_positions", "temperature", "blind",
+                                                  "news", "periods", "seeds", "api_seed")}, **ran(r)},
             "benchmarks": {p: {"start": b["start"], "end": b["end"],
                                "spy": {k: _round(x) for k, x in b["spy"].items()},
                                "equal_weight": {k: _round(x) for k, x in b["equal_weight"].items()}}
@@ -692,22 +701,30 @@ def across(reports: list[dict[str, Any]]) -> dict[str, Any] | None:
                           "attribution": _attr(at.get(n))} for n in names]}
 
 
-def site_payload(reports: dict[str, Any] | list[dict[str, Any]], notes: dict[str, str] | None = None) -> dict[str, Any]:
+def site_payload(reports: dict[str, Any] | list[dict[str, Any]], notes: dict[str, str] | None = None,
+                 titles: list[dict[str, str] | None] | None = None) -> dict[str, Any]:
     """The prompt board for the website (site/assets/data/prompts.json): one board per lab (one model each) and,
     with several labs, the comparison across models; ``notes`` ({"en", "zh"}) says what a reader should know (a model
-    left out, say). The format is described in docs/prompts.md."""
+    left out, say) and ``titles`` names the labs in their order ({"en", "zh"} or None each). The format is described
+    in docs/prompts.md."""
     reports = [reports] if isinstance(reports, dict) else list(reports)
+    titles = list(titles or [])
+    if len(titles) > len(reports):
+        raise ValueError(f"{len(titles)} titles for {len(reports)} labs")
+    titles += [None] * (len(reports) - len(titles))
     return {"format": "rta-prompt-board-1", "generated_utc": _now(),
             "set_version": reports[0]["set_version"], "baseline": BASELINE, "primary_metric": PRIMARY,
-            "boards": [board_entry(r) for r in reports], "across_models": across(reports), "method": METHOD,
-            "notes": notes}
+            "boards": [board_entry(r, t) for r, t in zip(reports, titles, strict=True)],
+            "across_models": across(reports),
+            "method": METHOD, "notes": notes}
 
 
-def board(labs: Iterable[str | Path], site: str | Path | None = None,
-          notes: dict[str, str] | None = None) -> dict[str, Any]:
-    """Report every lab (one model each) and combine them into the website's prompt board."""
+def board(labs: Iterable[str | Path], site: str | Path | None = None, notes: dict[str, str] | None = None,
+          titles: list[dict[str, str] | None] | None = None) -> dict[str, Any]:
+    """Report every lab (one model each) and combine them into the website's prompt board; ``titles`` names the
+    labs in their order (needed when two labs test the same model)."""
     reports = [report(lab) for lab in labs]
-    out = site_payload(reports, notes)
+    out = site_payload(reports, notes, titles)
     if site:
         p = Path(site)
         p.parent.mkdir(parents=True, exist_ok=True)

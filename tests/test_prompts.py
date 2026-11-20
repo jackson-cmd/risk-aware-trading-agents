@@ -170,11 +170,27 @@ def test_lab_with_a_fake_model_runs_records_and_reports(tmp_path):
     # two labs (two models) make one board with a comparison across them
     lab2 = P.run_lab(chosen, P.LabSettings(**{**st.to_dict(), "llm": "fake:other"}), tmp_path / "lab2", workers=3,
                      provider_factory=lambda v, s: FakeModel(s + 7), check=False)
-    both = R.board([lab, lab2], site=tmp_path / "site" / "both.json")
+    both = R.board([lab, lab2], site=tmp_path / "site" / "both.json", titles=[{"en": "Grid 1", "zh": "网格 1"}])
     assert [x["model"] for x in both["boards"]] == ["fake:model", "fake:other"]
+    assert [x["title"] for x in both["boards"]] == [{"en": "Grid 1", "zh": "网格 1"}, None]
     ac = both["across_models"]
     assert ac["models"] == ["fake:model", "fake:other"]
     assert next(v for v in ac["variants"] if v["name"] == "risk_rules")["vs_baseline"]["sharpe"]["pairs"] == 4
+    with pytest.raises(ValueError):  # more titles than labs
+        R.site_payload([r], titles=[{"en": "a", "zh": "a"}, {"en": "b", "zh": "b"}])
+    # a lab stopped before its last seeds shows the seeds that ran, not the ones it planned
+    planned = {**r, "settings": {**r["settings"], "seeds": [0, 1, 2, 3]}}
+    assert R.board_entry(planned)["settings"]["seeds"] == [0, 1] and "seeds 0, 1;" in R.render(planned)
+
+    # the command line names the labs in their order; a title missing in one language falls back to the other
+    from riskaware.research.cli import app
+
+    out = tmp_path / "site" / "cli.json"
+    res = CliRunner().invoke(app, ["prompts", "board", str(lab), str(lab2), "--site", str(out),
+                                   "--title", "A", "--title", "B", "--title-zh", "甲"])
+    assert res.exit_code == 0, res.output
+    assert [b["title"] for b in json.loads(out.read_text(encoding="utf-8"))["boards"]] == [
+        {"en": "A", "zh": "甲"}, {"en": "B", "zh": "B"}]
 
     # a second run of the same lab only does what is missing
     again = []

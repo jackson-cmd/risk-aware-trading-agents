@@ -10,9 +10,102 @@ period and seed, and the report says which differences are larger than the gap b
 
 The runs with news here read the research headline files (headline titles; for 2026 also SEC 8-K filings). They are licensed and not distributed, so the numbers are published and the headlines are not; with your own copy in `~/.riskaware/data/news`, or headline files built under the same rules ([news-history](news-history.md#the-research-headline-files-not-distributed)), the same commands run.
 
-## Results so far
+## Results
 
-The first batch is a pilot: the baseline and two rule prompts (`risk_rules` and `trend_news`, below) on three models
+Two grids on one model, `gpt-5.6-luna` through an OpenAI-compatible gateway: blind, the `core` universe (SPY, QQQ,
+AAPL, MSFT, NVDA, AMZN, TSLA, GOOGL, META), at most five positions, temperature 0.2, a decision every fifth trading
+day, realistic costs ([costs.md](costs.md)), the three periods. Every run used the package at one commit (`9b7ced2`,
+version 0.7.2). The calls ran on a free daily token quota and nothing was paid; at list price ($0.20 and $1.20 per
+million input and output tokens) the 11,862 calls would have cost $8.82.
+
+- **Grid 1** changes how the prompt asks: a persona, reasoning before the orders, a focus on news or on trend, three
+  examples, two looser reply formats, a decision every day. Seeds 0 to 3: 132 runs, twelve pairs per variant, enough
+  for a clear difference to pass the correction for ten variants (the smallest possible Holm-corrected p-value is
+  0.005).
+- **Grid 2** adds rules and changes the headlines: the four risk rules together and one at a time, the decision rule
+  of `trend_news`, two cash floors, no headlines or six. Seeds 0 and 1 only; seeds 2 and 3 were not run, to save
+  time. That makes 66 runs and six pairs per variant, and with six pairs no difference can pass the correction (the
+  smallest possible Holm-corrected p-value is 0.31). Grid 2's numbers are estimates, not tests.
+
+Each grid has its own baseline runs, and every variant is paired with the baseline of its own grid. All 198 runs
+passed the look-ahead check, no prompt was cut on the way (the model read 0.33 to 0.45 tokens per prompt character),
+and no reply broke the format (no format error in 11,862 calls). For scale: over the same days SPY returned +12.1%
+(2026), -18.6% (2022) and +17.2% (2020), the nine symbols held in equal weights +6.3%, -42.5% and +127.7%, and the
+baseline prompt +2.0%, -33.3% and +23.9% (grid 1, mean of four seeds).
+
+### The board
+
+Every variant, ranked by its Sharpe ratio against the baseline, the primary metric. Return and drawdown differences
+are in percentage points; a negative drawdown difference is a smaller maximum drawdown. "In stocks" is the mean share
+of equity held in stocks. The website's [prompt leaderboard](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html#prompts)
+draws the same ranking from `site/assets/data/prompts.json`.
+
+| | Variant | Grid | Sharpe vs baseline (95% CI) | Return vs baseline (95% CI) | Drawdown vs baseline | In stocks | Verdict |
+|---:|---|:-:|---:|---:|---:|---:|---|
+| 1 | `cash_50` | 2 | +0.21 (-0.37 to +0.79) | +0.1 (-7.4 to +7.5) | -18.4 | 16% | noise |
+| 2 | `news_6` | 2 | +0.10 (-0.37 to +0.56) | -1.3 (-9.2 to +6.7) | -4.5 | 64% | noise |
+| 3 | `role_quant` | 1 | +0.05 (-0.12 to +0.22) | -0.6 (-4.3 to +2.8) | +0.7 | 68% | noise |
+| 4 | `focus_news` | 1 | +0.03 (-0.08 to +0.18) | +1.3 (-2.2 to +4.5) | **-7.6** | 38% | noise |
+| 5 | `format_text` | 1 | +0.03 (-0.39 to +0.37) | +0.1 (-7.9 to +6.0) | -4.2 | 54% | noise |
+| 6 | `baseline` | | 0 | 0 | 0 | 66% | |
+| 7 | `few_shot` | 1 | -0.03 (-0.29 to +0.26) | +2.5 (-2.1 to +7.3) | **-7.2** | 41% | noise |
+| 8 | `trend_news` | 2 | -0.03 (-0.67 to +0.60) | +4.3 (-5.9 to +14.4) | -7.7 | 40% | noise |
+| 9 | `format_json` | 1 | -0.05 (-0.29 to +0.16) | -2.8 (-6.3 to +0.2) | +0.7 | 56% | noise |
+| 10 | `reason_first` | 1 | -0.06 (-0.24 to +0.13) | -0.5 (-4.1 to +2.8) | **-5.5** | 51% | noise |
+| 11 | `daily` | 1 | -0.07 (-0.35 to +0.24) | -0.7 (-6.2 to +4.7) | +0.8 | 65% | noise |
+| 12 | `focus_trend` | 1 | -0.08 (-0.38 to +0.20) | -1.5 (-7.6 to +3.6) | +2.2 | 72% | noise |
+| 13 | `role_pm` | 1 | -0.09 (-0.41 to +0.18) | -2.6 (-9.1 to +2.4) | +1.5 | 70% | noise |
+| 14 | `role_risk` | 1 | -0.12 (-0.38 to +0.13) | -1.5 (-5.1 to +2.1) | -1.9 | 59% | noise |
+| 15 | `above_200` | 2 | -0.15 (-0.49 to +0.20) | -0.4 (-8.1 to +7.2) | -2.3 | 62% | noise |
+| 16 | `stop_loss` | 2 | -0.21 (-0.69 to +0.27) | -4.9 (-14.3 to +4.5) | -5.0 | 56% | noise |
+| 17 | `cash_30` | 2 | -0.23 (-0.60 to +0.15) | -4.2 (-11.0 to +2.5) | -12.7 | 29% | noise |
+| 18 | `cap_25` | 2 | -0.31 (-0.61 to -0.01) | -8.1 (-15.9 to -0.3) | -3.0 | 58% | noise |
+| 19 | `news_0` | 2 | -0.41 (-0.88 to +0.07) | -9.5 (-19.7 to +0.7) | +0.8 | 62% | noise |
+| 20 | `regime_cash` | 2 | -0.50 (-0.77 to -0.23) | -5.6 (-10.7 to -0.5) | -9.4 | 36% | noise |
+| 21 | `risk_rules` | 2 | -0.65 (-1.00 to -0.30) | -7.5 (-14.6 to -0.3) | -8.0 | 38% | noise |
+
+Bold: passes the Holm correction across the ten variants of its grid. No Sharpe or return difference does.
+
+### What the grids show
+
+- **No prompt changed the return or the Sharpe ratio measurably.** In grid 1, which can show a difference, every
+  Holm-corrected p-value for Sharpe and for return is 1.00. Its largest Sharpe difference, -0.12 (`role_risk`), is a
+  quarter of the gap between two seeds of the baseline (0.51 on average, and 9.5 pp of return). Grid 2's estimates
+  spread wider, from -0.65 to +0.21, with two seeds instead of four.
+- **The top of the board is `cash_50`**, at least 50% in cash at all times: +0.21 Sharpe (95% CI -0.37 to +0.79),
+  better in four of six pairs, noise. It held 16% of equity in stocks instead of 66%, made the same return as the
+  baseline (+0.1 pp) and had a maximum drawdown 18.4 pp smaller. In grid 1 the leader is `role_quant`, +0.05 (-0.12
+  to +0.22).
+- **What the prompts did change is how much stock the model held, and with it the drawdown.** Three prompts of grid 1
+  cut the maximum drawdown measurably: `focus_news` by 7.6 pp (smaller in all twelve pairs, Holm p 0.005),
+  `few_shot` by 7.2 pp (eleven of twelve, Holm p 0.016) and `reason_first` by 5.5 pp (eleven of twelve, Holm p
+  0.009). They held 38%, 41% and 51% of equity in stocks against 66%, and their volatility fell by 4.6 to 7.2 pp
+  (Holm p 0.005 each); their returns did not change (+1.3, +2.5 and -0.5 pp, noise). They also tried more often to
+  sell stocks they did not hold: 6.0%, 3.1% and 3.0% of their orders against 0.4% (Holm p 0.008 or less).
+- **One of the four risk rules does the work of all four.** `risk_rules` scored -0.65 in Sharpe (worse in all six
+  pairs: p 0.031 before the correction, 0.31 after it, the smallest six pairs allow) and -7.5 pp in return, with 38%
+  in stocks and a drawdown 8.0 pp smaller. Its cash rule alone, `regime_cash` (at least 30% cash when the regime is
+  UNCERTAIN or RISK_OFF), gives nearly the same: -0.50, -5.6 pp, 36% in stocks, a drawdown 9.4 pp smaller, and the
+  same pattern by period (2022: +12.6 and +8.2 pp; 2020: -25.5 and -22.3 pp). The other three rules alone left the
+  exposure near the baseline's (58%, 56% and 62%) and cut the drawdown by 2 to 5 pp.
+- **A fixed cash floor does the same: it gains in 2022 and loses in 2020.** `cash_30` made 11.9 pp more than the
+  baseline in 2022 and 21.4 pp less in 2020; `cash_50` 24.3 pp more and 24.8 pp less. Over the three periods that
+  nets to -4.2 and +0.1 pp. Holding less stock pays in a falling market and costs in a rebound.
+- **No rule picked better stocks.** Split into holding more or less stock and holding other stocks ("Where a
+  difference comes from" below), every variant of grid 2 has a negative selection part, from -0.5 pp (`cash_50`) to
+  -5.8 pp (`stop_loss`). Scored one by one, their decisions trailed the baseline's by 0.1 to 0.5 pp of five-day
+  excess return each (Holm p 0.94 or more). In grid 1 the selection parts are mixed (-1.6 to +3.1 pp) and no
+  decision metric moved (Holm p 0.24 or more).
+- **Headlines.** Without headlines (`news_0`; the news score, confirmation counts and red flags stay) the model made
+  9.5 pp less (95% CI -19.7 to +0.7), less in each of the three periods; six headlines a stock instead of three
+  changed little (-1.3 pp). Both are noise with two seeds.
+- **The reply format did not matter for this model.** No reply broke the format, even with nothing enforced
+  (`format_text`: no JSON mode, no schema). Deciding every day (`daily`) traded four times as much (turnover 21.5
+  against 5.3) for the same result (-0.07 in Sharpe, -0.7 pp in return).
+
+### The pilot: three models, one seed
+
+The first batch was a pilot: the baseline and two rule prompts (`risk_rules` and `trend_news`, below) on three models
 (`gpt-5.6-luna`, `claude-haiku-5-5`, `gemini-3.1-flash-lite`), the three periods, blind, the `core` universe, a decision
 every fifth trading day, one seed: 27 runs, $0.26. Each prompt is paired with the baseline on the same model and
 period: nine pairs. A fourth model, `llama3.2` on a university LLM gateway, is left out: the gateway cuts long prompts for
@@ -46,8 +139,14 @@ observation.
 - No reply in the 27 runs broke the format; invalid orders (unknown symbols, sells of stocks not held) stayed between
   0% and 5% of orders under every prompt.
 
-The single-factor grid follows (every variant below, four seeds, one model) and asks the next questions: which of the
-four rules carries the effect, and whether a plain cash floor (`cash_30`, `cash_50`) does as well.
+The grids do not confirm the pilot's gain for `gpt-5.6-luna`. With one seed the pilot found +11.8 pp of return for
+`risk_rules` and +10.4 pp for `trend_news` on this model; with two seeds grid 2 finds -7.5 and +4.3 pp. The pilot's
+single baseline run was unlucky: it made +10.3% in 2020 and -40.4% in 2022, where grid 2's baselines made +30.1% and
+-29.2% on average, and in 2020 the baseline's return varies by 16 pp (standard deviation) from seed to seed. Pairing
+by seed fixes the blind aliases, not the model's sampling, so one baseline run carries its luck into every
+difference. (The pilot also called the model directly rather than through the gateway.) What holds is the pattern:
+the rules lose less in 2022 (+12.6 and +16.9 pp in grid 2), and they work through how much stock is held, not through
+which stocks.
 
 ## The variants
 
@@ -79,8 +178,8 @@ other variant changes one factor:
 | `news_6` | headlines | Six headlines per stock instead of three |
 | `daily` | frequency | A decision every trading day instead of every fifth |
 
-The four rules of `risk_rules` and the rule of `trend_news` are word for word the ones of the pilot above, so those
-runs count as seed 0 of the same variants (same SHA-256). `cap_25`, `regime_cash`, `stop_loss` and `above_200` state
+The four rules of `risk_rules` and the rule of `trend_news` are word for word the ones of the pilot above (same
+SHA-256). `cap_25`, `regime_cash`, `stop_loss` and `above_200` state
 one of the four rules alone in the same words; `cash_30` and `cash_50` only change how much stays in cash, which tells
 whether the rules do more than hold less stock.
 
@@ -199,6 +298,9 @@ Several labs, one model each, make the website's prompt board, with a comparison
 riskaware research prompts board lab-luna lab-haiku --site site/assets/data/prompts.json
 ```
 
+Two labs of the same model, like the two grids above, are told apart by a title each: `--title` and `--title-zh`,
+repeated in the order of the labs.
+
 Your own prompt runs as one more variant next to the built-in ones (with the baseline's settings):
 
 ```bash
@@ -229,8 +331,9 @@ each) and writes the prompt board for the website (format `rta-prompt-board-1`):
 
 - `generated_utc`, `set_version`, `baseline`, `primary_metric` (`sharpe`), `method` (`en`, `zh`: how to read it);
 - `boards`: one per lab, with
-  - `model`, `lab_note`, `settings` (universe, symbols, max_positions, temperature, blind, news, periods, seeds,
-    api_seed);
+  - `model`, `title` (`en`, `zh`, or null: the lab's name from `--title` and `--title-zh`), `lab_note`, `settings`
+    (universe, symbols, max_positions, temperature, blind, news, api_seed, and the periods and seeds that the
+    finished runs cover, which for a lab stopped early are fewer than it planned);
   - `benchmarks`: per period, the window and SPY's and the equal-weight universe's return, Sharpe and drawdown;
   - `noise`: the mean Sharpe gap between two seeds of the baseline and the standard deviation by period (null with
     one seed); `power`: whether the lab has enough pairs to pass the correction at all;
@@ -254,7 +357,8 @@ Fractions are fractions (0.123 is 12.3%); Sharpe ratios are annualised.
 - Blind mode lowers the chance that a model recognises a stock or a date; it cannot rule it out.
 - A gateway or a local server can cut a long prompt without saying so. Every call records the prompt's length and
   the tokens the model read, and the report flags a run whose model read far fewer tokens than its prompts hold.
-- The cost model is the research kit's default (5 bps of slippage, no commission). Turnover is reported so that a
-  variant that only wins by trading more can be spotted.
+- `prompts run` charges the research kit's default costs (a flat 5 bps a fill, no commission) unless it is given
+  `--costs realistic`, which the grids above used ([costs.md](costs.md)). Turnover is reported so that a variant that
+  only wins by trading more can be spotted.
 - Three periods are three markets, not a sample of all markets. A result that holds in all three is stronger than
   one that holds in one, and still not a law.
