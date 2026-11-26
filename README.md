@@ -14,7 +14,7 @@ Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnin
 
 [🌐 Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [🏆 LLM leaderboard](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html) · [中文说明 → README_zh.md](README_zh.md) · [🚀 Quick start](#-quick-start) · [🆕 What's new](#-whats-new) · [🔬 Research kit](#-research-kit) · [🔗 MCP](#-mcp-server) · [📸 Screenshots](#-screenshots) · [Changelog](CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.9.0](https://img.shields.io/badge/pypi-0.9.0-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.10.0](https://img.shields.io/badge/pypi-0.10.0-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
 <img src="site/assets/demo_en.gif" alt="A 16-second tour: the market regime, today's signals, how a decision was made, paper-trading agents ranked against SPY, a backtest, the news a backtest saw, cross-verified news, and a research run with its look-ahead check" width="100%">
 
@@ -83,6 +83,7 @@ For the daily paper-trading scheduler as well, put `riskaware.yaml` (from `riska
 
 ## 🆕 What's new
 
+- **0.10.0** · 🗞️ **Open news you may share, collected every hour**: [Open Market News](https://github.com/jackson-cmd/open-market-news) is a public dataset of SEC, Federal Reserve, FDA, BEA and CFTC releases and GDELT's finance headlines, each with the time it was first seen. `riskaware news-history pull` brings it into your backtests; `collect` runs the collector yourself, and from your own connection it also gets every 8-K, SEC enforcement releases and BLS releases. Only sources that allow republication are in it. [How →](docs/news-history.md#open-news-shareable-collected-hourly)
 - **0.9.0** · 📱 **The dashboard on your phone, at home or away**: turn on phone access, scan the QR code, and your phone opens the dashboard running on your computer through Tailscale, logged in with an access code for 180 days; nothing is opened to the internet. `riskaware dashboard` now listens on 127.0.0.1, so the same Wi-Fi no longer gets in without a login. [How →](#-on-your-phone)
 - **0.8.0** · 🏆 **LLM trading agent leaderboard, rta-bench-1**: six models trade 2026, the 2022 bear market and the 2020 crash, blind and with names, with news replayed by publication time and realistic costs. Scored after each model's training cutoff, Claude Haiku 4.5 leads 2026 with **+7.2%**, still behind SPY's +12.1%. [Leaderboard →](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html) Also new: the frozen 2022 and 2020 periods, realistic costs, return attribution (exposures and alpha), news factors, short selling and margin, a memory probe and prompt tests. The licensed headlines are no longer distributed with the package; the results and numbers stay public. Releases are no longer archived on Zenodo.
 - **0.7.2** · 🔗 **One step into Claude and other MCP clients**: the server is on the official MCP Registry, `uvx risk-aware-trading-agents mcp` starts it with nothing installed first, and every release carries a Claude Desktop extension (`.mcpb`) that installs when you open it. [How →](#-mcp-server)
@@ -512,6 +513,7 @@ llm:
 | `riskaware backtest [--news]` | backtest and compare strategies (`--news` replays your news archive) |
 | `riskaware lab FILE [--check-only] [--save NAME]` | check a strategy for look-ahead and side effects, then backtest it in a separate process |
 | `riskaware news-history build / import / status / show` | local point-in-time news archive for backtests |
+| `riskaware news-history pull / collect` | the open news dataset (SEC, Fed, FDA, BEA, CFTC, GDELT): import it, or collect it yourself |
 | `riskaware research day / run / baselines / trade / runs / data` | the frozen 2020, 2022 and 2026 markets (`--period`): any day's data, experiments with a look-ahead check, LLM trading |
 | `riskaware strategies` / `new-strategy` | list built-ins / create a strategy file |
 | `riskaware brokers` | supported brokers and their requirements |
@@ -566,7 +568,7 @@ Run `riskaware backtest --news`, or `riskaware research run` for a record you ca
 
 ### Where can I get historical news data for backtesting?
 
-Build it yourself: `riskaware news-history build` downloads SEC 8-K filings for free, and headlines from a news API with your own key; a CSV with a time, a ticker and a headline works too. Each item keeps its publication time, and backtests replay it point in time. The published results used 2020, 2022 and 2026 headlines for 64 large-cap US stocks (19,618, 29,300 and 16,945 items); those are licensed and not distributed, but the same rules run on yours. See [docs/news-history.md](docs/news-history.md).
+Start with the open dataset: `riskaware news-history pull` imports [Open Market News](https://github.com/jackson-cmd/open-market-news), US agency releases and GDELT finance headlines collected hourly with the time each was first seen, all of it free to share. Or build it yourself: `riskaware news-history build` downloads SEC 8-K filings for free, and headlines from a news API with your own key; a CSV with a time, a ticker and a headline works too. Each item keeps its publication time, and backtests replay it point in time. The published results used 2020, 2022 and 2026 headlines for 64 large-cap US stocks (19,618, 29,300 and 16,945 items); those are licensed and not distributed, but the same rules run on yours. See [docs/news-history.md](docs/news-history.md).
 
 ### Is there a free point-in-time dataset of US stock prices, VIX and news?
 
@@ -616,7 +618,7 @@ If you use the package or its frozen markets in your research, please cite the r
   title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
-  version = {0.9.0},
+  version = {0.10.0},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```

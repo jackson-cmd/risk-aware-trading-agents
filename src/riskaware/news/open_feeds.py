@@ -13,6 +13,10 @@ Sources and why they may be republished
   with a citation and a link to https://www.gdeltproject.org/. Kept: the title, link, time and tone of articles on
   business and finance sites that name a stock in RiskAware's lists or the market as a whole.
 
+SEC (other than its press releases) and BLS refuse requests from shared cloud addresses such as GitHub's runners,
+whatever the User-Agent, so the hourly public dataset leaves out ``sec-enforcement``, ``sec-8k`` and ``bls``; they work
+from an ordinary connection.
+
 Every row has ``published`` (the time the source gives) and ``seen`` (when it was first collected; for GDELT, the time
 of the 15-minute batch that listed it). Backtests use ``seen``, the later of the two, so a row never shows up before it
 could have been read. Commercial feeds (WSJ, Yahoo, Reuters, newswires) do not allow republication and are not here.
@@ -44,6 +48,8 @@ from .relevance import ALIASES, mentions
 log = logging.getLogger(__name__)
 
 DATASET_REPO = "jackson-cmd/open-market-news"
+#: What the hourly public dataset collects (see the note on cloud addresses above).
+DATASET_SOURCES = ("sec-press", "fed", "fda", "bea", "cftc", "gdelt")
 KEEP_DAYS = 45            # an RSS item older than this is not collected (it was collected before, or is stale)
 SUMMARY_CHARS = 400
 GDELT_LAST = "http://data.gdeltproject.org/gdeltv2/lastupdate.txt"
@@ -388,22 +394,23 @@ class Store:
 class Collector:
     def __init__(self, store: Store, contact: str | None = None, timeout: float = 30.0, session=None,
                  now: datetime | None = None):
-        from ..utils import BROWSER_UA, make_session, tool_user_agent
+        from ..utils import make_session, tool_user_agent
 
         self.store = store
         self.contact = contact
         self.timeout = timeout
         self.now = now or datetime.now(timezone.utc).replace(microsecond=0)
-        self.web = session or make_session(BROWSER_UA, retries=2)
-        self.gov = session or make_session(tool_user_agent(contact) if contact else tool_user_agent(), retries=2)
+        # Every request says what it is (and, for SEC, who to contact): FDA turns away browser-like clients from cloud
+        # addresses, and SEC asks automated tools to declare themselves.
+        self.http = session or make_session(tool_user_agent(contact), retries=2)
         self._tickers: dict[int, str] | None = None
 
-    def _get(self, url: str, gov: bool) -> bytes:
+    def _get(self, url: str, polite: bool = False) -> bytes:
         import time as _time
 
-        if gov:
+        if polite:
             _time.sleep(0.15)   # SEC asks for at most 10 requests a second
-        r = (self.gov if gov else self.web).get(url, timeout=self.timeout)
+        r = self.http.get(url, timeout=self.timeout)
         r.raise_for_status()
         return r.content
 
