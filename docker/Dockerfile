@@ -2,7 +2,8 @@
 # Released images: docker run --rm -p 8501:8501 ghcr.io/jackson-cmd/risk-aware-trading-agents dashboard
 FROM python:3.12-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 RISKAWARE_HOME=/data
+# RISKAWARE_CONTAINER: the dashboard listens on 0.0.0.0 here, and the host's browser counts as this computer
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 RISKAWARE_HOME=/data RISKAWARE_CONTAINER=1
 WORKDIR /app
 COPY pyproject.toml README.md README_zh.md LICENSE ./
 COPY src ./src

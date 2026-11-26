@@ -14,7 +14,7 @@ Market regimes from VIX and the FOMC / CPI calendar · dip buying with an earnin
 
 [🌐 Website](https://jackson-cmd.github.io/risk-aware-trading-agents/) · [🏆 LLM leaderboard](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html) · [中文说明 → README_zh.md](README_zh.md) · [🚀 Quick start](#-quick-start) · [🆕 What's new](#-whats-new) · [🔬 Research kit](#-research-kit) · [🔗 MCP](#-mcp-server) · [📸 Screenshots](#-screenshots) · [Changelog](CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.8.0-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.9.0](https://img.shields.io/badge/pypi-0.9.0-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP server](https://img.shields.io/badge/MCP-server-24292f.svg)](#-mcp-server) [![Docker image](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) [![English and Chinese](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-e3b341.svg)](README_zh.md)
 
 <img src="site/assets/demo_en.gif" alt="A 16-second tour: the market regime, today's signals, how a decision was made, paper-trading agents ranked against SPY, a backtest, the news a backtest saw, cross-verified news, and a research run with its look-ahead check" width="100%">
 
@@ -46,6 +46,8 @@ riskaware research run -s swing_trend # a strategy on the frozen 2026 market, wi
 riskaware research run -s swing_trend --period 2022   # the same in the 2022 bear market
 ```
 
+**On your phone:** `riskaware phone on`, then scan the QR code it prints; the phone reaches this computer through Tailscale, at home or away, and logs in with an access code. [How →](#-on-your-phone)
+
 No account or API key is needed for any of these. Add `--lang zh` to any command for Chinese output. For the newest code before it is released, use `pip install "risk-aware-trading-agents[dashboard,mcp] @ git+https://github.com/jackson-cmd/risk-aware-trading-agents"`; to change the code, clone the repository and run `pip install -e ".[dashboard,mcp]"`.
 
 **Docker**, for x86-64 and ARM:
@@ -75,12 +77,13 @@ For the daily paper-trading scheduler as well, put `riskaware.yaml` (from `riska
 ## Contents
 
 - [🚀 Quick start](#-quick-start) · [Is it for you?](#is-it-for-you) · [🆕 What's new](#-whats-new) · [💡 The idea](#-the-idea) · [Four ways to use it](#four-ways-to-use-it)
-- [✨ Feature tour](#-feature-tour): [How it works](#-how-it-works) · [Cross-verified news](#-cross-verified-news) · [Paper-trading agents](#-paper-trading-agents) · [MCP server](#-mcp-server) · [Strategy lab](#-strategy-lab) · [LLM leaderboard](#-llm-trading-agent-leaderboard) · [Research kit](#-research-kit) · [Backtest](#-backtest) · [Strategy library](#-strategy-library) · [Write your own strategy](#-write-your-own-strategy)
+- [✨ Feature tour](#-feature-tour): [How it works](#-how-it-works) · [Cross-verified news](#-cross-verified-news) · [Paper-trading agents](#-paper-trading-agents) · [On your phone](#-on-your-phone) · [MCP server](#-mcp-server) · [Strategy lab](#-strategy-lab) · [LLM leaderboard](#-llm-trading-agent-leaderboard) · [Research kit](#-research-kit) · [Backtest](#-backtest) · [Strategy library](#-strategy-library) · [Write your own strategy](#-write-your-own-strategy)
 - [📸 Screenshots](#-screenshots) · [🔌 Brokers](#-brokers) · [🔒 Safety](#-safety) · [🔧 Configuration](#-configuration) · [🧰 Under the hood](#-under-the-hood): [CLI](#-cli) · [Project layout](#-project-layout)
 - [❓ FAQ](#-faq) · [🧭 Roadmap](#-roadmap) · [🤝 Contributing](#-contributing) · [📝 Citation](#-citation) · [❗ Disclaimer](#-disclaimer) · [📜 License](#-license)
 
 ## 🆕 What's new
 
+- **0.9.0** · 📱 **The dashboard on your phone, at home or away**: turn on phone access, scan the QR code, and your phone opens the dashboard running on your computer through Tailscale, logged in with an access code for 180 days; nothing is opened to the internet. `riskaware dashboard` now listens on 127.0.0.1, so the same Wi-Fi no longer gets in without a login. [How →](#-on-your-phone)
 - **0.8.0** · 🏆 **LLM trading agent leaderboard, rta-bench-1**: six models trade 2026, the 2022 bear market and the 2020 crash, blind and with names, with news replayed by publication time and realistic costs. Scored after each model's training cutoff, Claude Haiku 4.5 leads 2026 with **+7.2%**, still behind SPY's +12.1%. [Leaderboard →](https://jackson-cmd.github.io/risk-aware-trading-agents/leaderboard.html) Also new: the frozen 2022 and 2020 periods, realistic costs, return attribution (exposures and alpha), news factors, short selling and margin, a memory probe and prompt tests. The licensed headlines are no longer distributed with the package; the results and numbers stay public. Releases are no longer archived on Zenodo.
 - **0.7.2** · 🔗 **One step into Claude and other MCP clients**: the server is on the official MCP Registry, `uvx risk-aware-trading-agents mcp` starts it with nothing installed first, and every release carries a Claude Desktop extension (`.mcpb`) that installs when you open it. [How →](#-mcp-server)
 - **0.7.1** · 📦 **On PyPI and Docker**: `pip install risk-aware-trading-agents`, or run the dashboard or the MCP server from `ghcr.io/jackson-cmd/risk-aware-trading-agents` without installing Python; GitHub Codespaces opens the repository with everything installed. [How →](#-quick-start)
@@ -214,6 +217,18 @@ riskaware agents schedule --install                      # every trading day, by
 The daily job (a LaunchAgent on macOS, a crontab line on Linux, a scheduled task on Windows) wakes every 15 minutes on weekdays and trades each agent once per trading day after 15:40 New York time, before the close. It skips holidays, catches up after the laptop sleeps, and keeps going when one agent fails. Each agent keeps its account, journal and daily equity in `~/.riskaware/arena/NAME/`. The **Agents** page of the dashboard shows the leaderboard and lets you create, run, pause, reset and delete agents; its **Decisions** tab shows how each decision was made, including the LLM's bull case, bear case and verdict and the exact prompt it was sent. GPT needs `OPENAI_API_KEY` in your `.env`; a local model needs [Ollama](https://ollama.com) (`ollama pull qwen2.5:3b`); and `--llm claude-cli`, `codex-cli` or `gemini-cli` uses your Claude, ChatGPT or Gemini plan through its command-line tool, with no API key. More in [docs/agents.md](docs/agents.md).
 
 <img src="site/assets/agents_en.jpg" width="820" alt="Agents page: a leaderboard of paper-trading agents with equity, return, comparison with SPY and status">
+
+### 📱 On your phone
+
+Check the agents, the market regime and today's signals from your phone while the dashboard runs on your computer. The phone reaches the computer through [Tailscale](https://tailscale.com/download), a free private network for your own devices, so nothing is opened to the internet.
+
+```bash
+riskaware dashboard                  # on the computer; open its Phone page, or:
+riskaware phone on                   # let phones in with an access code; prints a QR code to scan
+riskaware phone tailscale            # an https address only your own devices can open
+```
+
+Install Tailscale on the computer and the phone with the same account, scan the QR code, and add the page to the home screen: it opens full screen with its own icon, like an app. A phone logs in once with the 8-character access code and stays logged in for 180 days; wrong codes are rate-limited, a new code signs every phone out, and the Phone page that shows the code opens only on the computer. Without Tailscale, `riskaware dashboard --host 0.0.0.0` works on the same Wi-Fi. More in [docs/phone.md](docs/phone.md).
 
 ### 🔗 MCP server
 
@@ -449,6 +464,7 @@ Setup for each broker (keys, gateways, paper accounts) is in [docs/brokers.md](d
 - `riskaware halt` blocks all order submission until `riskaware resume`.
 - Every run, decision and order is written to a local SQLite journal (`~/.riskaware/journal.db`), visible in the dashboard.
 - API keys stay in `.env` (see [examples/.env.example](examples/.env.example)); they are never written to the config or the journal.
+- The dashboard listens on 127.0.0.1, so only this computer opens it. A phone gets in only with phone access on and the access code, through one gate in front of every page, file and WebSocket ([docs/phone.md](docs/phone.md)).
 
 ## 🔧 Configuration
 
@@ -503,7 +519,8 @@ llm:
 | `riskaware agents [init\|add\|run\|list\|show\|pause\|resume\|reset\|remove]` | paper-trading agents |
 | `riskaware agents schedule --install` | trade the agents every trading day |
 | `riskaware mcp` | MCP server for Claude and other assistants |
-| `riskaware dashboard` | web dashboard |
+| `riskaware dashboard [--host 0.0.0.0]` | web dashboard (only this computer, or also the same Wi-Fi) |
+| `riskaware phone [on\|off\|tailscale\|new-code\|sign-out]` | the dashboard on your phone: access code, QR code, Tailscale |
 
 ### 📁 Project layout
 
@@ -520,7 +537,8 @@ src/riskaware/      the package
   brokers/          paper + 9 broker adapters
   options/          option pricing and contract selection for backtests
   llm/              optional bull / bear / judge review
-  dashboard/        Streamlit app (pages, theme, charts)
+  dashboard/        Streamlit app (pages, theme, charts) and its ASGI entry
+  phone.py          phone access: the login gate, access code, Tailscale
   arena.py          paper-trading agents: accounts, daily runs, leaderboard
   scheduler.py      the daily background job (launchd, cron, Task Scheduler)
   mcp_server.py     tools for Claude and other MCP clients
@@ -570,6 +588,10 @@ Not in our 2026 test with headline sentiment from one feed. A news filter made e
 
 Paper trading is the default. `riskaware run` trades the built-in paper account, `riskaware agents` runs several strategies on simulated money every trading day, and broker paper accounts such as Alpaca's work too. Live trading needs three explicit switches. See [safety](#-safety).
 
+### Can I check my trading agents from my phone?
+
+Yes. The dashboard runs on your computer and your phone opens it through Tailscale, at home or away, after logging in once with an access code; on the same Wi-Fi it works without Tailscale. Paper trading stays the default on the phone too. See [on your phone](#-on-your-phone).
+
 ### Which brokers are supported?
 
 A built-in paper account, Alpaca, Interactive Brokers, Public.com, Charles Schwab, tastytrade, Tradier, Futu/moomoo, Tiger Brokers and Longbridge. See [brokers](#-brokers).
@@ -594,7 +616,7 @@ If you use the package or its frozen markets in your research, please cite the r
   title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
-  version = {0.8.0},
+  version = {0.9.0},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```

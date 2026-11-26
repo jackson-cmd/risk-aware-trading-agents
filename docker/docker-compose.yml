@@ -18,10 +18,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    entrypoint: ["python", "-m", "streamlit", "run", "/usr/local/lib/python3.12/site-packages/riskaware/dashboard/app.py",
-                 "--server.port", "8501", "--server.address", "0.0.0.0"]
-    environment:
-      RISKAWARE_CONFIG: /config/riskaware.yaml
+    command: ["--config", "/config/riskaware.yaml", "dashboard", "--host", "0.0.0.0"]
     env_file:
       - path: ../.env
         required: false
