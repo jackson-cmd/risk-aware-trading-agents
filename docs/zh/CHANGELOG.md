@@ -2,6 +2,13 @@
 
 [English](../../CHANGELOG.md)
 
+## 0.10.0（2026-11-26）
+
+- **可以分享的公开新闻，每小时收集**（[docs/zh/news-history.md](news-history.md#公开新闻可以分享每小时收集)）。`riskaware news-history collect` 只读条款允许任何人保存和转载的来源：SEC 新闻稿、执法公告和停牌令；EDGAR 最新公告 feed 里的所有 8-K（公司、按 SEC 列表对上的股票代码、事项编号、受理时间）；美联储、FDA、BEA、BLS 和 CFTC 的发布；以及 GDELT 每 15 分钟一批的数据里，约 50 个商业和财经网站上提到内置股票池里的股票或整个大盘的标题，附 GDELT 的情绪分。每条记下 `published`（来源给的时间）和 `seen`（第一次收到的时间），每个来源每个 UTC 日一个 JSON Lines 文件；一个来源出错不影响其他来源；GDELT 可以用 `--gdelt-from/--gdelt-to` 回补到 2015 年。[Open Market News](https://github.com/jackson-cmd/open-market-news) 就是这个目录在 GitHub 上的版本，GitHub Actions 每小时更新，收 SEC 新闻稿、美联储、FDA、BEA、CFTC 和 GDELT；SEC（新闻稿以外）和 BLS 拒绝来自 GitHub runner 的请求，这些请在你自己的网络下收集。
+- **`riskaware news-history pull`** 把数据集（从 GitHub 流式下载，或者用本地克隆）导入你的新闻库，按 `seen` 记时间，所以不会在能读到之前出现。你收集的 8-K 会变成和 `build --source sec` 一样的 `sec` 条目；其他条目保留发布方，所以 Reuters 和 CNBC 都报道的新闻算两家。
+- 股票按公司名或规范写法的代码（`$AAPL`、`(AAPL)`、`NYSE: GE`、`RTX stock`）标注，所以显卡「RTX 5060」不会被当成雷神（Raytheon）。
+- WSJ、Yahoo、Reuters 和新闻稿通讯社不允许转载，所以不收；指南里列出了每个来源的条款。
+
 ## 0.9.0（2026-11-26）
 
 - **在手机上用看板，在家在外都行**（[docs/zh/phone.md](phone.md)）。新增「手机访问」开关，默认关，在看板新增的 **手机** 页里，也可以用 `riskaware phone on`。手机通过 Tailscale 连回电脑：`tailscale serve` 在你自己的 tailnet 里发布一个 https 地址并转到 127.0.0.1，不向公网开放任何端口；一个按钮（或 `riskaware phone tailscale`）就能开启，tailnet 需要先开 HTTPS 时会给出链接。手机用 8 位访问码登录一次：手动输入，或者扫二维码，二维码链接把访问码放在 `#` 后面，不会出现在服务器日志里；之后拿到一个签名过的 HttpOnly cookie，保持 180 天，常用每周自动续期。同一台设备输错 5 次要等 10 分钟，所有设备合计输错 20 次所有登录暂停 15 分钟；换访问码或「让所有手机退出登录」会换掉签名密钥。显示访问码的 **手机** 页只能在电脑上打开。手机访问打开时，`caffeinate`（macOS）或 `systemd-inhibit`（Linux）阻止电脑因闲置而睡眠。看板可以添加到手机主屏幕，带着自己的图标全屏打开。

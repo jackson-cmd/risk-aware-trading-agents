@@ -7,6 +7,9 @@
 ## 快速开始
 
 ```bash
+# 任何人都能分享的公开新闻：SEC、美联储、FDA、BEA、CFTC 的发布和 GDELT 财经标题，每小时更新
+riskaware news-history pull --start 2026-11-01
+
 # core 股票池 2018 年以来的 SEC 8-K 公告（免费；SEC 要求注明联系邮箱）
 riskaware news-history build --preset core --start 2018-01-01 --contact-email you@example.com
 
@@ -66,6 +69,30 @@ riskaware news-history show NVDA --date 2026-05-20
 命令行用 `riskaware news-history show 代码 --date 日期` 也能打印同样的新闻和结论。
 
 ## 新闻来源
+
+### 公开新闻（可以分享，每小时收集）
+
+[Open Market News](https://github.com/jackson-cmd/open-market-news) 是一个公开数据集，GitHub Actions 每小时用 `riskaware news-history collect` 更新一次。它只收条款允许任何人保存和转载的来源：
+
+| 来源 | 内容 | 授权 |
+|---|---|---|
+| `sec-press` | SEC 新闻稿 | sec.gov 的信息「无需 SEC 许可即可复制或进一步分发」（[SEC](https://www.sec.gov/privacy)） |
+| `fed`、`fda`、`bea`、`cftc` | 美联储和 FDA 新闻稿、BEA 的数据发布（GDP、PCE、贸易……）、CFTC 公告 | 美国政府作品，属于公共领域；各机构希望注明来源 |
+| `sec-enforcement`、`sec-8k`、`bls` | SEC 诉讼公告、行政程序和停牌令；所有 8-K（带股票代码和事项编号）；BLS 的发布（非农、CPI、PPI、JOLTS……） | 同上；**不在每小时数据集里**：SEC 和 BLS 拒绝来自 GitHub runner 这类共享云地址的请求，所以这几个要在你自己的网络下运行 `collect` |
+| `gdelt` | 约 50 个商业和财经网站上、提到内置股票池里的股票或整个大盘的标题，附 GDELT 的情绪分 | GDELT 允许再分发，须注明出处并附链接（[GDELT](https://www.gdeltproject.org/about.html)） |
+
+```bash
+riskaware news-history pull --start 2026-11-01                  # 从 GitHub 下载；提到股票的条目加入你的新闻库
+riskaware news-history pull --start 2026-11-01 --from ./open-market-news --sources sec-8k,gdelt   # 用本地克隆
+riskaware news-history collect --out my-news --contact-email you@example.com                     # 自己收集
+riskaware news-history collect --out my-news --gdelt-from 2022-01-03 --gdelt-to 2022-01-07        # 回补 GDELT
+```
+
+- 每条都有 `published`（来源给出的时间）和 `seen`（第一次收到的时间；GDELT 是收录它的那个 15 分钟批次）。`pull` 按 `seen` 记时间，所以一条新闻不会在能被读到之前出现；每小时运行一次意味着机构发布最多晚一小时左右，这对回测是安全的。
+- 你收集的 8-K 会变成和 `build --source sec` 一样的 `sec` 条目。其他条目保留发布方（GDELT 是网站名，比如 `reuters.com`），所以 Reuters 和 CNBC 都报道的新闻算两家来源。
+- 股票按公司名或规范写法的代码（`$AAPL`、`(AAPL)`、`NYSE: GE`、`RTX stock`）标注，所以显卡「RTX 5060」不会被当成雷神（Raytheon）。讲整个大盘的条目留在数据集里，带 `"market": true`、没有股票代码；`pull` 只导入提到股票的条目。
+- 记录从 2026-11-26 开始。机构的 feed 只保留最新的条目，所以补不了历史；GDELT 可以从 2015 年 2 月开始回补，每个 15 分钟批次约 10 MB。
+- WSJ、Yahoo、Reuters 和新闻稿通讯社不允许转载，所以不收。自己用的话，可以用 `import` 导入你有权使用的任何 CSV。
 
 ### SEC EDGAR 8-K 公告
 

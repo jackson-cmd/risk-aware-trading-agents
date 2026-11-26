@@ -1482,6 +1482,89 @@ def news_history_import(
     console.print(f"[dim]{T('nh.private')}[/]")
 
 
+@news_app.command("collect")
+def news_history_collect(
+    out: str = typer.Option("open-news", "--out", help="Folder that holds data/ and state.json"),
+    sources: str = typer.Option("all", help="all, or some of: " + "sec-press, sec-enforcement, sec-8k, fed, fda, "
+                                                                  "bea, bls, cftc, gdelt"),
+    contact_email: Optional[str] = typer.Option(None, help="Contact email SEC and BLS ask for (default: "
+                                                           "RISKAWARE_CONTACT_EMAIL or data.contact_email)"),
+    gdelt_batches: int = typer.Option(8, help="At most this many 15-minute GDELT batches per run"),
+    gdelt_from: Optional[str] = typer.Option(None, help="Backfill GDELT from this UTC time (YYYY-MM-DD[THH:MM])"),
+    gdelt_to: Optional[str] = typer.Option(None, help="...to this UTC time (default: the end of that day)"),
+) -> None:
+    """Collect open news (US agencies and GDELT) point in time; safe to republish. / 收集可公开转载的新闻"""
+    from datetime import datetime as _dt
+    from datetime import timezone as _tz
+
+    from .news.open_feeds import FEEDS, Collector, Store, backfill_gdelt
+
+    store = Store(out)
+    contact = contact_email or os.environ.get("RISKAWARE_CONTACT_EMAIL") or cfg().data.contact_email
+    if gdelt_from:
+        def when(v: str, end: bool = False) -> _dt:
+            d = _dt.fromisoformat(v)
+            if len(v) <= 10 and end:
+                d = d.replace(hour=23, minute=45)
+            return d.replace(tzinfo=_tz.utc) if d.tzinfo is None else d.astimezone(_tz.utc)
+
+        t0 = when(gdelt_from)
+        t1 = when(gdelt_to or gdelt_from, end=True)
+        with console.status("GDELT ...") as status:
+            added = backfill_gdelt(store, t0, t1, Collector(store, contact),
+                                   progress=lambda t, n: status.update(f"GDELT {t:%Y-%m-%d %H:%M} · {n} rows"))
+        console.print(f"GDELT {t0:%Y-%m-%d %H:%M} → {t1:%Y-%m-%d %H:%M}: {added} rows · {store.root}")
+        return
+    names = list(FEEDS) if sources.strip().lower() == "all" else [s.strip() for s in sources.split(",") if s.strip()]
+    unknown = [n for n in names if n not in FEEDS]
+    if unknown:
+        console.print(f"[red]unknown source: {', '.join(unknown)} (choose from {', '.join(FEEDS)})[/]")
+        raise typer.Exit(2)
+    report = Collector(store, contact).collect(names, gdelt_batches=gdelt_batches)
+    tbl = Table(title=str(store.root))
+    for col in ("source", "read", "new", "error"):
+        tbl.add_column(col, justify="right" if col in ("read", "new") else "left")
+    for name, rep in report.items():
+        tbl.add_row(name, str(rep.get("read", "")), str(rep.get("new", "")), rep.get("error", ""))
+    console.print(tbl)
+    if all("error" in r for r in report.values()):
+        raise typer.Exit(1)
+
+
+@news_app.command("pull")
+def news_history_pull(
+    start: str = typer.Option(..., help="YYYY-MM-DD"),
+    end: Optional[str] = typer.Option(None, help="YYYY-MM-DD (default today)"),
+    from_dir: Optional[str] = typer.Option(None, "--from", help="A local copy of the dataset instead of GitHub"),
+    repo: Optional[str] = typer.Option(None, help="The dataset on GitHub (default jackson-cmd/open-market-news)"),
+    sources: Optional[str] = typer.Option(None, help="Only these sources, comma-separated"),
+) -> None:
+    """Import the open news dataset into the local archive for backtests. / 把公开新闻数据导入本地新闻库"""
+    import tempfile
+
+    from .news.open_feeds import DATASET_REPO, Store, download_dataset, to_items
+
+    d0 = date.fromisoformat(start)
+    d1 = date.fromisoformat(end) if end else date.today()
+    wanted = [s.strip() for s in sources.split(",")] if sources else None
+    with tempfile.TemporaryDirectory(prefix="riskaware-open-news-") as tmp:
+        if from_dir:
+            root = Path(from_dir)
+        else:
+            with console.status(f"{repo or DATASET_REPO} ..."):
+                try:
+                    root = download_dataset(tmp, d0, d1, repo or DATASET_REPO, sources=wanted)
+                except Exception as exc:  # noqa: BLE001 - network or GitHub errors
+                    console.print(f"[red]{exc}[/]")
+                    raise typer.Exit(2) from exc
+        rows = list(Store(root).rows(d0, d1, wanted))
+        items = to_items(rows)
+        added = _archive().add(items)
+    syms = sorted({i.symbol for i in items if i.symbol})
+    console.print(f"{len(rows)} rows · {T('nh.added')}: {added} / {len(items)} · {len(syms)} {T('col.symbol')}: "
+                  f"{', '.join(syms[:20])}{' ...' if len(syms) > 20 else ''}")
+
+
 @news_app.command("status")
 def news_history_status() -> None:
     """What the local archive holds. / 查看本地新闻库"""
