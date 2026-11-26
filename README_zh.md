@@ -12,7 +12,7 @@
 
 [🌐 项目主页](https://jackson-cmd.github.io/risk-aware-trading-agents/?lang=zh) · [🏆 LLM 模型榜单](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html) · [English → README.md](README.md) · [🚀 快速开始](#-快速开始) · [🆕 新功能](#-新功能) · [🔬 研究工具箱](#-研究工具箱) · [🔗 MCP](#-mcp-服务器) · [📸 截图](#-截图一览) · [更新记录](docs/zh/CHANGELOG.md)
 
-[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.7.2](https://img.shields.io/badge/pypi-0.8.0-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
+[![CI](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/actions/workflows/ci.yml) [![PyPI 0.9.0](https://img.shields.io/badge/pypi-0.9.0-e5534b.svg)](https://pypi.org/project/risk-aware-trading-agents/) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE) [![MCP 服务器](https://img.shields.io/badge/MCP-%E6%9C%8D%E5%8A%A1%E5%99%A8-24292f.svg)](#-mcp-服务器) [![Docker 镜像](https://img.shields.io/badge/docker-ghcr.io-2496ed.svg)](https://github.com/jackson-cmd/risk-aware-trading-agents/pkgs/container/risk-aware-trading-agents) [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-ffcc4d.svg)](https://huggingface.co/datasets/jacksonwangpro1/rta-bench-llm-trading-benchmark) [![中文和英文](https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87%20%7C%20English-e3b341.svg)](README.md)
 
 <img src="site/assets/demo_zh.gif" alt="16 秒导览：市场状态、今天的信号、一个决定是怎么做出来的、模拟盘智能体和 SPY 对比、回测、回测看到的新闻、交叉验证新闻，以及一次带防偷看检查的研究实验" width="100%">
 
@@ -44,6 +44,8 @@ riskaware --lang zh research run -s swing_trend   # 在冻结的 2026 年市场�
 riskaware --lang zh research run -s swing_trend --period 2022   # 同一个策略放到 2022 年熊市里
 ```
 
+**在手机上用：** 运行 `riskaware phone on`，扫它打印的二维码；手机通过 Tailscale 连回这台电脑，在家在外都行，用访问码登录。[怎么用 →](#-在手机上用)
+
 上面这些命令都不需要券商账户或 API key。在配置文件里写 `language: zh`，以后就不用每次加 `--lang zh`。想用 GitHub 上还没发版的最新代码，就改用 `pip install "risk-aware-trading-agents[dashboard,mcp] @ git+https://github.com/jackson-cmd/risk-aware-trading-agents"`；想改代码的话，先克隆仓库，再用 `pip install -e ".[dashboard,mcp]"` 安装。
 
 **Docker**，x86-64 和 ARM 都能用：
@@ -73,12 +75,13 @@ docker run -i --rm ghcr.io/jackson-cmd/risk-aware-trading-agents mcp            
 ## 目录
 
 - [🚀 快速开始](#-快速开始) · [这个项目适合你吗？](#这个项目适合你吗) · [🆕 新功能](#-新功能) · [💡 设计思路](#-设计思路) · [四种用法](#四种用法)
-- [✨ 功能导览](#-功能导览)：[工作原理](#-工作原理) · [新闻交叉验证](#-新闻交叉验证) · [模拟盘智能体](#-模拟盘智能体) · [MCP 服务器](#-mcp-服务器) · [策略实验室](#-策略实验室) · [LLM 榜单](#-llm-交易智能体榜单) · [研究工具箱](#-研究工具箱) · [回测](#-回测) · [策略库](#-策略库) · [写你自己的策略](#-写你自己的策略)
+- [✨ 功能导览](#-功能导览)：[工作原理](#-工作原理) · [新闻交叉验证](#-新闻交叉验证) · [模拟盘智能体](#-模拟盘智能体) · [在手机上用](#-在手机上用) · [MCP 服务器](#-mcp-服务器) · [策略实验室](#-策略实验室) · [LLM 榜单](#-llm-交易智能体榜单) · [研究工具箱](#-研究工具箱) · [回测](#-回测) · [策略库](#-策略库) · [写你自己的策略](#-写你自己的策略)
 - [📸 截图一览](#-截图一览) · [🔌 支持的券商](#-支持的券商) · [🔒 安全机制](#-安全机制) · [🔧 配置](#-配置) · [🧰 内部结构](#-内部结构)：[命令一览](#-命令一览) · [目录结构](#-目录结构)
 - [❓ 常见问题](#-常见问题) · [🧭 后续计划](#-后续计划) · [🤝 参与贡献](#-参与贡献) · [📝 引用](#-引用) · [❗ 免责声明](#-免责声明) · [📜 开源协议](#-开源协议)
 
 ## 🆕 新功能
 
+- **0.9.0** · 📱 **在手机上用看板，在家在外都行**：打开手机访问、扫二维码，手机就通过 Tailscale 打开电脑上运行的看板，用访问码登录一次保持 180 天，不向公网开放任何端口。`riskaware dashboard` 现在只监听 127.0.0.1，同一个 Wi-Fi 里的人不登录就进不来了。[怎么用 →](#-在手机上用)
 - **0.8.0** · 🏆 **LLM 交易智能体榜单 rta-bench-1**：六个模型在 2026 年、2022 年熊市和 2020 年暴跌上交易，盲测和实名各一次，新闻按发布时间回放，成交成本按真实情况算。按训练截止日之后计分，Claude Haiku 4.5 以 2026 年 **+7.2%** 领先，仍跑输 SPY 的 +12.1%。[看榜单 →](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html) 另外新增：2022 和 2020 两个冻结时段、真实成交成本、收益归因（暴露和 alpha）、新闻因子、做空和保证金、记忆检测和 prompt 测试。有许可限制的新闻标题不再随包分发，结论和数字照旧公开；发布的版本不再存档到 Zenodo。
 - **0.7.2** · 🔗 **一步接入 Claude 和其他 MCP 客户端**：服务器上了官方 MCP Registry，`uvx risk-aware-trading-agents mcp` 不用先安装就能启动，每个版本还附带 Claude Desktop 扩展（`.mcpb`），打开就能装。[怎么用 →](#-mcp-服务器)
 - **0.7.1** · 📦 **上架 PyPI 和 Docker**：`pip install risk-aware-trading-agents` 就能装；不想装 Python，也可以直接用 `ghcr.io/jackson-cmd/risk-aware-trading-agents` 跑网页看板或 MCP 服务器；在 GitHub Codespaces 里打开整个仓库，依赖都已装好。[怎么用 →](#-快速开始)
@@ -212,6 +215,18 @@ riskaware agents schedule --install                      # 以后每个交易日
 后台任务（macOS 上是 LaunchAgent，Linux 上是一行 crontab，Windows 上是计划任务）在工作日每 15 分钟唤醒一次，每个交易日纽约时间 15:40 之后、收盘之前，让每个智能体交易一次。它会跳过节假日，电脑睡眠醒来会补跑，某个智能体出错也不影响其他的。每个智能体的账户、日志和每天的净值都存在 `~/.riskaware/arena/名字/`。网页看板的「智能体」页能看到排行榜，也能新建、运行、暂停、重置和删除智能体；其中的「决策」页显示每个决定是怎么做出来的，包括 LLM 的多方、空方意见和结论，以及发给它的完整 prompt。用 GPT 需要在 `.env` 里设置 `OPENAI_API_KEY`；用本地模型需要装 [Ollama](https://ollama.com)（`ollama pull qwen2.5:3b`）；`--llm claude-cli`、`codex-cli` 或 `gemini-cli` 则通过命令行工具用你的 Claude、ChatGPT 或 Gemini 订阅，不需要 API key。详见 [docs/zh/agents.md](docs/zh/agents.md)。
 
 <img src="site/assets/agents_zh.jpg" width="820" alt="智能体页面：模拟盘智能体排行榜，显示净值、收益、相对 SPY 的表现和运行状态">
+
+### 📱 在手机上用
+
+看板照常在电脑上运行，手机上就能看智能体、市场状态和今天的信号。手机通过 [Tailscale](https://tailscale.com/download)（给你自己设备用的免费私有网络）连回电脑，不向公网开放任何端口。
+
+```bash
+riskaware dashboard                  # 在电脑上运行；打开它的「手机」页，或者：
+riskaware phone on                   # 允许手机用访问码登录，并打印可以扫的二维码
+riskaware phone tailscale            # 一个只有你自己的设备能打开的 https 地址
+```
+
+电脑和手机都装上 Tailscale、登录同一个账号，扫二维码，再把页面添加到主屏幕：之后它带着自己的图标全屏打开，和 App 一样。手机用 8 位访问码登录一次，之后 180 天内保持登录；输错访问码有次数限制，换访问码会让所有手机退出，显示访问码的「手机」页只能在电脑上打开。不装 Tailscale 的话，`riskaware dashboard --host 0.0.0.0` 在同一个 Wi-Fi 里也能用。详见 [docs/zh/phone.md](docs/zh/phone.md)。
 
 ### 🔗 MCP 服务器
 
@@ -447,6 +462,7 @@ class MyDip(Strategy):
 - `riskaware halt` 一键停止所有下单，`riskaware resume` 恢复。
 - 每次运行、每个决定、每笔订单都记在本地 SQLite 交易日志里（`~/.riskaware/journal.db`），看板里可以查看。
 - API key 只放在 `.env` 里（参考 [examples/.env.example](examples/.env.example)），不会写进配置文件或日志。
+- 看板只监听 127.0.0.1，只有这台电脑能打开。手机要打开手机访问、输对访问码才进得来，每个页面、文件和 WebSocket 都经过同一道登录门（[docs/zh/phone.md](docs/zh/phone.md)）。
 
 ## 🔧 配置
 
@@ -504,7 +520,8 @@ llm:
 | `riskaware agents [init\|add\|run\|list\|show\|pause\|resume\|reset\|remove]` | 模拟盘智能体 |
 | `riskaware agents schedule --install` | 每个交易日自动运行智能体 |
 | `riskaware mcp` | 给 Claude 等 AI 助手用的 MCP 服务器 |
-| `riskaware dashboard` | 网页看板 |
+| `riskaware dashboard [--host 0.0.0.0]` | 网页看板（只允许这台电脑，或者也允许同一个 Wi-Fi） |
+| `riskaware phone [on\|off\|tailscale\|new-code\|sign-out]` | 在手机上用看板：访问码、二维码、Tailscale |
 
 ### 📁 目录结构
 
@@ -521,7 +538,8 @@ src/riskaware/      Python 包本体
   brokers/          模拟盘 + 9 家券商接口
   options/          回测用的期权定价和合约选择
   llm/              可选的多空辩论复核
-  dashboard/        Streamlit 网页看板（页面、主题、图表）
+  dashboard/        Streamlit 网页看板（页面、主题、图表）和它的 ASGI 入口
+  phone.py          手机访问：登录门、访问码、Tailscale
   arena.py          模拟盘智能体：账户、每日运行、排行榜
   scheduler.py      每日后台任务（launchd、cron、计划任务）
   mcp_server.py     给 Claude 和其他 MCP 客户端用的工具
@@ -571,6 +589,10 @@ docker/             Dockerfile 和 docker-compose.yml
 
 默认就是模拟盘。`riskaware run` 用内置的模拟账户交易，`riskaware agents` 每个交易日用模拟资金跑多个策略，Alpaca 这类券商的模拟账户也能用。实盘交易要打开三个开关才行。详见[安全机制](#-安全机制)。
 
+### 能在手机上看我的交易智能体吗？
+
+能。看板在电脑上运行，手机通过 Tailscale 打开它，在家在外都行，用访问码登录一次即可；在同一个 Wi-Fi 里不装 Tailscale 也能用。手机上默认同样是模拟盘。详见[在手机上用](#-在手机上用)。
+
 ### 支持哪些券商？
 
 内置模拟盘、Alpaca、盈透（Interactive Brokers）、Public.com、嘉信（Charles Schwab）、tastytrade、Tradier、富途/moomoo、老虎证券和长桥。详见[支持的券商](#-支持的券商)。
@@ -595,7 +617,7 @@ docker/             Dockerfile 和 docker-compose.yml
   title   = {Risk-Aware Trading Agents: AI trading agents for US stocks with point-in-time news backtesting},
   author  = {{Risk-Aware Trading Agents contributors}},
   year    = {2026},
-  version = {0.8.0},
+  version = {0.9.0},
   url     = {https://github.com/jackson-cmd/risk-aware-trading-agents}
 }
 ```

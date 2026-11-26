@@ -2,6 +2,14 @@
 
 [English](../../CHANGELOG.md)
 
+## 0.9.0（2026-11-26）
+
+- **在手机上用看板，在家在外都行**（[docs/zh/phone.md](phone.md)）。新增「手机访问」开关，默认关，在看板新增的 **手机** 页里，也可以用 `riskaware phone on`。手机通过 Tailscale 连回电脑：`tailscale serve` 在你自己的 tailnet 里发布一个 https 地址并转到 127.0.0.1，不向公网开放任何端口；一个按钮（或 `riskaware phone tailscale`）就能开启，tailnet 需要先开 HTTPS 时会给出链接。手机用 8 位访问码登录一次：手动输入，或者扫二维码，二维码链接把访问码放在 `#` 后面，不会出现在服务器日志里；之后拿到一个签名过的 HttpOnly cookie，保持 180 天，常用每周自动续期。同一台设备输错 5 次要等 10 分钟，所有设备合计输错 20 次所有登录暂停 15 分钟；换访问码或「让所有手机退出登录」会换掉签名密钥。显示访问码的 **手机** 页只能在电脑上打开。手机访问打开时，`caffeinate`（macOS）或 `systemd-inhibit`（Linux）阻止电脑因闲置而睡眠。看板可以添加到手机主屏幕，带着自己的图标全屏打开。
+- **`riskaware dashboard` 只监听 127.0.0.1。** `streamlit run` 默认监听所有网卡，所以在这之前，同一个 Wi-Fi 里谁都能打开看板、启动智能体、查看账户。`--host 0.0.0.0` 是有意对同一个 Wi-Fi 开放（手机访问打开后，那里的手机仍然要登录）；Docker 镜像在容器里照旧监听 0.0.0.0，GitHub Codespaces 照旧能用。
+- 每个页面、文件和 WebSocket 前面都有同一道登录门：看板现在以 Streamlit 的 `st.App` 运行，登录门是它的 ASGI 中间件（`riskaware/phone.py`，纯 ASGI，不加新依赖）。电脑上浏览器的请求照旧放行；经过代理或隧道的、或来自其他地址的请求都算手机。登录门也挡住了 DNS 重绑定。
+- `dashboard` 这个 extra 现在要求 Streamlit 1.59 或更新版本（不用额外安装就能运行 `st.App`），并加上画二维码的 `segno`。Streamlit 太旧时看板照常运行，但没有手机访问，并提示怎么升级。
+- `docker compose` 改用 `riskaware dashboard --host 0.0.0.0` 启动看板，不再直接调用 Streamlit。
+
 ## 0.8.0（2026-11-14）
 
 - **LLM 交易智能体榜单 rta-bench-1**（[榜单](https://jackson-cmd.github.io/risk-aware-trading-agents/zh/leaderboard.html)、[docs/zh/leaderboard.md](leaderboard.md)）。在三个冻结时段上给 LLM 交易智能体定的一套固定基准：六个任务（2026、2022、2020 年，每年盲测和实名各一次），`megacap` 的 56 只股票，每 5 个交易日收盘后决策一次，最多 10 个仓位，新闻按发布时间回放，成交成本按真实情况算。`riskaware research bench --llm ...` 用这个包能调用的任何模型跑任务；`riskaware research submit` 按基准核对一次运行并写出条目（模型的订单、数据哈希、指标、训练截止日之后的成绩、运行分析和记忆检测结果）；`riskaware research leaderboard --verify` 不调用模型就重放核对每个条目。榜单上有六个模型、67 个条目，GPT-5.6 Luna、Gemini 3.5 Flash 和 Llama 3.2 各有三个种子，旁边是五个规则策略、SPY 和等权组合。按训练截止日之后计分，Claude Haiku 4.5 以 2026 年 +7.2%（一个种子）领先；在同样的日子里，没有一个模型跑赢 SPY（+12.1%）或等权组合（+11.4%）。新模型开一个只加 JSON 文件的 PR 就能上榜。

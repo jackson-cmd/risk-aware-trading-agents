@@ -1102,6 +1102,179 @@ def page_account() -> None:
     st.dataframe(pd.DataFrame(j.recent_orders(200)), hide_index=True, width="stretch")
 
 
+def _step(state: str, title: str, body: str) -> str:
+    """One line of the phone checklist: state is ok, todo or off."""
+    color, mark = {"ok": ("up", "✓"), "todo": ("warn", "!"), "off": ("faint", "·")}[state]
+    return (f'<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)">'
+            f'<div style="flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;'
+            f'font-weight:800;font-size:.8rem;color:var(--{color});border:1px solid var(--{color})">{mark}</div>'
+            f'<div><div style="font-weight:650">{ui.esc(title)}</div>'
+            f'<div class="ra-note" style="margin-top:2px">{body}</div></div></div>')
+
+
+def page_phone() -> None:
+    from riskaware import phone
+
+    port = int(os.environ.get("RISKAWARE_DASHBOARD_PORT") or st.get_option("server.port") or 8501)
+    H(ui.section(L("Phone access", "手机访问"),
+                 L("the dashboard keeps running here; your phone opens it at home or away",
+                   "看板照常在这台电脑上运行，手机在家、在外都能打开")))
+    if not phone.GATE["active"]:
+        st.warning(L('Phone access needs Streamlit 1.59 or newer. Run `pip install -U "streamlit>=1.59"` and start '
+                     "`riskaware dashboard` again.",
+                     '手机访问需要 Streamlit 1.59 或更新版本。运行 `pip install -U "streamlit>=1.59"`，'
+                     "再重新运行 `riskaware dashboard`。"))
+        return
+    if not phone.is_local_session(st.context.headers):
+        st.info(L("This page opens only on the computer that runs the dashboard.", "这一页只能在运行看板的电脑上打开。"))
+        return
+    on = phone.enabled()
+    want = st.toggle(L("Let my phone in with an access code", "允许手机用访问码登录"), value=on,
+                     help=L("Off: only this computer opens the dashboard. On: a phone logs in once with the code below "
+                            "and stays logged in for 180 days.",
+                            "关：只有这台电脑能打开看板。开：手机用下面的访问码登录一次，之后 180 天保持登录。"))
+    if want != on:
+        phone.set_enabled(want)
+        st.rerun()
+    if not on:
+        H(ui.empty("📱", L("Phone access is off", "手机访问已关闭"),
+                   L("Only this computer can open the dashboard. Turn it on above, and your phone logs in once with "
+                     "an access code. It reaches this computer through Tailscale, a free private network for your "
+                     "own devices, so nothing is opened to the internet.",
+                     "现在只有这台电脑能打开看板。在上面打开后，手机用访问码登录一次即可。手机通过 Tailscale"
+                     "（给你自己设备用的免费私有网络）连回这台电脑，不向公网开放任何端口。")))
+        return
+
+    ts = phone.tailscale_status(port)
+    url = phone.phone_url(port, ts)
+    lan = phone.lan_url(port)
+    left, right = st.columns([1, 1.35], gap="large")
+    with left:
+        code = phone.access_code()
+        qr = phone.qr_data_uri(phone.login_link(url)) if url else ""
+        qr_html = (f'<img src="{qr}" alt="QR" style="width:100%;max-width:230px;border-radius:12px;display:block;'
+                   f'margin:14px auto 6px">' if qr else "")
+        where = (f'<div class="ra-note" style="text-align:center;word-break:break-all">{ui.esc(url)}</div>' if url else
+                 '<div class="ra-note" style="text-align:center;margin-top:12px">'
+                 + L("The QR code appears once the phone has an address (steps on the right).",
+                     "手机有了地址后（右边的步骤），这里会出现二维码。") + "</div>")
+        H(f'<div class="ra-card" style="text-align:center"><div class="ra-note" style="text-transform:uppercase;'
+          f'letter-spacing:.08em;font-weight:700">{L("Access code", "访问码")}</div>'
+          f'<div class="mono" style="font-size:2rem;font-weight:700;letter-spacing:.12em;margin-top:6px">{code}</div>'
+          f'{qr_html}{where}</div>')
+        if qr:
+            st.caption(L("Scan it with the phone's camera: the dashboard opens and logs in by itself.",
+                         "用手机相机扫码：看板会打开并自动登录。"))
+        if ts.get("funnel"):
+            st.warning(L("Tailscale Funnel is on for this address, so it opens from the internet too. The access code "
+                         "still protects it.", "这个地址开了 Tailscale Funnel，在公网上也能打开。访问码仍然保护着它。"))
+
+    with right:
+        if phone.in_container():
+            s1 = _step("todo", L("Tailscale on the computer, not in the container", "Tailscale 装在电脑上，不是容器里"),
+                       L("Install and log in to Tailscale on the computer that runs Docker, then run there: ",
+                         "在运行 Docker 的电脑上安装并登录 Tailscale，然后在电脑的终端里运行：")
+                       + f"<code>tailscale serve --bg --https=443 http://127.0.0.1:{port}</code>")
+        elif not ts["installed"]:
+            s1 = _step("todo", L("Tailscale on this computer", "这台电脑装 Tailscale"),
+                       L(f'Not installed. <a href="{phone.TS_DOWNLOAD}" target="_blank">Download it</a> and log in.',
+                         f'还没装。<a href="{phone.TS_DOWNLOAD}" target="_blank">下载</a>并登录。'))
+        elif not ts["running"]:
+            s1 = _step("todo", L("Tailscale on this computer", "这台电脑的 Tailscale"),
+                       L("Installed but not running: open Tailscale and log in, then reload this page.",
+                         "已安装但没在运行：打开 Tailscale 并登录，然后刷新这一页。"))
+        else:
+            s1 = _step("ok", L("Tailscale on this computer", "这台电脑的 Tailscale"),
+                       L("Running", "运行中") + (f" · <span class='mono'>{ui.esc(ts['dns'])}</span>" if ts["dns"] else ""))
+        if ts["serve"]:
+            s2 = _step("ok", L("An https address for the dashboard", "给看板一个 HTTPS 地址"),
+                       f"<span class='mono'>{ui.esc(ts['url'])}</span>")
+        else:
+            s2 = _step("todo" if ts["running"] else "off", L("An https address for the dashboard", "给看板一个 HTTPS 地址"),
+                       L("Press the button below. It runs ", "点下面的按钮。它会运行 ")
+                       + f"<code>{ui.esc(' '.join(phone.serve_command(port, exe='tailscale')))}</code>"
+                       + L(", which forwards an address only your own devices can open to this dashboard.",
+                           "，把一个只有你自己的设备能打开的地址转到这个看板。"))
+        s3 = _step("off", L("Tailscale on the phone", "手机装 Tailscale"),
+                   L("From the App Store or Google Play, logged in to the same account.",
+                     "从 App Store 或 Google Play 安装，登录同一个账号。"))
+        s4 = _step("off", L("Scan the QR code", "扫二维码"),
+                   L("With the phone's camera. It logs in by itself; or open the address and type the code.",
+                     "用手机相机扫，会自动登录；也可以打开地址后手动输入访问码。"))
+        s5 = _step("off", L("Add it to the home screen", "添加到主屏幕"),
+                   L("iPhone: Safari → Share → Add to Home Screen. Android: Chrome → ⋮ → Add to Home screen. It then "
+                     "opens full screen, like an app.",
+                     "iPhone：Safari → 分享 → 添加到主屏幕；Android：Chrome → ⋮ → 添加到主屏幕。之后它像 App 一样全屏打开。"))
+        H(f'<div class="ra-card" style="padding:6px 18px">{s1}{s2}{s3}{s4}{s5}</div>')
+        if ts["running"] and not ts["serve"]:
+            if st.button(L("Turn on the https address", "开启 HTTPS 地址"), type="primary", icon=":material/lock:"):
+                with st.spinner(L("Asking Tailscale…", "正在设置 Tailscale…")):
+                    res = phone.tailscale_serve(port, True)
+                if res.get("ok"):
+                    st.rerun()
+                elif res.get("error") == "enable_https":
+                    st.warning(L(f"Tailscale needs HTTPS turned on for your tailnet first: open [this link]({res['link']}), "
+                                 "press Enable, then press the button again.",
+                                 f"Tailscale 需要先给你的 tailnet 开 HTTPS：打开[这个链接]({res['link']})，点 Enable，"
+                                 "再回来点一次按钮。"))
+                elif res.get("error") == "busy":
+                    st.error(L(f"Port 443 of this computer already forwards to {res.get('busy')}.",
+                               f"这台电脑的 443 端口已经转发到 {res.get('busy')}。"))
+                else:
+                    st.error(res.get("output") or res.get("error") or "tailscale serve failed")
+        elif ts["serve"]:
+            if st.button(L("Turn off the https address", "关闭 HTTPS 地址"), icon=":material/link_off:"):
+                phone.tailscale_serve(port, False)
+                st.rerun()
+        if lan:
+            st.caption(L(f"Same Wi-Fi without Tailscale: {lan} (plain http; anyone on the Wi-Fi can see the traffic).",
+                         f"同一个 Wi-Fi、不用 Tailscale：{lan}（走 http，同一 Wi-Fi 里的人能看到流量）。"))
+        else:
+            st.caption(L("Only on the same Wi-Fi, without Tailscale: start it with `riskaware dashboard --host 0.0.0.0`.",
+                         "只在同一个 Wi-Fi 用、不装 Tailscale：用 `riskaware dashboard --host 0.0.0.0` 启动。"))
+
+    H(ui.section(L("Keep it safe", "安全"), L("the code, the phones that logged in, and this computer",
+                                             "访问码、登录过的手机和这台电脑")))
+    b1, b2, b3 = st.columns(3, vertical_alignment="center")
+    with b1:
+        if st.button(L("New access code", "换一个访问码"), icon=":material/autorenew:", width="stretch",
+                     help=L("A new code; every phone has to log in again.", "换一个访问码；所有手机都要重新登录。")):
+            phone.new_access_code()
+            st.rerun()
+    with b2:
+        if st.button(L("Sign out every phone", "让所有手机退出登录"), icon=":material/logout:", width="stretch",
+                     help=L("The code stays the same.", "访问码不变。")):
+            phone.sign_out_all()
+            st.toast(L("Every phone is logged out.", "所有手机都已退出登录。"))
+    with b3:
+        if phone.keep_awake_supported():
+            awake = st.toggle(L("Keep this computer awake", "电脑不睡眠"), value=phone.keep_awake_wanted(),
+                              help=L("While phone access is on and the dashboard runs, the computer does not go to "
+                                     "sleep when idle. Closing a laptop's lid still puts it to sleep.",
+                                     "手机访问打开、看板运行时，电脑不会因闲置而睡眠。合上笔记本盖子仍会睡眠。"))
+            if awake != phone.keep_awake_wanted():
+                phone.set_keep_awake(awake)
+                st.rerun()
+    H('<div class="ra-note" style="margin-top:14px">' + L(
+        "A phone logs in once and stays logged in for 180 days, renewed while you use it. Five wrong codes from one "
+        "device make it wait 10 minutes; twenty from anywhere pause every login for 15 minutes. This page opens only "
+        "on this computer. The same controls are in the terminal: <code>riskaware phone</code>.",
+        "手机登录一次后 180 天内保持登录，常用会自动续期。同一台设备输错 5 次要等 10 分钟；所有设备合计输错 20 次，"
+        "所有登录暂停 15 分钟。这一页只能在这台电脑上打开。终端里也有同样的控制：<code>riskaware phone</code>。") + "</div>")
+
+
+def _phone_enabled() -> bool:
+    from riskaware import phone
+
+    return phone.enabled()
+
+
+def phone_page_shown() -> bool:
+    from riskaware import phone
+
+    return not phone.GATE["active"] or phone.is_local_session(st.context.headers)
+
+
 # ------------------------------------------------------------------------------------------ layout
 pages = [
     st.Page(page_market, title=L("Market", "市场"), icon=":material/monitoring:", default=True),
@@ -1111,6 +1284,9 @@ pages = [
     st.Page(page_news, title=L("News", "新闻"), icon=":material/newspaper:", url_path="news"),
     st.Page(page_account, title=L("Account", "账户"), icon=":material/account_balance_wallet:", url_path="account"),
 ]
+ON_PHONE = not phone_page_shown()
+if not ON_PHONE:
+    pages.append(st.Page(page_phone, title=L("Phone", "手机"), icon=":material/smartphone:", url_path="phone"))
 nav = st.navigation(pages, position="top")
 PAGE_BY_PATH = {p.url_path: p for p in pages}
 
@@ -1127,4 +1303,7 @@ with top_r:
 jobs_banner(nav.url_path)
 nav.run()
 H(f'<div class="ra-note" style="margin-top:40px;text-align:center">{ui.esc(T("disclaimer"))} · '
-        f'<a href="https://github.com/jackson-cmd/risk-aware-trading-agents" target="_blank">GitHub</a></div>')
+        f'<a href="https://github.com/jackson-cmd/risk-aware-trading-agents" target="_blank">GitHub</a>'
+        + (f' · <a href="/logout" target="_self">{L("Log out of this phone", "这台手机退出登录")}</a>'
+           if ON_PHONE and _phone_enabled() else "")
+        + '</div>')

@@ -764,23 +764,163 @@ def resume() -> None:
     console.print(f"[green]{T('halt.off')}[/]")
 
 
+def _has_st_app() -> bool:
+    """Streamlit 1.59 and later serve an st.App, which the phone-access gate needs, with no extra install."""
+    try:
+        return importlib.util.find_spec("streamlit.starlette") is not None \
+            and importlib.util.find_spec("starlette") is not None and importlib.util.find_spec("uvicorn") is not None
+    except (ImportError, ValueError):
+        return False
+
+
 @app.command()
-def dashboard(port: int = typer.Option(8501)) -> None:
+def dashboard(
+    port: int = typer.Option(8501),
+    host: Optional[str] = typer.Option(
+        None, "--host", help="Listen address. 127.0.0.1 (the default) lets only this computer in; 0.0.0.0 also the "
+                             "same Wi-Fi. Phones elsewhere: see `riskaware phone`. / 监听地址"),
+) -> None:
     """Open the web dashboard (needs the [dashboard] extra). / 打开网页看板"""
     if importlib.util.find_spec("streamlit") is None:
         console.print('Install it first: pip install "risk-aware-trading-agents[dashboard]"', markup=False)
         raise typer.Exit(1)
     import subprocess
 
-    app_path = Path(__file__).parent / "dashboard" / "app.py"
+    from . import phone
+
+    host = host or phone.default_host()
+    gated = _has_st_app()
+    script = Path(__file__).parent / "dashboard" / ("riskaware_asgi.py" if gated else "app.py")
+    if not gated:
+        console.print(_L("Phone access needs Streamlit 1.59 or newer: pip install -U \"streamlit>=1.59\"",
+                         "手机访问需要 Streamlit 1.59 或更新版本：pip install -U \"streamlit>=1.59\""),
+                      style="yellow", markup=False)
     env = dict(os.environ)
     if S.config_path:
         env["RISKAWARE_CONFIG"] = str(Path(S.config_path).resolve())
     env["RISKAWARE_LANG"] = S.lang
+    env["RISKAWARE_DASHBOARD_HOST"], env["RISKAWARE_DASHBOARD_PORT"] = host, str(port)
     from .dashboard.ui import THEME_FLAGS
 
-    subprocess.run([sys.executable, "-m", "streamlit", "run", str(app_path), "--server.port", str(port),
-                    "--browser.gatherUsageStats", "false", *THEME_FLAGS], env=env, check=False)
+    subprocess.run([sys.executable, "-m", "streamlit", "run", str(script), "--server.port", str(port),
+                    "--server.address", host, "--browser.gatherUsageStats", "false", *THEME_FLAGS],
+                   env=env, check=False)
+
+
+def _L(en: str, zh: str) -> str:
+    return zh if S.lang == "zh" else en
+
+
+phone_app = typer.Typer(help="Open the dashboard on your phone, at home or away / 在手机上用看板",
+                        invoke_without_command=True)
+app.add_typer(phone_app, name="phone")
+
+
+def _phone_status(port: int, show_qr: bool = True) -> None:
+    from . import phone
+
+    on = phone.enabled()
+    ts = phone.tailscale_status(port)
+    console.print(f"[bold]{_L('Phone access', '手机访问')}[/]  "
+                  + ("[green]on · 开[/]" if on else "[dim]off · 关[/]"))
+    if not on:
+        console.print(_L("Turn it on with `riskaware phone on`, or on the dashboard's Phone page.",
+                         "用 `riskaware phone on` 打开，或在看板的「手机」页打开。"), markup=False)
+        return
+    console.print(f"{_L('Access code', '访问码')}  [bold cyan]{phone.access_code()}[/]")
+    if not ts["installed"]:
+        console.print(_L(f"Tailscale is not installed: {phone.TS_DOWNLOAD} (or use the same Wi-Fi: "
+                         "riskaware dashboard --host 0.0.0.0)",
+                         f"没装 Tailscale：{phone.TS_DOWNLOAD}（或只在同一个 Wi-Fi 用：riskaware dashboard --host 0.0.0.0）"),
+                      markup=False)
+    elif not ts["running"]:
+        console.print(_L("Tailscale is installed but not running: open it and log in.",
+                         "Tailscale 已安装但没在运行：打开它并登录。"), markup=False)
+    elif not ts["serve"]:
+        console.print(_L(f"Give the dashboard an https address: riskaware phone tailscale --port {port}",
+                         f"给看板一个 https 地址：riskaware phone tailscale --port {port}"), markup=False)
+    url = phone.phone_url(port, ts)
+    if url:
+        console.print(f"{_L('On the phone', '手机上打开')}  {url}", markup=False, highlight=False)
+        if ts.get("funnel"):
+            console.print(_L("Tailscale Funnel is on: this address is open to the internet; the access code still "
+                             "protects it.", "Tailscale Funnel 已开：这个地址在公网上也能打开，访问码仍然保护着它。"),
+                          style="yellow", markup=False)
+        if show_qr:
+            console.print(_L("Scan it with the phone's camera (Tailscale on, same account):",
+                             "用手机相机扫码（手机上开着 Tailscale，同一个账号）："), markup=False)
+            if not phone.qr_terminal(phone.login_link(url)):
+                console.print(phone.login_link(url), markup=False, highlight=False)
+
+
+@phone_app.callback()
+def phone_main(ctx: typer.Context, port: int = typer.Option(8501, help="The dashboard's port")) -> None:
+    """Phone access: status, code and the QR code to scan. / 手机访问：状态、访问码和二维码"""
+    if ctx.invoked_subcommand is None:
+        _phone_status(port)
+
+
+@phone_app.command("on")
+def phone_on(port: int = typer.Option(8501, help="The dashboard's port")) -> None:
+    """Let your phone in with the access code. / 打开手机访问"""
+    from . import phone
+
+    phone.set_enabled(True)
+    _phone_status(port)
+
+
+@phone_app.command("off")
+def phone_off() -> None:
+    """Only this computer opens the dashboard again. / 关闭手机访问"""
+    from . import phone
+
+    phone.set_enabled(False)
+    console.print(_L("Phone access is off. Phones that logged in stay logged in for when you turn it on again; "
+                     "`riskaware phone sign-out` logs them out.",
+                     "手机访问已关闭。登录过的手机在你再次打开时仍保持登录；`riskaware phone sign-out` 让它们退出。"),
+                  markup=False)
+
+
+@phone_app.command("new-code")
+def phone_new_code() -> None:
+    """A new access code; every phone logs in again. / 换一个访问码（所有手机重新登录）"""
+    from . import phone
+
+    console.print(f"{_L('New access code', '新访问码')}  [bold cyan]{phone.new_access_code()}[/]")
+
+
+@phone_app.command("sign-out")
+def phone_sign_out() -> None:
+    """Log every phone out; the code stays. / 让所有手机退出登录"""
+    from . import phone
+
+    phone.sign_out_all()
+    console.print(_L("Every phone is logged out.", "所有手机都已退出登录。"), markup=False)
+
+
+@phone_app.command("tailscale")
+def phone_tailscale(port: int = typer.Option(8501, help="The dashboard's port"),
+                    off: bool = typer.Option(False, "--off", help="Stop forwarding")) -> None:
+    """Give the dashboard an https address in your tailnet (tailscale serve). / 用 Tailscale 给看板一个 https 地址"""
+    from . import phone
+
+    res = phone.tailscale_serve(port, not off)
+    if res.get("ok"):
+        if off:
+            console.print(_L("Stopped forwarding.", "已停止转发。"), markup=False)
+        else:
+            _phone_status(port)
+        return
+    err = res.get("error")
+    msg = {"not_installed": _L(f"Install Tailscale first: {phone.TS_DOWNLOAD}", f"先装 Tailscale：{phone.TS_DOWNLOAD}"),
+           "not_running": _L("Open Tailscale and log in first.", "先打开 Tailscale 并登录。"),
+           "busy": _L(f"Port 443 of this computer already forwards to {res.get('busy')}.",
+                      f"这台电脑的 443 端口已经转发到 {res.get('busy')}。"),
+           "enable_https": _L(f"Turn on HTTPS for your tailnet first: {res.get('link')} , then run this again.",
+                              f"先给你的 tailnet 开 HTTPS：{res.get('link')} ，然后再运行一次。")}.get(
+        err, (res.get("output") or "tailscale serve failed")[-400:])
+    console.print(msg, style="red", markup=False)
+    raise typer.Exit(1)
 
 
 @app.command()
