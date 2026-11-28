@@ -2,9 +2,13 @@
 
 [English](../../CHANGELOG.md)
 
+## 0.10.1（2026-11-28）
+
+- **公开数据集 Open Market News 已删除。** `riskaware news-history pull` 现在只导入你自己收集的目录（`--from`，默认 `open-news`，和 `collect --out` 的默认值一样），不再从 GitHub 下载；去掉了 `--repo`。`collect` 不变。
+
 ## 0.10.0（2026-11-26）
 
-- **可以分享的公开新闻，每小时收集**（[docs/zh/news-history.md](news-history.md#公开新闻可以分享每小时收集)）。`riskaware news-history collect` 只读条款允许任何人保存和转载的来源：SEC 新闻稿、执法公告和停牌令；EDGAR 最新公告 feed 里的所有 8-K（公司、按 SEC 列表对上的股票代码、事项编号、受理时间）；美联储、FDA、BEA、BLS 和 CFTC 的发布；以及 GDELT 每 15 分钟一批的数据里，约 50 个商业和财经网站上提到内置股票池里的股票或整个大盘的标题，附 GDELT 的情绪分。每条记下 `published`（来源给的时间）和 `seen`（第一次收到的时间），每个来源每个 UTC 日一个 JSON Lines 文件；一个来源出错不影响其他来源；GDELT 可以用 `--gdelt-from/--gdelt-to` 回补到 2015 年。[Open Market News](https://github.com/jackson-cmd/open-market-news) 就是这个目录在 GitHub 上的版本，GitHub Actions 每小时更新，收 SEC 新闻稿、美联储、FDA、BEA、CFTC 和 GDELT；SEC（新闻稿以外）和 BLS 拒绝来自 GitHub runner 的请求，这些请在你自己的网络下收集。
+- **可以分享的公开新闻，每小时收集**（[docs/zh/news-history.md](news-history.md#可以分享的公开新闻)）。`riskaware news-history collect` 只读条款允许任何人保存和转载的来源：SEC 新闻稿、执法公告和停牌令；EDGAR 最新公告 feed 里的所有 8-K（公司、按 SEC 列表对上的股票代码、事项编号、受理时间）；美联储、FDA、BEA、BLS 和 CFTC 的发布；以及 GDELT 每 15 分钟一批的数据里，约 50 个商业和财经网站上提到内置股票池里的股票或整个大盘的标题，附 GDELT 的情绪分。每条记下 `published`（来源给的时间）和 `seen`（第一次收到的时间），每个来源每个 UTC 日一个 JSON Lines 文件；一个来源出错不影响其他来源；GDELT 可以用 `--gdelt-from/--gdelt-to` 回补到 2015 年。Open Market News 曾是这个目录在 GitHub 上的版本（0.10.1 已删除），GitHub Actions 每小时更新，收 SEC 新闻稿、美联储、FDA、BEA、CFTC 和 GDELT；SEC（新闻稿以外）和 BLS 拒绝来自 GitHub runner 的请求，这些请在你自己的网络下收集。
 - **`riskaware news-history pull`** 把数据集（从 GitHub 流式下载，或者用本地克隆）导入你的新闻库，按 `seen` 记时间，所以不会在能读到之前出现。你收集的 8-K 会变成和 `build --source sec` 一样的 `sec` 条目；其他条目保留发布方，所以 Reuters 和 CNBC 都报道的新闻算两家。
 - 股票按公司名或规范写法的代码（`$AAPL`、`(AAPL)`、`NYSE: GE`、`RTX stock`）标注，所以显卡「RTX 5060」不会被当成雷神（Raytheon）。
 - WSJ、Yahoo、Reuters 和新闻稿通讯社不允许转载，所以不收；指南里列出了每个来源的条款。

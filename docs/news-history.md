@@ -7,8 +7,9 @@ Live trading reads news as it is published. A backtest has to replay what was kn
 ## Quick start
 
 ```bash
-# open news anyone may share: SEC, Fed, FDA, BEA, CFTC releases and GDELT finance headlines, hourly
-riskaware news-history pull --start 2026-11-01
+# open news anyone may share: SEC, Fed, FDA, BEA, BLS, CFTC releases, 8-Ks and GDELT finance headlines
+riskaware news-history collect --out open-news --contact-email you@example.com
+riskaware news-history pull --start 2026-11-01 --from open-news
 
 # SEC 8-K filings for the core universe since 2018 (free; SEC asks for a contact email)
 riskaware news-history build --preset core --start 2018-01-01 --contact-email you@example.com
@@ -70,28 +71,28 @@ From the command line, `riskaware news-history show SYMBOL --date DAY` prints th
 
 ## Sources
 
-### Open news (shareable, collected hourly)
+### Open news you may share
 
-[Open Market News](https://github.com/jackson-cmd/open-market-news) is a public dataset that a GitHub Actions job updates every hour with `riskaware news-history collect`. It keeps only sources whose terms allow anyone to keep and republish them:
+`riskaware news-history collect` reads only sources whose terms allow anyone to keep and republish them, and writes what is new to one JSON Lines file per source and UTC day; `pull` brings that folder into your archive:
 
 | Source | What | Terms |
 |---|---|---|
 | `sec-press` | SEC press releases | sec.gov information "may be copied or further distributed ... without the SEC's permission" ([SEC](https://www.sec.gov/privacy)) |
 | `fed`, `fda`, `bea`, `cftc` | Federal Reserve and FDA press releases, BEA data releases (GDP, PCE, trade...), CFTC releases | US government works, public domain; each agency asks to be credited |
-| `sec-enforcement`, `sec-8k`, `bls` | SEC litigation releases, administrative proceedings and trading suspensions; every 8-K with its ticker and items; BLS releases (jobs, CPI, PPI, JOLTS...) | as above; **not in the hourly dataset**: SEC and BLS refuse requests from shared cloud addresses such as GitHub's runners, so run `collect` for these from your own connection |
+| `sec-enforcement`, `sec-8k`, `bls` | SEC litigation releases, administrative proceedings and trading suspensions; every 8-K with its ticker and items; BLS releases (jobs, CPI, PPI, JOLTS...) | as above; SEC and BLS refuse requests from shared cloud addresses such as GitHub's runners, so run `collect` for these from your own connection |
 | `gdelt` | Headlines on about 50 business and finance sites that name a stock in the built-in lists or the market as a whole, with GDELT's tone | GDELT allows redistribution with a citation and a link ([GDELT](https://www.gdeltproject.org/about.html)) |
 
 ```bash
-riskaware news-history pull --start 2026-11-01                  # from GitHub; rows that name a stock join your archive
-riskaware news-history pull --start 2026-11-01 --from ./open-market-news --sources sec-8k,gdelt   # a local clone
-riskaware news-history collect --out my-news --contact-email you@example.com                     # run it yourself
-riskaware news-history collect --out my-news --gdelt-from 2022-01-03 --gdelt-to 2022-01-07        # backfill GDELT
+riskaware news-history collect --out my-news --contact-email you@example.com                # what is new; run it every hour or so
+riskaware news-history collect --out my-news --gdelt-from 2022-01-03 --gdelt-to 2022-01-07   # backfill GDELT
+riskaware news-history pull --start 2026-11-01 --from my-news                                # rows that name a stock join your archive
+riskaware news-history pull --start 2026-11-01 --from my-news --sources sec-8k,gdelt         # only some sources
 ```
 
-- Every row has `published` (the time the source gives) and `seen` (when it was first collected; for GDELT, the 15-minute batch that listed it). `pull` dates items by `seen`, so an item is never visible before it could have been read; an hourly job makes agency items up to about an hour late, which is safe.
+- Every row has `published` (the time the source gives) and `seen` (when it was first collected; for GDELT, the 15-minute batch that listed it). `pull` dates items by `seen`, so an item is never visible before it could have been read; collecting every hour makes agency items up to about an hour late, which is safe.
 - 8-Ks you collect become the same `sec` items as `build --source sec`. Other rows keep their publisher (for GDELT, the site, such as `reuters.com`), so a story that Reuters and CNBC both carry counts as two publishers.
-- Stocks are tagged by company name or by a ticker written as one (`$AAPL`, `(AAPL)`, `NYSE: GE`, `RTX stock`), so a product called "RTX 5060" is not Raytheon. Rows about the market as a whole stay in the dataset with `"market": true` and no symbol; `pull` imports only rows that name a stock.
-- The record starts on 2026-11-26. Agency feeds keep only their latest items, so they cannot be backfilled; GDELT can, from February 2015, at about 10 MB per 15-minute batch.
+- Stocks are tagged by company name or by a ticker written as one (`$AAPL`, `(AAPL)`, `NYSE: GE`, `RTX stock`), so a product called "RTX 5060" is not Raytheon. Rows about the market as a whole stay in the folder with `"market": true` and no symbol; `pull` imports only rows that name a stock.
+- Agency feeds keep only their latest items, so they cannot be backfilled: the record starts the day you first collect. GDELT can be backfilled from February 2015, at about 10 MB per 15-minute batch.
 - WSJ, Yahoo, Reuters and the newswires do not allow republication, so they are not collected. For your own use, `import` a CSV of anything you have the right to use.
 
 ### SEC EDGAR 8-K filings
