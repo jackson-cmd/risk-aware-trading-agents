@@ -1,8 +1,7 @@
 """Open news: sources whose terms let anyone keep and republish what they publish, collected point in time.
 
 ``riskaware news-history collect`` reads them and appends every new item to one JSON Lines file per source and day;
-the public dataset (`open-market-news`, updated hourly by GitHub Actions) is that folder. ``riskaware news-history
-pull`` reads the dataset back into the local archive for backtests.
+``riskaware news-history pull`` reads that folder back into the local archive for backtests.
 
 Sources and why they may be republished
 ---------------------------------------
@@ -14,8 +13,7 @@ Sources and why they may be republished
   business and finance sites that name a stock in RiskAware's lists or the market as a whole.
 
 SEC (other than its press releases) and BLS refuse requests from shared cloud addresses such as GitHub's runners,
-whatever the User-Agent, so the hourly public dataset leaves out ``sec-enforcement``, ``sec-8k`` and ``bls``; they work
-from an ordinary connection.
+whatever the User-Agent; ``sec-enforcement``, ``sec-8k`` and ``bls`` work from an ordinary connection.
 
 Every row has ``published`` (the time the source gives) and ``seen`` (when it was first collected; for GDELT, the time
 of the 15-minute batch that listed it). Backtests use ``seen``, the later of the two, so a row never shows up before it
@@ -47,9 +45,6 @@ from .relevance import ALIASES, mentions
 
 log = logging.getLogger(__name__)
 
-DATASET_REPO = "jackson-cmd/open-market-news"
-#: What the hourly public dataset collects (see the note on cloud addresses above).
-DATASET_SOURCES = ("sec-press", "fed", "fda", "bea", "cftc", "gdelt")
 KEEP_DAYS = 45            # an RSS item older than this is not collected (it was collected before, or is stale)
 SUMMARY_CHARS = 400
 GDELT_LAST = "http://data.gdeltproject.org/gdeltv2/lastupdate.txt"
@@ -542,37 +537,3 @@ def to_items(rows: Iterable[dict]) -> list[NewsItem]:
                                     publisher=r.get("publisher") or src, feed=f"open:{src}", published=seen,
                                     symbol=sym, summary=r.get("summary", "")))
     return out
-
-
-def download_dataset(dest: str | Path, start: date, end: date, repo: str = DATASET_REPO, branch: str = "main",
-                     sources: Iterable[str] | None = None, timeout: float = 120) -> Path:
-    """The dataset's files for ``start``..``end`` from GitHub, streamed from one archive into ``dest``."""
-    import tarfile
-
-    import requests
-
-    want = set(sources or [])
-    url = f"https://codeload.github.com/{repo}/tar.gz/refs/heads/{branch}"
-    dest = Path(dest)
-    with requests.get(url, timeout=timeout, stream=True) as r:
-        r.raise_for_status()
-        r.raw.decode_content = True
-        with tarfile.open(fileobj=r.raw, mode="r|gz") as tar:
-            for m in tar:
-                parts = Path(m.name).parts
-                # <repo>-<branch>/data/<source>/<YYYY>/<YYYY-MM-DD>.jsonl
-                if not m.isfile() or len(parts) != 5 or parts[1] != "data" or ".." in parts:
-                    continue
-                src, name = parts[2], parts[4]
-                try:
-                    day = date.fromisoformat(name.removesuffix(".jsonl"))
-                except ValueError:
-                    continue
-                if (want and src not in want) or not (start <= day <= end):
-                    continue
-                target = dest / Path(*parts[1:])
-                target.parent.mkdir(parents=True, exist_ok=True)
-                fh = tar.extractfile(m)
-                if fh is not None:
-                    target.write_bytes(fh.read())
-    return dest

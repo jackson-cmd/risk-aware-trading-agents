@@ -1,11 +1,10 @@
 """Open news: parsing each source, tagging stocks, the day files and their de-duplication, one failing source not
-stopping the others, GDELT's cursor, and reading the dataset back into the archive point in time. Offline."""
+stopping the others, GDELT's cursor, and reading a collected folder back into the archive point in time. Offline."""
 
 from __future__ import annotations
 
 import io
 import json
-import tarfile
 import zipfile
 from datetime import date, datetime, timedelta, timezone
 
@@ -215,33 +214,26 @@ def test_to_items_dates_rows_when_first_seen(tmp_path):
     assert archive.add(items) == 2 and archive.add(items) == 0
 
 
-def test_download_dataset_streams_only_the_wanted_files(tmp_path, monkeypatch):
-    buf = io.BytesIO()
-    with tarfile.open(fileobj=buf, mode="w:gz") as tar:
-        for name, body in [("open-market-news-main/data/fda/2026/2026-11-26.jsonl", b'{"id":"1"}\n'),
-                           ("open-market-news-main/data/fda/2026/2026-10-01.jsonl", b'{"id":"2"}\n'),
-                           ("open-market-news-main/data/gdelt/2026/2026-11-26.jsonl", b'{"id":"3"}\n'),
-                           ("open-market-news-main/README.md", b"hi")]:
-            info = tarfile.TarInfo(name)
-            info.size = len(body)
-            tar.addfile(info, io.BytesIO(body))
-    buf.seek(0)
+def test_pull_imports_a_collected_folder(tmp_path, monkeypatch):
+    from typer.testing import CliRunner
 
-    class Resp:
-        raw = buf
+    from riskaware import cli
 
-        def raise_for_status(self):
-            pass
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *a):
-            return False
-    monkeypatch.setattr(requests, "get", lambda *a, **k: Resp())
-    out = of.download_dataset(tmp_path, date(2026, 11, 1), date(2026, 11, 30), sources=["fda"])
-    files = sorted(p.relative_to(tmp_path).as_posix() for p in out.rglob("*.jsonl"))
-    assert files == ["data/fda/2026/2026-11-26.jsonl"]
+    folder = tmp_path / "open-news"
+    path = of.Store(folder).path("fda", date(2026, 11, 26))
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"id": "fda:1", "source": "fda", "publisher": "U.S. Food and Drug Administration",
+                                "title": "FDA approves Lilly drug", "url": "u1", "seen": "2026-11-26T18:17:00Z",
+                                "symbols": ["LLY"]}) + "\n", encoding="utf-8")
+    archive = NewsArchive(tmp_path / "archive", bundled=False)
+    monkeypatch.setattr(cli, "_archive", lambda: archive)
+    res = CliRunner().invoke(cli.app, ["news-history", "pull", "--start", "2026-11-01", "--end", "2026-11-30",
+                                       "--from", str(folder)])
+    assert res.exit_code == 0, res.output
+    assert [i.symbol for i in archive.items("LLY")] == ["LLY"]
+    missing = CliRunner().invoke(cli.app, ["news-history", "pull", "--start", "2026-11-01",
+                                           "--from", str(tmp_path / "nowhere")])
+    assert missing.exit_code == 2 and "collect" in missing.output
 
 
 def test_every_feed_says_where_it_may_be_republished():
